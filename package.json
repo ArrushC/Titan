@@ -1,0 +1,94 @@
+{
+	"name": "titan",
+	"private": true,
+	"proxy": "http://localhost:5173",
+	"version": "0.0.9",
+	"type": "module",
+	"main": "main.js",
+	"description": "A desktop application for managing your workflow in VCS and RCS environments.",
+	"author": "ArrushC",
+	"scripts": {
+		"start": "npm run server:start",
+		"client:dev": "vite",
+		"client:build": "vite build",
+		"client:build:watch": "vite build --watch",
+		"client:lint": "eslint . --ext js,jsx --report-unused-disable-directives --max-warnings 0",
+		"client:preview": "vite preview",
+		"server:start": "node server/server.js",
+		"server:dev": "nodemon server/server.js",
+		"electron:start": "electron .",
+		"electron:dev": "concurrently \"npm run client:build:watch\" \"nodemon --watch main.js --watch server --exec electron .\"",
+		"electron:build:win": "electron-builder --win",
+		"electron:build:mac": "electron-builder --mac",
+		"electron:build:linux": "electron-builder --linux",
+		"build:win": "vite build && electron-builder --win",
+		"build:mac": "vite build && electron-builder --mac",
+		"build:linux": "vite build && electron-builder --linux"
+	},
+	"dependencies": {
+		"@chakra-ui/icons": "^2.1.1",
+		"@chakra-ui/react": "^2.8.2",
+		"@emotion/react": "^11.11.4",
+		"@emotion/styled": "^11.11.5",
+		"ag-grid-react": "^31.3.2",
+		"async": "^3.2.5",
+		"axios": "^1.7.2",
+		"compression": "^1.7.4",
+		"express": "^4.19.2",
+		"framer-motion": "^11.2.7",
+		"lodash": "^4.17.21",
+		"node-svn-ultimate": "^1.2.1",
+		"nodemon": "^3.1.2",
+		"react": "^18.2.0",
+		"react-dom": "^18.2.0",
+		"react-icons": "^5.2.1",
+		"react-transition-group": "^4.4.5",
+		"socket.io": "^4.7.5",
+		"socket.io-client": "^4.7.5",
+		"winston": "^3.13.0"
+	},
+	"devDependencies": {
+		"@types/lodash": "^4.17.5",
+		"@types/react": "^18.2.66",
+		"@types/react-dom": "^18.2.22",
+		"@types/socket.io": "^3.0.2",
+		"@types/socket.io-client": "^3.0.0",
+		"@vitejs/plugin-react-swc": "^3.5.0",
+		"concurrently": "^8.2.2",
+		"electron": "^31.1.0",
+		"electron-builder": "^24.13.3",
+		"eslint": "^8.57.0",
+		"eslint-plugin-react": "^7.34.1",
+		"eslint-plugin-react-hooks": "^4.6.0",
+		"eslint-plugin-react-refresh": "^0.4.6",
+		"vite": "^5.2.0"
+	},
+	"build": {
+		"appId": "com.titan",
+		"productName": "Titan",
+		"files": [
+			"dist/**/*",
+			"icons/**/*",
+			"server/**/*",
+			"main.js",
+			"preload.js",
+			"splash.html",
+			"shutdown.html"
+		],
+		"directories": {
+			"output": "release"
+		},
+		"win": {
+			"target": "portable",
+			"icon": "icons/Titan.ico"
+		},
+		"mac": {
+			"target": "dir",
+			"icon": "icons/Titan.icns"
+		},
+		"linux": {
+			"target": "AppImage",
+			"icon": "icons/Titan.png"
+		}
+	}
+}

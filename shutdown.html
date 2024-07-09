@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html>
+
+	<head>
+		<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@600&display=swap" rel="stylesheet">
+		<style>
+			* {
+				overflow: hidden;
+			}
+			
+			body {
+				font-family: 'Montserrat', sans-serif;
+				margin: 0;
+				padding: 0;
+				background: transparent;
+			}
+
+			main {
+				text-align: center;
+				width: 100%;
+				justify-content: center;
+				align-items: center;
+				height: 100vh;
+				display: flex;
+				flex-direction: column;
+				border-radius: 20px;
+				background-color: #000000;
+				color: #ffd700;
+				box-shadow: 0 0 20px rgba(0, 0, 0, 0.3);
+			}
+
+			.logo-container {
+				width: 200px;
+				height: 200px;
+				margin: 0 auto 20px;
+				position: relative;
+				overflow: hidden;
+				border-radius: 50%;
+			}
+
+			.logo {
+				width: 100%;
+				height: 100%;
+				object-fit: cover;
+				animation: fadeOut 1s infinite alternate;
+			}
+
+			@keyframes fadeOut {
+				0% {
+					opacity: 1;
+				}
+
+				100% {
+					opacity: 0.5;
+				}
+			}
+
+			.shutdown-text {
+				font-size: 24px;
+				font-weight: 600;
+				letter-spacing: 2px;
+				margin-bottom: 10px;
+			}
+
+			.shutdown-subtext {
+				font-size: 16px;
+				opacity: 0.8;
+				margin-bottom: 20px;
+			}
+
+			.spinner {
+				width: 40px;
+				height: 40px;
+				border: 4px solid rgba(255, 215, 0, 0.3);
+				border-top: 4px solid #ffd700;
+				border-radius: 50%;
+				animation: spin 1s linear infinite;
+			}
+
+			@keyframes spin {
+				0% {
+					transform: rotate(0deg);
+				}
+
+				100% {
+					transform: rotate(360deg);
+				}
+			}
+		</style>
+	</head>
+
+	<body>
+		<main>
+			<div class="logo-container">
+				<img src="./icons/Titan.png" alt="Titan Logo" class="logo">
+			</div>
+			<p class="shutdown-text">Shutting down...</p>
+			<p class="shutdown-subtext">Please wait while Titan closes all processes.</p>
+			<div class="spinner"></div>
+		</main>
+	</body>
+</html>

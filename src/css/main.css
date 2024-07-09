@@ -1,0 +1,24 @@
+.branch-table-header-cell {
+	padding-left: 5px !important;
+	padding-right: 5px !important;
+}
+
+.branch-table-body-cell {
+	padding-left: 5px !important;
+	padding-right: 5px !important;
+}
+
+.fade-enter {
+	opacity: 0;
+}
+.fade-enter-active {
+	opacity: 1;
+	transition: opacity 600ms;
+}
+.fade-exit {
+	opacity: 1;
+}
+.fade-exit-active {
+	opacity: 0;
+	transition: opacity 600ms;
+}

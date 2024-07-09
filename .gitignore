@@ -1,0 +1,33 @@
+# Logs
+logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
+
+node_modules
+*.local
+
+# Release directory
+release/win-unpacked
+release/*.yml
+release/*.yaml
+release/*.7z
+release/*.exe
+release/*.dmg
+release/*.AppImage
+
+tests
+
+# Editor directories and files
+.vscode/*
+!.vscode/extensions.json
+.idea
+.DS_Store
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?

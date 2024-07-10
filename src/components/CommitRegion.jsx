@@ -287,11 +287,23 @@ export default function CommitRegion({ isCommitMode, setIsCommitMode, branchStat
 			<CSSTransition in={showFilesView} timeout={600} classNames="fade" unmountOnExit>
 				<Box>
 					<Box mb={6}>
-						<Tabs isLazy variant={"soft-rounded"} colorScheme="yellow">
+						<Tabs variant={"solid-rounded"} colorScheme="yellow" defaultIndex={Object.keys(fileUpdates).length >= 1 ? 0 : fileViewRowData.length >= 1 ? 1 : 2}>
 							<TabList>
-								<Tab>Files to Update</Tab>
-								<Tab>File View Table</Tab>
-								<Tab>Unversioned/Missing Files</Tab>
+								<Tab isDisabled={Object.keys(fileUpdates).length < 1}>
+									<Tooltip label={"No files to update!"} isDisabled={Object.keys(fileUpdates).length >= 1}>
+										Files to Update
+									</Tooltip>
+								</Tab>
+								<Tab isDisabled={fileViewRowData.length < 1}>
+									<Tooltip label={"No files to commit!"} isDisabled={fileViewRowData.length >= 1}>
+										File View Table
+									</Tooltip>
+								</Tab>
+								<Tab isDisabled={unseenFilesRowData.length < 1}>
+									<Tooltip label={"No unversioned/missing files!"} isDisabled={unseenFilesRowData.length >= 1}>
+										Unversioned/Missing Files
+									</Tooltip>
+								</Tab>
 							</TabList>
 							<TabPanels>
 								<TabPanel>

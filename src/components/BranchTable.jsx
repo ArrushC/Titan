@@ -1,8 +1,8 @@
 import { AgGridReact } from "ag-grid-react";
 import React, { useCallback, useEffect, useMemo, useState, useRef } from "react";
 import { useApp } from "../AppContext";
-import { Button, Flex, Icon, Tooltip, Wrap } from "@chakra-ui/react";
-import { CloseIcon, DownloadIcon, DragHandleIcon, RepeatIcon, SmallAddIcon } from "@chakra-ui/icons";
+import { Button, Flex, Icon, IconButton, Tooltip, Wrap } from "@chakra-ui/react";
+import { CloseIcon, CopyIcon, DragHandleIcon, RepeatIcon, SmallAddIcon } from "@chakra-ui/icons";
 import AlertConfirmRowDelete from "./AlertConfirmRowDelete";
 import { stripBranchInfo } from "../utils/CommonConfig";
 import _ from "lodash";
@@ -34,45 +34,6 @@ export default function BranchTable({ configurableRowData, setConfigurableRowDat
 			socket?.emit("svn-info-single", { id: row.id, branch: row["SVN Branch"], version: row["Branch Version"], folder: row["Branch Folder"] });
 		},
 		[socket]
-	);
-
-	/****************************************************
-	 * Callback Functions - Table Aesthetics
-	 ****************************************************/
-	const getRowStyle = useCallback(
-		(params) => {
-			const color = config?.branchFolderColours[params.data["Branch Folder"]];
-			return {
-				backgroundColor: color ? `${color}20` : "transparent", // Adding some transparency
-			};
-		},
-		[config?.branchFolderColours]
-	);
-
-	const defaultColDef = useMemo(
-		() => ({
-			resizable: true,
-			wrapText: true,
-			autoHeight: true,
-			filter: true,
-			suppressMovable: true,
-			editable: true,
-			wrapHeaderText: true,
-			autoHeaderHeight: true,
-		}),
-		[]
-	);
-
-	const colDefs = useMemo(
-		() => [
-			{ field: "", rowDrag: true, resizable: false, filter: false, suppressMovable: false, editable: false, width: 20, cellRenderer: DragHandleIcon, headerClass: "branch-table-header-cell", cellClass: "branch-table-body-cell" },
-			{ headerCheckboxSelection: true, checkboxSelection: true, width: 20, resizable: false, suppressMovable: false, filter: false, editable: false, headerClass: "branch-table-header-cell", cellClass: "branch-table-body-cell" },
-			{ field: "Branch Folder", resizable: false, width: 130, valueFormatter: (params) => params.value.toUpperCase() },
-			{ field: "Branch Version", resizable: false, width: 130 },
-			{ field: "SVN Branch", flex: 1 },
-			{ field: "Branch Info", editable: false, resizable: false, width: 200 },
-		],
-		[config]
 	);
 
 	/****************************************************
@@ -135,6 +96,21 @@ export default function BranchTable({ configurableRowData, setConfigurableRowDat
 		updateConfig((currentConfig) => ({ ...currentConfig, branches: stripBranchInfo([...currentConfig.branches, newRow]) }));
 	}, [rowData, updateConfig]);
 
+	const copyRow = useCallback(
+		(rowData) => {
+			const newRow = {
+				...rowData,
+				id: String(Date.now()),
+				"Branch Info": "Hasn't been refreshed",
+			};
+			updateConfig((currentConfig) => ({
+				...currentConfig,
+				branches: stripBranchInfo([...currentConfig.branches, newRow]),
+			}));
+		},
+		[updateConfig]
+	);
+
 	const updateSelectedBranches = useCallback(() => {
 		selectedRows.forEach((row) => {
 			emitUpdateSingle(row);
@@ -185,6 +161,58 @@ export default function BranchTable({ configurableRowData, setConfigurableRowDat
 	}, [setIsCommitMode]);
 
 	/****************************************************
+	 * Callback Functions - Table Aesthetics
+	 ****************************************************/
+	const getRowStyle = useCallback(
+		(params) => {
+			const color = config?.branchFolderColours[params.data["Branch Folder"]];
+			return {
+				backgroundColor: color ? `${color}20` : "transparent", // Adding some transparency
+			};
+		},
+		[config?.branchFolderColours]
+	);
+
+	const defaultColDef = useMemo(
+		() => ({
+			resizable: true,
+			wrapText: true,
+			autoHeight: true,
+			filter: true,
+			suppressMovable: true,
+			editable: true,
+			wrapHeaderText: true,
+			autoHeaderHeight: true,
+		}),
+		[]
+	);
+
+	const colDefs = useMemo(
+		() => [
+			{ field: "", rowDrag: true, resizable: false, filter: false, suppressMovable: false, editable: false, width: 20, cellRenderer: DragHandleIcon, headerClass: "branch-table-header-cell", cellClass: "branch-table-body-cell" },
+			{ headerCheckboxSelection: true, checkboxSelection: true, width: 20, resizable: false, suppressMovable: false, filter: false, editable: false, headerClass: "branch-table-header-cell", cellClass: "branch-table-body-cell" },
+			{ field: "Branch Folder", resizable: false, width: 130, valueFormatter: (params) => params.value.toUpperCase() },
+			{ field: "Branch Version", resizable: false, width: 130 },
+			{ field: "SVN Branch", flex: 1 },
+			{ field: "Branch Info", editable: false, resizable: false, width: 200 },
+			{
+				headerName: "",
+				width: 70,
+				resizable: false,
+				sortable: false,
+				filter: false,
+				editable: false,
+				cellRenderer: (params) => (
+					<Tooltip label="Copy Row" hasArrow>
+						<IconButton colorScheme={"yellow"} aria-label="Copy Row" size="sm" onClick={() => copyRow(params.data)} icon={<CopyIcon />} />
+					</Tooltip>
+				),
+			},
+		],
+		[config, copyRow]
+	);
+
+	/****************************************************
 	 * Hooks setup
 	 ****************************************************/
 	// Update configurableRowData when config changes.
@@ -198,18 +226,18 @@ export default function BranchTable({ configurableRowData, setConfigurableRowDat
 	// Update rowData when configurableRowData changes
 	useEffect(() => {
 		const updateRowData = _.debounce(() => {
-			const newRowData = configurableRowData.map(row => ({
+			const newRowData = configurableRowData.map((row) => ({
 				...row,
-				"Branch Info": branchInfos[row.id] || "Hasn't been refreshed"
+				"Branch Info": branchInfos[row.id] || "Hasn't been refreshed",
 			}));
-			
+
 			if (!_.isEqual(newRowData, rowData)) {
 				setRowData(newRowData);
 			}
 		}, 300);
-	
+
 		updateRowData();
-	
+
 		return () => updateRowData.cancel();
 	}, [configurableRowData, branchInfos]);
 

@@ -84,6 +84,16 @@ async function deleteFileOrDirectory(pathToDelete) {
 	}
 }
 
+async function isDirectory(pathToCheck) {
+	try {
+		const stats = await fs.lstat(pathToCheck);
+		return stats.isDirectory();
+	} catch (err) {
+		logger.error("Error checking if path is a directory:", err);
+		return false;
+	}
+}
+
 /************************************
  * Asynchronous SVN Logic
  ************************************/
@@ -103,7 +113,8 @@ function executeSvnCommand(commands) {
 
 					const callback = (err, result) => {
 						if (err) {
-							logger.error(`Error executing SVN operation ${cmd.command} with args ${args}:`, err);
+							logger.error(`Error executing SVN operation ${cmd.command} with args ${JSON.stringify(args, null, 2)}:`);
+							logger.error(JSON.stringify(err, null, 2));
 							return reject(err);
 						}
 						resolve({ command: cmd.command, result });
@@ -391,7 +402,8 @@ io.on("connection", (socket) => {
 			return;
 		}
 
-		for (const file of data.filesToProcess) {
+		let filesToProcess = data.filesToProcess;
+		for (const file of filesToProcess) {
 			const { "Branch Folder": branchFolder, "Branch Version": branchVersion, "Full Path": filePath, "Local Status": localStatus } = file;
 
 			const task = {
@@ -412,6 +424,10 @@ io.on("connection", (socket) => {
 				},
 			};
 
+			// If file path is directory then pass option of infinity depth
+			const isPathDirectory = await isDirectory(filePath);
+			if (isPathDirectory) task.options = { depth: "infinity" };
+
 			svnQueueSerial.push(task);
 		}
 
@@ -428,6 +444,7 @@ io.on("connection", (socket) => {
 
 		for (const file of data.filesToProcess) {
 			const { "Branch Folder": branchFolder, "Branch Version": branchVersion, "Full Path": filePath, "Local Status": localStatus } = file;
+			const isPathDirectory = await isDirectory(filePath);
 
 			let task = {};
 			if (localStatus == "unversioned") {
@@ -441,6 +458,7 @@ io.on("connection", (socket) => {
 						} else {
 							logger.info(`Successfully added file ${filePath}`);
 							emitMessage(socket, `Successfully added ${branchString(branchFolder, branchVersion, filePath)}`, "success");
+							if (isPathDirectory) socket.emit("branch-refresh-unseen");
 						}
 					},
 				};
@@ -467,7 +485,7 @@ io.on("connection", (socket) => {
 
 			svnQueueSerial.push(task);
 
-			if (localStatus == "unversioned") {
+			if (localStatus == "unversioned" && !isPathDirectory) {
 				let propTask = {
 					command: "propset",
 					args: ["svn:keywords", '"Id Author Date Revision HeadURL"', filePath],
@@ -544,7 +562,7 @@ io.on("connection", (socket) => {
 						emitMessage(socket, `Failed to commit files in ${branchString(branchFolder, branchVersion, svnBranch)}`, "error");
 
 						// Emit commit status for frontend
-						socket.emit("svn-commit-status-live", {
+						io.emit("svn-commit-status-live", {
 							id: id,
 							"Branch Folder": branchFolder,
 							"Branch Version": branchVersion,
@@ -561,7 +579,7 @@ io.on("connection", (socket) => {
 						logger.debug(`Revision Number: ${extractRevisionNumber(result[0].result)}`);
 
 						// Emit commit status for frontend
-						socket.emit("svn-commit-status-live", {
+						io.emit("svn-commit-status-live", {
 							id: id,
 							"Branch Folder": branchFolder,
 							"Branch Version": branchVersion,

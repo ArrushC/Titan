@@ -97,7 +97,7 @@ export default function ModalCommit({ isModalOpen, onModalClose, setIsCommitMode
 			const svnBranch = (response) => (values.includes("SVNBranch") ? `${response["branchPathFolder"]} ` : "");
 			const issueNumber = (response) => (values.includes("IssueNumber") ? ` Issue [${response["Branch Folder"] == socketPayload["sourceBranch"]["Branch Folder"] ? socketPayload["issueNumber"] : "XXXXXX"}]` : "");
 			const revision = (response) => response["revision"];
-			const clipboardText = commitLiveResponses.map((response) => `${branchFolder(response).concat(branchVersion(response).concat(svnBranch(response).trim()))} Revision [${revision(response)}]${issueNumber(response)}`).join("\n");
+			const clipboardText = commitLiveResponses.map((response) => `${branchFolder(response).concat(branchVersion(response).concat(svnBranch(response).trim()))}${issueNumber(response)} Revision [${revision(response)}]`).join("\n");
 			setValue((current) => {
 				if (current === clipboardText) return current;
 				return clipboardText;
@@ -120,6 +120,8 @@ export default function ModalCommit({ isModalOpen, onModalClose, setIsCommitMode
 		if (!isModalOpen || activeStep != 0) return;
 		onModalClose();
 		setActiveStep(1);
+		setCommitLiveResponses([]);
+		setValue("");
 	}, [activeStep, isModalOpen]);
 
 	// Step 2
@@ -166,10 +168,10 @@ export default function ModalCommit({ isModalOpen, onModalClose, setIsCommitMode
 
 	useEffect(() => {
 		if (activeStep != 2) return;
-		if (commitLiveResponses.length > 0 && commitLiveResponses[0].bulkCommitLength != commitLiveResponses.length) return;
-		setTimeout(() => {
-			setActiveStep(3);
-		}, 5000);
+		const hookTimeoutCallback = setTimeout(() => {
+			if (commitLiveResponses.length > 0 && commitLiveResponses[0].bulkCommitLength == commitLiveResponses.length) setActiveStep(3);
+		}, 3000);
+		return () => clearTimeout(hookTimeoutCallback);
 	}, [activeStep, commitLiveResponses]);
 
 	useEffect(() => {

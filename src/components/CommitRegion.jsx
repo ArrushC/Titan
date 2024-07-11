@@ -61,7 +61,7 @@ export default function CommitRegion({ isCommitMode, setIsCommitMode, branchStat
 
 	const colDefs = useMemo(
 		() => [
-			{ headerCheckboxSelection: true, checkboxSelection: true, width: 20, resizable: false, suppressMovable: false, filter: false, editable: false, headerClass: "branch-table-header-cell", cellClass: "branch-table-body-cell" },
+			{ headerCheckboxSelection: true, checkboxSelection: true, headerCheckboxSelectionFilteredOnly: true, width: 20, resizable: false, suppressMovable: false, filter: false, editable: false, headerClass: "branch-table-header-cell", cellClass: "branch-table-body-cell" },
 			{ field: "Branch Folder" },
 			{ field: "Branch Version" },
 			{ field: "File Path", flex: 1 },
@@ -375,6 +375,7 @@ export default function CommitRegion({ isCommitMode, setIsCommitMode, branchStat
 													columnDefs={colDefs}
 													domLayout="normal"
 													rowSelection={"multiple"}
+													rowMultiSelectWithClick={true}
 													animateRows={true}
 													onSelectionChanged={onFileViewSelectionChanged}
 													quickFilterText={quickFilterFileViewText}
@@ -417,6 +418,7 @@ export default function CommitRegion({ isCommitMode, setIsCommitMode, branchStat
 													columnDefs={colDefs}
 													domLayout="normal"
 													rowSelection={"multiple"}
+													rowMultiSelectWithClick={true}
 													animateRows={true}
 													onSelectionChanged={onUnseenFilesSelectionChanged}
 													quickFilterText={quickFilterUnseenText}

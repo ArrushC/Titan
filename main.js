@@ -117,16 +117,13 @@ function startServer() {
 	});
 
 	serverProcess.on("error", (error) => {
-		logger.error("Server process error:", error);
-		dialog.showErrorBox("Server Error", "There was an error starting the server. Please restart the application.");
+		logger.error("Server process error:");
+		logger.error(error);
 	});
 
 	serverProcess.on("exit", (code, signal) => {
 		logger.info(`Server process exited with code ${code} and signal ${signal}`);
-		if (!isQuitting) {
-			dialog.showErrorBox("Server Crashed", "The server has unexpectedly stopped. The application will now close.");
-			app.quit();
-		}
+		if (!isQuitting) app.quit();
 	});
 }
 
@@ -254,7 +251,7 @@ function gracefulShutdown() {
 	}
 
 	// Shutdown server process
-	if (serverProcess) {
+	if (serverProcess && !serverProcess.killed && !serverProcess.exited && serverProcess.connected) {
 		logger.info("Sending shutdown signal to server");
 		serverProcess.send("shutdown");
 		setTimeout(() => {

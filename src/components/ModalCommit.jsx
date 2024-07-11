@@ -189,7 +189,9 @@ export default function ModalCommit({ isModalOpen, onModalClose, setIsCommitMode
 						Commit Selected Files
 					</Heading>
 				</ModalHeader>
-				<ModalCloseButton size={"lg"} />
+				{activeStep == 1 ? (
+					<ModalCloseButton size={"lg"} />
+				) : <></>}
 				<ModalBody>
 					<Stepper index={activeStep} mb={6} size="lg" colorScheme="yellow">
 						{steps.map((step, index) => (

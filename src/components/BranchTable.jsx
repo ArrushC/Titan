@@ -40,18 +40,31 @@ export default function BranchTable({ configurableRowData, setConfigurableRowDat
 	 * Callback Functions - Table Operations
 	 ****************************************************/
 	const clearSelection = useCallback(() => {
+		if (isDebug) console.log("BranchTable.jsx: clearSelection: START");
 		branchTableGridRef?.current?.api?.deselectAll();
 		setSelectedRows([]);
 		setIsCommitMode(false);
-	}, [branchTableGridRef, setSelectedRows]);
+	}, [isDebug, branchTableGridRef, setSelectedRows]);
 
-	const onSelectionChanged = useCallback(() => {
-		const selectedRows = branchTableGridRef?.current?.api?.getSelectedNodes().map((node) => node.data);
+	const onSelectionChanged = useCallback((event) => {
+		const newSelectedRows = branchTableGridRef?.current?.api?.getSelectedNodes().map((node) => node.data);
+		if (isDebug) console.log("BranchTable.jsx: onSelectionChanged - event", event);
 		if (isDebug) console.log("BranchTable.jsx: onSelectionChanged - selectedRows", selectedRows);
-		setSelectedRows(selectedRows);
+		// If the grid has updated rows then we need to reselect them to maintain the selection
+		if (event?.source == "rowDataChanged") {
+			const selectedIds = selectedRows.map((row) => row.id);
+			branchTableGridRef?.current?.api?.forEachNode((node) => {
+				if (selectedIds.includes(node.data.id)) {
+					node.setSelected(true);
+				}
+			});
+			return;
+		} else {
+			setSelectedRows(newSelectedRows);
+		}
 		setBranchStatusRows([]);
 		setShowFilesView(false);
-	}, [branchTableGridRef, setSelectedRows, setShowFilesView]);
+	}, [isDebug, branchTableGridRef, selectedRows, setSelectedRows, setShowFilesView]);
 
 	const onRowDragEnd = useCallback(
 		(event) => {
@@ -60,7 +73,7 @@ export default function BranchTable({ configurableRowData, setConfigurableRowDat
 			if (isDebug) console.debug("BranchTable.jsx: onRowDragEnd - movedRowData", movedRowData);
 			updateConfig((currentConfig) => ({ ...currentConfig, branches: stripBranchInfo(movedRowData) }));
 		},
-		[updateConfig]
+		[updateConfig, isDebug]
 	);
 
 	const onRowValueChanged = useCallback(
@@ -70,7 +83,7 @@ export default function BranchTable({ configurableRowData, setConfigurableRowDat
 			if (isDebug) console.log("AG Grid: onRowValueChanged - rowData", rowData);
 			updateConfig((currentConfig) => ({ ...currentConfig, branches: stripBranchInfo(rowData) }));
 		},
-		[rowData, updateConfig]
+		[rowData, updateConfig, isDebug]
 	);
 
 	/****************************************************
@@ -127,7 +140,6 @@ export default function BranchTable({ configurableRowData, setConfigurableRowDat
 	}, [selectedRows, rowData, updateConfig]);
 
 	const refreshSelected = useCallback(() => {
-		setIsCommitMode(false);
 		setRowData((currentRowData) => {
 			const newRowData = [...currentRowData];
 			selectedRows.forEach((row) => {
@@ -190,7 +202,7 @@ export default function BranchTable({ configurableRowData, setConfigurableRowDat
 	const colDefs = useMemo(
 		() => [
 			{ field: "", rowDrag: true, resizable: false, filter: false, suppressMovable: false, editable: false, width: 20, cellRenderer: DragHandleIcon, headerClass: "branch-table-header-cell", cellClass: "branch-table-body-cell" },
-			{ headerCheckboxSelection: true, checkboxSelection: true, width: 20, resizable: false, suppressMovable: false, filter: false, editable: false, headerClass: "branch-table-header-cell", cellClass: "branch-table-body-cell" },
+			{ headerCheckboxSelection: true, checkboxSelection: true, headerCheckboxSelectionFilteredOnly: true, width: 20, resizable: false, suppressMovable: false, filter: false, editable: false, headerClass: "branch-table-header-cell", cellClass: "branch-table-body-cell" },
 			{ field: "Branch Folder", resizable: false, width: 130, valueFormatter: (params) => params.value.toUpperCase() },
 			{ field: "Branch Version", resizable: false, width: 130 },
 			{ field: "SVN Branch", flex: 1 },
@@ -329,6 +341,7 @@ export default function BranchTable({ configurableRowData, setConfigurableRowDat
 					onRowDragEnd={onRowDragEnd}
 					domLayout="autoHeight"
 					rowSelection={"multiple"}
+					rowMultiSelectWithClick={true}
 					animateRows={true}
 					rowDragManaged={true}
 					onSelectionChanged={onSelectionChanged}

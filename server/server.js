@@ -10,7 +10,7 @@ import { setupLogger, setupUncaughtExceptionHandler } from "./logger.js";
 import compression from "compression";
 
 // Import package.json
-import packageJson from "../package.json" assert { type: "json" };
+import packageJson from "../package.json" with { type: "json" };
 
 // Create a logger instance
 const logger = setupLogger("server.js");
@@ -24,7 +24,8 @@ const server = createServer(app);
 const io = new Server(server);
 
 const latestVersion = packageJson.version;
-const configPath = "C:/ATHive/Titan.config.json";
+const configFilePath = "C:/ATHive/Titan.config.json";
+const targetsFilePath = "C:/ATHive/Titan.targets.txt";
 
 // Use compression middleware
 app.use(compression());
@@ -89,8 +90,22 @@ async function isDirectory(pathToCheck) {
 		const stats = await fs.lstat(pathToCheck);
 		return stats.isDirectory();
 	} catch (err) {
-		logger.error("Error checking if path is a directory:", err);
-		return false;
+		if (err.code === "ENOENT") {
+			// Fallback heuristic method: Check if path lacks a file extension
+			const ext = path.extname(pathToCheck);
+			return ext === "";
+		} else {
+			throw err;
+		}
+	}
+}
+
+async function writeTargetsFile(targets = []) {
+	try {
+		await fs.mkdir(path.dirname(targetsFilePath), { recursive: true });
+		await fs.writeFile(targetsFilePath, targets.join("\n"));
+	} catch (err) {
+		logger.error("Error writing targets file:", err);
 	}
 }
 
@@ -111,7 +126,7 @@ function executeSvnCommand(commands) {
 
 					args.push(options);
 
-					const callback = (err, result) => {
+					const opCallback = (err, result) => {
 						if (err) {
 							logger.error(`Error executing SVN operation ${cmd.command} with args ${JSON.stringify(args, null, 2)}:`);
 							logger.error(JSON.stringify(err, null, 2));
@@ -126,13 +141,13 @@ function executeSvnCommand(commands) {
 						if (typeof svnUltimate.util[cmd.command] !== "function") {
 							return reject(new Error(`Invalid SVN utility command: ${cmd.command}`));
 						}
-						svnUltimate.util[cmd.command](...args, callback);
+						svnUltimate.util[cmd.command](...args, opCallback);
 					} else {
 						// Handle regular SVN commands
 						if (typeof svnUltimate.commands[cmd.command] !== "function") {
 							return reject(new Error(`Invalid SVN command: ${cmd.command}`));
 						}
-						svnUltimate.commands[cmd.command](...args, callback);
+						svnUltimate.commands[cmd.command](...args, opCallback);
 					}
 				})
 		)
@@ -141,15 +156,16 @@ function executeSvnCommand(commands) {
 
 const svnQueueSerial = async.queue(async (task) => {
 	debugTask("svnQueueSerial", task, false);
-	const { command, args } = task;
+	const { command, args, postopCallback, preopCallback } = task;
 
 	try {
+		if (preopCallback) await preopCallback();
 		const result = await executeSvnCommand(task);
 		logger.debug(`SVN command ${command} output:\n` + typeof result === "string" ? result : JSON.stringify(result, null, 4));
-		task.callback(null, result);
+		if (postopCallback) await postopCallback(null, result);
 	} catch (err) {
 		logger.error(`Error executing SVN command ${command} with args ${args}:`, err);
-		task.callback(err);
+		if (postopCallback) await postopCallback(err);
 	}
 
 	debugTask("svnQueueSerial", task, true);
@@ -202,8 +218,8 @@ function isSVNConnectionError(socket, err) {
 		emitMessage(socket, `You have either been disconnected from the site hosting the SVN repository or are unnable to connect to it. Disconnecting from Titan until this issue is resolved`, "error");
 		io.emit("svn-connection-error", "SVN connection error detected. The server will shut down.");
 
-		// Gracefully shut down the server
-		gracefulShutdown("SVN Connection Error");
+		// Forcefully shut down the server
+		forceShutdown("SVN Connection Error");
 		return true;
 	}
 	return false;
@@ -216,21 +232,21 @@ async function sendConfig(socket) {
 	let config = null;
 
 	try {
-		await fs.mkdir(path.dirname(configPath), { recursive: true });
-		await fs.access(configPath);
+		await fs.mkdir(path.dirname(configFilePath), { recursive: true });
+		await fs.access(configFilePath);
 	} catch (err) {
 		const defaultConfig = { currentVersion: latestVersion, branches: [], branchFolderColours: {} };
-		await fs.writeFile(configPath, JSON.stringify(defaultConfig, null, 4));
+		await fs.writeFile(configFilePath, JSON.stringify(defaultConfig, null, 4));
 		emitMessage(socket, "Config file created with default content", "success");
 	}
 
 	try {
-		const data = await fs.readFile(configPath, "utf8");
+		const data = await fs.readFile(configFilePath, "utf8");
 		config = JSON.parse(data);
 		if (!config.currentVersion || config.currentVersion !== latestVersion) {
 			logger.info(`Updating config file with latest version - v${config.currentVersion || "-1"} -> v${latestVersion}`);
 			config.currentVersion = latestVersion;
-			await fs.writeFile(configPath, JSON.stringify(config, null, 4));
+			await fs.writeFile(configFilePath, JSON.stringify(config, null, 4));
 			emitMessage(socket, "Config file updated with latest version", "success");
 		}
 	} catch (err) {
@@ -244,7 +260,7 @@ async function sendConfig(socket) {
 
 io.on("connection", (socket) => {
 	logger.info("Connected to client!");
-	emitMessage(socket, "Connected To Server!", "success", 2000);
+	emitMessage(socket, "Connected To Server!", "success", 1500);
 
 	socket.on("get-Config", async (data) => {
 		debugTask("get-Config", data, false);
@@ -257,7 +273,7 @@ io.on("connection", (socket) => {
 	socket.on("set-Config", async (data) => {
 		debugTask("set-Config", data, false);
 		try {
-			await fs.writeFile(configPath, JSON.stringify(data, null, 4));
+			await fs.writeFile(configFilePath, JSON.stringify(data, null, 4));
 			emitMessage(socket, "Config file updated", "success");
 		} catch (err) {
 			logger.error(err);
@@ -271,7 +287,7 @@ io.on("connection", (socket) => {
 		const task = {
 			command: "update",
 			args: [data.branch],
-			callback: function (err, result) {
+			postopCallback: function (err, result) {
 				if (err) {
 					logger.error("Failed to execute SVN command: " + task.command);
 					if (!isSVNConnectionError(socket, err)) {
@@ -409,7 +425,7 @@ io.on("connection", (socket) => {
 			const task = {
 				command: "revert",
 				args: [filePath],
-				callback: (err, result) => {
+				postopCallback: (err, result) => {
 					if (err) {
 						logger.error(`Failed to revert file ${filePath}:`, err);
 						emitMessage(socket, `Failed to revert ${branchString(branchFolder, branchVersion, filePath)}`, "error");
@@ -451,7 +467,7 @@ io.on("connection", (socket) => {
 				task = {
 					command: "add",
 					args: [filePath],
-					callback: (err, result) => {
+					postopCallback: (err, result) => {
 						if (err) {
 							logger.error(`Failed to add file ${filePath}:`, err);
 							emitMessage(socket, `Failed to add ${branchString(branchFolder, branchVersion, filePath)}`, "error");
@@ -466,7 +482,7 @@ io.on("connection", (socket) => {
 				task = {
 					command: "del",
 					args: [filePath],
-					callback: (err, result) => {
+					postopCallback: (err, result) => {
 						if (err) {
 							logger.error(`Failed to add file ${filePath}:`, err);
 							emitMessage(socket, `Failed to add ${branchString(branchFolder, branchVersion, filePath)}`, "error");
@@ -489,7 +505,7 @@ io.on("connection", (socket) => {
 				let propTask = {
 					command: "propset",
 					args: ["svn:keywords", '"Id Author Date Revision HeadURL"', filePath],
-					callback: (err, result) => {
+					postopCallback: (err, result) => {
 						if (err) {
 							logger.error(`Failed to set SVN properties for file ${filePath}:`, err);
 							emitMessage(socket, `Failed to set SVN properties for ${branchString(branchFolder, branchVersion, filePath)}`, "error");
@@ -546,11 +562,14 @@ io.on("connection", (socket) => {
 
 			const task = {
 				command: "commit",
-				args: [files],
 				options: {
 					msg: prefixedCommitMessage,
+					params: [`--targets ${targetsFilePath}`]
 				},
-				callback: (err, result) => {
+				preopCallback: async () => {
+					await writeTargetsFile(files);
+				},
+				postopCallback: (err, result) => {
 					if (err) {
 						logger.debug(`Files by Branch: ${JSON.stringify(filesByBranch, null, 2)}`);
 						logger.debug(`SVN Branch: ${svnBranch}`);
@@ -607,7 +626,15 @@ io.on("connection", (socket) => {
 	socket.on("disconnect", () => {
 		logger.info("Client disconnected");
 	});
+
+	// On reconnect
+	socket.on("reconnect", () => {
+		logger.info("Client reconnected");
+		emitMessage(socket, "Reconnected to server", "success", 1500);
+		sendConfig(socket);
+	});
 });
+
 
 /************************************
  * Catch-all Route To Serve React App
@@ -617,7 +644,7 @@ app.get("*", (req, res) => {
 });
 
 /************************************
- * Graceful Shutdown
+ * Application Shutdown
  ************************************/
 function gracefulShutdown(signal) {
 	logger.info(`Received ${signal}. Starting graceful shutdown...`);
@@ -645,6 +672,10 @@ function gracefulShutdown(signal) {
 	}, 10_000);
 }
 
+function forceShutdown(signal) {
+	logger.warn(`Received ${signal}. Forcing shutdown...`);
+	process.exit(1);
+}
 
 /************************************
  * Server Setup
@@ -662,7 +693,7 @@ server.listen(port, async () => {
 // Handle 'shutdown' message from parent process
 process.on("message", (message) => {
 	if (message === "shutdown") {
-		gracefulShutdown("shutdown message");
+		gracefulShutdown("Server Shutdown Signal");
 	}
 });
 

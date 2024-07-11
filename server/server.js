@@ -539,7 +539,7 @@ io.on("connection", (socket) => {
 			const key = file["SVN Branch"];
 			if (!acc[key]) {
 				acc[key] = {
-					id: file.id,
+					branchId: file.branchId,
 					branchFolder: file["Branch Folder"],
 					branchVersion: file["Branch Version"],
 					files: [],
@@ -550,11 +550,11 @@ io.on("connection", (socket) => {
 		}, {});
 
 		for (const [svnBranch, branchInfo] of Object.entries(filesByBranch)) {
-			const { id, branchFolder, branchVersion, files } = branchInfo;
+			const { branchId, branchFolder, branchVersion, files } = branchInfo;
 
 			let prefixedCommitMessage;
 			if (branchFolder === sourceBranch["Branch Folder"]) {
-				prefixedCommitMessage = `Issue ${issueNumber} (${branchFolder} ${branchVersion}): ${commitMessage}`;
+				prefixedCommitMessage = `Issue ${issueNumber} (${branchFolder} ${sourceBranch["Branch Version"]}): ${commitMessage}`;
 			} else {
 				prefixedCommitMessage = `Issue ${issueNumber} (${sourceBranch["Branch Folder"]}): ${commitMessage}`;
 			}
@@ -582,7 +582,7 @@ io.on("connection", (socket) => {
 
 						// Emit commit status for frontend
 						io.emit("svn-commit-status-live", {
-							id: id,
+							branchId: branchId,
 							"Branch Folder": branchFolder,
 							"Branch Version": branchVersion,
 							"SVN Branch": svnBranch,
@@ -599,7 +599,7 @@ io.on("connection", (socket) => {
 
 						// Emit commit status for frontend
 						io.emit("svn-commit-status-live", {
-							id: id,
+							branchId: branchId,
 							"Branch Folder": branchFolder,
 							"Branch Version": branchVersion,
 							"SVN Branch": svnBranch,

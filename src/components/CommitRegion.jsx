@@ -1,21 +1,22 @@
-import { Box, Button, CircularProgress, CircularProgressLabel, Flex, FormControl, FormLabel, Heading, Icon, Input, Select, Tab, Table, TabList, TabPanel, TabPanels, Tabs, Tbody, Td, Text, Textarea, Th, Thead, Tooltip, Tr, useDisclosure } from "@chakra-ui/react";
+import { Box, Button, CircularProgress, CircularProgressLabel, Flex, FormControl, FormLabel, Heading, Icon, Input, Tab, Table, TabList, TabPanel, TabPanels, Tabs, Tbody, Td, Text, Textarea, Th, Thead, Tooltip, Tr, useDisclosure } from "@chakra-ui/react";
 import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { useApp } from "../AppContext";
 import { branchPathFolder, branchString, stripBranchInfo } from "../utils/CommonConfig";
-import IssueNumberInput from "./IssueNumberInput";
 import { CSSTransition } from "react-transition-group";
 import { AgGridReact } from "ag-grid-react";
 import { RepeatIcon } from "@chakra-ui/icons";
 import { MdCloudUpload } from "react-icons/md";
 import { RaiseClientNotificaiton } from "../utils/ChakraUI";
 import ModalCommit from "./ModalCommit";
+import { CreatableSelect, Select } from "chakra-react-select";
 
 export default function CommitRegion({ isCommitMode, setIsCommitMode, branchStatusRows, setBranchStatusRows, fileViewGridRef, unseenFilesGridRef, showFilesView, setShowFilesView, selectedRows, setSelectedRows }) {
 	const { socket, isDebug, toast } = useApp();
 
 	// Form Fields
-	const [sourceBranch, setSourceBranch] = useState("");
-	const [issueNumber, setIssueNumber] = useState("");
+	const [sourceBranch, setSourceBranch] = useState(null);
+	const [issueNumber, setIssueNumber] = useState(null);
+	const [issueOptions, setIssueOptions] = useState([]);
 	const [commitMessage, setCommitMessage] = useState("");
 	const [selectedFiles, setSelectedFiles] = useState([]);
 	const [selectedUnseenItems, setSelectedUnseenItems] = useState([]);
@@ -34,8 +35,26 @@ export default function CommitRegion({ isCommitMode, setIsCommitMode, branchStat
 	/****************************************************
 	 * Callback Functions - Form Fields
 	 ****************************************************/
-	const handleSourceBranchChange = (e) => {
-		setSourceBranch(e.target.value);
+	const sourceBranchOptions = useMemo(
+		() =>
+			selectedRows.map((row) => ({
+				value: row.id,
+				label: branchString(row["Branch Folder"], row["Branch Version"], row["SVN Branch"]),
+			})),
+		[selectedRows]
+	);
+
+	const handleSourceBranchChange = (selectedOption) => {
+		setSourceBranch(selectedOption);
+	};
+
+	const handleIssueNumberChange = (selectedOption) => {
+		setIssueNumber(selectedOption);
+		if (selectedOption && !issueOptions.some((option) => option.value === selectedOption.value)) {
+			const newOptions = [...issueOptions, selectedOption];
+			setIssueOptions(newOptions);
+			localStorage.setItem("issueOptions", JSON.stringify(newOptions));
+		}
 	};
 
 	const handleCommitMessageChange = (e) => {
@@ -73,7 +92,6 @@ export default function CommitRegion({ isCommitMode, setIsCommitMode, branchStat
 	/****************************************************
 	 * Callback Functions - Table Operations
 	 ****************************************************/
-
 	const onFileViewSelectionChanged = useCallback(() => {
 		const selectedRows = fileViewGridRef?.current?.api?.getSelectedNodes().map((node) => node.data);
 		if (isDebug) console.log("CommitRegion.jsx: onFileViewSelectionChanged - selectedRows", selectedRows);
@@ -138,18 +156,23 @@ export default function CommitRegion({ isCommitMode, setIsCommitMode, branchStat
 
 	const performCommit = useCallback(() => {
 		// Check if the source branch is selected
-		if (sourceBranch === "") {
+		if (!sourceBranch) {
 			RaiseClientNotificaiton(toast, "Please select the source branch to proceed!", "error");
 			return;
 		}
 
 		// Check if the issue number and commit message is provided
-		if (issueNumber === "" || commitMessage === "") {
+		if (!issueNumber || commitMessage === "") {
 			RaiseClientNotificaiton(toast, "Please provide the issue number and the commit message to proceed!", "error");
 			return;
 		}
 
-		setSocketPayload({ sourceBranch: selectedRows.find((row) => row.id == sourceBranch), issueNumber, commitMessage, filesToProcess: selectedFiles });
+		if (!selectedFiles.map((file) => file.branchId).includes(sourceBranch.value)) {
+			RaiseClientNotificaiton(toast, "Please select at least 1 file from the source branch to proceed!", "error");
+			return;
+		}
+
+		setSocketPayload({ sourceBranch: selectedRows.find((row) => row.id == sourceBranch.value), issueNumber: issueNumber.value, commitMessage, filesToProcess: selectedFiles });
 		onOpen();
 	}, [sourceBranch, issueNumber, commitMessage, toast, selectedFiles, socket, selectedRows]);
 
@@ -189,9 +212,8 @@ export default function CommitRegion({ isCommitMode, setIsCommitMode, branchStat
 	// Scroll to the commit region when it is in commit mode
 	useEffect(() => {
 		if (!isCommitMode) return;
-		if (selectedRows.length == 1) setSourceBranch(selectedRows[0].id);
 		document.getElementById("commitRegion")?.scrollIntoView({ behavior: "smooth", block: "start" });
-	}, [isCommitMode, selectedRows]);
+	}, [isCommitMode]);
 
 	useEffect(() => {
 		if (branchStatusRows.length === selectedRows.length) {
@@ -215,7 +237,7 @@ export default function CommitRegion({ isCommitMode, setIsCommitMode, branchStat
 				if (filesToCommit.length > 0) {
 					const fileViewRowData = filesToCommit.map((file) => {
 						return {
-							id: branchId,
+							branchId: branchId,
 							"Branch Folder": matchedSelectedRow["Branch Folder"],
 							"Branch Version": matchedSelectedRow["Branch Version"],
 							"SVN Branch": matchedSelectedRow["SVN Branch"],
@@ -243,6 +265,18 @@ export default function CommitRegion({ isCommitMode, setIsCommitMode, branchStat
 		return () => socket?.off("branch-refresh-unseen", socketCallback);
 	}, [socket]);
 
+	// Load issue options from localStorage on component mount
+	useEffect(() => {
+		const savedOptions = localStorage.getItem("issueOptions");
+		if (savedOptions) {
+			setIssueOptions(JSON.parse(savedOptions));
+		}
+	}, []);
+
+	useEffect(() => {
+		if (selectedRows.length === 1) setSourceBranch(sourceBranchOptions[0]);
+	}, [selectedRows, sourceBranchOptions]);
+
 	return (
 		<Box>
 			<Box mb={6}>
@@ -252,20 +286,11 @@ export default function CommitRegion({ isCommitMode, setIsCommitMode, branchStat
 				<Flex columnGap={2} mb={2}>
 					<FormControl width={"50%"} isRequired>
 						<FormLabel>Source Branch</FormLabel>
-						<Select value={sourceBranch} onChange={handleSourceBranchChange} placeholder={"Select branch you would like to commit from"}>
-							{selectedRows.map((row) => {
-								return (
-									<option key={row.id} value={row.id}>
-										{branchString(row["Branch Folder"], row["Branch Version"], row["SVN Branch"])}
-									</option>
-								);
-							})}
-						</Select>
+						<Select value={sourceBranch} onChange={handleSourceBranchChange} options={sourceBranchOptions} placeholder="Select branch you would like to commit from" selectedOptionColorScheme="yellow" />
 					</FormControl>
 					<FormControl width={"50%"} isRequired>
-						{/* Issue Number is only for ATCOM. Should be removed when publishing this tool to the public */}
 						<FormLabel>Issue Number</FormLabel>
-						<IssueNumberInput issueNumber={issueNumber} setIssueNumber={setIssueNumber} />
+						<CreatableSelect value={issueNumber} onChange={handleIssueNumberChange} options={issueOptions} placeholder="Select or create an issue number" formatCreateLabel={(inputValue) => `Create issue "${inputValue}"`} selectedOptionColorScheme="yellow" />
 					</FormControl>
 				</Flex>
 				<Flex>

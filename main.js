@@ -3,6 +3,7 @@ import path from "path";
 import { fork } from "child_process";
 import { fileURLToPath } from "url";
 import { setupLogger, setupUncaughtExceptionHandler } from "./server/logger.js";
+import { exec } from "child_process";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -294,6 +295,27 @@ if (process.env.NODE_ENV === "development") {
 
 // IPC communication
 ipcMain.handle("app-version", () => app.getVersion());
+
+ipcMain.handle("open-tortoisesvn-diff", async (event, data) => {
+	const { fullPath, branchFolder, branchVersion } = data;
+	logger.info(`Opening TortoiseSVN diff for: ${fullPath} (${branchFolder} ${branchVersion})`);
+	const command = `TortoiseProc.exe /command:diff /ignoreprops /path:"${fullPath}" /revision1:HEAD /revision2:BASE`;
+
+	return new Promise((resolve, reject) => {
+		exec(command, (error, stdout, stderr) => {
+			if (error) {
+				console.error(`Error: ${error.message}`);
+				reject({ success: false, error: error.message });
+			} else if (stderr) {
+				console.error(`Stderr: ${stderr}`);
+				reject({ success: false, error: stderr });
+			} else {
+				console.log(`Stdout: ${stdout}`);
+				resolve({ success: true });
+			}
+		});
+	});
+});
 
 ipcMain.on("app-quit", () => {
 	if (!isQuitting) {

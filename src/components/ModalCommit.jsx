@@ -43,11 +43,23 @@ import { AgGridReact } from "ag-grid-react";
 import { RaiseClientNotificaiton } from "../utils/ChakraUI";
 import _ from "lodash";
 import { CopyIcon } from "@chakra-ui/icons";
+import DiffButton from "./DiffButton";
 
 export default function ModalCommit({ isModalOpen, onModalClose, setIsCommitMode, setBranchStatusRows, setShowFilesView, socketPayload }) {
 	const { socket, toast } = useApp();
 	const [commitLiveResponses, setCommitLiveResponses] = useState([]);
 	const { onCopy, value, setValue, hasCopied } = useClipboard("");
+
+	/****************************************************
+	 * Modal Aesthetic Functions
+	 ****************************************************/
+	const handleDiffResult = useCallback(
+		(result) => {
+			if (result.success) RaiseClientNotificaiton(toast, "TortoiseSVN diff opened successfully", "success", 3000);
+			else RaiseClientNotificaiton(toast, `Error opening TortoiseSVN diff: ${JSON.stringify(result.error, null, 4)}`, "error", 0);
+		},
+		[toast]
+	);
 
 	/****************************************************
 	 * Modal Asthetics
@@ -77,7 +89,23 @@ export default function ModalCommit({ isModalOpen, onModalClose, setIsCommitMode
 		[]
 	);
 
-	const colDefs = useMemo(() => [{ field: "Branch Folder" }, { field: "Branch Version" }, { field: "File Path", flex: 1 }, { field: "Local Status", headerTooltip: "Working Copy" }], []);
+	const colDefs = useMemo(
+		() => [
+			{ field: "Branch Folder" },
+			{ field: "Branch Version" },
+			{ field: "File Path", flex: 1 },
+			{ field: "Local Status", headerTooltip: "Working Copy" },
+			{
+				filter: false,
+				cellRenderer: DiffButton,
+				cellRendererParams: {
+					onDiffResult: handleDiffResult,
+				},
+				width: 120,
+			},
+		],
+		[]
+	);
 
 	/****************************************************
 	 * Modal Operations
@@ -144,7 +172,7 @@ export default function ModalCommit({ isModalOpen, onModalClose, setIsCommitMode
 		RaiseClientNotificaiton(toast, "Updating selected branches! Please wait", "info", 1500);
 		commitLiveResponses.forEach((response) => {
 			socket?.emit("svn-update-single", {
-				id: response.id,
+				id: response.branchId,
 				branch: response["SVN Branch"],
 				version: response["Branch Version"],
 				folder: response["Branch Folder"],
@@ -181,7 +209,7 @@ export default function ModalCommit({ isModalOpen, onModalClose, setIsCommitMode
 	return !isModalOpen || !socketPayload ? (
 		<></>
 	) : (
-		<Modal isOpen={isModalOpen} onClose={onModalClose} isCentered motionPreset="slideInBottom" scrollBehavior="inside" size="xl">
+		<Modal isOpen={isModalOpen} onClose={onModalClose} isCentered motionPreset="slideInBottom" scrollBehavior="inside" size="xl" closeOnOverlayClick={activeStep == 1}>
 			<ModalOverlay />
 			<ModalContent maxH={"95%"} maxW="95%">
 				<ModalHeader>
@@ -189,9 +217,7 @@ export default function ModalCommit({ isModalOpen, onModalClose, setIsCommitMode
 						Commit Selected Files
 					</Heading>
 				</ModalHeader>
-				{activeStep == 1 ? (
-					<ModalCloseButton size={"lg"} />
-				) : <></>}
+				{activeStep == 1 ? <ModalCloseButton size={"lg"} /> : <></>}
 				<ModalBody>
 					<Stepper index={activeStep} mb={6} size="lg" colorScheme="yellow">
 						{steps.map((step, index) => (

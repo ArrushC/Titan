@@ -46,25 +46,28 @@ export default function BranchTable({ configurableRowData, setConfigurableRowDat
 		setIsCommitMode(false);
 	}, [isDebug, branchTableGridRef, setSelectedRows]);
 
-	const onSelectionChanged = useCallback((event) => {
-		const newSelectedRows = branchTableGridRef?.current?.api?.getSelectedNodes().map((node) => node.data);
-		if (isDebug) console.log("BranchTable.jsx: onSelectionChanged - event", event);
-		if (isDebug) console.log("BranchTable.jsx: onSelectionChanged - selectedRows", selectedRows);
-		// If the grid has updated rows then we need to reselect them to maintain the selection
-		if (event?.source == "rowDataChanged") {
-			const selectedIds = selectedRows.map((row) => row.id);
-			branchTableGridRef?.current?.api?.forEachNode((node) => {
-				if (selectedIds.includes(node.data.id)) {
-					node.setSelected(true);
-				}
-			});
-			return;
-		} else {
-			setSelectedRows(newSelectedRows);
-		}
-		setBranchStatusRows([]);
-		setShowFilesView(false);
-	}, [isDebug, branchTableGridRef, selectedRows, setSelectedRows, setShowFilesView]);
+	const onSelectionChanged = useCallback(
+		(event) => {
+			const newSelectedRows = branchTableGridRef?.current?.api?.getSelectedNodes().map((node) => node.data);
+			if (isDebug) console.log("BranchTable.jsx: onSelectionChanged - event", event);
+			if (isDebug) console.log("BranchTable.jsx: onSelectionChanged - selectedRows", selectedRows);
+			// If the grid has updated rows then we need to reselect them to maintain the selection
+			if (event?.source == "rowDataChanged") {
+				const selectedIds = selectedRows.map((row) => row.id);
+				branchTableGridRef?.current?.api?.forEachNode((node) => {
+					if (selectedIds.includes(node.data.id)) {
+						node.setSelected(true);
+					}
+				});
+				return;
+			} else if (!["api"].includes(event?.source)) {
+				setSelectedRows(newSelectedRows);
+				setBranchStatusRows([]);
+				setShowFilesView(false);
+			}
+		},
+		[isDebug, branchTableGridRef, selectedRows, setSelectedRows, setShowFilesView]
+	);
 
 	const onRowDragEnd = useCallback(
 		(event) => {
@@ -158,7 +161,7 @@ export default function BranchTable({ configurableRowData, setConfigurableRowDat
 			RaiseClientNotificaiton(toast, "Unable to refresh branches while in commit mode", "warning", 0);
 			return;
 		}
-		RaiseClientNotificaiton(toast, "Refreshing all branches. Please wait until this is done!", "info", 4000);
+		RaiseClientNotificaiton(toast, "Refreshing all branches. Please wait until this is done!", "info", 3000);
 		const now = Date.now();
 		configurableRowData.forEach((row) => {
 			emitInfoSingle(row);
@@ -235,7 +238,7 @@ export default function BranchTable({ configurableRowData, setConfigurableRowDat
 		});
 	}, [config]);
 
-	// Update rowData when configurableRowData changes
+	// Update rowData when configurableRowData or branchInfo changes
 	useEffect(() => {
 		const updateRowData = _.debounce(() => {
 			const newRowData = configurableRowData.map((row) => ({
@@ -278,9 +281,19 @@ export default function BranchTable({ configurableRowData, setConfigurableRowDat
 	useEffect(() => {
 		const socketCallback = (data) => {
 			setBranchInfos((currentBranchInfos) => {
-				if (isDebug) console.debug("branch-info-single data received:", data);
 				const newBranchInfos = { ...currentBranchInfos, [data.id]: data.info };
+				if (isDebug) console.debug("branch-info-single data received:", data);
 				if (isDebug) console.debug("branch-info-single newBranchInfos", newBranchInfos);
+				// If branch id is in selectedRows, refresh the commit region.
+				// ? We're not using the getter function here because we do not want to miss an event fired before the state is updated.
+				setSelectedRows((currentSelectedRows) => {
+					const selectedRow = currentSelectedRows.find((row) => row.id === data.id);
+					if (selectedRow) {
+						setBranchStatusRows([]);
+						setShowFilesView(false);
+					}
+					return currentSelectedRows;
+				});
 				return newBranchInfos;
 			});
 		};

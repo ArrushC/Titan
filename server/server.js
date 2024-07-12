@@ -247,7 +247,7 @@ async function sendConfig(socket) {
 			logger.info(`Updating config file with latest version - v${config.currentVersion || "-1"} -> v${latestVersion}`);
 			config.currentVersion = latestVersion;
 			await fs.writeFile(configFilePath, JSON.stringify(config, null, 4));
-			emitMessage(socket, "Config file updated with latest version", "success");
+			emitMessage(socket, `Updated Titan successfully to v${latestVersion}`, "success");
 		}
 	} catch (err) {
 		logger.error(err);
@@ -418,32 +418,65 @@ io.on("connection", (socket) => {
 			return;
 		}
 
-		let filesToProcess = data.filesToProcess;
-		for (const file of filesToProcess) {
-			const { "Branch Folder": branchFolder, "Branch Version": branchVersion, "Full Path": filePath, "Local Status": localStatus } = file;
+		let directoryPaths = [];
+		let files = [];
 
+		for (const file of data.filesToProcess) {
+			const isPathDirectory = await isDirectory(file["Full Path"]);
+			if (isPathDirectory) directoryPaths.push(file);
+			else files.push(file);
+		}
+
+		if (files.length > 0) {
 			const task = {
 				command: "revert",
-				args: [filePath],
-				postopCallback: (err, result) => {
+				options: {
+					params: [`--targets ${targetsFilePath}`],
+				},
+				preopCallback: async () => {
+					await writeTargetsFile(files.map((f) => f["Full Path"]));
+				},
+				postopCallback: async (err, result) => {
 					if (err) {
-						logger.error(`Failed to revert file ${filePath}:`, err);
-						emitMessage(socket, `Failed to revert ${branchString(branchFolder, branchVersion, filePath)}`, "error");
+						logger.error(`Failed to revert files:` + err);
+						emitMessage(socket, `Failed to revert files`, "error");
 					} else {
-						logger.info(`Successfully reverted file ${filePath}`);
-						emitMessage(socket, `Successfully reverted ${branchString(branchFolder, branchVersion, filePath)}`, "success");
-						if (localStatus == "unversioned") {
-							deleteFileOrDirectory(filePath);
+						logger.info(`Successfully reverted files`);
+						emitMessage(socket, `Successfully reverted files`, "success");
+						for (const file of files.filter((f) => f["Local Status"] == "unversioned")) {
+							await deleteFileOrDirectory(file["Full Path"]);
 						}
 						socket.emit("branch-refresh-unseen");
 					}
 				},
 			};
+			svnQueueSerial.push(task);
+		}
 
-			// If file path is directory then pass option of infinity depth
-			const isPathDirectory = await isDirectory(filePath);
-			if (isPathDirectory) task.options = { depth: "infinity" };
-
+		if (directoryPaths.length > 0) {
+			const task = {
+				command: "revert",
+				options: {
+					depth: "infinity",
+					params: [`--targets ${targetsFilePath}`],
+				},
+				preopCallback: async () => {
+					await writeTargetsFile(directoryPaths.map((d) => d["Full Path"]));
+				},
+				postopCallback: async (err, result) => {
+					if (err) {
+						logger.error(`Failed to revert directories:` + err);
+						emitMessage(socket, `Failed to revert directories`, "error");
+					} else {
+						logger.info(`Successfully reverted directories`);
+						emitMessage(socket, `Successfully reverted directories`, "success");
+						for (const dir of directoryPaths.filter((d) => d["Local Status"] == "unversioned")) {
+							await deleteFileOrDirectory(dir["Full Path"]);
+						}
+						socket.emit("branch-refresh-unseen");
+					}
+				},
+			};
 			svnQueueSerial.push(task);
 		}
 
@@ -454,71 +487,84 @@ io.on("connection", (socket) => {
 		debugTask("svn-files-add-remove", data, false);
 
 		if (!data.filesToProcess || data.filesToProcess.length === 0) {
-			emitMessage(socket, "No files to undo", "error");
+			emitMessage(socket, "No files to add or remove", "error");
 			return;
 		}
 
-		for (const file of data.filesToProcess) {
-			const { "Branch Folder": branchFolder, "Branch Version": branchVersion, "Full Path": filePath, "Local Status": localStatus } = file;
-			const isPathDirectory = await isDirectory(filePath);
+		const unversionedPaths = data.filesToProcess.filter((file) => file["Local Status"] == "unversioned");
+		const missingPaths = data.filesToProcess.filter((file) => file["Local Status"] == "missing");
 
-			let task = {};
-			if (localStatus == "unversioned") {
-				task = {
-					command: "add",
-					args: [filePath],
-					postopCallback: (err, result) => {
-						if (err) {
-							logger.error(`Failed to add file ${filePath}:`, err);
-							emitMessage(socket, `Failed to add ${branchString(branchFolder, branchVersion, filePath)}`, "error");
-						} else {
-							logger.info(`Successfully added file ${filePath}`);
-							emitMessage(socket, `Successfully added ${branchString(branchFolder, branchVersion, filePath)}`, "success");
-							if (isPathDirectory) socket.emit("branch-refresh-unseen");
-						}
-					},
-				};
-			} else if (task == "missing") {
-				task = {
-					command: "del",
-					args: [filePath],
-					postopCallback: (err, result) => {
-						if (err) {
-							logger.error(`Failed to add file ${filePath}:`, err);
-							emitMessage(socket, `Failed to add ${branchString(branchFolder, branchVersion, filePath)}`, "error");
-						} else {
-							logger.info(`Successfully added file ${filePath}`);
-							emitMessage(socket, `Successfully added ${branchString(branchFolder, branchVersion, filePath)}`, "success");
-							socket.emit("branch-refresh-unseen");
-						}
-					},
-				};
-			} else {
-				emitMessage(socket, `Invalid local status for file ${branchString(branchFolder, branchVersion, filePath)}. Please contact the developer!`, "error");
-				logger.error(`Invalid local status for file ${filePath}: ${localStatus}`);
-				return;
+		if (unversionedPaths.length > 0) {
+			let allPaths = unversionedPaths.map((file) => file["Full Path"]);
+			let files = [];
+
+			for (const path of allPaths) {
+				const isPathDirectory = await isDirectory(path);
+				if (!isPathDirectory) files.push(path);
 			}
 
+			let task = {
+				command: "add",
+				options: {
+					params: [`--targets ${targetsFilePath}`],
+				},
+				preopCallback: async () => {
+					await writeTargetsFile(allPaths);
+				},
+				postopCallback: (err, result) => {
+					if (err) {
+						logger.error(`Failed to add all unversioned paths:` + err);
+						emitMessage(socket, `Failed to add all unversioned paths`, "error");
+					} else {
+						logger.info(`Successfully added all unversioned paths`);
+						emitMessage(socket, `Successfully added all unversioned paths`, "success");
+						if (files.length < 1) socket.emit("branch-refresh-unseen");
+					}
+				},
+			};
 			svnQueueSerial.push(task);
 
-			if (localStatus == "unversioned" && !isPathDirectory) {
-				let propTask = {
-					command: "propset",
-					args: ["svn:keywords", '"Id Author Date Revision HeadURL"', filePath],
-					postopCallback: (err, result) => {
-						if (err) {
-							logger.error(`Failed to set SVN properties for file ${filePath}:`, err);
-							emitMessage(socket, `Failed to set SVN properties for ${branchString(branchFolder, branchVersion, filePath)}`, "error");
-						} else {
-							logger.info(`Successfully set SVN properties for file ${filePath}`);
-							emitMessage(socket, `SVN properties for ${branchString(branchFolder, branchVersion, filePath)} has been set. Please check that you have added SVN comments to ensure that your SVN client can automatically update them`, "warning", 10_000);
-							socket.emit("branch-refresh-unseen");
-						}
-					},
-				};
+			let propTask = {
+				command: "propset",
+				args: ["svn:keywords", '"Id Author Date Revision HeadURL"', `--targets ${targetsFilePath}`],
+				preopCallback: async () => {
+					await writeTargetsFile(files);
+				},
+				postopCallback: (err, result) => {
+					if (err) {
+						logger.error(`Failed to set SVN properties for all unversioned files:` + err);
+						emitMessage(socket, `Failed to set SVN properties for all unversioned files`, "error");
+					} else {
+						logger.info(`Successfully set SVN properties for all unversioned files`);
+						emitMessage(socket, `SVN properties for all unversioned files have been set. Please check that you have added SVN comments to ensure that your SVN client can automatically update them`, "warning", 10_000);
+						socket.emit("branch-refresh-unseen");
+					}
+				},
+			};
+			svnQueueSerial.push(propTask);
+		}
 
-				svnQueueSerial.push(propTask);
-			}
+		if (missingPaths.length > 0) {
+			let task = {
+				command: "del",
+				options: {
+					params: [`--targets ${targetsFilePath}`],
+				},
+				preopCallback: async () => {
+					await writeTargetsFile(missingPaths.map((file) => file["Full Path"]));
+				},
+				postopCallback: (err, result) => {
+					if (err) {
+						logger.error(`Failed to remove all missing files:` + err);
+						emitMessage(socket, `Failed to remove all missing files`, "error");
+					} else {
+						logger.info(`Successfully removed all missing files`);
+						emitMessage(socket, `Successfully removed all missing files`, "success");
+						socket.emit("branch-refresh-unseen");
+					}
+				},
+			};
+			svnQueueSerial.push(task);
 		}
 
 		debugTask("svn-files-add-remove", data, true);
@@ -564,7 +610,7 @@ io.on("connection", (socket) => {
 				command: "commit",
 				options: {
 					msg: prefixedCommitMessage,
-					params: [`--targets ${targetsFilePath}`]
+					params: [`--targets ${targetsFilePath}`],
 				},
 				preopCallback: async () => {
 					await writeTargetsFile(files);
@@ -634,7 +680,6 @@ io.on("connection", (socket) => {
 		sendConfig(socket);
 	});
 });
-
 
 /************************************
  * Catch-all Route To Serve React App

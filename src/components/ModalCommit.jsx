@@ -46,7 +46,7 @@ import { CopyIcon } from "@chakra-ui/icons";
 import DiffButton from "./DiffButton";
 
 export default function ModalCommit({ isModalOpen, onModalClose, socketPayload }) {
-	const { socket, toast, setIsCommitMode, setBranchStatusRows, setShowFilesView } = useApp();
+	const { socket, toast, setIsCommitMode, setSelectedBranchStatuses, setShowCommitView } = useApp();
 	const [commitLiveResponses, setCommitLiveResponses] = useState([]);
 	const { onCopy, value, setValue, hasCopied } = useClipboard("");
 
@@ -202,8 +202,8 @@ export default function ModalCommit({ isModalOpen, onModalClose, socketPayload }
 			});
 		});
 		setIsCommitMode(false);
-		setBranchStatusRows([]);
-		setShowFilesView(false);
+		setSelectedBranchStatuses([]);
+		setShowCommitView(false);
 		onModalClose();
 		setActiveStep(1);
 	}, [activeStep, isModalOpen, socket, commitLiveResponses]);

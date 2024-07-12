@@ -10,7 +10,7 @@ import { MdCloudDownload, MdCloudUpload } from "react-icons/md";
 import { RaiseClientNotificaiton } from "../utils/ChakraUI";
 
 export default function BranchTable() {
-	const { socket, config, updateConfig, isDebug, toast, configurableRowData, setConfigurableRowData, branchInfos, setBranchInfos, branchTableGridRef, selectedRows, setSelectedRows, isCommitMode, setIsCommitMode, setBranchStatusRows, setShowFilesView } = useApp();
+	const { socket, config, updateConfig, isDebug, toast, configurableRowData, setConfigurableRowData, branchInfos, setBranchInfos, branchTableGridRef, selectedBranches, setSelectedBranches, isCommitMode, setIsCommitMode, setSelectedBranchStatuses, setShowCommitView } = useApp();
 
 	const [isAlertOpen, setIsAlertOpen] = useState(false);
 	const cancelRef = useRef();
@@ -42,18 +42,18 @@ export default function BranchTable() {
 	const clearSelection = useCallback(() => {
 		if (isDebug) console.log("BranchTable.jsx: clearSelection: START");
 		branchTableGridRef?.current?.api?.deselectAll();
-		setSelectedRows([]);
+		setSelectedBranches([]);
 		setIsCommitMode(false);
-	}, [isDebug, branchTableGridRef, setSelectedRows]);
+	}, [isDebug, branchTableGridRef, setSelectedBranches]);
 
 	const onSelectionChanged = useCallback(
 		(event) => {
 			const newSelectedRows = branchTableGridRef?.current?.api?.getSelectedNodes().map((node) => node.data);
 			if (isDebug) console.log("BranchTable.jsx: onSelectionChanged - event", event);
-			if (isDebug) console.log("BranchTable.jsx: onSelectionChanged - selectedRows", selectedRows);
+			if (isDebug) console.log("BranchTable.jsx: onSelectionChanged - selectedBranches", selectedBranches);
 			// If the grid has updated rows then we need to reselect them to maintain the selection
 			if (event?.source == "rowDataChanged") {
-				const selectedIds = selectedRows.map((row) => row.id);
+				const selectedIds = selectedBranches.map((row) => row.id);
 				branchTableGridRef?.current?.api?.forEachNode((node) => {
 					if (selectedIds.includes(node.data.id)) {
 						node.setSelected(true);
@@ -61,12 +61,12 @@ export default function BranchTable() {
 				});
 				return;
 			} else if (!["api"].includes(event?.source)) {
-				setSelectedRows(newSelectedRows);
-				setBranchStatusRows([]);
-				setShowFilesView(false);
+				setSelectedBranches(newSelectedRows);
+				setSelectedBranchStatuses([]);
+				setShowCommitView(false);
 			}
 		},
-		[isDebug, branchTableGridRef, selectedRows, setSelectedRows, setShowFilesView]
+		[isDebug, branchTableGridRef, selectedBranches, setSelectedBranches, setShowCommitView]
 	);
 
 	const onRowDragEnd = useCallback(
@@ -93,10 +93,10 @@ export default function BranchTable() {
 	 * Callback Functions - Alert Dialog
 	 ****************************************************/
 	const openAlertDialog = useCallback(() => {
-		const selectedRows = branchTableGridRef?.current?.api?.getSelectedNodes().map((node) => node.data);
-		setSelectedRows(selectedRows);
+		const selectedBranches = branchTableGridRef?.current?.api?.getSelectedNodes().map((node) => node.data);
+		setSelectedBranches(selectedBranches);
 		setIsAlertOpen(true);
-	}, [branchTableGridRef, setSelectedRows]);
+	}, [branchTableGridRef, setSelectedBranches]);
 
 	/****************************************************
 	 * Callback Functions - Table Actions
@@ -128,33 +128,33 @@ export default function BranchTable() {
 	);
 
 	const updateSelectedBranches = useCallback(() => {
-		selectedRows.forEach((row) => {
+		selectedBranches.forEach((row) => {
 			emitUpdateSingle(row);
 		});
-	}, [selectedRows, emitUpdateSingle]);
+	}, [selectedBranches, emitUpdateSingle]);
 
 	const removeSelectedRows = useCallback(() => {
-		const selectedIds = selectedRows.map((row) => row.id);
+		const selectedIds = selectedBranches.map((row) => row.id);
 		const updatedData = rowData.filter((row) => !selectedIds.includes(row.id));
 		console.log("BranchTable.jsx: removeSelectedRows - updatedData", updatedData);
 		updateConfig((currentConfig) => ({ ...currentConfig, branches: stripBranchInfo(updatedData) }));
 		clearSelection();
 		onCloseAlert();
-	}, [selectedRows, rowData, updateConfig]);
+	}, [selectedBranches, rowData, updateConfig]);
 
 	const refreshSelected = useCallback(() => {
 		setRowData((currentRowData) => {
 			const newRowData = [...currentRowData];
-			selectedRows.forEach((row) => {
+			selectedBranches.forEach((row) => {
 				const index = newRowData.findIndex((r) => r.id === row.id);
 				newRowData[index]["Branch Info"] = "Refreshing...";
 			});
 			return newRowData;
 		});
-		selectedRows.forEach((row) => {
+		selectedBranches.forEach((row) => {
 			emitInfoSingle(row);
 		});
-	}, [selectedRows, emitInfoSingle]);
+	}, [selectedBranches, emitInfoSingle]);
 
 	const refreshAll = useCallback(() => {
 		if (isCommitMode) {
@@ -171,8 +171,8 @@ export default function BranchTable() {
 
 	const toggleCommitSelectedBranches = useCallback(() => {
 		setIsCommitMode((currentIsCommitMode) => !currentIsCommitMode);
-		setBranchStatusRows([]);
-		setShowFilesView(false);
+		setSelectedBranchStatuses([]);
+		setShowCommitView(false);
 	}, [setIsCommitMode]);
 
 	/****************************************************
@@ -258,8 +258,8 @@ export default function BranchTable() {
 
 	// Refresh commit view when configurableRowData changes
 	useEffect(() => {
-		setBranchStatusRows([]);
-		setShowFilesView(false);
+		setSelectedBranchStatuses([]);
+		setShowCommitView(false);
 	}, [configurableRowData]);
 
 	// Create and change intervals for refreshAll when configurableRowData changes
@@ -290,13 +290,13 @@ export default function BranchTable() {
 				const newBranchInfos = { ...currentBranchInfos, [data.id]: data.info };
 				if (isDebug) console.debug("branch-info-single data received:", data);
 				if (isDebug) console.debug("branch-info-single newBranchInfos", newBranchInfos);
-				// If branch id is in selectedRows, refresh the commit region.
+				// If branch id is in selectedBranches, refresh the commit region.
 				// ? We're not using the getter function here because we do not want to miss an event fired before the state is updated.
-				setSelectedRows((currentSelectedRows) => {
+				setSelectedBranches((currentSelectedRows) => {
 					const selectedRow = currentSelectedRows.find((row) => row.id === data.id);
 					if (selectedRow) {
-						setBranchStatusRows([]);
-						setShowFilesView(false);
+						setSelectedBranchStatuses([]);
+						setShowCommitView(false);
 					}
 					return currentSelectedRows;
 				});
@@ -323,18 +323,18 @@ export default function BranchTable() {
 		<div>
 			<Wrap mb={4} justify={"space-between"}>
 				<Flex columnGap={2}>
-					<Tooltip label="Please select at least 1 branch" isDisabled={selectedRows.length > 0} hasArrow>
-						<Button onClick={updateSelectedBranches} leftIcon={<Icon as={MdCloudDownload} />} colorScheme={"yellow"} isDisabled={selectedRows.length < 1}>
+					<Tooltip label="Please select at least 1 branch" isDisabled={selectedBranches.length > 0} hasArrow>
+						<Button onClick={updateSelectedBranches} leftIcon={<Icon as={MdCloudDownload} />} colorScheme={"yellow"} isDisabled={selectedBranches.length < 1}>
 							Update
 						</Button>
 					</Tooltip>
-					<Tooltip label="Please select at least 1 branch" isDisabled={selectedRows.length > 0} hasArrow>
-						<Button onClick={toggleCommitSelectedBranches} leftIcon={<Icon as={MdCloudUpload} />} colorScheme={"yellow"} isDisabled={selectedRows.length < 1}>
+					<Tooltip label="Please select at least 1 branch" isDisabled={selectedBranches.length > 0} hasArrow>
+						<Button onClick={toggleCommitSelectedBranches} leftIcon={<Icon as={MdCloudUpload} />} colorScheme={"yellow"} isDisabled={selectedBranches.length < 1}>
 							{isCommitMode ? "Undo Commit" : "Commit"}
 						</Button>
 					</Tooltip>
-					<Tooltip label="Please select at least 1 branch" isDisabled={selectedRows.length > 0} hasArrow>
-						<Button onClick={refreshSelected} leftIcon={<RepeatIcon />} colorScheme={"yellow"} isDisabled={selectedRows.length < 1}>
+					<Tooltip label="Please select at least 1 branch" isDisabled={selectedBranches.length > 0} hasArrow>
+						<Button onClick={refreshSelected} leftIcon={<RepeatIcon />} colorScheme={"yellow"} isDisabled={selectedBranches.length < 1}>
 							Refresh
 						</Button>
 					</Tooltip>
@@ -371,13 +371,13 @@ export default function BranchTable() {
 			</div>
 			<Wrap mt={4} justify={"space-between"}>
 				<Flex columnGap={2}>
-					<Tooltip label="Please select at least 1 branch" isDisabled={selectedRows.length > 0} hasArrow>
-						<Button onClick={clearSelection} leftIcon={<CloseIcon />} colorScheme={"red"} isDisabled={selectedRows.length < 1}>
-							Deselect {selectedRows.length} Branch{selectedRows.length > 1 ? "es" : ""}
+					<Tooltip label="Please select at least 1 branch" isDisabled={selectedBranches.length > 0} hasArrow>
+						<Button onClick={clearSelection} leftIcon={<CloseIcon />} colorScheme={"red"} isDisabled={selectedBranches.length < 1}>
+							Deselect {selectedBranches.length} Branch{selectedBranches.length > 1 ? "es" : ""}
 						</Button>
 					</Tooltip>
-					<Tooltip label="Please select at least 1 branch" isDisabled={selectedRows.length > 0} hasArrow>
-						<Button onClick={openAlertDialog} leftIcon={<CloseIcon />} colorScheme={"red"} isDisabled={selectedRows.length < 1}>
+					<Tooltip label="Please select at least 1 branch" isDisabled={selectedBranches.length > 0} hasArrow>
+						<Button onClick={openAlertDialog} leftIcon={<CloseIcon />} colorScheme={"red"} isDisabled={selectedBranches.length < 1}>
 							Delete Selected
 						</Button>
 					</Tooltip>

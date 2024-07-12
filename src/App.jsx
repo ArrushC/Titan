@@ -7,7 +7,7 @@ import { useApp } from "./AppContext";
 import { RaiseClientNotificaiton } from "./utils/ChakraUI";
 
 function App() {
-	const { toast, isCommitMode, selectedRows, configurableRowData, config } = useApp();
+	const { toast, isCommitMode, selectedBranches, configurableRowData, config } = useApp();
 
 	useEffect(() => {
 		window.electron.onAppClosing((event) => {
@@ -42,7 +42,7 @@ function App() {
 				) : (
 					<Box id="commitRegion">
 						<Heading as={"h2"} size={"lg"} noOfLines={1} mb={4} className="pulse-animation">
-							Committing {selectedRows.length == configurableRowData.length ? "All" : `${selectedRows.length}/${configurableRowData.length}`} Branch{selectedRows.length == 1 ? "" : "es"}
+							Committing {selectedBranches.length == configurableRowData.length ? "All" : `${selectedBranches.length}/${configurableRowData.length}`} Branch{selectedBranches.length == 1 ? "" : "es"}
 						</Heading>
 						<CommitRegion />
 					</Box>

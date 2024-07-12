@@ -16,16 +16,16 @@ const AppContext = createContext({
 	branchInfos: {},
 	setBranchInfos: (_) => {},
 	branchTableGridRef: null,
-	selectedRows: [],
-	setSelectedRows: (_) => {},
+	selectedBranches: [],
+	setSelectedBranches: (_) => {},
 	isCommitMode: false,
 	setIsCommitMode: (_) => {},
-	branchStatusRows: [],
-	setBranchStatusRows: (_) => {},
-	fileViewGridRef: null,
-	unseenFilesGridRef: null,
-	showFilesView: false,
-	setShowFilesView: (_) => {},
+	selectedBranchStatuses: [],
+	setSelectedBranchStatuses: (_) => {},
+	localChangesGridRef: null,
+	untrackedChangesGridRef: null,
+	showCommitView: false,
+	setShowCommitView: (_) => {},
 });
 
 export const useApp = () => {
@@ -36,7 +36,7 @@ export const AppProvider = ({ children }) => {
 	const [config, setConfig] = useState(null);
 	const [socket, setSocket] = useState(null);
 	const toast = useToast();
-	const [isDebug, setIsDebug] = useState(true);
+	const [isDebug, setIsDebug] = useState(localStorage.getItem("isDebug") === "true");
 
 	useEffect(() => {
 		const socket = socketIOClient(ENDPOINT_URL);
@@ -71,6 +71,10 @@ export const AppProvider = ({ children }) => {
 		};
 	}, []);
 
+	useEffect(() => {
+		localStorage.setItem("isDebug", String(isDebug));
+	}, [isDebug]);
+
 	const saveConfig = useCallback(
 		(configToSave) => {
 			if (configToSave === null || configToSave === undefined) return;
@@ -95,14 +99,14 @@ export const AppProvider = ({ children }) => {
 	const [configurableRowData, setConfigurableRowData] = useState([]);
 	const [branchInfos, setBranchInfos] = useState({});
 	const branchTableGridRef = useRef(null);
-	const [selectedRows, setSelectedRows] = useState([]);
+	const [selectedBranches, setSelectedBranches] = useState([]);
 
 	// Props used in CommitRegion
 	const [isCommitMode, setIsCommitMode] = useState(false);
-	const [branchStatusRows, setBranchStatusRows] = useState([]);
-	const fileViewGridRef = useRef(null);
-	const unseenFilesGridRef = useRef(null);
-	const [showFilesView, setShowFilesView] = useState(false);
+	const [selectedBranchStatuses, setSelectedBranchStatuses] = useState([]);
+	const localChangesGridRef = useRef(null);
+	const untrackedChangesGridRef = useRef(null);
+	const [showCommitView, setShowCommitView] = useState(false);
 
 	return (
 		<AppContext.Provider
@@ -118,16 +122,16 @@ export const AppProvider = ({ children }) => {
 				branchInfos,
 				setBranchInfos,
 				branchTableGridRef,
-				selectedRows,
-				setSelectedRows,
+				selectedBranches,
+				setSelectedBranches,
 				isCommitMode,
 				setIsCommitMode,
-				branchStatusRows,
-				setBranchStatusRows,
-				fileViewGridRef,
-				unseenFilesGridRef,
-				showFilesView,
-				setShowFilesView,
+				selectedBranchStatuses,
+				setSelectedBranchStatuses,
+				localChangesGridRef,
+				untrackedChangesGridRef,
+				showCommitView,
+				setShowCommitView,
 			}}>
 			{children}
 		</AppContext.Provider>

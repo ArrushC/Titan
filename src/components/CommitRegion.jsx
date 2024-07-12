@@ -11,7 +11,7 @@ import { CreatableSelect, Select } from "chakra-react-select";
 import DiffButton from "./DiffButton";
 
 export default function CommitRegion() {
-	const { socket, isDebug, toast, isCommitMode, setIsCommitMode, branchStatusRows, setBranchStatusRows, fileViewGridRef, unseenFilesGridRef, showFilesView, setShowFilesView, selectedRows, configurableRowData } = useApp();
+	const { socket, isDebug, toast, isCommitMode, setIsCommitMode, selectedBranchStatuses, setSelectedBranchStatuses, localChangesGridRef, untrackedChangesGridRef, showCommitView, setShowCommitView, selectedBranches, configurableRowData } = useApp();
 
 	// Form Fields
 	const [sourceBranch, setSourceBranch] = useState(null);
@@ -37,11 +37,11 @@ export default function CommitRegion() {
 	 ****************************************************/
 	const sourceBranchOptions = useMemo(
 		() =>
-			selectedRows.map((row) => ({
+			selectedBranches.map((row) => ({
 				value: row.id,
 				label: branchString(row["Branch Folder"], row["Branch Version"], row["SVN Branch"]),
 			})),
-		[selectedRows]
+		[selectedBranches]
 	);
 
 	const handleSourceBranchChange = (selectedOption) => {
@@ -126,16 +126,16 @@ export default function CommitRegion() {
 	 * Callback Functions - Table Operations
 	 ****************************************************/
 	const onFileViewSelectionChanged = useCallback(() => {
-		const selectedRows = fileViewGridRef?.current?.api?.getSelectedNodes().map((node) => node.data);
-		if (isDebug) console.log("CommitRegion.jsx: onFileViewSelectionChanged - selectedRows", selectedRows);
-		setSelectedFiles(selectedRows);
-	}, [fileViewGridRef]);
+		const selectedBranches = localChangesGridRef?.current?.api?.getSelectedNodes().map((node) => node.data);
+		if (isDebug) console.log("CommitRegion.jsx: onFileViewSelectionChanged - selectedBranches", selectedBranches);
+		setSelectedFiles(selectedBranches);
+	}, [localChangesGridRef]);
 
 	const onUnseenFilesSelectionChanged = useCallback(() => {
-		const selectedRows = unseenFilesGridRef?.current?.api?.getSelectedNodes().map((node) => node.data);
-		if (isDebug) console.log("CommitRegion.jsx: onUnseenFilesSelectionChanged - selectedRows", selectedRows);
-		setSelectedUnseenItems(selectedRows);
-	}, [unseenFilesGridRef]);
+		const selectedBranches = untrackedChangesGridRef?.current?.api?.getSelectedNodes().map((node) => node.data);
+		if (isDebug) console.log("CommitRegion.jsx: onUnseenFilesSelectionChanged - selectedBranches", selectedBranches);
+		setSelectedUnseenItems(selectedBranches);
+	}, [untrackedChangesGridRef]);
 
 	const onQuickFilterFileViewInputChanged = useCallback(
 		(e) => {
@@ -205,20 +205,20 @@ export default function CommitRegion() {
 			return;
 		}
 
-		setSocketPayload({ sourceBranch: selectedRows.find((row) => row.id == sourceBranch.value), issueNumber: issueNumber.value, commitMessage, filesToProcess: selectedFiles });
+		setSocketPayload({ sourceBranch: selectedBranches.find((row) => row.id == sourceBranch.value), issueNumber: issueNumber.value, commitMessage, filesToProcess: selectedFiles });
 		onOpen();
-	}, [sourceBranch, issueNumber, commitMessage, toast, selectedFiles, socket, selectedRows]);
+	}, [sourceBranch, issueNumber, commitMessage, toast, selectedFiles, socket, selectedBranches]);
 
 	/****************************************************
 	 * Hooks setup
 	 ****************************************************/
 	// Fetch the branch status for each selected branch
 	useEffect(() => {
-		if (selectedRows.length < 1 || showFilesView) {
-			if (selectedRows.length < 1) setIsCommitMode(false);
+		if (selectedBranches.length < 1 || showCommitView) {
+			if (selectedBranches.length < 1) setIsCommitMode(false);
 			return;
 		}
-		setBranchStatusRows([]);
+		setSelectedBranchStatuses([]);
 		setSocketPayload(null);
 		setFileUpdates({});
 		setQuickFilterUnseenText("");
@@ -227,15 +227,15 @@ export default function CommitRegion() {
 		setFileViewRowData([]);
 		setSelectedFiles([]);
 		setSelectedUnseenItems([]);
-		stripBranchInfo(selectedRows).forEach((row) => {
+		stripBranchInfo(selectedBranches).forEach((row) => {
 			socket?.emit("svn-status-single", { selectedBranch: row });
 		});
-	}, [socket, selectedRows, showFilesView]);
+	}, [socket, selectedBranches, showCommitView]);
 
 	useEffect(() => {
 		const socketCallback = (data) => {
 			if (isDebug) console.debug("Received branch status data:", data);
-			setBranchStatusRows((prev) => [...prev, data]);
+			setSelectedBranchStatuses((prev) => [...prev, data]);
 		};
 
 		socket?.on("branch-status-single", socketCallback);
@@ -249,10 +249,10 @@ export default function CommitRegion() {
 	}, [isCommitMode]);
 
 	useEffect(() => {
-		if (branchStatusRows.length === selectedRows.length) {
-			console.debug("Branch Status Rows:", branchStatusRows);
-			console.debug("Selected Rows:", selectedRows);
-			branchStatusRows.forEach((branchStatus) => {
+		if (selectedBranchStatuses.length === selectedBranches.length) {
+			console.debug("Branch Status Rows:", selectedBranchStatuses);
+			console.debug("Selected Rows:", selectedBranches);
+			selectedBranchStatuses.forEach((branchStatus) => {
 				let branchId = branchStatus.id;
 				let filesToCommit = branchStatus.status.filesToCommit;
 				let filesToUpdate = branchStatus.status.filesToUpdate;
@@ -285,13 +285,13 @@ export default function CommitRegion() {
 				}
 			});
 
-			setShowFilesView(true);
+			setShowCommitView(true);
 		}
-	}, [branchStatusRows, selectedRows, configurableRowData]);
+	}, [selectedBranchStatuses, selectedBranches, configurableRowData]);
 
 	useEffect(() => {
 		const socketCallback = (data) => {
-			setShowFilesView(false);
+			setShowCommitView(false);
 		};
 
 		socket?.on("branch-refresh-unseen", socketCallback);
@@ -307,8 +307,8 @@ export default function CommitRegion() {
 	}, []);
 
 	useEffect(() => {
-		if (selectedRows.length === 1) setSourceBranch(sourceBranchOptions[0]);
-	}, [selectedRows, sourceBranchOptions]);
+		if (selectedBranches.length === 1) setSourceBranch(sourceBranchOptions[0]);
+	}, [selectedBranches, sourceBranchOptions]);
 
 	const hasChanges = Object.keys(fileUpdates).length > 0 || fileViewRowData.length > 0 || unseenFilesRowData.length > 0;
 
@@ -332,7 +332,7 @@ export default function CommitRegion() {
 					</FormControl>
 				</Flex>
 			</Box>
-			<Skeleton isLoaded={showFilesView && hasChanges} startColor="yelow.500" endColor="yellow.500">
+			<Skeleton isLoaded={showCommitView && hasChanges} startColor="yelow.500" endColor="yellow.500">
 				<Tabs variant={"solid-rounded"} colorScheme="yellow" defaultIndex={Object.keys(fileUpdates).length >= 1 ? 0 : fileViewRowData.length >= 1 ? 1 : 2}>
 					<TabList>
 						<Tab isDisabled={Object.keys(fileUpdates).length < 1}>
@@ -409,7 +409,7 @@ export default function CommitRegion() {
 									</Flex>
 									<div className="ag-theme-quartz-dark" style={{ height: "480px", width: "100%" }}>
 										<AgGridReact
-											ref={fileViewGridRef}
+											ref={localChangesGridRef}
 											rowData={fileViewRowData}
 											defaultColDef={defaultColDefs}
 											columnDefs={colDefsLocalChanges}
@@ -449,7 +449,7 @@ export default function CommitRegion() {
 									</Flex>
 									<div className="ag-theme-quartz-dark" style={{ height: "390px", width: "100%" }}>
 										<AgGridReact
-											ref={unseenFilesGridRef}
+											ref={untrackedChangesGridRef}
 											rowData={unseenFilesRowData}
 											defaultColDef={defaultColDefs}
 											columnDefs={colDefsUntracked}
@@ -485,7 +485,7 @@ export default function CommitRegion() {
 					</TabPanels>
 				</Tabs>
 			</Skeleton>
-			{showFilesView && !hasChanges ? (
+			{showCommitView && !hasChanges ? (
 				<Text mt={4} className="pulse-animation" fontWeight={600}>
 					No changes have been spotted! Please use the refresh button 👇 if you have recently made a change
 				</Text>
@@ -494,7 +494,7 @@ export default function CommitRegion() {
 			)}
 			<Box mt={6}>
 				<Flex columnGap={2} justifyContent={"center"}>
-					<Button onClick={() => setShowFilesView(false)} leftIcon={<RepeatIcon />} colorScheme={"yellow"}>
+					<Button onClick={() => setShowCommitView(false)} leftIcon={<RepeatIcon />} colorScheme={"yellow"}>
 						Refresh Process
 					</Button>
 					<Tooltip label={"Requires you to select at least 1 file"} hasArrow isDisabled={selectedFiles.length > 0}>

@@ -286,13 +286,6 @@ process.on("uncaughtException", (error) => {
 // Performance optimisation
 app.commandLine.appendSwitch("disable-renderer-backgrounding");
 
-// For development: Open DevTools automatically
-if (process.env.NODE_ENV === "development") {
-	app.on("browser-window-created", (_, window) => {
-		window.webContents.openDevTools();
-	});
-}
-
 // IPC communication
 ipcMain.handle("app-version", () => app.getVersion());
 

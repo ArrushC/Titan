@@ -32,7 +32,6 @@
 		"@emotion/styled": "^11.11.5",
 		"ag-grid-react": "^31.3.2",
 		"async": "^3.2.5",
-		"axios": "^1.7.2",
 		"chakra-react-select": "^4.9.1",
 		"compression": "^1.7.4",
 		"express": "^4.19.2",

@@ -1,17 +1,17 @@
-import { Box, Button, CircularProgress, CircularProgressLabel, Flex, FormControl, FormLabel, Heading, Icon, Input, Tab, Table, TabList, TabPanel, TabPanels, Tabs, Tbody, Td, Text, Textarea, Th, Thead, Tooltip, Tr, useDisclosure } from "@chakra-ui/react";
+import { Box, Button, Flex, FormControl, FormLabel, Icon, Input, Skeleton, Tab, Table, TabList, TabPanel, TabPanels, Tabs, Tbody, Td, Text, Textarea, Th, Thead, Tooltip, Tr, useDisclosure } from "@chakra-ui/react";
 import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { useApp } from "../AppContext";
 import { branchPathFolder, branchString, stripBranchInfo } from "../utils/CommonConfig";
-import { CSSTransition } from "react-transition-group";
 import { AgGridReact } from "ag-grid-react";
 import { RepeatIcon } from "@chakra-ui/icons";
 import { MdCloudUpload } from "react-icons/md";
 import { RaiseClientNotificaiton } from "../utils/ChakraUI";
 import ModalCommit from "./ModalCommit";
 import { CreatableSelect, Select } from "chakra-react-select";
+import DiffButton from "./DiffButton";
 
-export default function CommitRegion({ isCommitMode, setIsCommitMode, branchStatusRows, setBranchStatusRows, fileViewGridRef, unseenFilesGridRef, showFilesView, setShowFilesView, selectedRows, setSelectedRows }) {
-	const { socket, isDebug, toast } = useApp();
+export default function CommitRegion() {
+	const { socket, isDebug, toast, isCommitMode, setIsCommitMode, branchStatusRows, setBranchStatusRows, fileViewGridRef, unseenFilesGridRef, showFilesView, setShowFilesView, selectedRows, configurableRowData } = useApp();
 
 	// Form Fields
 	const [sourceBranch, setSourceBranch] = useState(null);
@@ -62,6 +62,17 @@ export default function CommitRegion({ isCommitMode, setIsCommitMode, branchStat
 	};
 
 	/****************************************************
+	 * Callback Functions - Table Aesthetic Helpers
+	 ****************************************************/
+	const handleDiffResult = useCallback(
+		(result) => {
+			if (result.success) RaiseClientNotificaiton(toast, "TortoiseSVN diff opened successfully", "success", 3000);
+			else RaiseClientNotificaiton(toast, `Error opening TortoiseSVN diff: ${JSON.stringify(result.error, null, 4)}`, "error", 0);
+		},
+		[toast]
+	);
+
+	/****************************************************
 	 * Callback Functions - Table Aesthetics
 	 ****************************************************/
 	const defaultColDefs = useMemo(
@@ -78,7 +89,29 @@ export default function CommitRegion({ isCommitMode, setIsCommitMode, branchStat
 		[]
 	);
 
-	const colDefs = useMemo(
+	const colDefsLocalChanges = useMemo(
+		() => [
+			{ headerCheckboxSelection: true, checkboxSelection: true, headerCheckboxSelectionFilteredOnly: true, width: 20, resizable: false, suppressMovable: false, filter: false, editable: false, headerClass: "branch-table-header-cell", cellClass: "branch-table-body-cell" },
+			{ field: "Branch Folder" },
+			{ field: "Branch Version" },
+			{ field: "File Path", flex: 1 },
+			{ field: "Local Status", headerTooltip: "Working Copy" },
+			{
+				headerName: "Diff",
+				filter: false,
+				sortable: false,
+				resizable: false,
+				cellRenderer: DiffButton,
+				cellRendererParams: {
+					onDiffResult: handleDiffResult,
+				},
+				width: 90,
+			},
+		],
+		[]
+	);
+
+	const colDefsUntracked = useMemo(
 		() => [
 			{ headerCheckboxSelection: true, checkboxSelection: true, headerCheckboxSelectionFilteredOnly: true, width: 20, resizable: false, suppressMovable: false, filter: false, editable: false, headerClass: "branch-table-header-cell", cellClass: "branch-table-body-cell" },
 			{ field: "Branch Folder" },
@@ -224,7 +257,7 @@ export default function CommitRegion({ isCommitMode, setIsCommitMode, branchStat
 				let filesToCommit = branchStatus.status.filesToCommit;
 				let filesToUpdate = branchStatus.status.filesToUpdate;
 
-				const matchedSelectedRow = selectedRows.find((row) => row.id === branchId);
+				const matchedSelectedRow = configurableRowData.find((row) => row.id === branchId);
 
 				if (filesToUpdate.length > 0) {
 					const matchedBranchString = branchString(matchedSelectedRow["Branch Folder"], matchedSelectedRow["Branch Version"], matchedSelectedRow["SVN Branch"]);
@@ -254,7 +287,7 @@ export default function CommitRegion({ isCommitMode, setIsCommitMode, branchStat
 
 			setShowFilesView(true);
 		}
-	}, [branchStatusRows, selectedRows]);
+	}, [branchStatusRows, selectedRows, configurableRowData]);
 
 	useEffect(() => {
 		const socketCallback = (data) => {
@@ -277,12 +310,11 @@ export default function CommitRegion({ isCommitMode, setIsCommitMode, branchStat
 		if (selectedRows.length === 1) setSourceBranch(sourceBranchOptions[0]);
 	}, [selectedRows, sourceBranchOptions]);
 
+	const hasChanges = Object.keys(fileUpdates).length > 0 || fileViewRowData.length > 0 || unseenFilesRowData.length > 0;
+
 	return (
 		<Box>
 			<Box mb={6}>
-				<Heading as={"h3"} size={"md"} noOfLines={1} mb={2}>
-					SVN Commit Message
-				</Heading>
 				<Flex columnGap={2} mb={2}>
 					<FormControl width={"50%"} isRequired>
 						<FormLabel>Source Branch</FormLabel>
@@ -300,194 +332,179 @@ export default function CommitRegion({ isCommitMode, setIsCommitMode, branchStat
 					</FormControl>
 				</Flex>
 			</Box>
-			<CSSTransition in={!showFilesView} timeout={600} classNames="fade" unmountOnExit>
-				<Flex justifyContent={"center"} alignItems={"center"}>
-					<CircularProgress value={(branchStatusRows.length / selectedRows.length) * 360} color="yellow.300" size="100px">
-						<CircularProgressLabel>
-							{branchStatusRows.length} / {selectedRows.length}
-						</CircularProgressLabel>
-					</CircularProgress>
-				</Flex>
-			</CSSTransition>
-			<CSSTransition in={showFilesView} timeout={600} classNames="fade" unmountOnExit>
-				<Box>
-					<Box mb={6}>
-						<Tabs variant={"solid-rounded"} colorScheme="yellow" defaultIndex={Object.keys(fileUpdates).length >= 1 ? 0 : fileViewRowData.length >= 1 ? 1 : 2}>
-							<TabList>
-								<Tab isDisabled={Object.keys(fileUpdates).length < 1}>
-									<Tooltip label={"No files to update!"} isDisabled={Object.keys(fileUpdates).length >= 1}>
-										Files to Update
-									</Tooltip>
-								</Tab>
-								<Tab isDisabled={fileViewRowData.length < 1}>
-									<Tooltip label={"No files to commit!"} isDisabled={fileViewRowData.length >= 1}>
-										File View Table
-									</Tooltip>
-								</Tab>
-								<Tab isDisabled={unseenFilesRowData.length < 1}>
-									<Tooltip label={"No unversioned/missing files!"} isDisabled={unseenFilesRowData.length >= 1}>
-										Unversioned/Missing Files
-									</Tooltip>
-								</Tab>
-							</TabList>
-							<TabPanels>
-								<TabPanel>
-									<Heading as={"h3"} size={"md"} noOfLines={1} mb={2}>
-										Files to Update
-									</Heading>
-									{Object.keys(fileUpdates).length > 0 ? (
-										<Box>
-											<Text mb={4}>Below are the list of files which have been changed on your machine but there exists a newer version of them in the repository:</Text>
-											<Box maxHeight="200px" overflowY="auto">
-												<Table>
-													<Thead>
-														<Tr>
-															<Th>Branch</Th>
-															<Th>Path</Th>
-															<Th>
-																<Tooltip label="Working Copy" hasArrow>
-																	Local Status
-																</Tooltip>
-															</Th>
-															<Th>
-																<Tooltip label="Repository" hasArrow>
-																	Remote Status
-																</Tooltip>
-															</Th>
-														</Tr>
-													</Thead>
-													<Tbody>
-														{Object.keys(fileUpdates).map((branch) => (
-															<React.Fragment key={branch}>
-																{fileUpdates[branch].map((fileRow, index) => (
-																	<Tr key={index}>
-																		<Td>{branch}</Td>
-																		<Td>{fileRow.pathDisplay}</Td>
-																		<Td>{fileRow.wcStatus}</Td>
-																		<Td>{fileRow.reposStatus}</Td>
-																	</Tr>
-																))}
-															</React.Fragment>
-														))}
-													</Tbody>
-												</Table>
-											</Box>
-											<Text mt={4}>If you wish to commit these files, please update the associated branches!</Text>
-										</Box>
-									) : (
-										<Box>
-											<Text>Your selected branches do not contain any changed files for which a newer version exists in the repository.</Text>
-										</Box>
-									)}
-								</TabPanel>
-								<TabPanel>
-									<Heading as={"h3"} size={"md"} noOfLines={1} mb={2}>
-										File View Table
-									</Heading>
-									{fileViewRowData.length > 0 ? (
-										<Box>
-											<Flex mb={4} alignItems={"center"}>
-												<Text mr={2} fontWeight={"600"} whiteSpace={"nowrap"}>
-													Quick Filter:
-												</Text>
-												<Input placeholder="Type to search..." onInput={onQuickFilterFileViewInputChanged} width={"100%"} />
-											</Flex>
-											<div className="ag-theme-quartz-dark" style={{ height: "480px", width: "100%" }}>
-												<AgGridReact
-													ref={fileViewGridRef}
-													rowData={fileViewRowData}
-													defaultColDef={defaultColDefs}
-													columnDefs={colDefs}
-													domLayout="normal"
-													rowSelection={"multiple"}
-													rowMultiSelectWithClick={true}
-													animateRows={true}
-													onSelectionChanged={onFileViewSelectionChanged}
-													quickFilterText={quickFilterFileViewText}
-													columnMenu={"new"}
-													isRowSelectable={isFileViewRowSelectable}
-												/>
-											</div>
-											<Flex mt={4} columnGap={2} justifyContent={"flex-end"}>
-												<Tooltip label={"Requires you to select at least 1 file"} hasArrow isDisabled={selectedFiles.length > 0}>
-													<Button onClick={handleRevertFileViewFiles} colorScheme={"red"} isDisabled={selectedFiles.length < 1}>
-														Revert Selected Files
-													</Button>
-												</Tooltip>
-											</Flex>
-										</Box>
-									) : (
-										<Box>
-											<Text>Your selected branches do not contain any files to commit.</Text>
-										</Box>
-									)}
-								</TabPanel>
-								<TabPanel>
-									<Heading as={"h3"} size={"md"} noOfLines={1} mb={2}>
-										Unversioned/Missing Files
-									</Heading>
-									{unseenFilesRowData.length > 0 ? (
-										<Box>
-											<Text mb={4}>Below are the list of files which are either unversioned or missing in the repository:</Text>
-											<Flex mb={4} alignItems={"center"}>
-												<Text mr={2} fontWeight={"600"} whiteSpace={"nowrap"}>
-													Quick Filter:
-												</Text>
-												<Input placeholder="Type to search..." onInput={onQuickFilterUnseenInputChanged} width={"100%"} />
-											</Flex>
-											<div className="ag-theme-quartz-dark" style={{ height: "390px", width: "100%" }}>
-												<AgGridReact
-													ref={unseenFilesGridRef}
-													rowData={unseenFilesRowData}
-													defaultColDef={defaultColDefs}
-													columnDefs={colDefs}
-													domLayout="normal"
-													rowSelection={"multiple"}
-													rowMultiSelectWithClick={true}
-													animateRows={true}
-													onSelectionChanged={onUnseenFilesSelectionChanged}
-													quickFilterText={quickFilterUnseenText}
-													columnMenu={"new"}
-													isRowSelectable={isUnseenRowSelectable}
-												/>
-											</div>
-											<Flex mt={4} columnGap={2} justifyContent={"flex-end"}>
-												<Tooltip label={"Requires you to select at least 1 file"} hasArrow isDisabled={selectedUnseenItems.length > 0}>
-													<Button onClick={handleAddRemoveFiles} colorScheme={"green"} isDisabled={selectedUnseenItems.length < 1}>
-														Add/Remove Selected Files
-													</Button>
-												</Tooltip>
-												<Tooltip label={"Requires you to select at least 1 file"} hasArrow isDisabled={selectedUnseenItems.length > 0}>
-													<Button onClick={hanldeRevertUnseenFiles} colorScheme={"red"} isDisabled={selectedUnseenItems.length < 1}>
-														Revert Selected Files
-													</Button>
-												</Tooltip>
-											</Flex>
-										</Box>
-									) : (
-										<Box>
-											<Text>Your selected branches do not contain any unversioned or missing files.</Text>
-										</Box>
-									)}
-								</TabPanel>
-							</TabPanels>
-						</Tabs>
-					</Box>
-					<Box>
-						<Flex columnGap={2} justifyContent={"flex-end"}>
-							<Button onClick={() => setShowFilesView(false)} leftIcon={<RepeatIcon />} colorScheme={"yellow"}>
-								Refresh Process
-							</Button>
-							<Tooltip label={"Requires you to select at least 1 file"} hasArrow isDisabled={selectedFiles.length > 0}>
-								<Button onClick={performCommit} leftIcon={<Icon as={MdCloudUpload} />} colorScheme={"yellow"} isDisabled={selectedFiles.length < 1}>
-									Perform Commit
-								</Button>
+			<Skeleton isLoaded={showFilesView && hasChanges} startColor="yelow.500" endColor="yellow.500">
+				<Tabs variant={"solid-rounded"} colorScheme="yellow" defaultIndex={Object.keys(fileUpdates).length >= 1 ? 0 : fileViewRowData.length >= 1 ? 1 : 2}>
+					<TabList>
+						<Tab isDisabled={Object.keys(fileUpdates).length < 1}>
+							<Tooltip label={"No files to update!"} isDisabled={Object.keys(fileUpdates).length >= 1}>
+								Files to Update
 							</Tooltip>
-						</Flex>
-					</Box>
-					<ModalCommit isModalOpen={isOpen} onModalClose={onClose} setIsCommitMode={setIsCommitMode} setBranchStatusRows={setBranchStatusRows} setShowFilesView={setShowFilesView} socketPayload={socketPayload} />
-				</Box>
-			</CSSTransition>
+						</Tab>
+						<Tab isDisabled={fileViewRowData.length < 1}>
+							<Tooltip label={"No files to commit!"} isDisabled={fileViewRowData.length >= 1}>
+								Local Changes
+							</Tooltip>
+						</Tab>
+						<Tab isDisabled={unseenFilesRowData.length < 1}>
+							<Tooltip label={"No unversioned/missing files!"} isDisabled={unseenFilesRowData.length >= 1}>
+								Untracked Changes
+							</Tooltip>
+						</Tab>
+					</TabList>
+					<TabPanels>
+						<TabPanel>
+							{Object.keys(fileUpdates).length > 0 ? (
+								<Box>
+									<Text mb={4}>Below are the list of files which have been changed on your machine but there exists a newer version of them in the repository:</Text>
+									<Box maxHeight="200px" overflowY="auto">
+										<Table>
+											<Thead>
+												<Tr>
+													<Th>Branch</Th>
+													<Th>Path</Th>
+													<Th>
+														<Tooltip label="Working Copy" hasArrow>
+															Local Status
+														</Tooltip>
+													</Th>
+													<Th>
+														<Tooltip label="Repository" hasArrow>
+															Remote Status
+														</Tooltip>
+													</Th>
+												</Tr>
+											</Thead>
+											<Tbody>
+												{Object.keys(fileUpdates).map((branch) => (
+													<React.Fragment key={branch}>
+														{fileUpdates[branch].map((fileRow, index) => (
+															<Tr key={index}>
+																<Td>{branch}</Td>
+																<Td>{fileRow.pathDisplay}</Td>
+																<Td>{fileRow.wcStatus}</Td>
+																<Td>{fileRow.reposStatus}</Td>
+															</Tr>
+														))}
+													</React.Fragment>
+												))}
+											</Tbody>
+										</Table>
+									</Box>
+									<Text mt={4}>If you wish to commit these files, please update the associated branches!</Text>
+								</Box>
+							) : (
+								<Box>
+									<Text>Your selected branches do not contain any changed files for which a newer version exists in the repository.</Text>
+								</Box>
+							)}
+						</TabPanel>
+						<TabPanel>
+							{fileViewRowData.length > 0 ? (
+								<Box>
+									<Flex mb={4} alignItems={"center"}>
+										<Text mr={2} fontWeight={"600"} whiteSpace={"nowrap"}>
+											Quick Filter:
+										</Text>
+										<Input placeholder="Type to search..." onInput={onQuickFilterFileViewInputChanged} width={"100%"} />
+									</Flex>
+									<div className="ag-theme-quartz-dark" style={{ height: "480px", width: "100%" }}>
+										<AgGridReact
+											ref={fileViewGridRef}
+											rowData={fileViewRowData}
+											defaultColDef={defaultColDefs}
+											columnDefs={colDefsLocalChanges}
+											domLayout="normal"
+											rowSelection={"multiple"}
+											rowMultiSelectWithClick={true}
+											animateRows={true}
+											onSelectionChanged={onFileViewSelectionChanged}
+											quickFilterText={quickFilterFileViewText}
+											columnMenu={"new"}
+											isRowSelectable={isFileViewRowSelectable}
+										/>
+									</div>
+									<Flex mt={4} columnGap={2} justifyContent={"flex-end"}>
+										<Tooltip label={"Requires you to select at least 1 file"} hasArrow isDisabled={selectedFiles.length > 0}>
+											<Button onClick={handleRevertFileViewFiles} colorScheme={"red"} isDisabled={selectedFiles.length < 1}>
+												Revert Selected
+											</Button>
+										</Tooltip>
+									</Flex>
+								</Box>
+							) : (
+								<Box>
+									<Text>Your selected branches do not contain any files to commit.</Text>
+								</Box>
+							)}
+						</TabPanel>
+						<TabPanel>
+							{unseenFilesRowData.length > 0 ? (
+								<Box>
+									<Text mb={4}>Below are the list of files which are either unversioned or missing in the repository:</Text>
+									<Flex mb={4} alignItems={"center"}>
+										<Text mr={2} fontWeight={"600"} whiteSpace={"nowrap"}>
+											Quick Filter:
+										</Text>
+										<Input placeholder="Type to search..." onInput={onQuickFilterUnseenInputChanged} width={"100%"} />
+									</Flex>
+									<div className="ag-theme-quartz-dark" style={{ height: "390px", width: "100%" }}>
+										<AgGridReact
+											ref={unseenFilesGridRef}
+											rowData={unseenFilesRowData}
+											defaultColDef={defaultColDefs}
+											columnDefs={colDefsUntracked}
+											domLayout="normal"
+											rowSelection={"multiple"}
+											rowMultiSelectWithClick={true}
+											animateRows={true}
+											onSelectionChanged={onUnseenFilesSelectionChanged}
+											quickFilterText={quickFilterUnseenText}
+											columnMenu={"new"}
+											isRowSelectable={isUnseenRowSelectable}
+										/>
+									</div>
+									<Flex mt={4} columnGap={2} justifyContent={"flex-end"}>
+										<Tooltip label={"Requires you to select at least 1 file"} hasArrow isDisabled={selectedUnseenItems.length > 0}>
+											<Button onClick={handleAddRemoveFiles} colorScheme={"green"} isDisabled={selectedUnseenItems.length < 1}>
+												Add/Remove Selected
+											</Button>
+										</Tooltip>
+										<Tooltip label={"Requires you to select at least 1 file"} hasArrow isDisabled={selectedUnseenItems.length > 0}>
+											<Button onClick={hanldeRevertUnseenFiles} colorScheme={"red"} isDisabled={selectedUnseenItems.length < 1}>
+												Revert Selected
+											</Button>
+										</Tooltip>
+									</Flex>
+								</Box>
+							) : (
+								<Box>
+									<Text>Your selected branches do not contain any unversioned or missing files.</Text>
+								</Box>
+							)}
+						</TabPanel>
+					</TabPanels>
+				</Tabs>
+			</Skeleton>
+			{showFilesView && !hasChanges ? (
+				<Text mt={4} className="pulse-animation" fontWeight={600}>
+					No changes have been spotted! Please use the refresh button 👇 if you have recently made a change
+				</Text>
+			) : (
+				<></>
+			)}
+			<Box mt={6}>
+				<Flex columnGap={2} justifyContent={"center"}>
+					<Button onClick={() => setShowFilesView(false)} leftIcon={<RepeatIcon />} colorScheme={"yellow"}>
+						Refresh Process
+					</Button>
+					<Tooltip label={"Requires you to select at least 1 file"} hasArrow isDisabled={selectedFiles.length > 0}>
+						<Button onClick={performCommit} leftIcon={<Icon as={MdCloudUpload} />} colorScheme={"yellow"} isDisabled={selectedFiles.length < 1}>
+							Commit
+						</Button>
+					</Tooltip>
+				</Flex>
+			</Box>
+			<ModalCommit isModalOpen={isOpen} onModalClose={onClose} socketPayload={socketPayload} />
 		</Box>
 	);
 }

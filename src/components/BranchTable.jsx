@@ -9,8 +9,8 @@ import _ from "lodash";
 import { MdCloudDownload, MdCloudUpload } from "react-icons/md";
 import { RaiseClientNotificaiton } from "../utils/ChakraUI";
 
-export default function BranchTable({ configurableRowData, setConfigurableRowData, branchInfos, setBranchInfos, branchTableGridRef, selectedRows, setSelectedRows, isCommitMode, setIsCommitMode, setBranchStatusRows, setShowFilesView }) {
-	const { socket, config, updateConfig, isDebug, toast } = useApp();
+export default function BranchTable() {
+	const { socket, config, updateConfig, isDebug, toast, configurableRowData, setConfigurableRowData, branchInfos, setBranchInfos, branchTableGridRef, selectedRows, setSelectedRows, isCommitMode, setIsCommitMode, setBranchStatusRows, setShowFilesView } = useApp();
 
 	const [isAlertOpen, setIsAlertOpen] = useState(false);
 	const cancelRef = useRef();
@@ -256,6 +256,12 @@ export default function BranchTable({ configurableRowData, setConfigurableRowDat
 		return () => updateRowData.cancel();
 	}, [configurableRowData, branchInfos]);
 
+	// Refresh commit view when configurableRowData changes
+	useEffect(() => {
+		setBranchStatusRows([]);
+		setShowFilesView(false);
+	}, [configurableRowData]);
+
 	// Create and change intervals for refreshAll when configurableRowData changes
 	useEffect(() => {
 		const intervalDuration = 60_000 * 5; // 5 minutes
@@ -319,29 +325,24 @@ export default function BranchTable({ configurableRowData, setConfigurableRowDat
 				<Flex columnGap={2}>
 					<Tooltip label="Please select at least 1 branch" isDisabled={selectedRows.length > 0} hasArrow>
 						<Button onClick={updateSelectedBranches} leftIcon={<Icon as={MdCloudDownload} />} colorScheme={"yellow"} isDisabled={selectedRows.length < 1}>
-							Update Selected
+							Update
 						</Button>
 					</Tooltip>
 					<Tooltip label="Please select at least 1 branch" isDisabled={selectedRows.length > 0} hasArrow>
 						<Button onClick={toggleCommitSelectedBranches} leftIcon={<Icon as={MdCloudUpload} />} colorScheme={"yellow"} isDisabled={selectedRows.length < 1}>
-							{isCommitMode ? "Undo Commit" : "Commit Selected"}
+							{isCommitMode ? "Undo Commit" : "Commit"}
 						</Button>
 					</Tooltip>
 					<Tooltip label="Please select at least 1 branch" isDisabled={selectedRows.length > 0} hasArrow>
 						<Button onClick={refreshSelected} leftIcon={<RepeatIcon />} colorScheme={"yellow"} isDisabled={selectedRows.length < 1}>
-							Refresh Selected
+							Refresh
 						</Button>
 					</Tooltip>
 				</Flex>
 				<Flex columnGap={2}>
 					<Button onClick={addNewRow} leftIcon={<SmallAddIcon boxSize={8} />} colorScheme={"green"}>
-						Add New Row
+						New Row
 					</Button>
-					<Tooltip label="Please select at least 1 branch" isDisabled={selectedRows.length > 0} hasArrow>
-						<Button onClick={openAlertDialog} leftIcon={<CloseIcon />} colorScheme={"red"} isDisabled={selectedRows.length < 1}>
-							Delete Selected
-						</Button>
-					</Tooltip>
 				</Flex>
 			</Wrap>
 			<div className="ag-theme-quartz-dark">
@@ -350,6 +351,7 @@ export default function BranchTable({ configurableRowData, setConfigurableRowDat
 					rowData={rowData}
 					defaultColDef={defaultColDef}
 					columnDefs={colDefs}
+					stopEditingWhenCellsLoseFocus={true}
 					getRowStyle={getRowStyle}
 					onRowDragEnd={onRowDragEnd}
 					domLayout="autoHeight"
@@ -367,15 +369,21 @@ export default function BranchTable({ configurableRowData, setConfigurableRowDat
 					suppressFlash={true}
 				/>
 			</div>
-			<Flex mt={4} justifyContent={"end"}>
+			<Wrap mt={4} justify={"space-between"}>
 				<Flex columnGap={2}>
 					<Tooltip label="Please select at least 1 branch" isDisabled={selectedRows.length > 0} hasArrow>
 						<Button onClick={clearSelection} leftIcon={<CloseIcon />} colorScheme={"red"} isDisabled={selectedRows.length < 1}>
 							Deselect {selectedRows.length} Branch{selectedRows.length > 1 ? "es" : ""}
 						</Button>
 					</Tooltip>
+					<Tooltip label="Please select at least 1 branch" isDisabled={selectedRows.length > 0} hasArrow>
+						<Button onClick={openAlertDialog} leftIcon={<CloseIcon />} colorScheme={"red"} isDisabled={selectedRows.length < 1}>
+							Delete Selected
+						</Button>
+					</Tooltip>
 				</Flex>
-			</Flex>
+				<Flex columnGap={2}></Flex>
+			</Wrap>
 			<AlertConfirmRowDelete isAlertOpen={isAlertOpen} onCloseAlert={onCloseAlert} cancelRef={cancelRef} removeSelectedRows={removeSelectedRows} />
 		</div>
 	);

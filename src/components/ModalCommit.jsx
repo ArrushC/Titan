@@ -45,8 +45,8 @@ import _ from "lodash";
 import { CopyIcon } from "@chakra-ui/icons";
 import DiffButton from "./DiffButton";
 
-export default function ModalCommit({ isModalOpen, onModalClose, setIsCommitMode, setBranchStatusRows, setShowFilesView, socketPayload }) {
-	const { socket, toast } = useApp();
+export default function ModalCommit({ isModalOpen, onModalClose, socketPayload }) {
+	const { socket, toast, setIsCommitMode, setBranchStatusRows, setShowFilesView } = useApp();
 	const [commitLiveResponses, setCommitLiveResponses] = useState([]);
 	const { onCopy, value, setValue, hasCopied } = useClipboard("");
 
@@ -96,12 +96,14 @@ export default function ModalCommit({ isModalOpen, onModalClose, setIsCommitMode
 			{ field: "File Path", flex: 1 },
 			{ field: "Local Status", headerTooltip: "Working Copy" },
 			{
+				headerName: "Diff",
 				filter: false,
+				sortable: false,
 				cellRenderer: DiffButton,
 				cellRendererParams: {
 					onDiffResult: handleDiffResult,
 				},
-				width: 120,
+				width: 90,
 			},
 		],
 		[]
@@ -118,20 +120,41 @@ export default function ModalCommit({ isModalOpen, onModalClose, setIsCommitMode
 		setActiveStep((prev) => prev + 1);
 	}, [setActiveStep]);
 
+	const formatForClipboard = useCallback(
+		(responses, options) => {
+			const zeroWidthSpace = "\u200B".repeat(7);
+			const newline = options.includes("MarkupSupport") ? `\r\n${zeroWidthSpace}` : "\r\n";
+
+			return responses
+				.map((response) => {
+					const parts = [];
+					if (options.includes("BranchFolder")) parts.push(response["Branch Folder"]);
+					if (options.includes("BranchVersion")) parts.push(response["Branch Version"]);
+					if (options.includes("SVNBranch")) parts.push(response["branchPathFolder"]);
+
+					let line = parts.join(" ").trim();
+
+					if (options.includes("IssueNumber")) {
+						const issueNumber = response["Branch Folder"] === socketPayload["sourceBranch"]["Branch Folder"] ? socketPayload["issueNumber"] : "XXXXXX";
+						line += ` Issue [${issueNumber}]`;
+					}
+
+					const revision = response["revision"] ? response["revision"] : response["errorMessage"] || "Error";
+					line += ` Revision [${revision}]`;
+
+					return line;
+				})
+				.join(newline);
+		},
+		[socketPayload]
+	);
+
 	const handleClipboardOption = useCallback(
 		(values) => {
-			const branchFolder = (response) => (values.includes("BranchFolder") ? `${response["Branch Folder"]} ` : "");
-			const branchVersion = (response) => (values.includes("BranchVersion") ? `${response["Branch Version"]} ` : "");
-			const svnBranch = (response) => (values.includes("SVNBranch") ? `${response["branchPathFolder"]} ` : "");
-			const issueNumber = (response) => (values.includes("IssueNumber") ? ` Issue [${response["Branch Folder"] == socketPayload["sourceBranch"]["Branch Folder"] ? socketPayload["issueNumber"] : "XXXXXX"}]` : "");
-			const revision = (response) => response["revision"];
-			const clipboardText = commitLiveResponses.map((response) => `${branchFolder(response).concat(branchVersion(response).concat(svnBranch(response).trim()))}${issueNumber(response)} Revision [${revision(response)}]`).join("\n");
-			setValue((current) => {
-				if (current === clipboardText) return current;
-				return clipboardText;
-			});
+			const formattedText = formatForClipboard(commitLiveResponses, values);
+			setValue(formattedText);
 		},
-		[commitLiveResponses, setValue, socketPayload]
+		[commitLiveResponses, formatForClipboard, setValue]
 	);
 
 	/****************************************************
@@ -270,7 +293,7 @@ export default function ModalCommit({ isModalOpen, onModalClose, setIsCommitMode
 								<Text fontWeight={600}>
 									Please wait while the files are being committed to the SVN repository.
 									<br />
-									Current Live Status of the commit process:
+									Current live status of the commit process:
 								</Text>
 								<Box>
 									<List spacing={3}>
@@ -297,7 +320,7 @@ export default function ModalCommit({ isModalOpen, onModalClose, setIsCommitMode
 									</Text>
 								</Box>
 								<Card size="lg" variant={"filled"}>
-									<CardHeader p={4}>
+									<CardHeader px={4} py={0}>
 										<Flex justifyContent="space-between" alignItems={"center"}>
 											<Heading as="h3" size={"md"}>
 												SVN Revisions
@@ -307,8 +330,8 @@ export default function ModalCommit({ isModalOpen, onModalClose, setIsCommitMode
 											</IconButton>
 										</Flex>
 									</CardHeader>
-									<CardBody p={4}>
-										<Text whiteSpace={"pre-line"}>{value}</Text>
+									<CardBody px={4} py={0}>
+										<pre style={{ whiteSpace: "pre-wrap", wordWrap: "break-word" }}>{value}</pre>
 									</CardBody>
 								</Card>
 								<Box my={4}>
@@ -319,6 +342,7 @@ export default function ModalCommit({ isModalOpen, onModalClose, setIsCommitMode
 											<Checkbox value="BranchVersion">Branch Version</Checkbox>
 											<Checkbox value="SVNBranch">SVN Branch</Checkbox>
 											<Checkbox value="IssueNumber">Issue Number</Checkbox>
+											<Checkbox value="MarkupSupport">Markup Support</Checkbox>
 										</Wrap>
 									</CheckboxGroup>
 								</Box>

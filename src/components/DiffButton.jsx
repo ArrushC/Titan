@@ -1,4 +1,4 @@
-import { Button } from "@chakra-ui/react";
+import { IconButton, Tooltip } from "@chakra-ui/react";
 import React from "react";
 import { VscDiffSingle } from "react-icons/vsc";
 
@@ -18,8 +18,8 @@ export default function DiffButton(props) {
 	};
 
 	return (
-		<Button size="sm" leftIcon={<VscDiffSingle  />} onClick={handleDiff} colorScheme="yellow">
-			Diff
-		</Button>
+		<Tooltip label="Diff">
+			<IconButton aria-label="Diff" size="sm" icon={<VscDiffSingle  />} onClick={handleDiff} colorScheme="yellow"/>
+		</Tooltip>
 	);
 }

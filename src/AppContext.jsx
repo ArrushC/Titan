@@ -1,4 +1,4 @@
-import React, { createContext, useCallback, useContext, useEffect, useState } from "react";
+import React, { createContext, useCallback, useContext, useEffect, useRef, useState } from "react";
 import socketIOClient from "socket.io-client";
 import { ENDPOINT_URL } from "./utils/Constants";
 import { useToast } from "@chakra-ui/react";
@@ -10,7 +10,22 @@ const AppContext = createContext({
 	config: null,
 	updateConfig: (_) => {},
 	isDebug: false,
-	setIsDebug: (_) => {}
+	setIsDebug: (_) => {},
+	configurableRowData: [],
+	setConfigurableRowData: (_) => {},
+	branchInfos: {},
+	setBranchInfos: (_) => {},
+	branchTableGridRef: null,
+	selectedRows: [],
+	setSelectedRows: (_) => {},
+	isCommitMode: false,
+	setIsCommitMode: (_) => {},
+	branchStatusRows: [],
+	setBranchStatusRows: (_) => {},
+	fileViewGridRef: null,
+	unseenFilesGridRef: null,
+	showFilesView: false,
+	setShowFilesView: (_) => {},
 });
 
 export const useApp = () => {
@@ -65,13 +80,56 @@ export const AppProvider = ({ children }) => {
 		[socket]
 	);
 
-	const updateConfig = useCallback((updateFunction) => {
-		setConfig((currentConfig) => {
-			const newConfig = updateFunction(currentConfig);
-			saveConfig(newConfig);
-			return newConfig;
-		});
-	}, [setConfig, saveConfig]);
+	const updateConfig = useCallback(
+		(updateFunction) => {
+			setConfig((currentConfig) => {
+				const newConfig = updateFunction(currentConfig);
+				saveConfig(newConfig);
+				return newConfig;
+			});
+		},
+		[setConfig, saveConfig]
+	);
 
-	return <AppContext.Provider value={{ socket, toast, config, updateConfig, isDebug, setIsDebug }}>{children}</AppContext.Provider>;
+	// Props used in BranchTable
+	const [configurableRowData, setConfigurableRowData] = useState([]);
+	const [branchInfos, setBranchInfos] = useState({});
+	const branchTableGridRef = useRef(null);
+	const [selectedRows, setSelectedRows] = useState([]);
+
+	// Props used in CommitRegion
+	const [isCommitMode, setIsCommitMode] = useState(false);
+	const [branchStatusRows, setBranchStatusRows] = useState([]);
+	const fileViewGridRef = useRef(null);
+	const unseenFilesGridRef = useRef(null);
+	const [showFilesView, setShowFilesView] = useState(false);
+
+	return (
+		<AppContext.Provider
+			value={{
+				socket,
+				toast,
+				config,
+				updateConfig,
+				isDebug,
+				setIsDebug,
+				configurableRowData,
+				setConfigurableRowData,
+				branchInfos,
+				setBranchInfos,
+				branchTableGridRef,
+				selectedRows,
+				setSelectedRows,
+				isCommitMode,
+				setIsCommitMode,
+				branchStatusRows,
+				setBranchStatusRows,
+				fileViewGridRef,
+				unseenFilesGridRef,
+				showFilesView,
+				setShowFilesView,
+			}}>
+			{children}
+		</AppContext.Provider>
+	);
 };

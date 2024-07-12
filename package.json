@@ -2,7 +2,7 @@
 	"name": "titan",
 	"private": true,
 	"proxy": "http://localhost:5173",
-	"version": "0.0.12",
+	"version": "0.0.13",
 	"type": "module",
 	"main": "main.js",
 	"description": "A desktop application for managing your workflow in VCS and RCS environments.",
@@ -43,7 +43,6 @@
 		"react": "^18.3.1",
 		"react-dom": "^18.3.1",
 		"react-icons": "^5.2.1",
-		"react-transition-group": "^4.4.5",
 		"socket.io": "^4.7.5",
 		"socket.io-client": "^4.7.5",
 		"winston": "^3.13.1"

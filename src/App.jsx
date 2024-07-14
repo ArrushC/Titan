@@ -1,24 +1,22 @@
 import React, { useEffect, useRef, useState } from "react";
 import { Box, Button, Flex, Heading } from "@chakra-ui/react";
 import Header from "./components/Header";
-import BranchTable from "./components/BranchTable";
-import CommitRegion from "./components/CommitRegion";
+import SectionBranches from "./components/SectionBranches";
+import SectionCommit from "./components/SectionCommit";
 import { useApp } from "./AppContext";
-import { RaiseClientNotificaiton } from "./utils/ChakraUI";
+import useNotifications from "./hooks/useNotifications";
 
 function App() {
-	const { toast, isCommitMode, selectedBranches, configurableRowData, config } = useApp();
+	const { isCommitMode, selectedBranches, configurableRowData, config } = useApp();
+	const { RaiseClientNotificaiton } = useNotifications();
 
 	useEffect(() => {
 		window.electron.onAppClosing((event) => {
-			RaiseClientNotificaiton(toast, "App is closing, performing cleanup...", "info", 0);
-
-			// When done, tell the main process it's okay to quit
+			RaiseClientNotificaiton("App is closing, performing cleanup...", "info", 0);
 			window.electron.quitApp();
 		});
 
 		return () => {
-			// Clean up the listener when the component unmounts
 			window.electron.removeAppClosingListener();
 		};
 	}, []);
@@ -35,16 +33,16 @@ function App() {
 					) : (
 						<></>
 					)}
-					<BranchTable />
+					<SectionBranches />
 				</Box>
 				{!isCommitMode ? (
 					<></>
 				) : (
-					<Box id="commitRegion">
+					<Box id="sectionCommit">
 						<Heading as={"h2"} size={"lg"} noOfLines={1} mb={4} className="pulse-animation">
 							Committing {selectedBranches.length == configurableRowData.length ? "All" : `${selectedBranches.length}/${configurableRowData.length}`} Branch{selectedBranches.length == 1 ? "" : "es"}
 						</Heading>
-						<CommitRegion />
+						<SectionCommit />
 					</Box>
 				)}
 			</Flex>

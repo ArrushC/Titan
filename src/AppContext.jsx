@@ -1,8 +1,7 @@
 import React, { createContext, useCallback, useContext, useEffect, useRef, useState } from "react";
 import socketIOClient from "socket.io-client";
-import { ENDPOINT_URL } from "./utils/Constants";
 import { useToast } from "@chakra-ui/react";
-import { RaiseClientNotificaiton } from "./utils/ChakraUI";
+import _ from "lodash";
 
 const AppContext = createContext({
 	socket: null,
@@ -26,11 +25,37 @@ const AppContext = createContext({
 	untrackedChangesGridRef: null,
 	showCommitView: false,
 	setShowCommitView: (_) => {},
+	sourceBranch: null,
+	setSourceBranch: (_) => {},
+	issueNumber: null,
+	setIssueNumber: (_) => {},
+	issueOptions: [],
+	setIssueOptions: (_) => {},
+	commitMessage: "",
+	setCommitMessage: (_) => {},
+	selectedLocalChanges: [],
+	setSelectedLocalChanges: (_) => {},
+	selectedUntrackedChanges: [],
+	setSelectedUntrackedChanges: (_) => {},
+	socketPayload: null,
+	setSocketPayload: (_) => {},
 });
 
 export const useApp = () => {
 	return useContext(AppContext);
 };
+
+function createToastConfig(isServer = true, description, status = "info", duration = 3000) {
+	return {
+		position: "top",
+		variant: "solid",
+		title: isServer ? "Server Notification" : "Client Notification",
+		description: description,
+		status: status,
+		duration: duration && duration >= 1 ? duration : null,
+		isClosable: true,
+	};
+}
 
 export const AppProvider = ({ children }) => {
 	const [config, setConfig] = useState(null);
@@ -39,31 +64,27 @@ export const AppProvider = ({ children }) => {
 	const [isDebug, setIsDebug] = useState(localStorage.getItem("isDebug") === "true");
 
 	useEffect(() => {
-		const socket = socketIOClient(ENDPOINT_URL);
+		const socket = socketIOClient("http://localhost:4000");
 		setSocket(socket);
 
 		socket.on("connect", () => {
 			socket.emit("get-Config", "fetch");
 			socket.once("get-Config", (data) => {
 				setConfig(data);
-				RaiseClientNotificaiton(toast, "Configurations Loaded", "success", 2000);
+				toast(createToastConfig(false, "Configurations Loaded", "success", 2000));
 			});
 		});
 
 		socket.on("notification", (data) => {
-			toast({
-				position: "top",
-				variant: "solid",
-				title: "Server Notification",
-				description: data.description,
-				status: data.status,
-				duration: data.duration && data.duration >= 1 ? data.duration : null,
-				isClosable: true,
-			});
+			toast(createToastConfig(true, data.description, data.status, data.duration));
 		});
 
 		socket.on("disconnect", () => {
-			RaiseClientNotificaiton(toast, "Server Has Been Disconnected", "warning", 0);
+			toast(createToastConfig(true, "Server Has Been Disconnected", "warning", 0));
+		});
+
+		socket.on("reconnect", () => {
+			toast(createToastConfig(true, "Server Has Been Reconnected", "success", 2000));
 		});
 
 		return () => {
@@ -95,18 +116,62 @@ export const AppProvider = ({ children }) => {
 		[setConfig, saveConfig]
 	);
 
-	// Props used in BranchTable
+	// Props used in SectionBranches
 	const [configurableRowData, setConfigurableRowData] = useState([]);
 	const [branchInfos, setBranchInfos] = useState({});
 	const branchTableGridRef = useRef(null);
 	const [selectedBranches, setSelectedBranches] = useState([]);
 
-	// Props used in CommitRegion
+	// Props used in SectionCommit
 	const [isCommitMode, setIsCommitMode] = useState(false);
 	const [selectedBranchStatuses, setSelectedBranchStatuses] = useState([]);
 	const localChangesGridRef = useRef(null);
 	const untrackedChangesGridRef = useRef(null);
 	const [showCommitView, setShowCommitView] = useState(false);
+	const [sourceBranch, setSourceBranch] = useState(null);
+	const [issueNumber, setIssueNumber] = useState(null);
+	const [issueOptions, setIssueOptions] = useState([]);
+	const [commitMessage, setCommitMessage] = useState("");
+	const [selectedLocalChanges, setSelectedLocalChanges] = useState([]);
+	const [selectedUntrackedChanges, setSelectedUntrackedChanges] = useState([]);
+	const [socketPayload, setSocketPayload] = useState(null);
+
+	/*****************************************
+	 *  Hooks used in both sections
+	 *****************************************/
+	/**** SectionBranches ****/	
+	// Refresh commit view when configurableRowData changes
+	useEffect(() => {
+		setSelectedBranchStatuses([]);
+		setShowCommitView(false);
+	}, [configurableRowData]);
+
+	/**** SectionCommit ****/
+	// Scroll to the commit region when it is in commit mode
+	useEffect(() => {
+		if (!isCommitMode) return;
+		document.getElementById("sectionCommit")?.scrollIntoView({ behavior: "smooth", block: "start" });
+	}, [isCommitMode]);
+
+	// Refresh the commit section whenever there has been an update on untracked files being tracked by SVN.
+	useEffect(() => {
+		const socketCallback = () => {
+			setShowCommitView(false);
+		};
+
+		socket?.on("branch-refresh-unseen", socketCallback);
+		return () => socket?.off("branch-refresh-unseen", socketCallback);
+	}, [socket]);
+
+	useEffect(() => {
+		const socketCallback = (data) => {
+			if (isDebug) console.debug("Received branch status data:", data);
+			setSelectedBranchStatuses((prev) => [...prev, data]);
+		};
+
+		socket?.on("branch-status-single", socketCallback);
+		return () => socket?.off("branch-status-single", socketCallback);
+	}, [socket]);
 
 	return (
 		<AppContext.Provider
@@ -132,6 +197,20 @@ export const AppProvider = ({ children }) => {
 				untrackedChangesGridRef,
 				showCommitView,
 				setShowCommitView,
+				sourceBranch,
+				setSourceBranch,
+				issueNumber,
+				setIssueNumber,
+				issueOptions,
+				setIssueOptions,
+				commitMessage,
+				setCommitMessage,
+				selectedLocalChanges,
+				setSelectedLocalChanges,
+				selectedUntrackedChanges,
+				setSelectedUntrackedChanges,
+				socketPayload,
+				setSocketPayload,
 			}}>
 			{children}
 		</AppContext.Provider>

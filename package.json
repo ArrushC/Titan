@@ -2,7 +2,7 @@
 	"name": "titan",
 	"private": true,
 	"proxy": "http://localhost:5173",
-	"version": "1.0.0",
+	"version": "1.0.1",
 	"type": "module",
 	"main": "main.js",
 	"description": "A desktop application for managing your workflow in VCS and RCS environments.",

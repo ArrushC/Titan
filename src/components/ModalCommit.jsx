@@ -40,13 +40,16 @@ import { useApp } from "../AppContext";
 import { branchString } from "../utils/CommonConfig";
 import { MdCheckCircle, MdError } from "react-icons/md";
 import { AgGridReact } from "ag-grid-react";
-import { RaiseClientNotificaiton } from "../utils/ChakraUI";
 import _ from "lodash";
 import { CopyIcon } from "@chakra-ui/icons";
 import DiffButton from "./DiffButton";
+import useSocketEmits from "../hooks/useSocketEmits";
+import useNotifications from "../hooks/useNotifications";
 
-export default function ModalCommit({ isModalOpen, onModalClose, socketPayload }) {
-	const { socket, toast, setIsCommitMode, setSelectedBranchStatuses, setShowCommitView } = useApp();
+export default function ModalCommit({ isModalOpen, onModalClose }) {
+	const { socket, setIsCommitMode, setSelectedBranchStatuses, setShowCommitView, socketPayload } = useApp();
+	const {emitUpdateSingle, emitCommitPayload} = useSocketEmits();
+	const {RaiseClientNotificaiton} = useNotifications();
 	const [commitLiveResponses, setCommitLiveResponses] = useState([]);
 	const { onCopy, value, setValue, hasCopied } = useClipboard("");
 
@@ -55,10 +58,10 @@ export default function ModalCommit({ isModalOpen, onModalClose, socketPayload }
 	 ****************************************************/
 	const handleDiffResult = useCallback(
 		(result) => {
-			if (result.success) RaiseClientNotificaiton(toast, "TortoiseSVN diff opened successfully", "success", 3000);
-			else RaiseClientNotificaiton(toast, `Error opening TortoiseSVN diff: ${JSON.stringify(result.error, null, 4)}`, "error", 0);
+			if (result.success) RaiseClientNotificaiton("TortoiseSVN diff opened successfully", "success", 3000);
+			else RaiseClientNotificaiton(`Error opening TortoiseSVN diff: ${JSON.stringify(result.error, null, 4)}`, "error", 0);
 		},
-		[toast]
+		[RaiseClientNotificaiton]
 	);
 
 	/****************************************************
@@ -178,35 +181,30 @@ export default function ModalCommit({ isModalOpen, onModalClose, socketPayload }
 	// Step 2
 	useEffect(() => {
 		if (!isModalOpen || activeStep != 2) return;
-		socket?.emit("svn-commit", socketPayload);
-	}, [activeStep, isModalOpen, socket]);
+		emitCommitPayload(socketPayload);
+	}, [activeStep, isModalOpen, emitCommitPayload, socketPayload]);
 
 	// Step 3
 	useEffect(() => {
 		if (!isModalOpen || activeStep != 3) return;
-		RaiseClientNotificaiton(toast, "The commit process has been completed successfully", "success", 5000);
+		RaiseClientNotificaiton("The commit process has been completed successfully", "success", 5000);
 		handleClipboardOption(["BranchFolder", "BranchVersion", "SVNBranch"]);
-	}, [activeStep, isModalOpen, handleClipboardOption]);
+	}, [RaiseClientNotificaiton, activeStep, isModalOpen, handleClipboardOption]);
 
 	// Commmit process completion
 	useEffect(() => {
 		if (!isModalOpen || activeStep <= 3) return;
 		onCopy();
-		RaiseClientNotificaiton(toast, "Updating selected branches! Please wait", "info", 1500);
+		RaiseClientNotificaiton("Updating selected branches! Please wait", "info", 1500);
 		commitLiveResponses.forEach((response) => {
-			socket?.emit("svn-update-single", {
-				id: response.branchId,
-				branch: response["SVN Branch"],
-				version: response["Branch Version"],
-				folder: response["Branch Folder"],
-			});
+			emitUpdateSingle(response.branchId, response["SVN Branch"], response["Branch Version"], response["Branch Folder"]);
 		});
 		setIsCommitMode(false);
 		setSelectedBranchStatuses([]);
 		setShowCommitView(false);
 		onModalClose();
 		setActiveStep(1);
-	}, [activeStep, isModalOpen, socket, commitLiveResponses]);
+	}, [RaiseClientNotificaiton, activeStep, isModalOpen, commitLiveResponses, emitUpdateSingle]);
 
 	useEffect(() => {
 		const socketCallback = (data) => {
@@ -226,8 +224,8 @@ export default function ModalCommit({ isModalOpen, onModalClose, socketPayload }
 	}, [activeStep, commitLiveResponses]);
 
 	useEffect(() => {
-		if (hasCopied) RaiseClientNotificaiton(toast, "Copied to Clipboard", "success", 1500);
-	}, [hasCopied]);
+		if (hasCopied) RaiseClientNotificaiton("Copied to Clipboard", "success", 1500);
+	}, [hasCopied, RaiseClientNotificaiton]);
 
 	return !isModalOpen || !socketPayload ? (
 		<></>

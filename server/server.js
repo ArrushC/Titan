@@ -10,7 +10,7 @@ import { setupLogger, setupUncaughtExceptionHandler } from "./logger.js";
 import compression from "compression";
 
 // Import package.json
-import packageJson from "../package.json" with { type: "json" };
+import packageJson from "../package.json" assert { type: "json" };
 
 // Create a logger instance
 const logger = setupLogger("server.js");
@@ -290,9 +290,7 @@ io.on("connection", (socket) => {
 			postopCallback: function (err, result) {
 				if (err) {
 					logger.error("Failed to execute SVN command: " + task.command);
-					if (!isSVNConnectionError(socket, err)) {
-						emitMessage(socket, `Failed to update ${branchString(data.folder, data.version, data.branch)}`, "error");
-					}
+					if (!isSVNConnectionError(socket, err)) emitMessage(socket, `Failed to update ${branchString(data.folder, data.version, data.branch)}`, "error");
 				} else {
 					logger.info("Successfully executed SVN command: " + task.command);
 					emitMessage(socket, `Successfully updated ${branchString(data.folder, data.version, data.branch)}`, "success");
@@ -402,9 +400,7 @@ io.on("connection", (socket) => {
 			});
 		} catch (err) {
 			logger.error("Error checking SVN status:", err);
-			if (!isSVNConnectionError(socket, err)) {
-				emitMessage(socket, `Error checking SVN status for branch ${branchPath}`, "error");
-			}
+			if (!isSVNConnectionError(socket, err)) emitMessage(socket, `Error checking SVN status for branch ${branchPath}`, "error");
 		}
 
 		debugTask("svn-status-single", data, true);
@@ -439,7 +435,7 @@ io.on("connection", (socket) => {
 				postopCallback: async (err, result) => {
 					if (err) {
 						logger.error(`Failed to revert files:` + err);
-						emitMessage(socket, `Failed to revert files`, "error");
+						if (!isSVNConnectionError(socket, err)) emitMessage(socket, `Failed to revert files`, "error");
 					} else {
 						logger.info(`Successfully reverted files`);
 						emitMessage(socket, `Successfully reverted files`, "success");
@@ -466,7 +462,7 @@ io.on("connection", (socket) => {
 				postopCallback: async (err, result) => {
 					if (err) {
 						logger.error(`Failed to revert directories:` + err);
-						emitMessage(socket, `Failed to revert directories`, "error");
+						if (!isSVNConnectionError(socket, err)) emitMessage(socket, `Failed to revert directories`, "error");
 					} else {
 						logger.info(`Successfully reverted directories`);
 						emitMessage(socket, `Successfully reverted directories`, "success");
@@ -514,7 +510,7 @@ io.on("connection", (socket) => {
 				postopCallback: (err, result) => {
 					if (err) {
 						logger.error(`Failed to add all unversioned paths:` + err);
-						emitMessage(socket, `Failed to add all unversioned paths`, "error");
+						if (!isSVNConnectionError(socket, err)) emitMessage(socket, `Failed to add all unversioned paths`, "error");
 					} else {
 						logger.info(`Successfully added all unversioned paths`);
 						emitMessage(socket, `Successfully added all unversioned paths`, "success");
@@ -533,7 +529,7 @@ io.on("connection", (socket) => {
 				postopCallback: (err, result) => {
 					if (err) {
 						logger.error(`Failed to set SVN properties for all unversioned files:` + err);
-						emitMessage(socket, `Failed to set SVN properties for all unversioned files`, "error");
+						if (!isSVNConnectionError(socket, err)) emitMessage(socket, `Failed to set SVN properties for all unversioned files`, "error");
 					} else {
 						logger.info(`Successfully set SVN properties for all unversioned files`);
 						emitMessage(socket, `SVN properties for all unversioned files have been set. Please check that you have added SVN comments to ensure that your SVN client can automatically update them`, "warning", 10_000);
@@ -556,7 +552,7 @@ io.on("connection", (socket) => {
 				postopCallback: (err, result) => {
 					if (err) {
 						logger.error(`Failed to remove all missing files:` + err);
-						emitMessage(socket, `Failed to remove all missing files`, "error");
+						if (!isSVNConnectionError(socket, err)) emitMessage(socket, `Failed to remove all missing files`, "error");
 					} else {
 						logger.info(`Successfully removed all missing files`);
 						emitMessage(socket, `Successfully removed all missing files`, "success");
@@ -617,27 +613,29 @@ io.on("connection", (socket) => {
 				},
 				postopCallback: (err, result) => {
 					if (err) {
-						logger.debug(`Files by Branch: ${JSON.stringify(filesByBranch, null, 2)}`);
-						logger.debug(`SVN Branch: ${svnBranch}`);
-						logger.debug(`Issue Number: ${issueNumber}`);
-						logger.debug(`Commit Message: ${commitMessage}`);
-						logger.debug(`Prefixed Commit Message: ${prefixedCommitMessage}`);
-						logger.debug(`Files to Commit: ${JSON.stringify(files, null, 2)}`);
-						logger.error(`Failed to commit files in ${svnBranch}:`, err);
-						emitMessage(socket, `Failed to commit files in ${branchString(branchFolder, branchVersion, svnBranch)}`, "error");
+						if (!isSVNConnectionError(socket, err)) {
+							logger.debug(`Files by Branch: ${JSON.stringify(filesByBranch, null, 2)}`);
+							logger.debug(`SVN Branch: ${svnBranch}`);
+							logger.debug(`Issue Number: ${issueNumber}`);
+							logger.debug(`Commit Message: ${commitMessage}`);
+							logger.debug(`Prefixed Commit Message: ${prefixedCommitMessage}`);
+							logger.debug(`Files to Commit: ${JSON.stringify(files, null, 2)}`);
+							logger.error(`Failed to commit files in ${svnBranch}:`, err);
+							emitMessage(socket, `Failed to commit files in ${branchString(branchFolder, branchVersion, svnBranch)}`, "error");
 
-						// Emit commit status for frontend
-						io.emit("svn-commit-status-live", {
-							branchId: branchId,
-							"Branch Folder": branchFolder,
-							"Branch Version": branchVersion,
-							"SVN Branch": svnBranch,
-							branchPathFolder: branchPathFolder(svnBranch),
-							branchString: branchString(branchFolder, branchVersion, svnBranch),
-							revision: null,
-							errorMessage: err.message,
-							bulkCommitLength: Object.entries(filesByBranch).length,
-						});
+							// Emit commit status for frontend
+							io.emit("svn-commit-status-live", {
+								branchId: branchId,
+								"Branch Folder": branchFolder,
+								"Branch Version": branchVersion,
+								"SVN Branch": svnBranch,
+								branchPathFolder: branchPathFolder(svnBranch),
+								branchString: branchString(branchFolder, branchVersion, svnBranch),
+								revision: null,
+								errorMessage: err.message,
+								bulkCommitLength: Object.entries(filesByBranch).length,
+							});
+						}
 					} else {
 						logger.info(`Successfully committed files in ${svnBranch}`);
 						emitMessage(socket, `Successfully committed files in ${branchString(branchFolder, branchVersion, svnBranch)}`, "success");

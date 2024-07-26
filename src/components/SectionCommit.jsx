@@ -115,17 +115,17 @@ export default function SectionCommit() {
 				<Tabs variant={"solid-rounded"} colorScheme="yellow" defaultIndex={hasFileUpdates ? 0 : hasLocalChanges ? 1 : 2}>
 					<TabList>
 						<Tab isDisabled={!hasFileUpdates}>
-							<Tooltip label={"No files to update!"} isDisabled={hasFileUpdates}>
+							<Tooltip label={"No files to update!"} hasArrow isDisabled={hasFileUpdates}>
 								Files to Update
 							</Tooltip>
 						</Tab>
 						<Tab isDisabled={!hasLocalChanges}>
-							<Tooltip label={"No files to commit!"} isDisabled={hasLocalChanges}>
+							<Tooltip label={"No files to commit!"} hasArrow isDisabled={hasLocalChanges}>
 								Local Changes
 							</Tooltip>
 						</Tab>
 						<Tab isDisabled={!hasUntrackedChanges}>
-							<Tooltip label={"No unversioned/missing files!"} isDisabled={hasUntrackedChanges}>
+							<Tooltip label={"No unversioned/missing files!"} hasArrow isDisabled={hasUntrackedChanges}>
 								Untracked Changes
 							</Tooltip>
 						</Tab>

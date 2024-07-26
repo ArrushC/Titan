@@ -17,6 +17,8 @@ const AppContext = createContext({
 	branchTableGridRef: null,
 	selectedBranches: [],
 	setSelectedBranches: (_) => {},
+	showSelectedBranchesLog: false,
+	setShowSelectedBranchesLog: (_) => {},
 	isCommitMode: false,
 	setIsCommitMode: (_) => {},
 	selectedBranchStatuses: [],
@@ -121,6 +123,7 @@ export const AppProvider = ({ children }) => {
 	const [branchInfos, setBranchInfos] = useState({});
 	const branchTableGridRef = useRef(null);
 	const [selectedBranches, setSelectedBranches] = useState([]);
+	const [showSelectedBranchesLog, setShowSelectedBranchesLog] = useState(false);
 
 	// Props used in SectionCommit
 	const [isCommitMode, setIsCommitMode] = useState(false);
@@ -189,6 +192,8 @@ export const AppProvider = ({ children }) => {
 				branchTableGridRef,
 				selectedBranches,
 				setSelectedBranches,
+				showSelectedBranchesLog,
+				setShowSelectedBranchesLog,
 				isCommitMode,
 				setIsCommitMode,
 				selectedBranchStatuses,

@@ -22,10 +22,11 @@ export default function FooterSectionCommit({ openModal }) {
 			return;
 		}
 
-		if (!selectedLocalChanges.map((file) => file.branchId).includes(sourceBranch.value)) {
-			RaiseClientNotificaiton("Please select at least 1 file from the source branch to proceed!", "error");
-			return;
-		}
+		// 16/07/2024 AC: Commented this validation logic to allow users to commit without selecting files from the source branch for added flexibility.
+		// if (!selectedLocalChanges.map((file) => file.branchId).includes(sourceBranch.value)) {
+		// 	RaiseClientNotificaiton("Please select at least 1 file from the source branch to proceed!", "error");
+		// 	return;
+		// }
 
 		setSocketPayload({ sourceBranch: selectedBranches.find((row) => row.id == sourceBranch.value), issueNumber: issueNumber.value, commitMessage, filesToProcess: selectedLocalChanges });
 		openModal();

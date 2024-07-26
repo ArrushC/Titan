@@ -1,7 +1,7 @@
 import React, { useCallback, useEffect, useState, useRef } from "react";
 import { useApp } from "../AppContext";
 import { Button, Flex, Icon, Tooltip, Wrap } from "@chakra-ui/react";
-import { CloseIcon, RepeatIcon, SmallAddIcon } from "@chakra-ui/icons";
+import { CloseIcon, RepeatIcon, SmallAddIcon, TimeIcon } from "@chakra-ui/icons";
 import AlertConfirmRowDelete from "./AlertConfirmRowDelete";
 import { stripBranchInfo } from "../utils/CommonConfig";
 import { MdCloudDownload, MdCloudUpload } from "react-icons/md";
@@ -11,7 +11,7 @@ import useNotifications from "../hooks/useNotifications";
 import useManagedRowDataBranches from "../hooks/useManagedRowDataBranches";
 
 export default function SectionBranches() {
-	const { socket, updateConfig, isDebug, configurableRowData, branchTableGridRef, selectedBranches, setSelectedBranches, isCommitMode, setIsCommitMode, setSelectedBranchStatuses, setShowCommitView } = useApp();
+	const { socket, updateConfig, isDebug, setShowSelectedBranchesLog, configurableRowData, branchTableGridRef, selectedBranches, setSelectedBranches, isCommitMode, setIsCommitMode, setSelectedBranchStatuses, setShowCommitView } = useApp();
 	const { emitUpdateSingle, emitInfoSingle } = useSocketEmits();
 	const { RaiseClientNotificaiton } = useNotifications();
 
@@ -69,6 +69,10 @@ export default function SectionBranches() {
 		clearSelection();
 		onCloseAlert();
 	}, [selectedBranches, rowDataBranches, updateConfig]);
+
+	const viewSelectedBranchesLog = useCallback(() => {
+		setShowSelectedBranchesLog(true);
+	}, [])
 
 	const refreshSelected = useCallback(() => {
 		setRowDataBranches((currentRowData) => {
@@ -147,16 +151,18 @@ export default function SectionBranches() {
 							{isCommitMode ? "Undo Commit" : "Commit"}
 						</Button>
 					</Tooltip>
+				</Flex>
+				<Flex columnGap={2}>
+					<Tooltip label="Please select at least 1 branch" isDisabled={selectedBranches.length > 0} hasArrow>
+						<Button onClick={viewSelectedBranchesLog} leftIcon={<TimeIcon />} colorScheme={"yellow"} isDisabled={selectedBranches.length < 1}>
+							View Logs
+						</Button>
+					</Tooltip>
 					<Tooltip label="Please select at least 1 branch" isDisabled={selectedBranches.length > 0} hasArrow>
 						<Button onClick={refreshSelected} leftIcon={<RepeatIcon />} colorScheme={"yellow"} isDisabled={selectedBranches.length < 1}>
 							Refresh
 						</Button>
 					</Tooltip>
-				</Flex>
-				<Flex columnGap={2}>
-					<Button onClick={addNewRow} leftIcon={<SmallAddIcon boxSize={8} />} colorScheme={"green"}>
-						New Row
-					</Button>
 				</Flex>
 			</Wrap>
 			<TableBranches rowData={rowDataBranches} onRowValueChanged={onRowValueChanged} />
@@ -173,7 +179,11 @@ export default function SectionBranches() {
 						</Button>
 					</Tooltip>
 				</Flex>
-				<Flex columnGap={2}></Flex>
+				<Flex columnGap={2}>
+					<Button onClick={addNewRow} leftIcon={<SmallAddIcon boxSize={8} />} colorScheme={"green"}>
+						New Row
+					</Button>
+				</Flex>
 			</Wrap>
 			<AlertConfirmRowDelete isAlertOpen={isAlertOpen} onCloseAlert={onCloseAlert} cancelRef={cancelRef} removeSelectedRows={removeSelectedRows} />
 		</div>

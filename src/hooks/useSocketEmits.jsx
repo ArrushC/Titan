@@ -46,6 +46,13 @@ export default function useSocketEmits() {
 		[socket]
 	);
 
+	const emitLogSelected = useCallback(
+		(selectedBranches) => {
+			socket?.emit("svn-log-selected", { selectedBranches: selectedBranches });
+		},
+		[socket]
+	);
+
 	return {
 		emitUpdateSingle,
 		emitInfoSingle,
@@ -53,5 +60,6 @@ export default function useSocketEmits() {
 		emitFilesRevert,
 		emitFilesAddRemove,
 		emitStatusSingle,
+		emitLogSelected
 	};
 }

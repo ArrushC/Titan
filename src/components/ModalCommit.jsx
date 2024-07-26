@@ -127,8 +127,8 @@ export default function ModalCommit({ isModalOpen, onModalClose }) {
 		(responses, options) => {
 			const zeroWidthSpace = "\u200B".repeat(7);
 			const newline = options.includes("MarkupSupport") ? `\r\n${zeroWidthSpace}` : "\r\n";
-
-			return responses
+			const sortedResponses = responses.sort((a, b) => a["Branch Version"].localeCompare(b["Branch Version"]));
+			return sortedResponses
 				.map((response) => {
 					const parts = [];
 					if (options.includes("BranchFolder")) parts.push(response["Branch Folder"]);
@@ -353,12 +353,12 @@ export default function ModalCommit({ isModalOpen, onModalClose }) {
 					</Box>
 				</ModalBody>
 				<ModalFooter>
-					<Tooltip label={"Cannot undo the commit currently"} isDisabled={activeStep < 2}>
+					<Tooltip hasArrow label={"Cannot undo the commit currently"} isDisabled={activeStep < 2}>
 						<Button onClick={handlePrevious} mr={3} isDisabled={activeStep >= 2}>
 							{activeStep == 1 ? "Cancel" : "Previous"}
 						</Button>
 					</Tooltip>
-					<Tooltip label={"Cannot undo the commit currently"} isDisabled={activeStep != 2}>
+					<Tooltip hasArrow label={"Cannot undo the commit currently"} isDisabled={activeStep != 2}>
 						<Button colorScheme="yellow" onClick={handleNext} isDisabled={activeStep == 2}>
 							{activeStep == steps.length ? "Complete" : "Next"}
 						</Button>

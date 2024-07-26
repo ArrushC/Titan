@@ -87,6 +87,7 @@ export default function PanelLocalChanges({ rowDataLocalChanges, setRowDataLocal
 							quickFilterText={quickFilterFileViewText}
 							domLayout="normal"
 							rowSelection={"multiple"}
+							suppressRowClickSelection={true}
 							rowMultiSelectWithClick={true}
 							animateRows={true}
 							columnMenu={"new"}

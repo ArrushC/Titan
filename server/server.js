@@ -114,7 +114,7 @@ async function writeTargetsFile(targets = []) {
  ************************************/
 function executeSvnCommand(commands) {
 	if (!Array.isArray(commands)) {
-		commands = [commands]; // Wrap the single command object in an array for uniform processing
+		commands = [commands];
 	}
 
 	return Promise.all(
@@ -152,6 +152,45 @@ function executeSvnCommand(commands) {
 				})
 		)
 	);
+}
+
+function executeSvnCommandParallel(commands) {
+	if (!Array.isArray(commands)) {
+		commands = [commands];
+	}
+
+	// Dont return promise, just execute the commands in parallel
+	commands.forEach((cmd) => {
+		const args = Array.isArray(cmd.args) ? cmd.args : [cmd.args];
+		const options = cmd.options || {};
+
+		args.push(options);
+
+		const opCallback = (err, result) => {
+			if (err) {
+				logger.error(`Error executing SVN operation ${cmd.command} with args ${JSON.stringify(args, null, 2)}:`);
+				logger.error(JSON.stringify(err, null, 2));
+			}
+			cmd.postopCallback(err, result);
+		};
+
+		// Check whether to execute a utility command or a regular SVN command
+		if (cmd.isUtilityCmd) {
+			// Handle utility commands
+			if (typeof svnUltimate.util[cmd.command] !== "function") {
+				logger.error(`Invalid SVN utility command: ${cmd.command}`);
+				return;
+			}
+			svnUltimate.util[cmd.command](...args, opCallback);
+		} else {
+			// Handle regular SVN commands
+			if (typeof svnUltimate.commands[cmd.command] !== "function") {
+				logger.error(`Invalid SVN command: ${cmd.command}`);
+				return;
+			}
+			svnUltimate.commands[cmd.command](...args, opCallback);
+		}
+	});
 }
 
 const svnQueueSerial = async.queue(async (task) => {
@@ -660,6 +699,54 @@ io.on("connection", (socket) => {
 		}
 
 		debugTask("svn-commit", data, true);
+	});
+
+	socket.on("svn-log-selected", async (data) => {
+		debugTask("svn-log-selected", data, false);
+
+		if (!data.selectedBranches || data.selectedBranches.length === 0) {
+			emitMessage(socket, "No branches selected", "error");
+			return;
+		}
+
+		const tasks = data.selectedBranches.map((branch) => {
+			return {
+				command: "log",
+				args: [branch["SVN Branch"]],
+				options: { revision: "1:HEAD" },
+				postopCallback: (err, result) => {
+					if (err) {
+						logger.error(`Failed to fetch logs for branch ${branch["SVN Branch"]}:`, err);
+						if (!isSVNConnectionError(socket, err)) emitMessage(socket, `Failed to fetch logs for branch ${branch["SVN Branch"]}`, "error");
+					} else {
+						const logs = result.logentry || [];
+						const logsArray = Array.isArray(logs) ? logs : [logs];
+						const formattedLogs = logsArray.map((entry) => {
+							return {
+								revision: entry["$"].revision,
+								branchFolder: branch["Branch Folder"],
+								branchVersion: branch["Branch Version"],
+								author: entry.author,
+								message: entry.msg,
+								date: (new Date(entry.date)).toLocaleString("en-GB"),
+							};
+						});
+
+						socket.emit("svn-log-result", { ...branch, logs: formattedLogs });
+					}
+				},
+			};
+		});
+
+		try {
+			// Execute SVN commands in parallel
+			executeSvnCommandParallel(tasks);
+		} catch (err) {
+			logger.error("Error fetching SVN logs:", err);
+			if (!isSVNConnectionError(socket, err)) emitMessage(socket, "Error fetching SVN logs", "error");
+		}
+
+		debugTask("svn-log-selected", data, true);
 	});
 
 	socket.on("client-log", (data) => {

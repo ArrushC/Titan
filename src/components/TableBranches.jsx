@@ -116,6 +116,7 @@ export default function TableBranches({rowData, onRowValueChanged}) {
 				getRowStyle={getRowStyle}
 				onRowDragEnd={onRowDragEnd}
 				domLayout="autoHeight"
+				suppressRowClickSelection={true}
 				rowSelection={"multiple"}
 				rowMultiSelectWithClick={true}
 				animateRows={true}

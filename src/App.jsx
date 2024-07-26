@@ -5,6 +5,7 @@ import SectionBranches from "./components/SectionBranches";
 import SectionCommit from "./components/SectionCommit";
 import { useApp } from "./AppContext";
 import useNotifications from "./hooks/useNotifications";
+import SectionBranchLog from "./components/SectionBranchLog";
 
 function App() {
 	const { isCommitMode, selectedBranches, configurableRowData, config } = useApp();
@@ -46,6 +47,7 @@ function App() {
 					</Box>
 				)}
 			</Flex>
+			<SectionBranchLog />
 		</Box>
 	);
 }

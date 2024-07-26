@@ -6,7 +6,7 @@ export default function TableLogs({ rowDataLogs, quickFilterLogsText }) {
 		() => ({
 			sortable: true,
 			resizable: false,
-			wrapText: false,
+			wrapText: true,
 			autoHeight: true,
 			filter: true,
 			suppressMovable: true,
@@ -31,7 +31,7 @@ export default function TableLogs({ rowDataLogs, quickFilterLogsText }) {
 
 	return (
 		<div className="ag-theme-quartz-dark compact" style={{ height: "95%", width: "100%" }}>
-			<AgGridReact rowData={rowDataLogs} defaultColDef={defaultColDefs} columnDefs={colDefs} quickFilterText={quickFilterLogsText} domLayout="normal" columnMenu={"new"} />
+			<AgGridReact rowData={rowDataLogs} defaultColDef={defaultColDefs} columnDefs={colDefs} quickFilterText={quickFilterLogsText} domLayout="normal" columnMenu={"new"} animateRows={false} enableCellTextSelection ensureDomOrder />
 		</div>
 	);
 }

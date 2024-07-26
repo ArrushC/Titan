@@ -4,9 +4,9 @@ import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { useApp } from "../AppContext";
 import useSocketEmits from "../hooks/useSocketEmits";
 
-export default function PanelUntrackedChanges({rowDataUntrackedChanges, setRowDataUntrackedChanges, defaultColDefsCommit}) {
-	const {untrackedChangesGridRef, selectedUntrackedChanges, setSelectedUntrackedChanges, isDebug, selectedBranches, showCommitView} = useApp();
-	const {emitFilesAddRemove, emitFilesRevert} = useSocketEmits();
+export default function PanelUntrackedChanges({ rowDataUntrackedChanges, setRowDataUntrackedChanges, defaultColDefsCommit }) {
+	const { untrackedChangesGridRef, selectedUntrackedChanges, setSelectedUntrackedChanges, isDebug, selectedBranches, showCommitView } = useApp();
+	const { emitFilesAddRemove, emitFilesRevert } = useSocketEmits();
 
 	const [quickFilterUnseenText, setQuickFilterUnseenText] = useState("");
 
@@ -45,7 +45,7 @@ export default function PanelUntrackedChanges({rowDataUntrackedChanges, setRowDa
 	useEffect(() => {
 		if (selectedBranches.length < 1 || showCommitView) return;
 		setQuickFilterUnseenText("");
-		setRowDataUntrackedChanges([])
+		setRowDataUntrackedChanges([]);
 		setSelectedUntrackedChanges([]);
 	}, [selectedBranches, showCommitView]);
 
@@ -73,6 +73,8 @@ export default function PanelUntrackedChanges({rowDataUntrackedChanges, setRowDa
 							rowMultiSelectWithClick={true}
 							animateRows={true}
 							columnMenu={"new"}
+							enableCellTextSelection
+							ensureDomOrder
 						/>
 					</div>
 					<Flex mt={4} columnGap={2} justifyContent={"flex-end"}>

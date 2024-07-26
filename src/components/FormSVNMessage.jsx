@@ -1,13 +1,12 @@
 import { Box, Flex, FormControl, FormLabel, IconButton, Textarea, Tooltip } from "@chakra-ui/react";
 import { CreatableSelect, Select } from "chakra-react-select";
-import React, { useCallback, useEffect, useMemo, useState } from "react";
+import React, { useCallback, useEffect, useMemo } from "react";
 import { useApp } from "../AppContext";
 import { branchString } from "../utils/CommonConfig";
 import { CloseIcon } from "@chakra-ui/icons";
 
 export default function FormSVNMessage() {
 	const { sourceBranch, setSourceBranch, issueNumber, setIssueNumber, commitMessage, setCommitMessage, issueOptions, setIssueOptions, selectedBranches, isCommitMode } = useApp();
-	const [commitMessageHistory, setCommitMessageHistory] = useState([]);
 
 	const sourceBranchOptions = useMemo(
 		() =>
@@ -39,31 +38,14 @@ export default function FormSVNMessage() {
 		localStorage.removeItem("issueOptions");
 	};
 
-	const handleCommitMessageChange = (selectedMessage) => {
-		if (selectedMessage) {
-			setCommitMessage(selectedMessage.value.replace(/["`]/g, "'"));
-			if (!commitMessageHistory.some((option) => option.value === selectedMessage.value)) {
-				const newHistory = [selectedMessage, ...commitMessageHistory];
-				setCommitMessageHistory(newHistory);
-				localStorage.setItem("commitMessageHistory", JSON.stringify(newHistory));
-			}
-		} else {
-			setCommitMessage("");
-		}
-	};
-
-	const handleClearCommitMessageHistory = () => {
-		setCommitMessageHistory([]);
-		localStorage.removeItem("commitMessageHistory");
-	};
+	const handleCommitMessageChange = useCallback((e) => {
+		setCommitMessage(String(e.target.value).replace(/["`]/g, "'"));
+	}, [setCommitMessage]);
 
 	// Load options from localStorage on component mount
 	useEffect(() => {
 		const savedIssueOptions = localStorage.getItem("issueOptions");
 		if (savedIssueOptions) setIssueOptions(JSON.parse(savedIssueOptions));
-
-		const savedCommitMessageHistory = localStorage.getItem("commitMessageHistory");
-		if (savedCommitMessageHistory) setCommitMessageHistory(JSON.parse(savedCommitMessageHistory));
 	}, []);
 
 	useEffect(() => {
@@ -97,24 +79,11 @@ export default function FormSVNMessage() {
 					</Tooltip>
 				</Flex>
 			</Flex>
-			<Flex alignItems={"flex-end"} columnGap={2}>
+			<Flex>
 				<FormControl width={"100%"} isRequired>
 					<FormLabel>Commit Message</FormLabel>
-					<CreatableSelect
-						size={"lg"}
-						value={commitMessage ? { value: commitMessage, label: commitMessage } : null}
-						onChange={handleCommitMessageChange}
-						options={commitMessageHistory}
-						placeholder="Enter or select a commit message"
-						formatCreateLabel={(inputValue) => `Create message "${inputValue}"`}
-						selectedOptionStyle="check"
-						selectedOptionColorScheme="yellow"
-						isClearable
-					/>
+					<Textarea placeholder={"Enter Commit Message"} resize={"vertical"} onInput={handleCommitMessageChange} value={commitMessage} />
 				</FormControl>
-				<Tooltip label="Clear All Commit Message History" hasArrow>
-					<IconButton colorScheme={"red"} aria-label="Clear Commit Message History" size="lg" onClick={handleClearCommitMessageHistory} icon={<CloseIcon />} />
-				</Tooltip>
 			</Flex>
 		</Box>
 	);

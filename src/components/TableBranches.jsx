@@ -5,9 +5,9 @@ import { useApp } from "../AppContext";
 import { IconButton, Tooltip } from "@chakra-ui/react";
 import { stripBranchInfo } from "../utils/CommonConfig";
 
-export default function TableBranches({rowData, onRowValueChanged}) {
-	const {config, branchTableGridRef, updateConfig, isDebug, selectedBranches, setSelectedBranches, setSelectedBranchStatuses, setShowCommitView} = useApp();
-	
+export default function TableBranches({ rowData, onRowValueChanged }) {
+	const { config, branchTableGridRef, updateConfig, isDebug, selectedBranches, setSelectedBranches, setSelectedBranchStatuses, setShowCommitView } = useApp();
+
 	const copyRow = useCallback(
 		(currentRowData) => {
 			const newRow = {
@@ -129,6 +129,8 @@ export default function TableBranches({rowData, onRowValueChanged}) {
 				getRowNodeId={(data) => data.id}
 				immutableData={true}
 				suppressFlash={true}
+				enableCellTextSelection
+				ensureDomOrder
 			/>
 		</div>
 	);

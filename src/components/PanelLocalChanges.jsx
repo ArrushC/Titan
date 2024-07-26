@@ -65,7 +65,7 @@ export default function PanelLocalChanges({ rowDataLocalChanges, setRowDataLocal
 		setQuickFilterFileViewText("");
 		setRowDataLocalChanges([]);
 		setSelectedLocalChanges([]);
-	}, [selectedBranches, showCommitView])
+	}, [selectedBranches, showCommitView]);
 
 	return (
 		<Box>
@@ -91,6 +91,8 @@ export default function PanelLocalChanges({ rowDataLocalChanges, setRowDataLocal
 							rowMultiSelectWithClick={true}
 							animateRows={true}
 							columnMenu={"new"}
+							enableCellTextSelection
+							ensureDomOrder
 						/>
 					</div>
 					<Flex mt={4} columnGap={2} justifyContent={"flex-end"}>

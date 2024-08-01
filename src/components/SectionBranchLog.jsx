@@ -8,7 +8,7 @@ import TableLogs from "./TableLogs";
 import { RepeatIcon } from "@chakra-ui/icons";
 
 export default function SectionBranchLog() {
-	const { showSelectedBranchesLog, setShowSelectedBranchesLog, selectedBranches, socket } = useApp();
+	const { showSelectedBranchesLog, setShowSelectedBranchesLog, setSelectedBranches, selectedBranches, socket } = useApp();
 	const { emitLogSelected } = useSocketEmits();
 	const [logData, setLogData] = React.useState([]);
 	const rowDataLogs = logData.map((logData) => logData.logs).flat();
@@ -24,20 +24,23 @@ export default function SectionBranchLog() {
 
 	const refreshLogs = useCallback(() => {
 		setLogData([]);
-		emitLogSelected(selectedBranches);
-	}, [selectedBranches]);
+	}, [setLogData]);
 
 	useEffect(() => {
 		setLogData([]);
-	}, [showSelectedBranchesLog, selectedBranches]);
+	}, [selectedBranches]);
 
 	useEffect(() => {
-		if (!showSelectedBranchesLog) return;
-		emitLogSelected(selectedBranches);
-	}, [showSelectedBranchesLog]);
+		if (logData.length === 0)
+			setSelectedBranches((currSelectedBranches) => {
+				if (currSelectedBranches.length > 0) emitLogSelected(currSelectedBranches);
+				return currSelectedBranches;
+			});
+	}, [logData]);
 
 	useEffect(() => {
 		const socketCallback = (data) => {
+			console.debug("Received svn-log-result from socket in SectionBranchLog component in background");
 			setLogData((prevData) => [...prevData, data]);
 		};
 

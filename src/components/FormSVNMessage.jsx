@@ -26,7 +26,7 @@ export default function FormSVNMessage() {
 
 	const handleIssueNumberChange = (selectedOption) => {
 		setIssueNumber(selectedOption);
-		if (selectedOption && !issueOptions.some((option) => option.value === selectedOption.value)) {
+		if (selectedOption && !issueOptions.some((option) => String(option.value).trim() === String(selectedOption.value).trim())) {
 			const newOptions = [...issueOptions, selectedOption];
 			setIssueOptions(newOptions);
 			localStorage.setItem("issueOptions", JSON.stringify(newOptions));
@@ -38,9 +38,12 @@ export default function FormSVNMessage() {
 		localStorage.removeItem("issueOptions");
 	};
 
-	const handleCommitMessageChange = useCallback((e) => {
-		setCommitMessage(String(e.target.value).replace(/["`]/g, "'"));
-	}, [setCommitMessage]);
+	const handleCommitMessageChange = useCallback(
+		(e) => {
+			setCommitMessage(String(e.target.value).replace(/["`]/g, "'"));
+		},
+		[setCommitMessage]
+	);
 
 	// Load options from localStorage on component mount
 	useEffect(() => {
@@ -72,7 +75,18 @@ export default function FormSVNMessage() {
 				<Flex width={"50%"} alignItems={"flex-end"} columnGap={2}>
 					<FormControl isRequired>
 						<FormLabel>Issue Number</FormLabel>
-						<CreatableSelect value={issueNumber} onChange={handleIssueNumberChange} options={issueOptions} placeholder="Select or create an issue number" formatCreateLabel={(inputValue) => `Create issue "${inputValue}"`} selectedOptionStyle="check" selectedOptionColorScheme="yellow" isClearable />
+						<CreatableSelect
+							value={issueNumber}
+							onChange={handleIssueNumberChange}
+							options={issueOptions}
+							placeholder="Select or create an issue number"
+							formatCreateLabel={(inputValue) => `Create issue "${inputValue}"`}
+							selectedOptionStyle="check"
+							selectedOptionColorScheme="yellow"
+							isClearable
+							isSearchable
+							createOptionPosition="first"
+						/>
 					</FormControl>
 					<Tooltip label="Clear All Issue Number Options" hasArrow>
 						<IconButton colorScheme={"red"} aria-label="Clear Issue Number Options" size="md" onClick={handleClearIssueOptions} icon={<CloseIcon />} />

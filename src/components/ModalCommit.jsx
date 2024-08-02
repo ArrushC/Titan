@@ -274,6 +274,10 @@ export default function ModalCommit({ isModalOpen, onModalClose }) {
 											<ListIcon as={MdCheckCircle} color="yellow.500" />
 											Commit Message: <Code>{socketPayload["commitMessage"]}</Code>
 										</ListItem>
+										<ListItem>
+											<ListIcon as={MdCheckCircle} color="yellow.500" />
+											Example: <Code>Issue {socketPayload["issueNumber"]} ({socketPayload["sourceBranch"]["Branch Folder"]} {socketPayload["sourceBranch"]["Branch Version"]}): {socketPayload["commitMessage"]}</Code>
+										</ListItem>
 									</List>
 								</Box>
 								<Box>

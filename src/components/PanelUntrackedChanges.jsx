@@ -35,7 +35,7 @@ export default function PanelUntrackedChanges({ rowDataUntrackedChanges, setRowD
 		() => [
 			{ headerCheckboxSelection: true, checkboxSelection: true, headerCheckboxSelectionFilteredOnly: true, width: 20, resizable: false, suppressMovable: false, filter: false, editable: false, headerClass: "branch-table-header-cell", cellClass: "branch-table-body-cell" },
 			{ field: "Branch Folder" },
-			{ field: "Branch Version" },
+			{ field: "Branch Version", sort: "asc" },
 			{ field: "File Path", flex: 1 },
 			{ field: "Local Status", headerTooltip: "Working Copy" },
 		],

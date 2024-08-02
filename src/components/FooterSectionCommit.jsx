@@ -40,7 +40,7 @@ export default function FooterSectionCommit({ openModal }) {
 				</Button>
 				<Tooltip label={"Requires you to select at least 1 file"} hasArrow isDisabled={selectedLocalChanges.length > 0}>
 					<Button onClick={performCommit} leftIcon={<Icon as={MdCloudUpload} />} colorScheme={"yellow"} isDisabled={selectedLocalChanges.length < 1}>
-						Commit
+						Commit {selectedLocalChanges.length} File{selectedLocalChanges.length > 1 ? "s" : ""}
 					</Button>
 				</Tooltip>
 			</Flex>

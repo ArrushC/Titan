@@ -3,9 +3,9 @@ import { CreatableSelect, Select } from "chakra-react-select";
 import React, { useCallback, useEffect, useMemo } from "react";
 import { useApp } from "../AppContext";
 import { branchString } from "../utils/CommonConfig";
-import { CloseIcon } from "@chakra-ui/icons";
+import { CloseIcon, ExternalLinkIcon } from "@chakra-ui/icons";
 
-export default function FormSVNMessage() {
+export default function FormSVNMessage({ openMessageAutoFillModal }) {
 	const { sourceBranch, setSourceBranch, issueNumber, setIssueNumber, commitMessage, setCommitMessage, issueOptions, setIssueOptions, selectedBranches, isCommitMode } = useApp();
 
 	const sourceBranchOptions = useMemo(
@@ -88,8 +88,11 @@ export default function FormSVNMessage() {
 							createOptionPosition="first"
 						/>
 					</FormControl>
-					<Tooltip label="Clear All Issue Number Options" hasArrow>
-						<IconButton colorScheme={"red"} aria-label="Clear Issue Number Options" size="md" onClick={handleClearIssueOptions} icon={<CloseIcon />} />
+					<Tooltip label="Clear All Options" hasArrow>
+						<IconButton colorScheme={"red"} aria-label="Clear All Options" size="md" onClick={handleClearIssueOptions} icon={<CloseIcon />} />
+					</Tooltip>
+					<Tooltip label="Auto Fill Message" hasArrow>
+						<IconButton colorScheme={"yellow"} aria-label="Auto Fill Message" size="md" onClick={() => openMessageAutoFillModal()} icon={<ExternalLinkIcon />} />
 					</Tooltip>
 				</Flex>
 			</Flex>

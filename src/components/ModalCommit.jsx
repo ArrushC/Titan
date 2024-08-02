@@ -46,7 +46,7 @@ import DiffButton from "./DiffButton";
 import useSocketEmits from "../hooks/useSocketEmits";
 import useNotifications from "../hooks/useNotifications";
 
-export default function ModalCommit({ isModalOpen, onModalClose }) {
+export default function ModalCommit({ isModalOpen, closeModal }) {
 	const { socket, setIsCommitMode, setSelectedBranchStatuses, setShowCommitView, socketPayload } = useApp();
 	const {emitUpdateSingle, emitCommitPayload} = useSocketEmits();
 	const {RaiseClientNotificaiton} = useNotifications();
@@ -172,7 +172,7 @@ export default function ModalCommit({ isModalOpen, onModalClose }) {
 	// Below Step 1
 	useEffect(() => {
 		if (!isModalOpen || activeStep != 0) return;
-		onModalClose();
+		closeModal();
 		setActiveStep(1);
 		setCommitLiveResponses([]);
 		setValue("");
@@ -202,7 +202,7 @@ export default function ModalCommit({ isModalOpen, onModalClose }) {
 		setIsCommitMode(false);
 		setSelectedBranchStatuses([]);
 		setShowCommitView(false);
-		onModalClose();
+		closeModal();
 		setActiveStep(1);
 	}, [RaiseClientNotificaiton, activeStep, isModalOpen, commitLiveResponses, emitUpdateSingle]);
 
@@ -230,7 +230,7 @@ export default function ModalCommit({ isModalOpen, onModalClose }) {
 	return !isModalOpen || !socketPayload ? (
 		<></>
 	) : (
-		<Modal isOpen={isModalOpen} onClose={onModalClose} isCentered motionPreset="slideInBottom" scrollBehavior="inside" size="xl" closeOnOverlayClick={activeStep == 1}>
+		<Modal isOpen={isModalOpen} onClose={closeModal} isCentered motionPreset="slideInBottom" scrollBehavior="inside" size="xl" closeOnOverlayClick={activeStep == 1}>
 			<ModalOverlay />
 			<ModalContent maxH={"95%"} maxW="95%">
 				<ModalHeader>

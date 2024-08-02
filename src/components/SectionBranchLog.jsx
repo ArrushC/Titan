@@ -6,29 +6,12 @@ import { MdCheckCircle, MdDirectionsRun } from "react-icons/md";
 import { branchString } from "../utils/CommonConfig";
 import TableLogs from "./TableLogs";
 import { RepeatIcon } from "@chakra-ui/icons";
+import useStoreSVNLogs from "../hooks/useStoreSVNLogs";
 
 export default function SectionBranchLog() {
-	const { showSelectedBranchesLog, setShowSelectedBranchesLog, setSelectedBranches, selectedBranches, socket } = useApp();
+	const { showSelectedBranchesLog, setShowSelectedBranchesLog, setSelectedBranches, selectedBranches, socket, logData, setLogData } = useApp();
 	const { emitLogSelected } = useSocketEmits();
-	const [logData, setLogData] = React.useState([]);
-	const rowDataLogs = logData.map((logData) => logData.logs).flat();
-
-	const [quickFilterLogsText, setQuickFilterLogsText] = useState("");
-
-	const onQuickFilterLogsInputChanged = useCallback(
-		(e) => {
-			setQuickFilterLogsText(e.target.value);
-		},
-		[setQuickFilterLogsText]
-	);
-
-	const refreshLogs = useCallback(() => {
-		setLogData([]);
-	}, [setLogData]);
-
-	useEffect(() => {
-		setLogData([]);
-	}, [selectedBranches]);
+	const { rowDataLogs, quickFilterLogsText, onQuickFilterLogsInputChanged, refreshLogs } = useStoreSVNLogs();
 
 	useEffect(() => {
 		if (logData.length === 0)

@@ -5,7 +5,7 @@ import { MdCloudUpload } from "react-icons/md";
 import { useApp } from "../AppContext";
 import useNotifications from "../hooks/useNotifications";
 
-export default function FooterSectionCommit({ openModal }) {
+export default function FooterSectionCommit({ openCommitModal }) {
 	const { setShowCommitView, selectedLocalChanges, sourceBranch, issueNumber, commitMessage, setSocketPayload, selectedBranches } = useApp();
 	const { RaiseClientNotificaiton } = useNotifications();
 
@@ -29,7 +29,7 @@ export default function FooterSectionCommit({ openModal }) {
 		// }
 
 		setSocketPayload({ sourceBranch: selectedBranches.find((row) => row.id == sourceBranch.value), issueNumber: issueNumber.value, commitMessage, filesToProcess: selectedLocalChanges });
-		openModal();
+		openCommitModal();
 	}, [sourceBranch, issueNumber, commitMessage, RaiseClientNotificaiton, selectedLocalChanges, selectedBranches]);
 
 	return (

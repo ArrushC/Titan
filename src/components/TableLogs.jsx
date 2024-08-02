@@ -1,7 +1,7 @@
 import { AgGridReact } from "ag-grid-react";
 import React, { useMemo } from "react";
 
-export default function TableLogs({ rowDataLogs, quickFilterLogsText }) {
+export default function TableLogs({ rowDataLogs, quickFilterLogsText, isAutofill = false }) {
 	const defaultColDefs = useMemo(
 		() => ({
 			sortable: true,
@@ -30,7 +30,7 @@ export default function TableLogs({ rowDataLogs, quickFilterLogsText }) {
 	);
 
 	return (
-		<div className="ag-theme-quartz-dark compact" style={{ height: "90%", width: "100%" }}>
+		<div className="ag-theme-quartz-dark compact" style={{ height: isAutofill ? "85%" : "90%", width: "100%" }}>
 			<AgGridReact rowData={rowDataLogs} defaultColDef={defaultColDefs} columnDefs={colDefs} quickFilterText={quickFilterLogsText} domLayout="normal" columnMenu={"new"} animateRows={false} enableCellTextSelection ensureDomOrder pagination={true} paginationAutoPageSize={true} />
 		</div>
 	);

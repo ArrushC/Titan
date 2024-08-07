@@ -95,7 +95,7 @@ export default function ModalCommit({ isModalOpen, closeModal }) {
 	const colDefs = useMemo(
 		() => [
 			{ field: "Branch Folder" },
-			{ field: "Branch Version" },
+			{ field: "Branch Version", sort: "asc"},
 			{ field: "File Path", flex: 1 },
 			{ field: "Local Status", headerTooltip: "Working Copy" },
 			{

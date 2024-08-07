@@ -713,7 +713,7 @@ io.on("connection", (socket) => {
 			return {
 				command: "log",
 				args: [branch["SVN Branch"]],
-				options: { revision: "1:HEAD" },
+				options: { revision: "1:HEAD", params: ["--stop-on-copy"] },
 				postopCallback: (err, result) => {
 					if (err) {
 						logger.error(`Failed to fetch logs for branch ${branch["SVN Branch"]}:`, err);

@@ -3,9 +3,9 @@ import { CreatableSelect, Select } from "chakra-react-select";
 import React, { useCallback, useEffect, useMemo } from "react";
 import { useApp } from "../AppContext";
 import { branchString } from "../utils/CommonConfig";
-import { CloseIcon } from "@chakra-ui/icons";
+import { CloseIcon, ExternalLinkIcon } from "@chakra-ui/icons";
 
-export default function FormSVNMessage() {
+export default function FormSVNMessage({ openMessageAutoFillModal }) {
 	const { sourceBranch, setSourceBranch, issueNumber, setIssueNumber, commitMessage, setCommitMessage, issueOptions, setIssueOptions, selectedBranches, isCommitMode } = useApp();
 
 	const sourceBranchOptions = useMemo(
@@ -26,7 +26,7 @@ export default function FormSVNMessage() {
 
 	const handleIssueNumberChange = (selectedOption) => {
 		setIssueNumber(selectedOption);
-		if (selectedOption && !issueOptions.some((option) => option.value === selectedOption.value)) {
+		if (selectedOption && !issueOptions.some((option) => String(option.value).trim() === String(selectedOption.value).trim())) {
 			const newOptions = [...issueOptions, selectedOption];
 			setIssueOptions(newOptions);
 			localStorage.setItem("issueOptions", JSON.stringify(newOptions));
@@ -38,9 +38,12 @@ export default function FormSVNMessage() {
 		localStorage.removeItem("issueOptions");
 	};
 
-	const handleCommitMessageChange = useCallback((e) => {
-		setCommitMessage(String(e.target.value).replace(/["`]/g, "'"));
-	}, [setCommitMessage]);
+	const handleCommitMessageChange = useCallback(
+		(e) => {
+			setCommitMessage(String(e.target.value).replace(/["`]/g, "'"));
+		},
+		[setCommitMessage]
+	);
 
 	// Load options from localStorage on component mount
 	useEffect(() => {
@@ -72,10 +75,24 @@ export default function FormSVNMessage() {
 				<Flex width={"50%"} alignItems={"flex-end"} columnGap={2}>
 					<FormControl isRequired>
 						<FormLabel>Issue Number</FormLabel>
-						<CreatableSelect value={issueNumber} onChange={handleIssueNumberChange} options={issueOptions} placeholder="Select or create an issue number" formatCreateLabel={(inputValue) => `Create issue "${inputValue}"`} selectedOptionStyle="check" selectedOptionColorScheme="yellow" isClearable />
+						<CreatableSelect
+							value={issueNumber}
+							onChange={handleIssueNumberChange}
+							options={issueOptions}
+							placeholder="Select or create an issue number"
+							formatCreateLabel={(inputValue) => `Create issue "${inputValue}"`}
+							selectedOptionStyle="check"
+							selectedOptionColorScheme="yellow"
+							isClearable
+							isSearchable
+							createOptionPosition="first"
+						/>
 					</FormControl>
-					<Tooltip label="Clear All Issue Number Options" hasArrow>
-						<IconButton colorScheme={"red"} aria-label="Clear Issue Number Options" size="md" onClick={handleClearIssueOptions} icon={<CloseIcon />} />
+					<Tooltip label="Clear All Options" hasArrow>
+						<IconButton colorScheme={"red"} aria-label="Clear All Options" size="md" onClick={handleClearIssueOptions} icon={<CloseIcon />} />
+					</Tooltip>
+					<Tooltip label="Auto Fill Message" hasArrow>
+						<IconButton colorScheme={"yellow"} aria-label="Auto Fill Message" size="md" onClick={() => openMessageAutoFillModal()} icon={<ExternalLinkIcon />} />
 					</Tooltip>
 				</Flex>
 			</Flex>

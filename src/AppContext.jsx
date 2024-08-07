@@ -41,6 +41,8 @@ const AppContext = createContext({
 	setSelectedUntrackedChanges: (_) => {},
 	socketPayload: null,
 	setSocketPayload: (_) => {},
+	logData: [],
+	setLogData: (_) => {},
 });
 
 export const useApp = () => {
@@ -139,6 +141,9 @@ export const AppProvider = ({ children }) => {
 	const [selectedUntrackedChanges, setSelectedUntrackedChanges] = useState([]);
 	const [socketPayload, setSocketPayload] = useState(null);
 
+	// Props used in the entire application
+	const [logData, setLogData] = React.useState([]);
+
 	/*****************************************
 	 *  Hooks used in both sections
 	 *****************************************/
@@ -216,6 +221,8 @@ export const AppProvider = ({ children }) => {
 				setSelectedUntrackedChanges,
 				socketPayload,
 				setSocketPayload,
+				logData,
+				setLogData,
 			}}>
 			{children}
 		</AppContext.Provider>

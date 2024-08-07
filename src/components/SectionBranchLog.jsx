@@ -6,38 +6,24 @@ import { MdCheckCircle, MdDirectionsRun } from "react-icons/md";
 import { branchString } from "../utils/CommonConfig";
 import TableLogs from "./TableLogs";
 import { RepeatIcon } from "@chakra-ui/icons";
+import useStoreSVNLogs from "../hooks/useStoreSVNLogs";
 
 export default function SectionBranchLog() {
-	const { showSelectedBranchesLog, setShowSelectedBranchesLog, selectedBranches, socket } = useApp();
+	const { showSelectedBranchesLog, setShowSelectedBranchesLog, setSelectedBranches, selectedBranches, socket, logData, setLogData } = useApp();
 	const { emitLogSelected } = useSocketEmits();
-	const [logData, setLogData] = React.useState([]);
-	const rowDataLogs = logData.map((logData) => logData.logs).flat();
-
-	const [quickFilterLogsText, setQuickFilterLogsText] = useState("");
-
-	const onQuickFilterLogsInputChanged = useCallback(
-		(e) => {
-			setQuickFilterLogsText(e.target.value);
-		},
-		[setQuickFilterLogsText]
-	);
-
-	const refreshLogs = useCallback(() => {
-		setLogData([]);
-		emitLogSelected(selectedBranches);
-	}, [selectedBranches]);
+	const { rowDataLogs, quickFilterLogsText, onQuickFilterLogsInputChanged, refreshLogs } = useStoreSVNLogs();
 
 	useEffect(() => {
-		setLogData([]);
-	}, [showSelectedBranchesLog, selectedBranches]);
-
-	useEffect(() => {
-		if (!showSelectedBranchesLog) return;
-		emitLogSelected(selectedBranches);
-	}, [showSelectedBranchesLog]);
+		if (logData.length === 0)
+			setSelectedBranches((currSelectedBranches) => {
+				if (currSelectedBranches.length > 0) emitLogSelected(currSelectedBranches);
+				return currSelectedBranches;
+			});
+	}, [logData]);
 
 	useEffect(() => {
 		const socketCallback = (data) => {
+			console.debug("Received svn-log-result from socket in SectionBranchLog component in background");
 			setLogData((prevData) => [...prevData, data]);
 		};
 

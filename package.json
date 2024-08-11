@@ -34,6 +34,7 @@
 		"async": "^3.2.5",
 		"chakra-react-select": "^4.9.1",
 		"compression": "^1.7.4",
+		"electron-updater": "^6.2.1",
 		"express": "^4.19.2",
 		"framer-motion": "^11.3.2",
 		"lodash": "^4.17.21",
@@ -63,8 +64,8 @@
 		"vite": "^5.3.3"
 	},
 	"build": {
-		"appId": "com.titan",
 		"productName": "Titan",
+		"appId": "com.arrushc.titan",
 		"files": [
 			"dist/**/*",
 			"icons/**/*",
@@ -78,7 +79,7 @@
 			"output": "release"
 		},
 		"win": {
-			"target": "portable",
+			"target": "nsis",
 			"icon": "icons/Titan.ico"
 		},
 		"mac": {
@@ -88,6 +89,15 @@
 		"linux": {
 			"target": "AppImage",
 			"icon": "icons/Titan.png"
+		},
+		"nsis": {
+			"runAfterFinish": true,
+			"deleteAppDataOnUninstall": true,
+			"allowToChangeInstallationDirectory": true,
+			"createDesktopShortcut": "always",
+			"createStartMenuShortcut": true,
+			"perMachine": false,
+			"oneClick": false
 		}
 	}
 }

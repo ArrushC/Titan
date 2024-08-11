@@ -1,4 +1,5 @@
 import { app, BrowserWindow, screen, ipcMain, Menu, dialog, session } from "electron";
+import { autoUpdater } from "electron-updater";
 import path from "path";
 import { fork } from "child_process";
 import { fileURLToPath } from "url";
@@ -11,6 +12,16 @@ const __dirname = path.dirname(__filename);
 // Create a logger instance
 const logger = setupLogger("main.js");
 setupUncaughtExceptionHandler();
+
+if (process.defaultApp) {
+	if (process.argv.length >= 2) {
+		app.setAsDefaultProtocolClient("titan", process.execPath, [path.resolve(process.argv[1])]);
+	}
+} else {
+	app.setAsDefaultProtocolClient("titan");
+}
+
+const gotTheLock = app.requestSingleInstanceLock();
 
 // Enable V8 code caching for faster startup
 app.commandLine.appendSwitch("js-flags", "--max-old-space-size=4096");
@@ -171,17 +182,6 @@ function createMenu() {
 	Menu.setApplicationMenu(menu);
 }
 
-function setupMemoryMonitoring() {
-	const intervalId = setInterval(async () => {
-		const memoryInfo = await getFormattedMemoryInfo();
-		logger.debug("App Memory Usage:", memoryInfo.appUsage);
-		logger.debug("System Memory:", memoryInfo.systemMemory);
-	}, 60_000 * 2); // Log every 2 minutes
-
-	// Clear interval on app quit
-	app.on("will-quit", () => clearInterval(intervalId));
-}
-
 async function getFormattedMemoryInfo() {
 	const memoryInfo = await process.getProcessMemoryInfo();
 	const systemMemory = process.getSystemMemoryInfo();
@@ -205,12 +205,77 @@ async function getFormattedMemoryInfo() {
 	};
 }
 
-app.on("ready", () => {
-	createSplashWindow();
-	startServer();
-	createMenu();
-	setupMemoryMonitoring();
-});
+function setupMemoryMonitoring() {
+	const intervalId = setInterval(async () => {
+		const memoryInfo = await getFormattedMemoryInfo();
+		logger.debug("App Memory Usage:", memoryInfo.appUsage);
+		logger.debug("System Memory:", memoryInfo.systemMemory);
+	}, 60_000 * 2); // Log every 2 minutes
+
+	// Clear interval on app quit
+	app.on("will-quit", () => clearInterval(intervalId));
+}
+
+function checkForUpdates() {
+	autoUpdater.setFeedURL({
+		provider: "github",
+		owner: "ArrushC",
+		repo: "Titan",
+	});
+
+	autoUpdater.checkForUpdatesAndNotify();
+
+	autoUpdater.on("update-available", () => {
+		logger.info("Update available");
+		// dialog.showMessageBox(mainWindow, {
+		// 	title: "Update Available",
+		// 	message: "A new version of Titan is available",
+		// 	detail: "Titan will now download the update in the background. You will be prompted to install it once the download is complete.",
+		// 	icon: path.join(__dirname, "icons/Titan.ico"),
+		// });
+		mainWindow.webContents.send("update-available");
+	});
+
+	autoUpdater.on("update-downloaded", () => {
+		logger.info("Update downloaded");
+		// dialog.showMessageBox(mainWindow, {
+		// 	title: "Update Downloaded",
+		// 	message: "A new version of Titan has been downloaded",
+		// 	detail: "Titan will now install the update and restart",
+		// 	icon: path.join(__dirname, "icons/Titan.ico"),
+		// });
+		mainWindow.webContents.send("update-downloaded");
+	});
+
+	autoUpdater.on("error", (error) => {
+		logger.error("AutoUpdater error:", error);
+	});
+}
+
+if (!gotTheLock) {
+	app.quit();
+} else {
+	app.on("second-instance", (event, commandLine, workingDirectory) => {
+		if (mainWindow) {
+			if (mainWindow.isMinimized()) mainWindow.restore();
+			mainWindow.focus();
+		}
+		dialog.showMessageBox(mainWindow, {
+			title: "Titan",
+			message: "Titan is already running",
+			detail: "Another instance of Titan is already running, please close it before starting a new one.",
+			icon: path.join(__dirname, "icons/Titan.ico")
+		});
+	});
+
+	app.on("ready", () => {
+		createSplashWindow();
+		startServer();
+		createMenu();
+		setupMemoryMonitoring();
+		checkForUpdates();
+	});
+}
 
 app.on("window-all-closed", function () {
 	if (process.platform !== "darwin") app.quit();
@@ -310,7 +375,15 @@ ipcMain.handle("open-tortoisesvn-diff", async (event, data) => {
 	});
 });
 
-ipcMain.on("app-quit", () => {
+ipcMain.handle('start-update', () => {
+    autoUpdater.quitAndInstall();
+});
+
+ipcMain.handle('check-for-updates', () => {
+    autoUpdater.checkForUpdatesAndNotify();
+});
+
+ipcMain.handle("app-quit", () => {
 	if (!isQuitting) {
 		gracefulShutdown();
 	}

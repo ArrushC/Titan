@@ -5,5 +5,7 @@ contextBridge.exposeInMainWorld("electron", {
 	openTortoiseSVNDiff: (data) => ipcRenderer.invoke('open-tortoisesvn-diff', data),
 	onAppClosing: (callback) => ipcRenderer.on("app-closing", callback),
 	removeAppClosingListener: () => ipcRenderer.removeAllListeners("app-closing"),
-	quitApp: () => ipcRenderer.send("app-quit"),
+	startUpdate: () => ipcRenderer.invoke("app-update"),
+	checkForUpdates: () => ipcRenderer.invoke("check-for-updates"),
+	quitApp: () => ipcRenderer.invoke("app-quit"),
 });

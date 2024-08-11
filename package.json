@@ -5,7 +5,7 @@
 	"version": "1.2.0",
 	"type": "module",
 	"main": "main.js",
-	"description": "A desktop application for streamlining your workflow in Revision Control Systems (RCS).",
+	"description": "Streamlining your workflow in Revision Control Systems (RCS).",
 	"author": "ArrushC",
 	"scripts": {
 		"start": "npm run server:start",
@@ -22,8 +22,11 @@
 		"electron:build:mac": "electron-builder --mac",
 		"electron:build:linux": "electron-builder --linux",
 		"build:win": "vite build && electron-builder --win",
+		"publish:win": "vite build && electron-builder --win --publish always",
 		"build:mac": "vite build && electron-builder --mac",
-		"build:linux": "vite build && electron-builder --linux"
+		"publish:mac": "vite build && electron-builder --mac --publish always",
+		"build:linux": "vite build && electron-builder --linux",
+		"publish:linux": "vite build && electron-builder --linux --publish always"
 	},
 	"dependencies": {
 		"@chakra-ui/icons": "^2.1.1",

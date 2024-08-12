@@ -12,14 +12,18 @@ function App() {
 	const { RaiseClientNotificaiton } = useNotifications();
 
 	useEffect(() => {
-		window.electron.onAppClosing((event) => {
-			RaiseClientNotificaiton("App is closing, performing cleanup...", "info", 0);
-			window.electron.quitApp();
-		});
+		if (window.electron) {
+			window.electron.onAppClosing((event) => {
+				RaiseClientNotificaiton("App is closing, performing cleanup...", "info", 0);
+				window.electron.quitApp();
+			});
 
-		return () => {
-			window.electron.removeAppClosingListener();
-		};
+			return () => {
+				window.electron.removeAppClosingListener();
+			};
+		} else {
+			console.warn("Electron specific logic is not available in browser mode.");
+		}
 	}, []);
 
 	return (

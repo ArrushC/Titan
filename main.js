@@ -1,10 +1,12 @@
 import { app, BrowserWindow, screen, ipcMain, Menu, dialog, session } from "electron";
-import { autoUpdater } from "electron-updater";
+import electronUpdaterPkg from "electron-updater";
 import path from "path";
 import { fork } from "child_process";
 import { fileURLToPath } from "url";
 import { setupLogger, setupUncaughtExceptionHandler } from "./server/logger.js";
 import { exec } from "child_process";
+
+const { autoUpdater } = electronUpdaterPkg;
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);

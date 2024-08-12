@@ -20,11 +20,14 @@ export default function useStoreSVNLogs() {
 		setLogData([]);
 	}, [selectedBranches]);
 
+	const areLogsFetched = logData.length === selectedBranches.length;
+
 	return {
 		rowDataLogs,
 		quickFilterLogsText,
 		setQuickFilterLogsText,
 		onQuickFilterLogsInputChanged,
 		refreshLogs,
+		areLogsFetched,
 	}
 }

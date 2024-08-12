@@ -234,7 +234,7 @@ function extractRevisionNumber(commitResult) {
  * @returns {String} The sanitized commit message
  */
 function sanitizeCommitMessage(commitMessage) {
-	return commitMessage.replaceAll(/[\n\r\t\b\f]/g, " ").trim();
+	return commitMessage.replaceAll(/[\n\r\t\b\f]/g, "; ").trim();
 }
 
 /************************************

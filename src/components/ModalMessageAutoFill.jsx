@@ -5,7 +5,7 @@ import { RepeatIcon } from "@chakra-ui/icons";
 import useStoreSVNLogs from "../hooks/useStoreSVNLogs";
 
 export default function ModalMessageAutoFill({ isModalOpen, closeModal }) {
-	const { rowDataLogs, quickFilterLogsText, onQuickFilterLogsInputChanged, refreshLogs } = useStoreSVNLogs();
+	const { rowDataLogs, quickFilterLogsText, onQuickFilterLogsInputChanged, refreshLogs, areLogsFetched } = useStoreSVNLogs();
 
 	const disableSelect = false;
 	const handleSelect = useCallback(() => {}, []);
@@ -22,20 +22,28 @@ export default function ModalMessageAutoFill({ isModalOpen, closeModal }) {
 				<ModalCloseButton size={"lg"} />
 				<ModalBody>
 					<Box height={"70vh"}>
-						<Flex mb={4} width={"100%"} alignItems={"center"} columnGap={4}>
-							<Flex alignItems={"center"} width={"100%"}>
-								<Text mr={2} fontWeight={"600"} whiteSpace={"nowrap"}>
-									Quick Filter:
-								</Text>
-								<Input placeholder="Type to search..." onInput={onQuickFilterLogsInputChanged} width={"100%"} />
+						{!areLogsFetched ? (
+							<Flex justifyContent={"center"} alignItems={"center"} height={"100%"}>
+								<Text>Loading logs...</Text>
 							</Flex>
+						) : (
 							<Box>
-								<Tooltip label={"Refresh"} hasArrow>
-									<IconButton onClick={refreshLogs} icon={<RepeatIcon />} colorScheme={"yellow"} aria-label="Refresh" />
-								</Tooltip>
+								<Flex mb={4} width={"100%"} alignItems={"center"} columnGap={4}>
+									<Flex alignItems={"center"} width={"100%"}>
+										<Text mr={2} fontWeight={"600"} whiteSpace={"nowrap"}>
+											Quick Filter:
+										</Text>
+										<Input placeholder="Type to search..." onInput={onQuickFilterLogsInputChanged} width={"100%"} />
+									</Flex>
+									<Box>
+										<Tooltip label={"Refresh"} hasArrow>
+											<IconButton onClick={refreshLogs} icon={<RepeatIcon />} colorScheme={"yellow"} aria-label="Refresh" />
+										</Tooltip>
+									</Box>
+								</Flex>
+								<TableLogs rowDataLogs={rowDataLogs} quickFilterLogsText={quickFilterLogsText} />
 							</Box>
-						</Flex>
-						<TableLogs rowDataLogs={rowDataLogs} quickFilterLogsText={quickFilterLogsText} />
+						)}
 					</Box>
 				</ModalBody>
 				<ModalFooter>

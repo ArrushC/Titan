@@ -11,7 +11,7 @@ import useStoreSVNLogs from "../hooks/useStoreSVNLogs";
 export default function SectionBranchLog() {
 	const { showSelectedBranchesLog, setShowSelectedBranchesLog, setSelectedBranches, selectedBranches, socket, logData, setLogData } = useApp();
 	const { emitLogSelected } = useSocketEmits();
-	const { rowDataLogs, quickFilterLogsText, onQuickFilterLogsInputChanged, refreshLogs } = useStoreSVNLogs();
+	const { rowDataLogs, quickFilterLogsText, onQuickFilterLogsInputChanged, refreshLogs, areLogsFetched } = useStoreSVNLogs();
 
 	useEffect(() => {
 		if (logData.length === 0)
@@ -40,7 +40,7 @@ export default function SectionBranchLog() {
 				<DrawerHeader>Selected Branches: SVN Log</DrawerHeader>
 				<DrawerBody>
 					<Box height={"100%"}>
-						{logData.length != selectedBranches.length ? (
+						{!areLogsFetched ? (
 							<Box>
 								<Box mb={4}>
 									<Text fontWeight={600}>Showing SVN Log for the following branches:</Text>

@@ -48,10 +48,11 @@ import useNotifications from "../hooks/useNotifications";
 
 export default function ModalCommit({ isModalOpen, closeModal }) {
 	const { socket, setIsCommitMode, setSelectedBranchStatuses, setShowCommitView, socketPayload } = useApp();
-	const {emitUpdateSingle, emitCommitPayload} = useSocketEmits();
-	const {RaiseClientNotificaiton} = useNotifications();
+	const { emitUpdateSingle, emitCommitPayload } = useSocketEmits();
+	const { RaiseClientNotificaiton } = useNotifications();
 	const [commitLiveResponses, setCommitLiveResponses] = useState([]);
-	const { onCopy, value, setValue, hasCopied } = useClipboard("");
+	const { onCopy: onRevisionsCopy, value: revisionsValue, setValue: setRevisionsValue, hasCopied: hasRevisionsCopied } = useClipboard("");
+	const { onCopy: onCommitMsgCopy, value: commitMsgValue, setValue: setCommitMsgValue, hasCopied: hasCommitMsgCopied } = useClipboard("");
 
 	/****************************************************
 	 * Modal Aesthetic Functions
@@ -95,7 +96,7 @@ export default function ModalCommit({ isModalOpen, closeModal }) {
 	const colDefs = useMemo(
 		() => [
 			{ field: "Branch Folder" },
-			{ field: "Branch Version", sort: "asc"},
+			{ field: "Branch Version", sort: "asc" },
 			{ field: "File Path", flex: 1 },
 			{ field: "Local Status", headerTooltip: "Working Copy" },
 			{
@@ -155,18 +156,19 @@ export default function ModalCommit({ isModalOpen, closeModal }) {
 	const handleClipboardOption = useCallback(
 		(values) => {
 			const formattedText = formatForClipboard(commitLiveResponses, values);
-			setValue(formattedText);
+			setRevisionsValue(formattedText);
 		},
-		[commitLiveResponses, formatForClipboard, setValue]
+		[commitLiveResponses, formatForClipboard, setRevisionsValue]
 	);
 
 	/****************************************************
 	 * Hooks
 	 ****************************************************/
 	useEffect(() => {
-		setActiveStep(1);
+		setActiveStep(3);
 		setCommitLiveResponses([]);
-		setValue("");
+		setRevisionsValue("");
+		setCommitMsgValue("");
 	}, [isModalOpen, setCommitLiveResponses]);
 
 	// Below Step 1
@@ -175,7 +177,8 @@ export default function ModalCommit({ isModalOpen, closeModal }) {
 		closeModal();
 		setActiveStep(1);
 		setCommitLiveResponses([]);
-		setValue("");
+		setRevisionsValue("");
+		setCommitMsgValue("");
 	}, [activeStep, isModalOpen]);
 
 	// Step 2
@@ -189,12 +192,13 @@ export default function ModalCommit({ isModalOpen, closeModal }) {
 		if (!isModalOpen || activeStep != 3) return;
 		RaiseClientNotificaiton("The commit process has been completed successfully", "success", 5000);
 		handleClipboardOption(["BranchFolder", "BranchVersion", "SVNBranch"]);
+		setCommitMsgValue(socketPayload["commitMessage"] || "");
 	}, [RaiseClientNotificaiton, activeStep, isModalOpen, handleClipboardOption]);
 
 	// Commmit process completion
 	useEffect(() => {
 		if (!isModalOpen || activeStep <= 3) return;
-		onCopy();
+		onRevisionsCopy();
 		RaiseClientNotificaiton("Updating selected branches! Please wait", "info", 1500);
 		commitLiveResponses.forEach((response) => {
 			emitUpdateSingle(response.branchId, response["SVN Branch"], response["Branch Version"], response["Branch Folder"]);
@@ -224,8 +228,8 @@ export default function ModalCommit({ isModalOpen, closeModal }) {
 	}, [activeStep, commitLiveResponses]);
 
 	useEffect(() => {
-		if (hasCopied) RaiseClientNotificaiton("Copied to Clipboard", "success", 1500);
-	}, [hasCopied, RaiseClientNotificaiton]);
+		if (hasRevisionsCopied || hasCommitMsgCopied) RaiseClientNotificaiton("Copied to Clipboard", "success", 1500);
+	}, [hasRevisionsCopied, hasCommitMsgCopied, RaiseClientNotificaiton]);
 
 	return !isModalOpen || !socketPayload ? (
 		<></>
@@ -276,7 +280,10 @@ export default function ModalCommit({ isModalOpen, closeModal }) {
 										</ListItem>
 										<ListItem>
 											<ListIcon as={MdCheckCircle} color="yellow.500" />
-											Example: <Code>Issue {socketPayload["issueNumber"]} ({socketPayload["sourceBranch"]["Branch Folder"]} {socketPayload["sourceBranch"]["Branch Version"]}): {socketPayload["commitMessage"]}</Code>
+											Example:{" "}
+											<Code>
+												Issue {socketPayload["issueNumber"]} ({socketPayload["sourceBranch"]["Branch Folder"]} {socketPayload["sourceBranch"]["Branch Version"]}): {socketPayload["commitMessage"]}
+											</Code>
 										</ListItem>
 									</List>
 								</Box>
@@ -321,21 +328,21 @@ export default function ModalCommit({ isModalOpen, closeModal }) {
 										Please find your revisions here for view and copy:
 									</Text>
 								</Box>
-								<Card size="lg" variant={"filled"}>
-									<CardHeader px={4} py={0}>
-										<Flex justifyContent="space-between" alignItems={"center"}>
-											<Heading as="h3" size={"md"}>
-												SVN Revisions
-											</Heading>
-											<IconButton aria-label="Copy To Clipboard" onClick={onCopy} icon={<CopyIcon />} colorScheme="yellow">
-												Copy
-											</IconButton>
-										</Flex>
-									</CardHeader>
-									<CardBody px={4} py={0}>
-										<pre style={{ whiteSpace: "pre-wrap", wordWrap: "break-word" }}>{value}</pre>
-									</CardBody>
-								</Card>
+								<Flex columnGap={10} alignItems={"center"}>
+									<Box>
+										<Heading as="h3" size={"md"}>
+											SVN Revisions
+										</Heading>
+										<Box>
+											<pre style={{ whiteSpace: "pre-wrap", wordWrap: "break-word" }}>{revisionsValue}</pre>
+										</Box>
+									</Box>
+									<Box>
+										<Tooltip hasArrow label={"Copy to clipboard"}>
+											<IconButton aria-label="Copy To Clipboard" onClick={onRevisionsCopy} icon={<CopyIcon />} colorScheme="yellow" />
+										</Tooltip>
+									</Box>
+								</Flex>
 								<Box my={4}>
 									<Text fontWeight={600}>Modify the clipboard text to include...</Text>
 									<CheckboxGroup colorScheme="yellow" defaultValue={["BranchFolder", "BranchVersion", "SVNBranch"]} onChange={handleClipboardOption}>
@@ -348,10 +355,15 @@ export default function ModalCommit({ isModalOpen, closeModal }) {
 										</Wrap>
 									</CheckboxGroup>
 								</Box>
-								<Box>
-									<Text fontWeight={600}>Here is your SVN commit message for the source branch:</Text>
-									<Code>{`Issue ${socketPayload["issueNumber"]} (${socketPayload["sourceBranch"]["Branch Folder"]} ${socketPayload["sourceBranch"]["Branch Version"]}): ${socketPayload["commitMessage"]}`}</Code>
-								</Box>
+								<Flex columnGap={10} alignItems={"center"}>
+									<Box>
+										<Text fontWeight={600}>Here is your SVN commit message for the source branch:</Text>
+										<Code>{`Issue ${socketPayload["issueNumber"]} (${socketPayload["sourceBranch"]["Branch Folder"]} ${socketPayload["sourceBranch"]["Branch Version"]}): ${commitMsgValue}`}</Code>
+									</Box>
+									<Tooltip hasArrow label={"Copy to clipboard"}>
+										<IconButton aria-label="Copy To Clipboard" onClick={onCommitMsgCopy} icon={<CopyIcon />} colorScheme="yellow" />
+									</Tooltip>
+								</Flex>
 							</Box>
 						)}
 					</Box>

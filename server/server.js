@@ -274,7 +274,15 @@ async function sendConfig(socket) {
 		await fs.mkdir(path.dirname(configFilePath), { recursive: true });
 		await fs.access(configFilePath);
 	} catch (err) {
-		const defaultConfig = { currentVersion: latestVersion, branches: [], branchFolderColours: {} };
+		const defaultConfig = {
+			currentVersion: latestVersion,
+			branches: [],
+			branchFolderColours: {},
+			trelloIntegration: {
+				key: "TRELLO_KEY",
+				token: "TRELLO_TOKEN",
+			},
+		};
 		await fs.writeFile(configFilePath, JSON.stringify(defaultConfig, null, 4));
 		emitMessage(socket, "Config file created with default content", "success");
 	}
@@ -559,24 +567,26 @@ io.on("connection", (socket) => {
 			};
 			svnQueueSerial.push(task);
 
-			let propTask = {
-				command: "propset",
-				args: ["svn:keywords", '"Id Author Date Revision HeadURL"', `--targets ${targetsFilePath}`],
-				preopCallback: async () => {
-					await writeTargetsFile(files);
-				},
-				postopCallback: (err, result) => {
-					if (err) {
-						logger.error(`Failed to set SVN properties for all unversioned files:` + err);
-						if (!isSVNConnectionError(socket, err)) emitMessage(socket, `Failed to set SVN properties for all unversioned files`, "error");
-					} else {
-						logger.info(`Successfully set SVN properties for all unversioned files`);
-						emitMessage(socket, `SVN properties for all unversioned files have been set. Please check that you have added SVN comments to ensure that your SVN client can automatically update them`, "warning", 10_000);
-						socket.emit("branch-refresh-unseen");
-					}
-				},
-			};
-			svnQueueSerial.push(propTask);
+			if (files.length > 0) {
+				let propTask = {
+					command: "propset",
+					args: ["svn:keywords", '"Id Author Date Revision HeadURL"', `--targets ${targetsFilePath}`],
+					preopCallback: async () => {
+						await writeTargetsFile(files);
+					},
+					postopCallback: (err, result) => {
+						if (err) {
+							logger.error(`Failed to set SVN properties for all unversioned files:` + err);
+							if (!isSVNConnectionError(socket, err)) emitMessage(socket, `Failed to set SVN properties for all unversioned files`, "error");
+						} else {
+							logger.info(`Successfully set SVN properties for all unversioned files`);
+							emitMessage(socket, `SVN properties for all unversioned files have been set. Please check that you have added SVN comments to ensure that your SVN client can automatically update them`, "warning", 10_000);
+							socket.emit("branch-refresh-unseen");
+						}
+					},
+				};
+				svnQueueSerial.push(propTask);
+			}
 		}
 
 		if (missingPaths.length > 0) {
@@ -728,7 +738,7 @@ io.on("connection", (socket) => {
 								branchVersion: branch["Branch Version"],
 								author: entry.author,
 								message: entry.msg,
-								date: (new Date(entry.date)).toLocaleString("en-GB"),
+								date: new Date(entry.date).toLocaleString("en-GB"),
 							};
 						});
 

@@ -133,13 +133,13 @@ export default function SectionCommit() {
 						</Tab>
 					</TabList>
 					<TabPanels>
-						<TabPanel>
+						<TabPanel px={0}>
 							<PanelUpdates fileUpdates={fileUpdates} />
 						</TabPanel>
-						<TabPanel>
+						<TabPanel px={0}>
 							<PanelLocalChanges rowDataLocalChanges={rowDataLocalChanges} setRowDataLocalChanges={setRowDataLocalChanges} defaultColDefsCommit={defaultColDefsCommit} />
 						</TabPanel>
-						<TabPanel>
+						<TabPanel px={0}>
 							<PanelUntrackedChanges rowDataUntrackedChanges={rowDataUntrackedChanges} setRowDataUntrackedChanges={setRowDataUntrackedChanges} defaultColDefsCommit={defaultColDefsCommit} />
 						</TabPanel>
 					</TabPanels>

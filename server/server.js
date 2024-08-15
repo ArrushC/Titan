@@ -8,6 +8,7 @@ import async from "async";
 import svnUltimate from "node-svn-ultimate";
 import { setupLogger, setupUncaughtExceptionHandler } from "./logger.js";
 import compression from "compression";
+import { exec } from "child_process";
 
 // Import package.json
 import packageJson from "../package.json" assert { type: "json" };
@@ -302,23 +303,23 @@ async function sendConfig(socket) {
 		return;
 	}
 
-	socket.emit("get-Config", config);
+	socket.emit("titan-config-get", config);
 }
 
 io.on("connection", (socket) => {
 	logger.info("Connected to client!");
 	emitMessage(socket, "Connected To Server!", "success", 1500);
 
-	socket.on("get-Config", async (data) => {
-		debugTask("get-Config", data, false);
+	socket.on("titan-config-get", async (data) => {
+		debugTask("titan-config-get", data, false);
 		if (data === "fetch") {
 			await sendConfig(socket);
 		}
-		debugTask("get-Config", data, true);
+		debugTask("titan-config-get", data, true);
 	});
 
-	socket.on("set-Config", async (data) => {
-		debugTask("set-Config", data, false);
+	socket.on("titan-config-set", async (data) => {
+		debugTask("titan-config-set", data, false);
 		try {
 			await fs.writeFile(configFilePath, JSON.stringify(data, null, 4));
 			emitMessage(socket, "Config file updated", "success");
@@ -326,7 +327,21 @@ io.on("connection", (socket) => {
 			logger.error(err);
 			emitMessage(socket, "Error updating config file", "error");
 		}
-		debugTask("set-Config", data, true);
+		debugTask("titan-config-set", data, true);
+	});
+
+	socket.on("titan-config-open", async () => {
+		debugTask("titan-config-open", null, false);
+		exec(`start "" "${configFilePath}"`, (err) => {
+			if (err) {
+				logger.error("Failed to open config file:", err);
+				emitMessage(socket, "Failed to open config file", "error");
+			} else {
+				logger.info("Config file opened successfully");
+				emitMessage(socket, "Config file opened successfully", "success");
+			}
+		});
+		debugTask("titan-config-open", null, true);
 	});
 
 	socket.on("svn-update-single", async (data) => {

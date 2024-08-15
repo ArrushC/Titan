@@ -27,7 +27,7 @@ export default function ModalMessageAutoFill({ isModalOpen, closeModal }) {
 								<Text>Loading logs...</Text>
 							</Flex>
 						) : (
-							<Box>
+							<Box height={"100%"}>
 								<Flex mb={4} width={"100%"} alignItems={"center"} columnGap={4}>
 									<Flex alignItems={"center"} width={"100%"}>
 										<Text mr={2} fontWeight={"600"} whiteSpace={"nowrap"}>

@@ -53,6 +53,10 @@ export default function useSocketEmits() {
 		[socket]
 	);
 
+	const emitOpenConfig = useCallback(() => {
+		socket?.emit("titan-config-open", {});
+	}, [socket]);
+
 	return {
 		emitUpdateSingle,
 		emitInfoSingle,
@@ -60,6 +64,7 @@ export default function useSocketEmits() {
 		emitFilesRevert,
 		emitFilesAddRemove,
 		emitStatusSingle,
-		emitLogSelected
+		emitLogSelected,
+		emitOpenConfig,
 	};
 }

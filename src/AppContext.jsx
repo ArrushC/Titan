@@ -72,8 +72,8 @@ export const AppProvider = ({ children }) => {
 		setSocket(socket);
 
 		socket.on("connect", () => {
-			socket.emit("get-Config", "fetch");
-			socket.once("get-Config", (data) => {
+			socket.emit("titan-config-get", "fetch");
+			socket.once("titan-config-get", (data) => {
 				setConfig(data);
 				toast(createToastConfig(false, "Configurations Loaded", "success", 2000));
 			});
@@ -104,7 +104,7 @@ export const AppProvider = ({ children }) => {
 		(configToSave) => {
 			if (configToSave === null || configToSave === undefined) return;
 			console.log("Saving config:", configToSave);
-			socket?.emit("set-Config", configToSave);
+			socket?.emit("titan-config-set", configToSave);
 		},
 		[socket]
 	);
@@ -147,7 +147,7 @@ export const AppProvider = ({ children }) => {
 	/*****************************************
 	 *  Hooks used in both sections
 	 *****************************************/
-	/**** SectionBranches ****/	
+	/**** SectionBranches ****/
 	// Refresh commit view when configurableRowData changes
 	useEffect(() => {
 		setSelectedBranchStatuses([]);

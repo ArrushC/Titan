@@ -25,9 +25,9 @@ export default function PanelLocalChanges({ rowDataLocalChanges, setRowDataLocal
 	);
 
 	const onFileViewSelectionChanged = useCallback(() => {
-		const selectedBranches = localChangesGridRef?.current?.api?.getSelectedNodes().map((node) => node.data);
-		if (isDebug) console.log("CommitRegion.jsx: onFileViewSelectionChanged - selectedBranches", selectedBranches);
-		setSelectedLocalChanges(selectedBranches);
+		const localChanges = localChangesGridRef?.current?.api?.getSelectedNodes().map((node) => node.data);
+		if (isDebug) console.log("CommitRegion.jsx: onFileViewSelectionChanged - selectedBranches", localChanges);
+		setSelectedLocalChanges(localChanges);
 	}, [localChangesGridRef, isDebug]);
 
 	const handleDiffResult = useCallback(
@@ -42,9 +42,9 @@ export default function PanelLocalChanges({ rowDataLocalChanges, setRowDataLocal
 		() => [
 			{ headerCheckboxSelection: true, checkboxSelection: true, headerCheckboxSelectionFilteredOnly: true, width: 20, resizable: false, suppressMovable: false, filter: false, editable: false, headerClass: "branch-table-header-cell", cellClass: "branch-table-body-cell" },
 			{ field: "Branch Folder" },
-			{ field: "Branch Version", sort: "asc" },
-			{ field: "File Path", flex: 1 },
-			{ field: "Local Status", headerTooltip: "Working Copy" },
+			{ field: "Branch Version", sort: "asc", sortIndex: 0 },
+			{ field: "File Path", flex: 1, sort: "asc", sortIndex: 2 },
+			{ field: "Local Status", headerTooltip: "Working Copy", sort: "asc", sortIndex: 1 },
 			{
 				headerName: "Diff",
 				filter: false,

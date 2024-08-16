@@ -114,7 +114,7 @@ export default function SectionCommit() {
 				<FormSVNMessage openMessageAutoFillModal={openMessageAutoFillModal} />
 			</Box>
 			<Skeleton isLoaded={showCommitView && hasChanges} startColor="yelow.500" endColor="yellow.500">
-				<Tabs variant={"solid-rounded"} colorScheme="yellow" defaultIndex={hasFileUpdates ? 0 : hasLocalChanges ? 1 : 2}>
+				<Tabs variant={"solid-rounded"} colorScheme="yellow" defaultIndex={hasFileUpdates ? 0 : hasLocalChanges ? 1 : 2} isLazy={false}>
 					<TabList>
 						<Tab isDisabled={!hasFileUpdates}>
 							<Tooltip label={"No files to update!"} hasArrow isDisabled={hasFileUpdates}>

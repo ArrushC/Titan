@@ -749,6 +749,7 @@ io.on("connection", (socket) => {
 						const formattedLogs = logsArray.map((entry) => {
 							return {
 								revision: entry["$"].revision,
+								branchId: branch.id,
 								branchFolder: branch["Branch Folder"],
 								branchVersion: branch["Branch Version"],
 								author: entry.author,

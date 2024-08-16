@@ -157,9 +157,11 @@ export const AppProvider = ({ children }) => {
 	/**** SectionCommit ****/
 	// Scroll to the commit region when it is in commit mode
 	useEffect(() => {
-		if (!isCommitMode) return;
-		document.getElementById("sectionCommit")?.scrollIntoView({ behavior: "smooth", block: "start" });
-	}, [isCommitMode]);
+		if (!isCommitMode || !showCommitView) return;
+		setTimeout(() => {
+			document.getElementById("sectionCommit")?.scrollIntoView({ behavior: "smooth", block: "start", inline: "nearest" });
+		}, 200);
+	}, [isCommitMode, showCommitView]);
 
 	// Refresh the commit section whenever there has been an update on untracked files being tracked by SVN.
 	useEffect(() => {

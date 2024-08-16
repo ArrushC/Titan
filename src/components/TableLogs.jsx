@@ -67,7 +67,7 @@ export default function TableLogs({ rowDataLogs, quickFilterLogsText, setAutoFil
 				domLayout="normal"
 				columnMenu={"new"}
 				rowSelection={"single"}
-				suppressRowClickSelection={true}
+				suppressRowClickSelection={!isAutofill}
 				animateRows={false}
 				immutableData={true}
 				suppressFlash={true}

@@ -8,8 +8,6 @@ import TableLogs from "./TableLogs";
 export default function ModalMessageAutoFill({ isModalOpen, closeModal }) {
 	const { rowDataLogs, quickFilterLogsText, onQuickFilterLogsInputChanged, refreshLogs } = useStoreSVNLogs();
 
-	const [rowDataLogsAutoFill, setRowDataLogsAutoFill] = useState([]);
-
 	const [autofillSelection, setAutoFillSelection] = useState(null);
 	const [disableSelect, setDisableSelect] = useState(true);
 	const handleSelect = useCallback(() => {
@@ -21,13 +19,6 @@ export default function ModalMessageAutoFill({ isModalOpen, closeModal }) {
 	useEffect(() => {
 		setDisableSelect(autofillSelection && autofillSelection != null ? false : true);
 	}, [autofillSelection]);
-
-	useEffect(() => {
-		setRowDataLogsAutoFill((currRowDataLogs) => {
-			if (!_.isEqual(currRowDataLogs, rowDataLogs)) return rowDataLogs;
-			return currRowDataLogs;
-		});
-	}, [rowDataLogs]);
 
 	return (
 		<Modal isOpen={isModalOpen} onClose={closeModal} isCentered motionPreset="slideInBottom" scrollBehavior="inside" size="xl" closeOnOverlayClick={true}>
@@ -55,7 +46,7 @@ export default function ModalMessageAutoFill({ isModalOpen, closeModal }) {
 									</Tooltip>
 								</Box>
 							</Flex>
-							<TableLogs rowDataLogs={rowDataLogsAutoFill} quickFilterLogsText={quickFilterLogsText} setAutoFillSelection={setAutoFillSelection} isAutofill={true} />
+							<TableLogs rowDataLogs={rowDataLogs} quickFilterLogsText={quickFilterLogsText} setAutoFillSelection={setAutoFillSelection} isAutofill={true} />
 						</Box>
 					</Box>
 				</ModalBody>

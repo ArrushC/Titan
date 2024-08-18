@@ -1,4 +1,4 @@
-name: Build and Release Titan Electron App
+name: Build and Publish Titan Electron App
 
 on:
   push:
@@ -6,7 +6,7 @@ on:
       - 'v*'
 
 jobs:
-  build:
+  release:
     runs-on: ${{ matrix.os }}
 
     strategy:
@@ -16,6 +16,8 @@ jobs:
 
     steps:
     - uses: actions/checkout@v2
+      with:
+        fetch-depth: 0  # Important for generating the changelog
 
     - name: Use Node.js
       uses: actions/setup-node@v2
@@ -25,54 +27,22 @@ jobs:
     - name: Install dependencies
       run: npm ci
 
-    - name: Build Vite project
-      run: npm run client:build
-
-    - name: Build Electron app
-      env:
-        GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      run: |
-        if ("${{ matrix.os }}" -eq "windows-latest") {
-          npm run build:win
-        } elseif ("${{ matrix.os }}" -eq "macos-latest") {
-          npm run build:mac
-        } else {
-          npm run build:linux
-        }
-
-    - name: Upload artifacts
-      uses: actions/upload-artifact@v2
-      with:
-        name: ${{ matrix.os }}-build
-        path: release
-
-  release:
-    needs: build
-    runs-on: ubuntu-latest
-    steps:
-    - uses: actions/checkout@v2
-      with:
-          fetch-depth: 0  # This is important for generating the changelog
-
     - name: Generate Changelog
       id: changelog
-      shell: bash
+      shell: pwsh
       run: |
-        PREVIOUS_TAG=$(git describe --tags --abbrev=0 HEAD^ 2>/dev/null || echo "")
-        if [ -z "$PREVIOUS_TAG" ]; then
-          echo "CHANGELOG<<EOF" >> $GITHUB_OUTPUT
-          git log --pretty=format:"- %s" >> $GITHUB_OUTPUT
-          echo "EOF" >> $GITHUB_OUTPUT
-        else
-          echo "CHANGELOG<<EOF" >> $GITHUB_OUTPUT
-          git log --pretty=format:"- %s" $PREVIOUS_TAG..HEAD >> $GITHUB_OUTPUT
-          echo "EOF" >> $GITHUB_OUTPUT
-        fi
+        $PreviousTag = git describe --tags --abbrev=0 HEAD^ 2>$null
+        if (-not $PreviousTag) {
+          $Changelog = git log --pretty=format:"- %s"
+        } else {
+          $Changelog = git log --pretty=format:"- %s" "$PreviousTag..HEAD"
+        }
+        $Changelog = $Changelog -join "`n"
+        "CHANGELOG<<EOF" >> $env:GITHUB_OUTPUT
+        $Changelog >> $env:GITHUB_OUTPUT
+        "EOF" >> $env:GITHUB_OUTPUT
 
-    - name: Download artifacts
-      uses: actions/download-artifact@v2
-
-    - name: Create Release
+    - name: Create Draft Release
       id: create_release
       uses: actions/create-release@v1
       env:
@@ -86,18 +56,27 @@ jobs:
         draft: true
         prerelease: false
 
-    - name: Upload Release Assets
+    - name: Build and Publish Electron App
       env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      shell: pwsh
       run: |
-        for artifact in *-build/*; do
-          if [[ -f "$artifact" ]]; then
-            asset_name=$(basename "$artifact")
-            echo "Uploading $asset_name"
-            curl --fail \
-              -H "Authorization: token $GITHUB_TOKEN" \
-              -H "Content-Type: application/octet-stream" \
-              --data-binary @"$artifact" \
-              "https://uploads.github.com/repos/${{ github.repository }}/releases/${{ steps.create_release.outputs.id }}/assets?name=$asset_name"
-          fi
-        done
+        if ("${{ matrix.os }}" -eq "windows-latest") {
+          npm run publish:win
+        } elseif ("${{ matrix.os }}" -eq "macos-latest") {
+          npm run publish:mac
+        } else {
+          npm run publish:linux
+        }
+
+    - name: Update Release
+      uses: actions/github-script@v6
+      with:
+        github-token: ${{secrets.GITHUB_TOKEN}}
+        script: |
+          github.rest.repos.updateRelease({
+            owner: context.repo.owner,
+            repo: context.repo.repo,
+            release_id: ${{ steps.create_release.outputs.id }},
+            draft: false
+          })

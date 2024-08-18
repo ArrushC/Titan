@@ -16,7 +16,7 @@ jobs:
 
     steps:
     - uses: actions/checkout@v2
-    
+
     - name: Use Node.js
       uses: actions/setup-node@v2
       with:
@@ -32,13 +32,13 @@ jobs:
       env:
         GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       run: |
-        if [ "${{ matrix.os }}" = "windows-latest" ]; then
+        if ("${{ matrix.os }}" -eq "windows-latest") {
           npm run build:win
-        elif [ "${{ matrix.os }}" = "macos-latest" ]; then
+        } elseif ("${{ matrix.os }}" -eq "macos-latest") {
           npm run build:mac
-        else
+        } else {
           npm run build:linux
-        fi
+        }
 
     - name: Upload artifacts
       uses: actions/upload-artifact@v2
@@ -53,9 +53,10 @@ jobs:
     - uses: actions/checkout@v2
       with:
           fetch-depth: 0  # This is important for generating the changelog
-    
+
     - name: Generate Changelog
       id: changelog
+      shell: bash
       run: |
         PREVIOUS_TAG=$(git describe --tags --abbrev=0 HEAD^ 2>/dev/null || echo "")
         if [ -z "$PREVIOUS_TAG" ]; then
@@ -67,7 +68,7 @@ jobs:
           git log --pretty=format:"- %s" $PREVIOUS_TAG..HEAD >> $GITHUB_OUTPUT
           echo "EOF" >> $GITHUB_OUTPUT
         fi
-    
+
     - name: Download artifacts
       uses: actions/download-artifact@v2
 
@@ -82,7 +83,7 @@ jobs:
         body: |
           ## Changes in this Release:
           ${{ steps.changelog.outputs.CHANGELOG }}
-        draft: false
+        draft: true
         prerelease: false
 
     - name: Upload Release Assets

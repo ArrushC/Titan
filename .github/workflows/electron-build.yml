@@ -68,15 +68,3 @@ jobs:
         } else {
           npm run publish:linux
         }
-
-    - name: Update Release
-      uses: actions/github-script@v6
-      with:
-        github-token: ${{secrets.GITHUB_TOKEN}}
-        script: |
-          github.rest.repos.updateRelease({
-            owner: context.repo.owner,
-            repo: context.repo.repo,
-            release_id: ${{ steps.create_release.outputs.id }},
-            draft: false
-          })

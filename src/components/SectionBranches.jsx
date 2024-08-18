@@ -143,7 +143,7 @@ export default function SectionBranches() {
 				<Flex columnGap={2}>
 					<Tooltip label="Please select at least 1 branch" isDisabled={selectedBranches.length > 0} hasArrow>
 						<Button onClick={updateSelectedBranches} leftIcon={<Icon as={MdCloudDownload} />} colorScheme={"yellow"} isDisabled={selectedBranches.length < 1}>
-							Update
+							Update {selectedBranches.length > 0 ? `${selectedBranches.length} Branch` : ""}{selectedBranches.length > 1 ? "es" : ""}
 						</Button>
 					</Tooltip>
 					<Tooltip label="Please select at least 1 branch" isDisabled={selectedBranches.length > 0} hasArrow>
@@ -160,7 +160,7 @@ export default function SectionBranches() {
 					</Tooltip>
 					<Tooltip label="Please select at least 1 branch" isDisabled={selectedBranches.length > 0} hasArrow>
 						<Button onClick={refreshSelected} leftIcon={<RepeatIcon />} colorScheme={"yellow"} isDisabled={selectedBranches.length < 1}>
-							Refresh
+							Refresh {selectedBranches.length > 0 ? `${selectedBranches.length} Branch` : ""}{selectedBranches.length > 1 ? "es" : ""}
 						</Button>
 					</Tooltip>
 				</Flex>
@@ -170,12 +170,12 @@ export default function SectionBranches() {
 				<Flex columnGap={2}>
 					<Tooltip label="Please select at least 1 branch" isDisabled={selectedBranches.length > 0} hasArrow>
 						<Button onClick={clearSelection} leftIcon={<CloseIcon />} colorScheme={"red"} isDisabled={selectedBranches.length < 1}>
-							Deselect {selectedBranches.length} Branch{selectedBranches.length > 1 ? "es" : ""}
+							Deselect {selectedBranches.length > 0 ? `${selectedBranches.length} Branch` : ""}{selectedBranches.length > 1 ? "es" : ""}
 						</Button>
 					</Tooltip>
 					<Tooltip label="Please select at least 1 branch" isDisabled={selectedBranches.length > 0} hasArrow>
 						<Button onClick={openAlertDialog} leftIcon={<CloseIcon />} colorScheme={"red"} isDisabled={selectedBranches.length < 1}>
-							Delete Selected
+							Delete {selectedBranches.length > 0 ? `${selectedBranches.length} Branch` : ""}{selectedBranches.length > 1 ? "es" : ""}
 						</Button>
 					</Tooltip>
 				</Flex>

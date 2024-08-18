@@ -4,6 +4,10 @@ import { useApp } from "../AppContext";
 export default function useSocketEmits() {
 	const { socket } = useApp();
 
+	const emitOpenConfig = useCallback(() => {
+		socket?.emit("titan-config-open", {});
+	}, [socket]);
+
 	const emitUpdateSingle = useCallback(
 		(branchId, svnBranch, branchVersion, branchFolder) => {
 			socket?.emit("svn-update-single", { id: branchId, branch: svnBranch, version: branchVersion, folder: branchFolder });
@@ -46,20 +50,22 @@ export default function useSocketEmits() {
 		[socket]
 	);
 
-	const emitLogSelected = useCallback(
-		(selectedBranches) => {
-			socket?.emit("svn-log-selected", { selectedBranches: selectedBranches });
+	const emitTrelloCardNamesSearch = useCallback(
+		(key, token, query, limit = null) => {
+			socket?.emit("trello-search-names-card", { key, token, query, limit });
 		},
 		[socket]
 	);
 
+
 	return {
+		emitOpenConfig,
 		emitUpdateSingle,
 		emitInfoSingle,
 		emitCommitPayload,
 		emitFilesRevert,
 		emitFilesAddRemove,
 		emitStatusSingle,
-		emitLogSelected
+		emitTrelloCardNamesSearch,
 	};
 }

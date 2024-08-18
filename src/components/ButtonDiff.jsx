@@ -2,7 +2,7 @@ import { IconButton } from "@chakra-ui/react";
 import React from "react";
 import { VscDiffSingle } from "react-icons/vsc";
 
-export default function DiffButton(props) {
+export default function ButtonDiff(props) {
 	const { data, onDiffResult } = props;
 	const handleDiff = async () => {
 		try {

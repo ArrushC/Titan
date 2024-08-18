@@ -8,6 +8,7 @@ import async from "async";
 import svnUltimate from "node-svn-ultimate";
 import { setupLogger, setupUncaughtExceptionHandler } from "./logger.js";
 import compression from "compression";
+import { exec } from "child_process";
 
 // Import package.json
 import packageJson from "../package.json" assert { type: "json" };
@@ -109,6 +110,57 @@ async function writeTargetsFile(targets = []) {
 	}
 }
 
+/************************************
+ * Trello Utilities
+ ************************************/
+async function getTrelloCardNames(key, token, query, limit) {
+	// Docs URL: https://developer.atlassian.com/cloud/trello/rest/api-group-search/#api-search-get
+
+	try {
+		// Create a new URL object
+		const url = new URL('https://api.trello.com/1/search');
+
+		// Use URLSearchParams to append query parameters
+		const params = new URLSearchParams({
+			query: `name:"${query}"`,
+			key: key,
+			token: token,
+			cards_limit: limit,
+			card_fields: 'name,dateLastActivity,shortUrl',
+			partial: 'true',
+			modelTypes: 'cards'
+		});
+
+		// Append the search parameters to the URL
+		url.search = params.toString();
+
+		// Fetch the data from Trello API
+		const res = await fetch(url);
+
+		if (!res.ok) {
+			throw new Error(`HTTP error! status: ${res.status} - ${res.statusText} - ${await res.text()}`);
+		}
+
+		// Parse the JSON response
+		const data = await res.json();
+
+		// Sort and format the card data
+		const cards = data.cards
+			.sort((a, b) => new Date(b.dateLastActivity) - new Date(a.dateLastActivity))
+			.map((card) => ({
+				id: card.id,
+				name: card.name,
+				lastActivityDate: new Date(card.dateLastActivity).toLocaleString(),
+				url: card.shortUrl
+			}));
+
+		logger.debug(`Retrieved ${cards.length} cards`);
+		return cards;
+	} catch (error) {
+		logger.error("Error fetching data from Trello:", error);
+		throw error;
+	}
+}
 /************************************
  * Asynchronous SVN Logic
  ************************************/
@@ -234,7 +286,7 @@ function extractRevisionNumber(commitResult) {
  * @returns {String} The sanitized commit message
  */
 function sanitizeCommitMessage(commitMessage) {
-	return commitMessage.replaceAll(/[\n\r\t\b\f]/g, " ").trim();
+	return commitMessage.replaceAll(/[\n\r\t\b\f]/g, "; ").trim();
 }
 
 /************************************
@@ -274,7 +326,15 @@ async function sendConfig(socket) {
 		await fs.mkdir(path.dirname(configFilePath), { recursive: true });
 		await fs.access(configFilePath);
 	} catch (err) {
-		const defaultConfig = { currentVersion: latestVersion, branches: [], branchFolderColours: {} };
+		const defaultConfig = {
+			currentVersion: latestVersion,
+			branches: [],
+			branchFolderColours: {},
+			trelloIntegration: {
+				key: "TRELLO_API_KEY",
+				token: "TRELLO_TOKEN",
+			},
+		};
 		await fs.writeFile(configFilePath, JSON.stringify(defaultConfig, null, 4));
 		emitMessage(socket, "Config file created with default content", "success");
 	}
@@ -294,23 +354,23 @@ async function sendConfig(socket) {
 		return;
 	}
 
-	socket.emit("get-Config", config);
+	socket.emit("titan-config-get", config);
 }
 
 io.on("connection", (socket) => {
 	logger.info("Connected to client!");
 	emitMessage(socket, "Connected To Server!", "success", 1500);
 
-	socket.on("get-Config", async (data) => {
-		debugTask("get-Config", data, false);
+	socket.on("titan-config-get", async (data) => {
+		debugTask("titan-config-get", data, false);
 		if (data === "fetch") {
 			await sendConfig(socket);
 		}
-		debugTask("get-Config", data, true);
+		debugTask("titan-config-get", data, true);
 	});
 
-	socket.on("set-Config", async (data) => {
-		debugTask("set-Config", data, false);
+	socket.on("titan-config-set", async (data) => {
+		debugTask("titan-config-set", data, false);
 		try {
 			await fs.writeFile(configFilePath, JSON.stringify(data, null, 4));
 			emitMessage(socket, "Config file updated", "success");
@@ -318,7 +378,21 @@ io.on("connection", (socket) => {
 			logger.error(err);
 			emitMessage(socket, "Error updating config file", "error");
 		}
-		debugTask("set-Config", data, true);
+		debugTask("titan-config-set", data, true);
+	});
+
+	socket.on("titan-config-open", async () => {
+		debugTask("titan-config-open", null, false);
+		exec(`start "" "${configFilePath}"`, (err) => {
+			if (err) {
+				logger.error("Failed to open config file:", err);
+				emitMessage(socket, "Failed to open config file", "error");
+			} else {
+				logger.info("Config file opened successfully");
+				emitMessage(socket, "Config file opened successfully", "success");
+			}
+		});
+		debugTask("titan-config-open", null, true);
 	});
 
 	socket.on("svn-update-single", async (data) => {
@@ -559,24 +633,26 @@ io.on("connection", (socket) => {
 			};
 			svnQueueSerial.push(task);
 
-			let propTask = {
-				command: "propset",
-				args: ["svn:keywords", '"Id Author Date Revision HeadURL"', `--targets ${targetsFilePath}`],
-				preopCallback: async () => {
-					await writeTargetsFile(files);
-				},
-				postopCallback: (err, result) => {
-					if (err) {
-						logger.error(`Failed to set SVN properties for all unversioned files:` + err);
-						if (!isSVNConnectionError(socket, err)) emitMessage(socket, `Failed to set SVN properties for all unversioned files`, "error");
-					} else {
-						logger.info(`Successfully set SVN properties for all unversioned files`);
-						emitMessage(socket, `SVN properties for all unversioned files have been set. Please check that you have added SVN comments to ensure that your SVN client can automatically update them`, "warning", 10_000);
-						socket.emit("branch-refresh-unseen");
-					}
-				},
-			};
-			svnQueueSerial.push(propTask);
+			if (files.length > 0) {
+				let propTask = {
+					command: "propset",
+					args: ["svn:keywords", '"Id Author Date Revision HeadURL"', `--targets ${targetsFilePath}`],
+					preopCallback: async () => {
+						await writeTargetsFile(files);
+					},
+					postopCallback: (err, result) => {
+						if (err) {
+							logger.error(`Failed to set SVN properties for all unversioned files:` + err);
+							if (!isSVNConnectionError(socket, err)) emitMessage(socket, `Failed to set SVN properties for all unversioned files`, "error");
+						} else {
+							logger.info(`Successfully set SVN properties for all unversioned files`);
+							emitMessage(socket, `SVN properties for all unversioned files have been set. Please check that you have added SVN comments to ensure that your SVN client can automatically update them`, "warning", 10_000);
+							socket.emit("branch-refresh-unseen");
+						}
+					},
+				};
+				svnQueueSerial.push(propTask);
+			}
 		}
 
 		if (missingPaths.length > 0) {
@@ -713,7 +789,7 @@ io.on("connection", (socket) => {
 			return {
 				command: "log",
 				args: [branch["SVN Branch"]],
-				options: { revision: "1:HEAD" },
+				options: { revision: "1:HEAD", params: ["--stop-on-copy"] },
 				postopCallback: (err, result) => {
 					if (err) {
 						logger.error(`Failed to fetch logs for branch ${branch["SVN Branch"]}:`, err);
@@ -724,11 +800,12 @@ io.on("connection", (socket) => {
 						const formattedLogs = logsArray.map((entry) => {
 							return {
 								revision: entry["$"].revision,
+								branchId: branch.id,
 								branchFolder: branch["Branch Folder"],
 								branchVersion: branch["Branch Version"],
 								author: entry.author,
 								message: entry.msg,
-								date: (new Date(entry.date)).toLocaleString("en-GB"),
+								date: new Date(entry.date).toLocaleString("en-GB"),
 							};
 						});
 
@@ -747,6 +824,32 @@ io.on("connection", (socket) => {
 		}
 
 		debugTask("svn-log-selected", data, true);
+	});
+
+	socket.on("trello-search-names-card", async (data) => {
+		debugTask("trello-search-names-card", data, false);
+
+		if (!data.query || data.query === "") {
+			emitMessage(socket, "No search query provided", "error");
+			return;
+		}
+
+		if (!data.key || data.key === "" || data.key === "TRELLO_API_KEY" || !data.token || data.token === "" || data.token === "TRELLO_TOKEN") {
+			emitMessage(socket, "Trello API key and token are required for this function", "error");
+			return;
+		}
+
+		const limit = data.limit || 50;
+
+		try {
+			const cards = await getTrelloCardNames(data.key, data.token, data.query, limit);
+			socket.emit("trello-result-search-names-card", cards);
+		} catch (err) {
+			logger.error("Error fetching Trello card names:", JSON.stringify(err, null, 2));
+			emitMessage(socket, "Error fetching Trello card names", "error");
+		}
+
+		debugTask("trello-search-names-card", data, true);
 	});
 
 	socket.on("client-log", (data) => {

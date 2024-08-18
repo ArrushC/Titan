@@ -1,7 +1,8 @@
-import React, { createContext, useCallback, useContext, useEffect, useRef, useState } from "react";
+import React, { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState } from "react";
 import socketIOClient from "socket.io-client";
 import { useToast } from "@chakra-ui/react";
 import _ from "lodash";
+import { branchString } from "./utils/CommonConfig";
 
 const AppContext = createContext({
 	socket: null,
@@ -29,10 +30,9 @@ const AppContext = createContext({
 	setShowCommitView: (_) => {},
 	sourceBranch: null,
 	setSourceBranch: (_) => {},
+	sourceBranchOptions: [],
 	issueNumber: null,
 	setIssueNumber: (_) => {},
-	issueOptions: [],
-	setIssueOptions: (_) => {},
 	commitMessage: "",
 	setCommitMessage: (_) => {},
 	selectedLocalChanges: [],
@@ -41,6 +41,8 @@ const AppContext = createContext({
 	setSelectedUntrackedChanges: (_) => {},
 	socketPayload: null,
 	setSocketPayload: (_) => {},
+	logData: [],
+	setLogData: (_) => {},
 });
 
 export const useApp = () => {
@@ -66,31 +68,31 @@ export const AppProvider = ({ children }) => {
 	const [isDebug, setIsDebug] = useState(localStorage.getItem("isDebug") === "true");
 
 	useEffect(() => {
-		const socket = socketIOClient("http://localhost:4000");
-		setSocket(socket);
+		const newSocket = socketIOClient("http://localhost:4000");
+		setSocket(newSocket);
 
-		socket.on("connect", () => {
-			socket.emit("get-Config", "fetch");
-			socket.once("get-Config", (data) => {
+		newSocket.on("connect", () => {
+			newSocket.emit("titan-config-get", "fetch");
+			newSocket.once("titan-config-get", (data) => {
 				setConfig(data);
 				toast(createToastConfig(false, "Configurations Loaded", "success", 2000));
 			});
 		});
 
-		socket.on("notification", (data) => {
+		newSocket.on("notification", (data) => {
 			toast(createToastConfig(true, data.description, data.status, data.duration));
 		});
 
-		socket.on("disconnect", () => {
+		newSocket.on("disconnect", () => {
 			toast(createToastConfig(true, "Server Has Been Disconnected", "warning", 0));
 		});
 
-		socket.on("reconnect", () => {
+		newSocket.on("reconnect", () => {
 			toast(createToastConfig(true, "Server Has Been Reconnected", "success", 2000));
 		});
 
 		return () => {
-			socket.disconnect();
+			newSocket.disconnect();
 		};
 	}, []);
 
@@ -102,7 +104,7 @@ export const AppProvider = ({ children }) => {
 		(configToSave) => {
 			if (configToSave === null || configToSave === undefined) return;
 			console.log("Saving config:", configToSave);
-			socket?.emit("set-Config", configToSave);
+			socket?.emit("titan-config-set", configToSave);
 		},
 		[socket]
 	);
@@ -132,17 +134,27 @@ export const AppProvider = ({ children }) => {
 	const untrackedChangesGridRef = useRef(null);
 	const [showCommitView, setShowCommitView] = useState(false);
 	const [sourceBranch, setSourceBranch] = useState(null);
+	const sourceBranchOptions = useMemo(
+		() =>
+			selectedBranches.map((row) => ({
+				value: row.id,
+				label: branchString(row["Branch Folder"], row["Branch Version"], row["SVN Branch"]),
+			})),
+		[selectedBranches]
+	);
 	const [issueNumber, setIssueNumber] = useState(null);
-	const [issueOptions, setIssueOptions] = useState([]);
 	const [commitMessage, setCommitMessage] = useState("");
 	const [selectedLocalChanges, setSelectedLocalChanges] = useState([]);
 	const [selectedUntrackedChanges, setSelectedUntrackedChanges] = useState([]);
 	const [socketPayload, setSocketPayload] = useState(null);
 
+	// Props used in the entire application
+	const [logData, setLogData] = React.useState([]);
+
 	/*****************************************
 	 *  Hooks used in both sections
 	 *****************************************/
-	/**** SectionBranches ****/	
+	/**** SectionBranches ****/
 	// Refresh commit view when configurableRowData changes
 	useEffect(() => {
 		setSelectedBranchStatuses([]);
@@ -152,9 +164,11 @@ export const AppProvider = ({ children }) => {
 	/**** SectionCommit ****/
 	// Scroll to the commit region when it is in commit mode
 	useEffect(() => {
-		if (!isCommitMode) return;
-		document.getElementById("sectionCommit")?.scrollIntoView({ behavior: "smooth", block: "start" });
-	}, [isCommitMode]);
+		if (!isCommitMode || !showCommitView) return;
+		setTimeout(() => {
+			document.getElementById("sectionCommit")?.scrollIntoView({ behavior: "smooth", block: "start", inline: "nearest" });
+		}, 200);
+	}, [isCommitMode, showCommitView]);
 
 	// Refresh the commit section whenever there has been an update on untracked files being tracked by SVN.
 	useEffect(() => {
@@ -174,6 +188,33 @@ export const AppProvider = ({ children }) => {
 
 		socket?.on("branch-status-single", socketCallback);
 		return () => socket?.off("branch-status-single", socketCallback);
+	}, [socket]);
+
+	useEffect(() => {
+		setLogData([]);
+	}, [selectedBranches]);
+
+	useEffect(() => {
+		if (logData.length === 0 && socket)
+			setSelectedBranches((currSelectedBranches) => {
+				if (currSelectedBranches.length > 0) socket.emit("svn-log-selected", { selectedBranches: selectedBranches });
+				return currSelectedBranches;
+			});
+	}, [logData, socket]);
+
+	useEffect(() => {
+		const socketCallback = (data) => {
+			console.debug("Received svn-log-result from socket in SectionBranchLog component in background");
+			setLogData((prevData) => {
+				const isDataExist = prevData.some((logBranch) => logBranch.id === data.id);
+				if (!isDataExist) return [...prevData, data];
+				return prevData;
+			});
+		};
+
+		socket?.on("svn-log-result", socketCallback);
+
+		return () => socket?.off("svn-log-result", socketCallback);
 	}, [socket]);
 
 	return (
@@ -204,10 +245,9 @@ export const AppProvider = ({ children }) => {
 				setShowCommitView,
 				sourceBranch,
 				setSourceBranch,
+				sourceBranchOptions,
 				issueNumber,
 				setIssueNumber,
-				issueOptions,
-				setIssueOptions,
 				commitMessage,
 				setCommitMessage,
 				selectedLocalChanges,
@@ -216,6 +256,8 @@ export const AppProvider = ({ children }) => {
 				setSelectedUntrackedChanges,
 				socketPayload,
 				setSocketPayload,
+				logData,
+				setLogData,
 			}}>
 			{children}
 		</AppContext.Provider>

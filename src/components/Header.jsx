@@ -3,9 +3,12 @@ import React from "react";
 import Logo from "../assets/Titan.png";
 import { useApp } from "../AppContext";
 import { MdCode, MdCodeOff } from "react-icons/md";
+import useSocketEmits from "../hooks/useSocketEmits";
+import { LuFileCog } from "react-icons/lu";
 
 export default function Header() {
 	const { isDebug, setIsDebug } = useApp();
+	const { emitOpenConfig } = useSocketEmits();
 
 	return (
 		<Flex justifyContent={"space-between"} mb={5}>
@@ -15,9 +18,12 @@ export default function Header() {
 					Titan
 				</Heading>
 			</Flex>
-			<Flex alignItems={"center"}>
+			<Flex alignItems={"center"} columnGap={2}>
 				<Tooltip label={`Current Debug Mode: ${isDebug ? "on" : "off"}`} hasArrow placement="left">
 					<IconButton aria-label="Toggle Debug Mode" colorScheme={"yellow"} icon={!isDebug ? <Icon as={MdCodeOff} /> : <Icon as={MdCode} />} onClick={() => setIsDebug((prev) => !prev)} />
+				</Tooltip>
+				<Tooltip label={"Open configuration file"} hasArrow placement="bottom-start">
+					<IconButton aria-label="Open configuration file" colorScheme={"yellow"} icon={<Icon as={LuFileCog} />} onClick={() => emitOpenConfig()} />
 				</Tooltip>
 			</Flex>
 		</Flex>

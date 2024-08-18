@@ -2,10 +2,10 @@
 	"name": "titan",
 	"private": true,
 	"proxy": "http://localhost:5173",
-	"version": "1.1.1",
+	"version": "1.2.0",
 	"type": "module",
 	"main": "main.js",
-	"description": "A desktop application for streamlining your workflow in Revision Control Systems (RCS).",
+	"description": "Streamlining your workflow in Revision Control Systems (RCS).",
 	"author": "ArrushC",
 	"scripts": {
 		"start": "npm run server:start",
@@ -22,8 +22,11 @@
 		"electron:build:mac": "electron-builder --mac",
 		"electron:build:linux": "electron-builder --linux",
 		"build:win": "vite build && electron-builder --win",
+		"publish:win": "vite build && electron-builder --win --publish always",
 		"build:mac": "vite build && electron-builder --mac",
-		"build:linux": "vite build && electron-builder --linux"
+		"publish:mac": "vite build && electron-builder --mac --publish always",
+		"build:linux": "vite build && electron-builder --linux",
+		"publish:linux": "vite build && electron-builder --linux --publish always"
 	},
 	"dependencies": {
 		"@chakra-ui/icons": "^2.1.1",
@@ -34,6 +37,7 @@
 		"async": "^3.2.5",
 		"chakra-react-select": "^4.9.1",
 		"compression": "^1.7.4",
+		"electron-updater": "^6.2.1",
 		"express": "^4.19.2",
 		"framer-motion": "^11.3.2",
 		"lodash": "^4.17.21",
@@ -63,8 +67,8 @@
 		"vite": "^5.3.3"
 	},
 	"build": {
-		"appId": "com.titan",
 		"productName": "Titan",
+		"appId": "com.arrushc.titan",
 		"files": [
 			"dist/**/*",
 			"icons/**/*",
@@ -78,7 +82,7 @@
 			"output": "release"
 		},
 		"win": {
-			"target": "portable",
+			"target": "nsis",
 			"icon": "icons/Titan.ico"
 		},
 		"mac": {
@@ -88,6 +92,15 @@
 		"linux": {
 			"target": "AppImage",
 			"icon": "icons/Titan.png"
+		},
+		"nsis": {
+			"runAfterFinish": true,
+			"deleteAppDataOnUninstall": true,
+			"allowToChangeInstallationDirectory": true,
+			"createDesktopShortcut": "always",
+			"createStartMenuShortcut": true,
+			"perMachine": false,
+			"oneClick": false
 		}
 	}
 }

@@ -18,9 +18,9 @@ export default function PanelUntrackedChanges({ rowDataUntrackedChanges, setRowD
 	);
 
 	const onUnseenFilesSelectionChanged = useCallback(() => {
-		const selectedBranches = untrackedChangesGridRef?.current?.api?.getSelectedNodes().map((node) => node.data);
-		if (isDebug) console.log("CommitRegion.jsx: onUnseenFilesSelectionChanged - selectedBranches", selectedBranches);
-		setSelectedUntrackedChanges(selectedBranches);
+		const untrackedChanges = untrackedChangesGridRef?.current?.api?.getSelectedNodes().map((node) => node.data);
+		if (isDebug) console.log("CommitRegion.jsx: onUnseenFilesSelectionChanged - selectedBranches", untrackedChanges);
+		setSelectedUntrackedChanges(untrackedChanges);
 	}, [untrackedChangesGridRef, isDebug]);
 
 	const handleAddRemoveFiles = useCallback(() => {
@@ -35,8 +35,8 @@ export default function PanelUntrackedChanges({ rowDataUntrackedChanges, setRowD
 		() => [
 			{ headerCheckboxSelection: true, checkboxSelection: true, headerCheckboxSelectionFilteredOnly: true, width: 20, resizable: false, suppressMovable: false, filter: false, editable: false, headerClass: "branch-table-header-cell", cellClass: "branch-table-body-cell" },
 			{ field: "Branch Folder" },
-			{ field: "Branch Version" },
-			{ field: "File Path", flex: 1 },
+			{ field: "Branch Version", sort: "asc", sortIndex: 0 },
+			{ field: "File Path", flex: 1, sort: "asc", sortIndex: 1 },
 			{ field: "Local Status", headerTooltip: "Working Copy" },
 		],
 		[]
@@ -73,19 +73,19 @@ export default function PanelUntrackedChanges({ rowDataUntrackedChanges, setRowD
 							rowMultiSelectWithClick={true}
 							animateRows={true}
 							columnMenu={"new"}
-							enableCellTextSelection
+							enableCellTextSelection={true}
 							ensureDomOrder
 						/>
 					</div>
 					<Flex mt={4} columnGap={2} justifyContent={"flex-end"}>
 						<Tooltip label={"Requires you to select at least 1 file"} hasArrow isDisabled={selectedUntrackedChanges.length > 0}>
 							<Button onClick={handleAddRemoveFiles} colorScheme={"green"} isDisabled={selectedUntrackedChanges.length < 1}>
-								Add/Remove Selected
+								Add/Remove {selectedUntrackedChanges.length} File{selectedUntrackedChanges.length > 1 ? "s" : ""}
 							</Button>
 						</Tooltip>
 						<Tooltip label={"Requires you to select at least 1 file"} hasArrow isDisabled={selectedUntrackedChanges.length > 0}>
 							<Button onClick={hanldeRevertUnseenFiles} colorScheme={"red"} isDisabled={selectedUntrackedChanges.length < 1}>
-								Revert Selected
+								Revert {selectedUntrackedChanges.length} File{selectedUntrackedChanges.length > 1 ? "s" : ""}
 							</Button>
 						</Tooltip>
 					</Flex>

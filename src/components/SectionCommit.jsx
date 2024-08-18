@@ -9,6 +9,7 @@ import PanelLocalChanges from "./PanelLocalChanges";
 import PanelUntrackedChanges from "./PanelUntrackedChanges";
 import FormSVNMessage from "./FormSVNMessage";
 import FooterSectionCommit from "./FooterSectionCommit";
+import ModalMessageAutoFill from "./ModalMessageAutoFill";
 
 export default function SectionCommit() {
 	const {
@@ -28,8 +29,9 @@ export default function SectionCommit() {
 	const [rowDataLocalChanges, setRowDataLocalChanges] = useState([]);
 	const [rowDataUntrackedChanges, setRowDataUntrackedChanges] = useState([]);
 
-	// Commit Modal
-	const { isOpen, onOpen, onClose } = useDisclosure();
+	// Modals
+	const { isOpen: isCommitModalOpen, onOpen: openCommitModal, onClose: closeCommitModal } = useDisclosure();
+	const { isOpen: isMessageAutoFillModalOpen, onOpen: openMessageAutoFillModal, onClose: closeMessageAutoFillModal } = useDisclosure();
 
 	const defaultColDefsCommit = useMemo(
 		() => ({
@@ -109,10 +111,10 @@ export default function SectionCommit() {
 	return (
 		<Box>
 			<Box mb={6}>
-				<FormSVNMessage/>
+				<FormSVNMessage openMessageAutoFillModal={openMessageAutoFillModal} />
 			</Box>
 			<Skeleton isLoaded={showCommitView && hasChanges} startColor="yelow.500" endColor="yellow.500">
-				<Tabs variant={"solid-rounded"} colorScheme="yellow" defaultIndex={hasFileUpdates ? 0 : hasLocalChanges ? 1 : 2}>
+				<Tabs variant={"solid-rounded"} colorScheme="yellow" defaultIndex={hasFileUpdates ? 0 : hasLocalChanges ? 1 : 2} isLazy={false}>
 					<TabList>
 						<Tab isDisabled={!hasFileUpdates}>
 							<Tooltip label={"No files to update!"} hasArrow isDisabled={hasFileUpdates}>
@@ -131,13 +133,13 @@ export default function SectionCommit() {
 						</Tab>
 					</TabList>
 					<TabPanels>
-						<TabPanel>
+						<TabPanel px={0}>
 							<PanelUpdates fileUpdates={fileUpdates} />
 						</TabPanel>
-						<TabPanel>
+						<TabPanel px={0}>
 							<PanelLocalChanges rowDataLocalChanges={rowDataLocalChanges} setRowDataLocalChanges={setRowDataLocalChanges} defaultColDefsCommit={defaultColDefsCommit} />
 						</TabPanel>
-						<TabPanel>
+						<TabPanel px={0}>
 							<PanelUntrackedChanges rowDataUntrackedChanges={rowDataUntrackedChanges} setRowDataUntrackedChanges={setRowDataUntrackedChanges} defaultColDefsCommit={defaultColDefsCommit} />
 						</TabPanel>
 					</TabPanels>
@@ -151,9 +153,10 @@ export default function SectionCommit() {
 				<></>
 			)}
 			<Box mt={6}>
-				<FooterSectionCommit openModal={onOpen} />
+				<FooterSectionCommit openCommitModal={openCommitModal} />
 			</Box>
-			<ModalCommit isModalOpen={isOpen} onModalClose={onClose} />
+			<ModalCommit isModalOpen={isCommitModalOpen} closeModal={closeCommitModal} />
+			<ModalMessageAutoFill isModalOpen={isMessageAutoFillModalOpen} closeModal={closeMessageAutoFillModal} />
 		</Box>
 	);
 }

@@ -14,15 +14,12 @@ export default function useStoreSVNLogs() {
 		},
 		[setQuickFilterLogsText]
 	);
+
 	const refreshLogs = useCallback(() => {
 		setLogData([]);
 	}, [setLogData]);
 
 	const areLogsFetched = logData.length === selectedBranches.length;
-
-	useEffect(() => {
-		setLogData([]);
-	}, [selectedBranches]);
 
 	useEffect(() => {
 		if (logData.length === 0) return;

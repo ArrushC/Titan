@@ -42,7 +42,7 @@ import { MdCheckCircle, MdError } from "react-icons/md";
 import { AgGridReact } from "ag-grid-react";
 import _ from "lodash";
 import { CopyIcon } from "@chakra-ui/icons";
-import DiffButton from "./DiffButton";
+import ButtonDiff from "./ButtonDiff";
 import useSocketEmits from "../hooks/useSocketEmits";
 import useNotifications from "../hooks/useNotifications";
 
@@ -103,7 +103,7 @@ export default function ModalCommit({ isModalOpen, closeModal }) {
 				headerName: "Diff",
 				filter: false,
 				sortable: false,
-				cellRenderer: DiffButton,
+				cellRenderer: ButtonDiff,
 				cellRendererParams: {
 					onDiffResult: handleDiffResult,
 				},

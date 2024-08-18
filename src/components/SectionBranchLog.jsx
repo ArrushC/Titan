@@ -1,36 +1,10 @@
-import React, { useCallback, useEffect, useState } from "react";
+import React from "react";
 import { useApp } from "../AppContext";
-import { Drawer, DrawerBody, DrawerCloseButton, DrawerContent, DrawerHeader, DrawerOverlay, ListItem, Text, Box, ListIcon, List, CircularProgress, CircularProgressLabel, Flex, Input, IconButton, Tooltip } from "@chakra-ui/react";
-import useSocketEmits from "../hooks/useSocketEmits";
-import { MdCheckCircle, MdDirectionsRun } from "react-icons/md";
-import { branchString } from "../utils/CommonConfig";
-import TableLogs from "./TableLogs";
-import { RepeatIcon } from "@chakra-ui/icons";
-import useStoreSVNLogs from "../hooks/useStoreSVNLogs";
+import { Drawer, DrawerBody, DrawerCloseButton, DrawerContent, DrawerHeader, DrawerOverlay, Box } from "@chakra-ui/react";
+import FilterableTableLogs from "./FilterableTableLogs";
 
 export default function SectionBranchLog() {
-	const { showSelectedBranchesLog, setShowSelectedBranchesLog, setSelectedBranches, selectedBranches, socket, logData, setLogData } = useApp();
-	const { emitLogSelected } = useSocketEmits();
-	const { rowDataLogs, quickFilterLogsText, onQuickFilterLogsInputChanged, refreshLogs, areLogsFetched } = useStoreSVNLogs();
-
-	useEffect(() => {
-		if (logData.length === 0)
-			setSelectedBranches((currSelectedBranches) => {
-				if (currSelectedBranches.length > 0) emitLogSelected(currSelectedBranches);
-				return currSelectedBranches;
-			});
-	}, [logData]);
-
-	useEffect(() => {
-		const socketCallback = (data) => {
-			console.debug("Received svn-log-result from socket in SectionBranchLog component in background");
-			setLogData((prevData) => [...prevData, data]);
-		};
-
-		socket?.on("svn-log-result", socketCallback);
-
-		return () => socket?.off("svn-log-result", socketCallback);
-	}, [socket]);
+	const { showSelectedBranchesLog, setShowSelectedBranchesLog } = useApp();
 
 	return (
 		<Drawer isOpen={showSelectedBranchesLog} onClose={() => setShowSelectedBranchesLog(false)} placement="left" size="full">
@@ -40,48 +14,7 @@ export default function SectionBranchLog() {
 				<DrawerHeader>Selected Branches: SVN Log</DrawerHeader>
 				<DrawerBody>
 					<Box height={"100%"}>
-						{!areLogsFetched ? (
-							<Box>
-								<Box mb={4}>
-									<Text fontWeight={600}>Showing SVN Log for the following branches:</Text>
-									<List spacing={3}>
-										{selectedBranches.map((branch) => {
-											const isBranchLogged = logData.find((loggedBranch) => loggedBranch.id === branch.id);
-											return (
-												<ListItem key={branch.branchId} display={"flex"} alignItems={"center"}>
-													<ListIcon w={30} h={30} as={!isBranchLogged ? MdDirectionsRun : MdCheckCircle} color={"yellow.500"} />
-													{branchString(branch["Branch Folder"], branch["Branch Version"], branch["SVN Branch"])}
-												</ListItem>
-											);
-										})}
-									</List>
-								</Box>
-								<Flex justifyContent={"center"}>
-									<CircularProgress value={(logData.length / selectedBranches.length) * 360} color="yellow.300" size="100px">
-										<CircularProgressLabel>
-											{logData.length} / {selectedBranches.length}
-										</CircularProgressLabel>
-									</CircularProgress>
-								</Flex>
-							</Box>
-						) : (
-							<Box height={"100%"}>
-								<Flex mb={4} width={"100%"} alignItems={"center"} columnGap={4}>
-									<Flex alignItems={"center"} width={"100%"}>
-										<Text mr={2} fontWeight={"600"} whiteSpace={"nowrap"}>
-											Quick Filter:
-										</Text>
-										<Input placeholder="Type to search..." onInput={onQuickFilterLogsInputChanged} width={"100%"} />
-									</Flex>
-									<Box>
-										<Tooltip label={"Refresh"} hasArrow>
-											<IconButton onClick={refreshLogs} icon={<RepeatIcon />} colorScheme={"yellow"} aria-label="Refresh" />
-										</Tooltip>
-									</Box>
-								</Flex>
-								<TableLogs rowDataLogs={rowDataLogs} quickFilterLogsText={quickFilterLogsText} />
-							</Box>
-						)}
+						<FilterableTableLogs />
 					</Box>
 				</DrawerBody>
 			</DrawerContent>

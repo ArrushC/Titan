@@ -1,21 +1,12 @@
 import { Box, Flex, FormControl, FormLabel, IconButton, Textarea, Tooltip } from "@chakra-ui/react";
-import { CreatableSelect, Select } from "chakra-react-select";
-import React, { useCallback, useEffect, useMemo } from "react";
+import { Select } from "chakra-react-select";
+import React, { useCallback, useEffect } from "react";
 import { useApp } from "../AppContext";
-import { branchString } from "../utils/CommonConfig";
-import { CloseIcon, ExternalLinkIcon } from "@chakra-ui/icons";
+import { ExternalLinkIcon } from "@chakra-ui/icons";
+import IssueNumberInput from "./IssueNumberInput";
 
 export default function FormSVNMessage({ openMessageAutoFillModal }) {
-	const { sourceBranch, setSourceBranch, issueNumber, setIssueNumber, commitMessage, setCommitMessage, issueOptions, setIssueOptions, selectedBranches, isCommitMode } = useApp();
-
-	const sourceBranchOptions = useMemo(
-		() =>
-			selectedBranches.map((row) => ({
-				value: row.id,
-				label: branchString(row["Branch Folder"], row["Branch Version"], row["SVN Branch"]),
-			})),
-		[selectedBranches]
-	);
+	const { sourceBranch, setSourceBranch, sourceBranchOptions, issueNumber, setIssueNumber, commitMessage, setCommitMessage, selectedBranches, isCommitMode } = useApp();
 
 	const handleSourceBranchChange = useCallback(
 		(selectedOption) => {
@@ -24,32 +15,12 @@ export default function FormSVNMessage({ openMessageAutoFillModal }) {
 		[setSourceBranch]
 	);
 
-	const handleIssueNumberChange = (selectedOption) => {
-		setIssueNumber(selectedOption);
-		if (selectedOption && !issueOptions.some((option) => String(option.value).trim() === String(selectedOption.value).trim())) {
-			const newOptions = [...issueOptions, selectedOption];
-			setIssueOptions(newOptions);
-			localStorage.setItem("issueOptions", JSON.stringify(newOptions));
-		}
-	};
-
-	const handleClearIssueOptions = () => {
-		setIssueOptions([]);
-		localStorage.removeItem("issueOptions");
-	};
-
 	const handleCommitMessageChange = useCallback(
 		(e) => {
 			setCommitMessage(String(e.target.value).replace(/["`]/g, "'"));
 		},
 		[setCommitMessage]
 	);
-
-	// Load options from localStorage on component mount
-	useEffect(() => {
-		const savedIssueOptions = localStorage.getItem("issueOptions");
-		if (savedIssueOptions) setIssueOptions(JSON.parse(savedIssueOptions));
-	}, []);
 
 	useEffect(() => {
 		if (selectedBranches.length === 1) setSourceBranch(sourceBranchOptions[0]);
@@ -59,7 +30,7 @@ export default function FormSVNMessage({ openMessageAutoFillModal }) {
 	useEffect(() => {
 		if (!isCommitMode) return;
 		setSourceBranch(null);
-		setIssueNumber(null);
+		setIssueNumber("");
 		setCommitMessage("");
 	}, [isCommitMode]);
 
@@ -75,22 +46,8 @@ export default function FormSVNMessage({ openMessageAutoFillModal }) {
 				<Flex width={"50%"} alignItems={"flex-end"} columnGap={2}>
 					<FormControl isRequired>
 						<FormLabel>Issue Number</FormLabel>
-						<CreatableSelect
-							value={issueNumber}
-							onChange={handleIssueNumberChange}
-							options={issueOptions}
-							placeholder="Select or create an issue number"
-							formatCreateLabel={(inputValue) => `Create issue "${inputValue}"`}
-							selectedOptionStyle="check"
-							selectedOptionColorScheme="yellow"
-							isClearable
-							isSearchable
-							createOptionPosition="first"
-						/>
+						<IssueNumberInput issueNumber={issueNumber} setIssueNumber={setIssueNumber} />
 					</FormControl>
-					<Tooltip label="Clear All Options" hasArrow>
-						<IconButton colorScheme={"red"} aria-label="Clear All Options" size="md" onClick={handleClearIssueOptions} icon={<CloseIcon />} />
-					</Tooltip>
 					<Tooltip label="Auto Fill Message" hasArrow>
 						<IconButton colorScheme={"yellow"} aria-label="Auto Fill Message" size="md" onClick={() => openMessageAutoFillModal()} icon={<ExternalLinkIcon />} />
 					</Tooltip>

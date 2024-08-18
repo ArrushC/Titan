@@ -51,12 +51,12 @@ export default function TableLogs({ rowDataLogs, quickFilterLogsText, setAutoFil
 	const onLogsSelectionChange = useCallback(() => {
 		if (setAutoFillSelection) {
 			const logs = logsGridRef?.current?.api?.getSelectedNodes().map((node) => node.data);
-			setAutoFillSelection(logs);
+			setAutoFillSelection(logs[0] || null);
 		}
 	}, [setAutoFillSelection]);
 
 	return (
-		<div className="ag-theme-quartz-dark compact" style={{ height: isAutofill ? "85%" : "90%", width: "100%" }}>
+		<div className="ag-theme-quartz-dark compact" style={{ height: "90%", width: "100%" }}>
 			<AgGridReact
 				ref={logsGridRef}
 				rowData={rowDataLogs}
@@ -71,7 +71,7 @@ export default function TableLogs({ rowDataLogs, quickFilterLogsText, setAutoFil
 				animateRows={false}
 				immutableData={true}
 				suppressFlash={true}
-				enableCellTextSelection
+				enableCellTextSelection={true}
 				ensureDomOrder
 				pagination={true}
 				paginationAutoPageSize={true}

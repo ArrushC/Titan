@@ -3,7 +3,7 @@ import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { useApp } from "../AppContext";
 import useSocketEmits from "../hooks/useSocketEmits";
 import { AgGridReact } from "ag-grid-react";
-import DiffButton from "./DiffButton";
+import ButtonDiff from "./ButtonDiff";
 import useNotifications from "../hooks/useNotifications";
 
 export default function PanelLocalChanges({ rowDataLocalChanges, setRowDataLocalChanges, defaultColDefsCommit }) {
@@ -50,7 +50,7 @@ export default function PanelLocalChanges({ rowDataLocalChanges, setRowDataLocal
 				filter: false,
 				sortable: false,
 				resizable: false,
-				cellRenderer: DiffButton,
+				cellRenderer: ButtonDiff,
 				cellRendererParams: {
 					onDiffResult: handleDiffResult,
 				},
@@ -91,7 +91,7 @@ export default function PanelLocalChanges({ rowDataLocalChanges, setRowDataLocal
 							rowMultiSelectWithClick={true}
 							animateRows={true}
 							columnMenu={"new"}
-							enableCellTextSelection
+							enableCellTextSelection={true}
 							ensureDomOrder
 						/>
 					</div>

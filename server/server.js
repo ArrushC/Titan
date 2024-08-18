@@ -111,6 +111,57 @@ async function writeTargetsFile(targets = []) {
 }
 
 /************************************
+ * Trello Utilities
+ ************************************/
+async function getTrelloCardNames(key, token, query, limit) {
+	// Docs URL: https://developer.atlassian.com/cloud/trello/rest/api-group-search/#api-search-get
+
+	try {
+		// Create a new URL object
+		const url = new URL('https://api.trello.com/1/search');
+
+		// Use URLSearchParams to append query parameters
+		const params = new URLSearchParams({
+			query: `name:"${query}"`,
+			key: key,
+			token: token,
+			cards_limit: limit,
+			card_fields: 'name,dateLastActivity,shortUrl',
+			partial: 'true',
+			modelTypes: 'cards'
+		});
+
+		// Append the search parameters to the URL
+		url.search = params.toString();
+
+		// Fetch the data from Trello API
+		const res = await fetch(url);
+
+		if (!res.ok) {
+			throw new Error(`HTTP error! status: ${res.status} - ${res.statusText} - ${await res.text()}`);
+		}
+
+		// Parse the JSON response
+		const data = await res.json();
+
+		// Sort and format the card data
+		const cards = data.cards
+			.sort((a, b) => new Date(b.dateLastActivity) - new Date(a.dateLastActivity))
+			.map((card) => ({
+				id: card.id,
+				name: card.name,
+				lastActivityDate: new Date(card.dateLastActivity).toLocaleString(),
+				url: card.shortUrl
+			}));
+
+		logger.debug(`Retrieved ${cards.length} cards`);
+		return cards;
+	} catch (error) {
+		logger.error("Error fetching data from Trello:", error);
+		throw error;
+	}
+}
+/************************************
  * Asynchronous SVN Logic
  ************************************/
 function executeSvnCommand(commands) {
@@ -280,7 +331,7 @@ async function sendConfig(socket) {
 			branches: [],
 			branchFolderColours: {},
 			trelloIntegration: {
-				key: "TRELLO_KEY",
+				key: "TRELLO_API_KEY",
 				token: "TRELLO_TOKEN",
 			},
 		};
@@ -773,6 +824,32 @@ io.on("connection", (socket) => {
 		}
 
 		debugTask("svn-log-selected", data, true);
+	});
+
+	socket.on("trello-search-names-card", async (data) => {
+		debugTask("trello-search-names-card", data, false);
+
+		if (!data.query || data.query === "") {
+			emitMessage(socket, "No search query provided", "error");
+			return;
+		}
+
+		if (!data.key || data.key === "" || data.key === "TRELLO_API_KEY" || !data.token || data.token === "" || data.token === "TRELLO_TOKEN") {
+			emitMessage(socket, "Trello API key and token are required for this function", "error");
+			return;
+		}
+
+		const limit = data.limit || 50;
+
+		try {
+			const cards = await getTrelloCardNames(data.key, data.token, data.query, limit);
+			socket.emit("trello-result-search-names-card", cards);
+		} catch (err) {
+			logger.error("Error fetching Trello card names:", JSON.stringify(err, null, 2));
+			emitMessage(socket, "Error fetching Trello card names", "error");
+		}
+
+		debugTask("trello-search-names-card", data, true);
 	});
 
 	socket.on("client-log", (data) => {

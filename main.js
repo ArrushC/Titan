@@ -1,4 +1,4 @@
-import { app, BrowserWindow, screen, ipcMain, Menu, dialog, session } from "electron";
+import { app, BrowserWindow, screen, ipcMain, Menu, dialog, session, shell } from "electron";
 import electronUpdaterPkg from "electron-updater";
 import path from "path";
 import { fork } from "child_process";
@@ -88,7 +88,7 @@ function createWindow() {
 
 	// Open external links in the default browser
 	mainWindow.webContents.setWindowOpenHandler(({ url }) => {
-		require("electron").shell.openExternal(url);
+		shell.openExternal(url);
 		return { action: "deny" };
 	});
 }

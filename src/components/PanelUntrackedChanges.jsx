@@ -73,7 +73,7 @@ export default function PanelUntrackedChanges({ rowDataUntrackedChanges, setRowD
 							rowMultiSelectWithClick={true}
 							animateRows={true}
 							columnMenu={"new"}
-							enableCellTextSelection
+							enableCellTextSelection={true}
 							ensureDomOrder
 						/>
 					</div>

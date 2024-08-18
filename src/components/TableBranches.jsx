@@ -129,7 +129,7 @@ export default function TableBranches({ rowData, onRowValueChanged }) {
 				getRowNodeId={(data) => data.id}
 				immutableData={true}
 				suppressFlash={true}
-				enableCellTextSelection
+				enableCellTextSelection={true}
 				ensureDomOrder
 			/>
 		</div>

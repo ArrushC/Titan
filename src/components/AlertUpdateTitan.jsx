@@ -29,7 +29,7 @@ export default function AlertUpdateTitan() {
 			window.electron.removeAllListeners("update-downloaded");
 			window.electron.removeAllListeners("update-error");
 		};
-	}, [toast, onOpenAlert, setUpdateDownloaded]);
+	}, [toast, onOpenAlert]);
 
 	const handleCancel = useCallback(() => {
 		onCloseAlert();

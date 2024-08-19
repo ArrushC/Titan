@@ -1,4 +1,4 @@
-import { app, BrowserWindow, screen, ipcMain, Menu, dialog, session, shell } from "electron";
+import { app, BrowserWindow, screen, ipcMain, dialog, session, shell } from "electron";
 import electronUpdaterPkg from "electron-updater";
 import path from "path";
 import { fork } from "child_process";
@@ -44,6 +44,7 @@ function createWindow() {
 		backgroundColor: "#1A202C",
 		show: false,
 		resizable: true,
+		autoHideMenuBar: true,
 		webPreferences: {
 			nodeIntegration: false,
 			contextIsolation: true,
@@ -51,6 +52,8 @@ function createWindow() {
 			sandbox: true,
 		},
 	});
+
+	mainWindow.removeMenu();
 
 	// Set CSP headers
 	session.defaultSession.webRequest.onHeadersReceived((details, callback) => {
@@ -141,49 +144,6 @@ function startServer() {
 	});
 }
 
-// Create application menu
-function createMenu() {
-	const template = [
-		{
-			label: "File",
-			submenu: [
-				{
-					label: "Exit",
-					click: () => {
-						gracefulShutdown();
-					},
-				},
-			],
-		},
-		{
-			label: "Edit",
-			submenu: [{ role: "undo" }, { role: "redo" }, { type: "separator" }, { role: "cut" }, { role: "copy" }, { role: "paste" }],
-		},
-		{
-			label: "View",
-			submenu: [{ role: "reload" }, { role: "forceReload" }, { role: "toggleDevTools" }, { type: "separator" }, { role: "resetZoom" }, { role: "zoomIn" }, { role: "zoomOut" }, { type: "separator" }, { role: "togglefullscreen" }],
-		},
-		{
-			label: "Help",
-			submenu: [
-				{
-					label: "About",
-					click: () => {
-						dialog.showMessageBox(mainWindow, {
-							title: "About",
-							message: `Titan v${app.getVersion()}`,
-							detail: "Created by ArrushC",
-						});
-					},
-				},
-			],
-		},
-	];
-
-	const menu = Menu.buildFromTemplate(template);
-	Menu.setApplicationMenu(menu);
-}
-
 async function getFormattedMemoryInfo() {
 	const memoryInfo = await process.getProcessMemoryInfo();
 	const systemMemory = process.getSystemMemoryInfo();
@@ -267,7 +227,6 @@ if (!gotTheLock) {
 	app.on("ready", () => {
 		createSplashWindow();
 		startServer();
-		createMenu();
 		setupMemoryMonitoring();
 		checkForUpdates();
 	});

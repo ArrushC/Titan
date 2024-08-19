@@ -14,6 +14,7 @@ export default function Header() {
 	const {RaiseClientNotificaiton} = useNotifications();
 
 	const handleCheckForUpdates = useCallback(() => {
+		RaiseClientNotificaiton("Checking for updates...", "info", 3000);
 		window.electron.checkForUpdates().then((result) => {
 			console.debug("Check for updates result: ", result);
 		});

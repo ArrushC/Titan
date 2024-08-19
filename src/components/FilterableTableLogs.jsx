@@ -26,7 +26,7 @@ export default function FilterableTableLogs({ setAutoFillSelection = false, isAu
 					</Tooltip>
 				</Box>
 			</Flex>
-			<TableLogs rowDataLogs={rowDataLogs} quickFilterLogsText={quickFilterLogsText} setAutoFillSelection={setAutoFillSelection} isAutofill={true} />
+			<TableLogs rowDataLogs={rowDataLogs} quickFilterLogsText={quickFilterLogsText} setAutoFillSelection={setAutoFillSelection} isAutofill={isAutofill} />
 		</Box>
 	) : (
 		<Box>

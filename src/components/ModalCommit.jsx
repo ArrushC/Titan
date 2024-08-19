@@ -165,7 +165,7 @@ export default function ModalCommit({ isModalOpen, closeModal }) {
 	 * Hooks
 	 ****************************************************/
 	useEffect(() => {
-		setActiveStep(3);
+		setActiveStep(1);
 		setCommitLiveResponses([]);
 		setRevisionsValue("");
 		setCommitMsgValue("");

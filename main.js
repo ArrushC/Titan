@@ -225,32 +225,26 @@ function checkForUpdates() {
 		repo: "Titan",
 	});
 
-	autoUpdater.checkForUpdatesAndNotify();
+	autoUpdater.checkForUpdates();
+
+	setInterval(() => {
+		// Check for updates every hour
+        autoUpdater.checkForUpdates();
+    }, 1000 * 60 * 60);
 
 	autoUpdater.on("update-available", () => {
 		logger.info("Update available");
-		// dialog.showMessageBox(mainWindow, {
-		// 	title: "Update Available",
-		// 	message: "A new version of Titan is available",
-		// 	detail: "Titan will now download the update in the background. You will be prompted to install it once the download is complete.",
-		// 	icon: path.join(__dirname, "icons/Titan.ico"),
-		// });
 		mainWindow.webContents.send("update-available");
 	});
 
 	autoUpdater.on("update-downloaded", () => {
 		logger.info("Update downloaded");
-		// dialog.showMessageBox(mainWindow, {
-		// 	title: "Update Downloaded",
-		// 	message: "A new version of Titan has been downloaded",
-		// 	detail: "Titan will now install the update and restart",
-		// 	icon: path.join(__dirname, "icons/Titan.ico"),
-		// });
 		mainWindow.webContents.send("update-downloaded");
 	});
 
 	autoUpdater.on("error", (error) => {
 		logger.error("AutoUpdater error:", error);
+		mainWindow.webContents.send("update-error", error);
 	});
 }
 
@@ -378,11 +372,11 @@ ipcMain.handle("open-tortoisesvn-diff", async (event, data) => {
 });
 
 ipcMain.handle('start-update', () => {
-    autoUpdater.quitAndInstall();
+    return autoUpdater.quitAndInstall();
 });
 
 ipcMain.handle('check-for-updates', () => {
-    autoUpdater.checkForUpdatesAndNotify();
+    return autoUpdater.checkForUpdates();
 });
 
 ipcMain.handle("app-quit", () => {

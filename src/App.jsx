@@ -6,6 +6,7 @@ import SectionCommit from "./components/SectionCommit";
 import { useApp } from "./AppContext";
 import useNotifications from "./hooks/useNotifications";
 import SectionBranchLog from "./components/SectionBranchLog";
+import AlertUpdateTitan from "./components/AlertUpdateTitan";
 
 function App() {
 	const { isCommitMode, selectedBranches, configurableRowData, config } = useApp();
@@ -29,6 +30,7 @@ function App() {
 	return (
 		<Box p={10}>
 			<Header />
+			<AlertUpdateTitan />
 			<Flex rowGap={4} flexDirection={"column"}>
 				<Box>
 					{config?.branches && config?.branches.length < 1 ? (

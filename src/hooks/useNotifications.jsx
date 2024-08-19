@@ -15,7 +15,7 @@ function createToastConfig(description, status = "info", duration = 3000) {
 
 export default function useNotifications() {
 	const { toast } = useApp();
-	
+
 	const RaiseClientNotificaiton = useCallback((description = "", status = "info", duration = 3000, manualToast=null) => {
 		const toastConfig = createToastConfig(description, status, duration);
 		if (toast) return toast(toastConfig);
@@ -23,6 +23,7 @@ export default function useNotifications() {
 	}, [toast]);
 
 	return {
+		toast,
 		RaiseClientNotificaiton
 	}
 }

@@ -51,7 +51,7 @@ jobs:
         tag_name: ${{ github.ref }}
         release_name: Titan ${{ github.ref }}
         body: |
-          ## Changes in this Release:
+          ## Changelog:
           ${{ steps.changelog.outputs.CHANGELOG }}
         draft: true
         prerelease: false
@@ -59,6 +59,7 @@ jobs:
     - name: Build and Publish Electron App
       env:
         GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       shell: pwsh
       run: |
         if ("${{ matrix.os }}" -eq "windows-latest") {

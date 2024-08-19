@@ -28,7 +28,7 @@ export default function FooterSectionCommit({ openCommitModal }) {
 		// 	return;
 		// }
 
-		setSocketPayload({ sourceBranch: selectedBranches.find((row) => row.id == sourceBranch.value), issueNumber: issueNumber.value, commitMessage, filesToProcess: selectedLocalChanges });
+		setSocketPayload({ sourceBranch: selectedBranches.find((row) => row.id == sourceBranch.value), issueNumber: issueNumber, commitMessage, filesToProcess: selectedLocalChanges });
 		openCommitModal();
 	}, [sourceBranch, issueNumber, commitMessage, RaiseClientNotificaiton, selectedLocalChanges, selectedBranches]);
 

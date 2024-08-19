@@ -43,8 +43,15 @@ export default function AlertUpdateTitan() {
 		}
 
 		if (window.electron) {
-			window.electron.startUpdate();
 			setUpdateInProgress(true);
+			window.electron.downloadUpdate().then(() => {
+				RaiseClientNotificaiton("Update has been downloaded successfully. Titan will now restart to apply the update.", "info", 5000);
+				setUpdateInProgress(false);
+				onCloseAlert();
+			}).catch((error) => {
+				setUpdateInProgress(false);
+				RaiseClientNotificaiton(`An error occurred while downloading the update: ${error}`, "error", 5000);
+			});
 		} else {
 			RaiseClientNotificaiton("Cannot update Titan in a non-desktop application environment", "error", 5000);
 		}

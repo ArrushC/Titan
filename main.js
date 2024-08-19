@@ -227,6 +227,10 @@ function checkForUpdates() {
 		repo: "Titan",
 	});
 
+	autoUpdater.autoDownload = false;
+	autoUpdater.autoInstallOnAppQuit = true;
+	autoUpdater.autoRunAppAfterInstall = true;
+
 	autoUpdater.checkForUpdates();
 
 	setInterval(() => {
@@ -381,8 +385,8 @@ ipcMain.handle("open-tortoisesvn-diff", async (event, data) => {
 	});
 });
 
-ipcMain.handle('start-update', () => {
-    autoUpdater.quitAndInstall();
+ipcMain.handle('download-update', () => {
+    return autoUpdater.downloadUpdate();
 });
 
 ipcMain.handle('check-for-updates', () => {

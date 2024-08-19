@@ -6,7 +6,7 @@ import { ExternalLinkIcon } from "@chakra-ui/icons";
 import IssueNumberInput from "./IssueNumberInput";
 
 export default function FormSVNMessage({ openMessageAutoFillModal }) {
-	const { sourceBranch, setSourceBranch, sourceBranchOptions, issueNumber, setIssueNumber, commitMessage, setCommitMessage, selectedBranches, isCommitMode } = useApp();
+	const { sourceBranch, setSourceBranch, sourceBranchOptions, setIssueNumber, commitMessage, setCommitMessage, selectedBranches, isCommitMode } = useApp();
 
 	const handleSourceBranchChange = useCallback(
 		(selectedOption) => {
@@ -46,7 +46,7 @@ export default function FormSVNMessage({ openMessageAutoFillModal }) {
 				<Flex width={"50%"} alignItems={"flex-end"} columnGap={2}>
 					<FormControl isRequired>
 						<FormLabel>Issue Number</FormLabel>
-						<IssueNumberInput issueNumber={issueNumber} setIssueNumber={setIssueNumber} />
+						<IssueNumberInput />
 					</FormControl>
 					<Tooltip label="Auto Fill Message" hasArrow>
 						<IconButton colorScheme={"yellow"} aria-label="Auto Fill Message" size="md" onClick={() => openMessageAutoFillModal()} icon={<ExternalLinkIcon />} />

@@ -346,7 +346,7 @@ async function sendConfig(socket) {
 			logger.info(`Updating config file with latest version - v${config.currentVersion || "-1"} -> v${latestVersion}`);
 			config.currentVersion = latestVersion;
 			await fs.writeFile(configFilePath, JSON.stringify(config, null, 4));
-			emitMessage(socket, `Updated Titan successfully to v${latestVersion}`, "success");
+			emitMessage(socket, `Successfully updated Titan to v${latestVersion}!`, "success");
 		}
 	} catch (err) {
 		logger.error(err);

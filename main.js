@@ -33,6 +33,7 @@ let mainWindow;
 let splashWindow;
 let serverProcess;
 let isQuitting = false;
+let updateDownloaded = false;
 
 function createWindow() {
 	const primaryDisplay = screen.getPrimaryDisplay();
@@ -199,7 +200,8 @@ function checkForUpdates() {
 
 	autoUpdater.on("update-downloaded", () => {
 		logger.info("Update downloaded");
-		mainWindow.webContents.send("update-downloaded");
+		updateDownloaded = true;
+		autoUpdater.quitAndInstall();
 	});
 
 	autoUpdater.on("error", (error) => {
@@ -253,6 +255,13 @@ function gracefulShutdown() {
 	isQuitting = true;
 
 	logger.info("Starting graceful shutdown");
+
+	// If an update is available and downloaded, quit and install
+    if (updateDownloaded) {
+        logger.info("Update downloaded, quitting and installing...");
+        autoUpdater.quitAndInstall();
+        return; // Exit the function to prevent further shutdown logic
+    }
 
 	const shutdownDialog = new BrowserWindow({
 		width: 400,
@@ -331,7 +340,7 @@ ipcMain.handle("open-tortoisesvn-diff", async (event, data) => {
 });
 
 ipcMain.handle('start-update', () => {
-    return autoUpdater.quitAndInstall();
+    autoUpdater.quitAndInstall();
 });
 
 ipcMain.handle('check-for-updates', () => {

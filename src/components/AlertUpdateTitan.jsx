@@ -1,4 +1,4 @@
-import { AlertDialog, AlertDialogBody, AlertDialogContent, AlertDialogFooter, AlertDialogHeader, AlertDialogOverlay, Button, useDisclosure } from "@chakra-ui/react";
+import { AlertDialog, AlertDialogBody, AlertDialogCloseButton, AlertDialogContent, AlertDialogFooter, AlertDialogHeader, AlertDialogOverlay, Button, useDisclosure } from "@chakra-ui/react";
 import React, { useCallback, useEffect, useRef, useState } from "react";
 import useNotifications from "../hooks/useNotifications";
 
@@ -6,7 +6,7 @@ export default function AlertUpdateTitan() {
 	const { toast, RaiseClientNotificaiton } = useNotifications();
 	const { isOpen: isAlertOpen, onOpen: onOpenAlert, onClose: onCloseAlert } = useDisclosure();
 	const cancelRef = useRef();
-	const [updateDownloaded, setUpdateDownloaded] = useState(false);
+	const [updateInProgress, setUpdateInProgress] = useState(false);
 
 	useEffect(() => {
 		if (!window.electron) {
@@ -19,9 +19,6 @@ export default function AlertUpdateTitan() {
 			onOpenAlert();
 		});
 
-		window.electron.on("update-downloaded", () => {
-			setUpdateDownloaded(true);
-		});
 
 		window.electron.on("update-error", (error) => {
 			RaiseClientNotificaiton(`An error occurred while checking for updates: ${error}`, "error", 5000);
@@ -40,32 +37,33 @@ export default function AlertUpdateTitan() {
 	}, [onCloseAlert, RaiseClientNotificaiton]);
 
 	const handleStartUpdate = useCallback(() => {
-		if (!updateDownloaded) {
-			RaiseClientNotificaiton("The update is being downloaded. Please wait.", "info", 5000);
+		if (updateInProgress) {
+			RaiseClientNotificaiton("Update is already in progress. Please wait.", "info", 5000);
 			return;
 		}
 
 		if (window.electron) {
 			window.electron.startUpdate();
+			setUpdateInProgress(true);
 		} else {
 			RaiseClientNotificaiton("Cannot update Titan in a non-desktop application environment", "error", 5000);
 		}
-		onCloseAlert();
-	}, [updateDownloaded, RaiseClientNotificaiton, onCloseAlert]);
+	}, [updateInProgress, RaiseClientNotificaiton, onCloseAlert]);
 
 	return (
-		<AlertDialog isOpen={isAlertOpen} leastDestructiveRef={cancelRef} onClose={onCloseAlert}>
+		<AlertDialog isOpen={isAlertOpen} leastDestructiveRef={cancelRef} onClose={onCloseAlert} motionPreset="slideInBottom">
 			<AlertDialogOverlay>
 				<AlertDialogContent>
 					<AlertDialogHeader fontSize="lg" fontWeight="bold">
 						Update Available
 					</AlertDialogHeader>
+					<AlertDialogCloseButton />
 					<AlertDialogBody>A new version of Titan is available. Would you like to download the update and restart?</AlertDialogBody>
 					<AlertDialogFooter>
 						<Button colorScheme="red" ref={cancelRef} onClick={handleCancel}>
 							Cancel
 						</Button>
-						<Button colorScheme="yellow" onClick={handleStartUpdate} ml={3} isDisabled={updateDownloaded}>
+						<Button colorScheme="yellow" onClick={handleStartUpdate} ml={3} isDisabled={updateInProgress}>
 							Confirm
 						</Button>
 					</AlertDialogFooter>

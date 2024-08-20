@@ -2,7 +2,7 @@
 	"name": "titan",
 	"private": true,
 	"proxy": "http://localhost:5173",
-	"version": "1.2.6",
+	"version": "1.2.7",
 	"type": "module",
 	"main": "main.js",
 	"description": "Streamlining your workflow in Revision Control Systems (RCS).",

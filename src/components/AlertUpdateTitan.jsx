@@ -19,6 +19,9 @@ export default function AlertUpdateTitan() {
 			onOpenAlert();
 		});
 
+		window.electron.on("update-not-available", () => {
+			RaiseClientNotificaiton("Titan is up to date", "info", 3000);
+		});
 
 		window.electron.on("update-error", (error) => {
 			RaiseClientNotificaiton(`An error occurred while checking for updates: ${error}`, "error", 5000);
@@ -26,14 +29,14 @@ export default function AlertUpdateTitan() {
 
 		return () => {
 			window.electron.removeAllListeners("update-available");
-			window.electron.removeAllListeners("update-downloaded");
+			window.electron.removeAllListeners("update-not-available");
 			window.electron.removeAllListeners("update-error");
 		};
 	}, [toast, onOpenAlert]);
 
 	const handleCancel = useCallback(() => {
 		onCloseAlert();
-		RaiseClientNotificaiton("You can update the application later by manually triggering an update check or wait until Titan performs this", "info", 5000);
+		RaiseClientNotificaiton("You may update the application later by manually triggering an update check or wait until Titan does this", "info", 5000);
 	}, [onCloseAlert, RaiseClientNotificaiton]);
 
 	const handleStartUpdate = useCallback(() => {
@@ -44,14 +47,17 @@ export default function AlertUpdateTitan() {
 
 		if (window.electron) {
 			setUpdateInProgress(true);
-			window.electron.downloadUpdate().then(() => {
-				RaiseClientNotificaiton("Update has been downloaded successfully. Titan will now restart to apply the update.", "info", 5000);
-				setUpdateInProgress(false);
-				onCloseAlert();
-			}).catch((error) => {
-				setUpdateInProgress(false);
-				RaiseClientNotificaiton(`An error occurred while downloading the update: ${error}`, "error", 5000);
-			});
+			window.electron
+				.downloadUpdate()
+				.then(() => {
+					RaiseClientNotificaiton("Update has been downloaded successfully. Titan will now restart to apply the update.", "info", 5000);
+					setUpdateInProgress(false);
+					onCloseAlert();
+				})
+				.catch((error) => {
+					setUpdateInProgress(false);
+					RaiseClientNotificaiton(`An error occurred while downloading the update: ${error}`, "error", 5000);
+				});
 		} else {
 			RaiseClientNotificaiton("Cannot update Titan in a non-desktop application environment", "error", 5000);
 		}
@@ -65,7 +71,7 @@ export default function AlertUpdateTitan() {
 						Update Available
 					</AlertDialogHeader>
 					<AlertDialogCloseButton />
-					<AlertDialogBody>A new version of Titan is available. Would you like to download the update and restart?</AlertDialogBody>
+					<AlertDialogBody>A new version of Titan is available. Would you like to download and install the update?</AlertDialogBody>
 					<AlertDialogFooter>
 						<Button colorScheme="red" ref={cancelRef} onClick={handleCancel}>
 							Cancel

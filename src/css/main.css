@@ -1,3 +1,27 @@
+:root {
+	--chakra-colors-chakra-body-bg: #121212 !important;
+}
+
+body {
+	/* overflow: hidden; */
+}
+
+.chakra-portal > div[role="region"] {
+	margin-top: 40px !important;
+}
+
+.titanHead {
+	-webkit-app-region: drag;
+}
+
+.titanHead *:not(div) {
+	-webkit-app-region: no-drag;
+}
+
+.titanBody {
+	-webkit-app-region: no-drag;
+}
+
 .branch-table-header-cell {
 	padding-left: 5px !important;
 	padding-right: 5px !important;
@@ -8,24 +32,10 @@
 	padding-right: 5px !important;
 }
 
-.fade-enter {
-	opacity: 0;
-}
-.fade-enter-active {
-	opacity: 1;
-	transition: opacity 600ms;
-}
-.fade-exit {
-	opacity: 1;
-}
-.fade-exit-active {
-	opacity: 0;
-	transition: opacity 600ms;
-}
-
-.pulse-animation {
+.animation-pulse {
 	animation: pulse 1.5s infinite;
 }
+
 @keyframes pulse {
 	0%,
 	100% {
@@ -37,6 +47,75 @@
 	}
 }
 
+.animation-fadein-forward {
+	animation: fadeinforward 0.5s;
+}
+
+@keyframes fadeinforward {
+	from {
+		opacity: 0;
+		transform: translate3d(0, -100%, 0);
+	}
+
+	to {
+		opacity: 1;
+		transform: none;
+	}
+}
+
+.animation-fadein-left-forward {
+	animation: fadeinleftforward 0.5s;
+}
+
+@keyframes fadeinleftforward {
+	from {
+		opacity: 0;
+		transform: translate3d(-100%, 0, 0);
+	}
+
+	to {
+		opacity: 1;
+		transform: none;
+	}
+}
+
+.animation-fadein-right-forward {
+	animation: fadeinrightforward 0.5s;
+}
+
+@keyframes fadeinrightforward {
+	from {
+		opacity: 0;
+		transform: translate3d(100%, 0, 0);
+	}
+
+	to {
+		opacity: 1;
+		transform: none;
+	}
+}
+
+.animation-handwave {
+	animation: handwave 2s infinite;
+}
+
+@keyframes handwave {
+	0%,
+	100% {
+		transform: rotate(0deg);
+	}
+
+	20%,
+	60% {
+		transform: rotate(15deg);
+	}
+
+	40%,
+	80% {
+		transform: rotate(-15deg);
+	}
+}
+
 .ag-cell-focus,
 .ag-cell-no-focus {
 	border: none !important;
@@ -44,13 +123,13 @@
 
 /* From AG Grid React */
 .large {
-    --ag-grid-size: 10px;
-    --ag-list-item-height: 40px;
-    --ag-font-size: 32px;
+	--ag-grid-size: 10px;
+	--ag-list-item-height: 40px;
+	--ag-font-size: 32px;
 }
 
 .compact {
-    --ag-grid-size: 3px;
-    --ag-list-item-height: 20px;
-    --ag-font-size: 12px;
+	--ag-grid-size: 3px;
+	--ag-list-item-height: 20px;
+	--ag-font-size: 12px;
 }

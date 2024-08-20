@@ -7,16 +7,17 @@ import { useApp } from "./AppContext";
 import useNotifications from "./hooks/useNotifications";
 import SectionBranchLog from "./components/SectionBranchLog";
 import AlertUpdateTitan from "./components/AlertUpdateTitan";
+import HeaderApp from "./components/HeaderApp";
 
 function App() {
-	const { isCommitMode, selectedBranches, configurableRowData, config } = useApp();
+	const { isCommitMode, selectedBranches, configurableRowData } = useApp();
 	const { RaiseClientNotificaiton } = useNotifications();
 
 	useEffect(() => {
 		if (window.electron) {
-			window.electron.onAppClosing((event) => {
+			window.electron.onAppClosing(() => {
 				RaiseClientNotificaiton("App is closing, performing cleanup...", "info", 0);
-				window.electron.quitApp();
+				window.electron.closeWindow();
 			});
 
 			return () => {
@@ -28,30 +29,26 @@ function App() {
 	}, []);
 
 	return (
-		<Box p={10}>
-			<Header />
-			<AlertUpdateTitan />
-			<Flex rowGap={4} flexDirection={"column"}>
-				<Box>
-					{config?.branches && config?.branches.length < 1 ? (
-						<Heading as={"h2"} size={"lg"} noOfLines={1} mb={4} className="pulse-animation">
-							To Get Started, Add SVN Branches 👇
-						</Heading>
-					) : (
-						<></>
-					)}
-					<SectionBranches />
-				</Box>
-				<Collapse in={isCommitMode} animateOpacity>
-					<Box id="sectionCommit">
-						<Heading as={"h2"} size={"lg"} noOfLines={1} mb={4} className="pulse-animation">
-							Committing {selectedBranches.length == configurableRowData.length ? "All" : `${selectedBranches.length}/${configurableRowData.length}`} Branch{selectedBranches.length == 1 ? "" : "es"}
-						</Heading>
-						<SectionCommit />
+		<Box className={"titanBody"}>
+			<HeaderApp />
+			<Box p={10}>
+				<Header />
+				<AlertUpdateTitan />
+				<Flex rowGap={4} flexDirection={"column"}>
+					<Box>
+						<SectionBranches />
 					</Box>
-				</Collapse>
-			</Flex>
-			<SectionBranchLog />
+					<Collapse in={isCommitMode} animateOpacity>
+						<Box id="sectionCommit">
+							<Heading as={"h2"} size={"lg"} noOfLines={1} mb={4} className="animation-pulse">
+								Committing {selectedBranches.length == configurableRowData.length ? "All" : `${selectedBranches.length}/${configurableRowData.length}`} Branch{selectedBranches.length == 1 ? "" : "es"}
+							</Heading>
+							<SectionCommit />
+						</Box>
+					</Collapse>
+				</Flex>
+				<SectionBranchLog />
+			</Box>
 		</Box>
 	);
 }

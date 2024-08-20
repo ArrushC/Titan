@@ -3,6 +3,7 @@ import socketIOClient from "socket.io-client";
 import { useToast } from "@chakra-ui/react";
 import _ from "lodash";
 import { branchString } from "./utils/CommonConfig";
+import { createToastConfig, URL_SOCKET_CLIENT } from "./utils/Constants";
 
 const AppContext = createContext({
 	socket: null,
@@ -49,18 +50,6 @@ export const useApp = () => {
 	return useContext(AppContext);
 };
 
-function createToastConfig(isServer = true, description, status = "info", duration = 3000) {
-	return {
-		position: "top",
-		variant: "solid",
-		title: isServer ? "Server Notification" : "Client Notification",
-		description: description,
-		status: status,
-		duration: duration && duration >= 1 ? duration : null,
-		isClosable: true,
-	};
-}
-
 export const AppProvider = ({ children }) => {
 	const [config, setConfig] = useState(null);
 	const [socket, setSocket] = useState(null);
@@ -68,27 +57,27 @@ export const AppProvider = ({ children }) => {
 	const [isDebug, setIsDebug] = useState(localStorage.getItem("isDebug") === "true");
 
 	useEffect(() => {
-		const newSocket = socketIOClient("http://localhost:4000");
+		const newSocket = socketIOClient(URL_SOCKET_CLIENT);
 		setSocket(newSocket);
 
 		newSocket.on("connect", () => {
 			newSocket.emit("titan-config-get", "fetch");
 			newSocket.once("titan-config-get", (data) => {
 				setConfig(data);
-				toast(createToastConfig(false, "Configurations Loaded", "success", 2000));
+				toast(createToastConfig("Configurations Loaded", "success", 2000));
 			});
 		});
 
 		newSocket.on("notification", (data) => {
-			toast(createToastConfig(true, data.description, data.status, data.duration));
+			toast(createToastConfig(data.description, data.status, data.duration, true));
 		});
 
 		newSocket.on("disconnect", () => {
-			toast(createToastConfig(true, "Server Has Been Disconnected", "warning", 0));
+			toast(createToastConfig("Server Has Been Disconnected", "warning", 0, true));
 		});
 
 		newSocket.on("reconnect", () => {
-			toast(createToastConfig(true, "Server Has Been Reconnected", "success", 2000));
+			toast(createToastConfig("Server Has Been Reconnected", "success", 2000, true));
 		});
 
 		return () => {

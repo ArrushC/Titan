@@ -43,6 +43,7 @@ function createWindow() {
 		width: width,
 		height: height,
 		backgroundColor: "#1A202C",
+		frame: false,
 		show: false,
 		resizable: true,
 		autoHideMenuBar: true,
@@ -235,8 +236,8 @@ function checkForUpdates() {
 
 	setInterval(() => {
 		// Check for updates every hour
-        autoUpdater.checkForUpdates();
-    }, 1000 * 60 * 60);
+		autoUpdater.checkForUpdates();
+	}, 1000 * 60 * 60);
 
 	autoUpdater.on("update-available", () => {
 		logger.info("Update available");
@@ -247,6 +248,11 @@ function checkForUpdates() {
 		logger.info("Update downloaded");
 		updateDownloaded = true;
 		autoUpdater.quitAndInstall();
+	});
+
+	autoUpdater.on("update-not-available", () => {
+		logger.info("No updates available");
+		mainWindow.webContents.send("update-not-available");
 	});
 
 	autoUpdater.on("error", (error) => {
@@ -267,7 +273,7 @@ if (!gotTheLock) {
 			title: "Titan",
 			message: "Titan is already running",
 			detail: "Another instance of Titan is already running, please close it before starting a new one.",
-			icon: path.join(__dirname, "icons/Titan.ico")
+			icon: path.join(__dirname, "icons/Titan.ico"),
 		});
 	});
 
@@ -303,11 +309,11 @@ function gracefulShutdown() {
 	logger.info("Starting graceful shutdown");
 
 	// If an update is available and downloaded, quit and install
-    if (updateDownloaded) {
-        logger.info("Update downloaded, quitting and installing...");
-        autoUpdater.quitAndInstall();
-        return; // Exit the function to prevent further shutdown logic
-    }
+	if (updateDownloaded) {
+		logger.info("Update downloaded, quitting and installing...");
+		autoUpdater.quitAndInstall();
+		return; // Exit the function to prevent further shutdown logic
+	}
 
 	const shutdownDialog = new BrowserWindow({
 		width: 400,
@@ -385,15 +391,24 @@ ipcMain.handle("open-tortoisesvn-diff", async (event, data) => {
 	});
 });
 
-ipcMain.handle('download-update', () => {
-    return autoUpdater.downloadUpdate();
+ipcMain.handle("download-update", () => {
+	return autoUpdater.downloadUpdate();
 });
 
-ipcMain.handle('check-for-updates', () => {
-    return autoUpdater.checkForUpdates();
+ipcMain.handle("check-for-updates", () => {
+	return autoUpdater.checkForUpdates();
 });
 
-ipcMain.handle("app-quit", () => {
+ipcMain.handle("app-minimize", () => {
+	mainWindow.minimize();
+});
+
+ipcMain.handle("app-maximize", () => {
+	if (mainWindow.isMaximized()) mainWindow.unmaximize();
+	else mainWindow.maximize();
+});
+
+ipcMain.handle("app-close", () => {
 	if (!isQuitting) {
 		gracefulShutdown();
 	}

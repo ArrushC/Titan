@@ -84,13 +84,9 @@ export default function TableBranches({ rowData, onRowValueChanged }) {
 		() => [
 			{ field: "", rowDrag: true, resizable: false, filter: false, suppressMovable: false, editable: false, width: 20, cellRenderer: DragHandleIcon, headerClass: "branch-table-header-cell", cellClass: "branch-table-body-cell" },
 			{ headerCheckboxSelection: true, checkboxSelection: true, headerCheckboxSelectionFilteredOnly: true, width: 20, resizable: false, suppressMovable: false, filter: false, editable: false, headerClass: "branch-table-header-cell", cellClass: "branch-table-body-cell" },
-			{ field: "Branch Folder", resizable: false, width: 130, valueFormatter: (params) => params.value.toUpperCase() },
-			{ field: "Branch Version", resizable: false, width: 130 },
-			{ field: "SVN Branch", flex: 1 },
-			{ field: "Branch Info", editable: false, resizable: false, width: 200 },
 			{
 				headerName: "",
-				width: 70,
+				width: 60,
 				resizable: false,
 				sortable: false,
 				filter: false,
@@ -101,12 +97,16 @@ export default function TableBranches({ rowData, onRowValueChanged }) {
 					</Tooltip>
 				),
 			},
+			{ field: "Branch Folder", resizable: false, width: 130, valueFormatter: (params) => params.value.toUpperCase() },
+			{ field: "Branch Version", resizable: false, width: 130 },
+			{ field: "SVN Branch", flex: 1 },
+			{ field: "Branch Info", editable: false, resizable: false, width: 200 },
 		],
 		[config, copyRow]
 	);
 
 	return (
-		<div className="ag-theme-quartz-dark">
+		<div className="ag-theme-balham-dark">
 			<AgGridReact
 				ref={branchTableGridRef}
 				rowData={rowData}

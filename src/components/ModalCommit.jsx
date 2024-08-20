@@ -288,7 +288,7 @@ export default function ModalCommit({ isModalOpen, closeModal }) {
 									</List>
 								</Box>
 								<Box>
-									<div className="ag-theme-quartz-dark" style={{ height: "350px", width: "100%" }}>
+									<div className="ag-theme-balham-dark" style={{ height: "350px", width: "100%" }}>
 										<AgGridReact rowData={socketPayload["filesToProcess"]} defaultColDef={defaultColDefs} columnDefs={colDefs} domLayout="normal" columnMenu={"new"} />
 									</div>
 								</Box>

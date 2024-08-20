@@ -7,7 +7,9 @@ contextBridge.exposeInMainWorld("electron", {
 	removeAppClosingListener: () => ipcRenderer.removeAllListeners("app-closing"),
 	downloadUpdate: () => ipcRenderer.invoke("download-update"),
 	checkForUpdates: () => ipcRenderer.invoke("check-for-updates"),
-	quitApp: () => ipcRenderer.invoke("app-quit"),
+	minimizeWindow: () => ipcRenderer.invoke("app-minimize"),
+	maximizeWindow: () => ipcRenderer.invoke("app-maximize"),
+	closeWindow: () => ipcRenderer.invoke("app-close"),
 	on: (channel, func) => {
 		ipcRenderer.on(channel, (event, ...args) => func(...args));
 	},

@@ -1,5 +1,5 @@
-import { Flex, Heading, Icon, IconButton, Image, Tooltip } from "@chakra-ui/react";
-import React, { useCallback } from "react";
+import { Heading, Icon, IconButton, Image, Tooltip, Wrap, WrapItem } from "@chakra-ui/react";
+import React, { useCallback, useEffect } from "react";
 import Logo from "../assets/Titan.png";
 import { useApp } from "../AppContext";
 import { MdBrowserUpdated, MdCode, MdCodeOff } from "react-icons/md";
@@ -9,32 +9,44 @@ import { FaInfo } from "react-icons/fa6";
 import useNotifications from "../hooks/useNotifications";
 
 export default function Header() {
-	const { isDebug, setIsDebug } = useApp();
+	const { config, isDebug, setIsDebug } = useApp();
 	const { emitOpenConfig } = useSocketEmits();
-	const {RaiseClientNotificaiton} = useNotifications();
+	const { RaiseClientNotificaiton } = useNotifications();
 
 	const handleCheckForUpdates = useCallback(() => {
-		RaiseClientNotificaiton("Checking for updates...", "info", 3000);
 		window.electron.checkForUpdates().then((result) => {
 			console.debug("Check for updates result: ", result);
 		});
-	}, [RaiseClientNotificaiton]);
+	}, []);
 
 	const handleGetAppVersion = useCallback(() => {
 		window.electron.getAppVersion().then((version) => {
-			RaiseClientNotificaiton(`Application Version: v${version}`, "info", 3000);
+			RaiseClientNotificaiton(`Application Version: v${version}`, "info", 2000);
 		});
 	}, [RaiseClientNotificaiton]);
 
+	useEffect(() => {
+		if (!window.electron) return;
+
+		window.electron.on("update-not-available", () => {
+			RaiseClientNotificaiton("Titan is up to date", "info", 3000);
+		});
+
+		return () => window.electron.removeAllListeners("update-not-available");
+	}, [RaiseClientNotificaiton]);
+
 	return (
-		<Flex justifyContent={"space-between"} mb={5}>
-			<Flex alignItems="center">
-				<Image src={Logo} alt="Titan Logo" boxSize="100px" mr={10} borderRadius={"full"} />
-				<Heading as={"h1"} size={"3xl"} noOfLines={1}>
-					Titan
+		<Wrap my={5} spacingY={5} justify={"space-between"}>
+			<WrapItem alignItems="center">
+				<Image src={Logo} alt="Titan Logo" boxSize="100px" mr={5} borderRadius={"full"} />
+				<Heading as={"h2"} size={"2xl"} noOfLines={1} className={"animation-fadein-forward"}>
+					Welcome back
 				</Heading>
-			</Flex>
-			<Flex alignItems={"center"} columnGap={2}>
+				<Heading as={"h2"} size={"2xl"} noOfLines={1} p={2} className={"animation-handwave"}>
+					👋
+				</Heading>
+			</WrapItem>
+			<WrapItem alignItems={"center"} columnGap={2}>
 				<Tooltip label={`Current Debug Mode: ${isDebug ? "on" : "off"}`} hasArrow placement="left">
 					<IconButton aria-label="Toggle Debug Mode" colorScheme={"yellow"} icon={!isDebug ? <Icon as={MdCodeOff} /> : <Icon as={MdCode} />} onClick={() => setIsDebug((prev) => !prev)} />
 				</Tooltip>
@@ -47,7 +59,7 @@ export default function Header() {
 				<Tooltip label={"Get App Version"} hasArrow placement="bottom-start" isDisabled={!window.electron}>
 					<IconButton aria-label="Get App Version" colorScheme={"yellow"} icon={<Icon as={FaInfo} />} onClick={handleGetAppVersion} isDisabled={!window.electron} />
 				</Tooltip>
-			</Flex>
-		</Flex>
+			</WrapItem>
+		</Wrap>
 	);
 }

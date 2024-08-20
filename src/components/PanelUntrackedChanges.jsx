@@ -60,7 +60,7 @@ export default function PanelUntrackedChanges({ rowDataUntrackedChanges, setRowD
 						</Text>
 						<Input placeholder="Type to search..." onInput={onQuickFilterUnseenInputChanged} width={"100%"} />
 					</Flex>
-					<div className="ag-theme-quartz-dark" style={{ height: "390px", width: "100%" }}>
+					<div className="ag-theme-balham-dark" style={{ height: "390px", width: "100%" }}>
 						<AgGridReact
 							ref={untrackedChangesGridRef}
 							rowData={rowDataUntrackedChanges}

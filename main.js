@@ -237,7 +237,7 @@ function checkForUpdates() {
 	setInterval(() => {
 		// Check for updates every hour
 		autoUpdater.checkForUpdates();
-	}, 1000 * 60 * 60);
+	}, 1000 * 60 * 60 * 2);
 
 	autoUpdater.on("update-available", () => {
 		logger.info("Update available");
@@ -307,13 +307,6 @@ function gracefulShutdown() {
 	isQuitting = true;
 
 	logger.info("Starting graceful shutdown");
-
-	// If an update is available and downloaded, quit and install
-	if (updateDownloaded) {
-		logger.info("Update downloaded, quitting and installing...");
-		autoUpdater.quitAndInstall();
-		return; // Exit the function to prevent further shutdown logic
-	}
 
 	const shutdownDialog = new BrowserWindow({
 		width: 400,

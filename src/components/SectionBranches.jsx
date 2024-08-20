@@ -4,7 +4,7 @@ import { Button, Flex, Icon, Tooltip, Wrap } from "@chakra-ui/react";
 import { CloseIcon, RepeatIcon, SmallAddIcon, TimeIcon } from "@chakra-ui/icons";
 import AlertConfirmRowDelete from "./AlertConfirmRowDelete";
 import { stripBranchInfo } from "../utils/CommonConfig";
-import { MdCloudDownload, MdCloudUpload } from "react-icons/md";
+import { MdCloudDownload, MdCloudUpload, MdOutlineSwitchAccessShortcut } from "react-icons/md";
 import TableBranches from "./TableBranches";
 import useSocketEmits from "../hooks/useSocketEmits";
 import useNotifications from "../hooks/useNotifications";
@@ -21,6 +21,8 @@ export default function SectionBranches() {
 
 	const { rowDataBranches, setRowDataBranches, onRowValueChanged } = useManagedRowDataBranches();
 	const [lastInfoTaskTime, setLastInfoTaskTime] = useState(0);
+
+	const [outdatedBranches, setOutdatedBranches] = useState([]);
 
 	/****************************************************
 	 * Callback Functions - Table Operations
@@ -60,6 +62,12 @@ export default function SectionBranches() {
 			emitUpdateSingle(row.id, row["SVN Branch"], row["Branch Version"], row["Branch Folder"]);
 		});
 	}, [selectedBranches, emitUpdateSingle]);
+
+	const updateOutdatedBranches = useCallback(() => {
+		outdatedBranches.forEach((row) => {
+			emitUpdateSingle(row.id, row["SVN Branch"], row["Branch Version"], row["Branch Folder"]);
+		});
+	}, [outdatedBranches, emitUpdateSingle]);
 
 	const removeSelectedRows = useCallback(() => {
 		const selectedIds = selectedBranches.map((row) => row.id);
@@ -111,6 +119,12 @@ export default function SectionBranches() {
 	 * Hooks setup
 	 ****************************************************/
 
+	// Check for outdated branches when rowDataBranches changes
+	useEffect(() => {
+		const outdatedBranches = rowDataBranches.filter((row) => String(row["Branch Info"]).toLowerCase().includes("behind"));
+		setOutdatedBranches(outdatedBranches);
+	}, [rowDataBranches]);
+
 	// Create and change intervals for refreshAll when configurableRowData changes
 	useEffect(() => {
 		const intervalDuration = 60_000 * 5; // 5 minutes
@@ -139,30 +153,39 @@ export default function SectionBranches() {
 
 	return (
 		<div>
-			<Flex columnGap={2} mb={4}>
-				<Tooltip label="Requires at least 1 branch" isDisabled={selectedBranches.length > 0} hasArrow>
-					<Button onClick={refreshSelected} leftIcon={<RepeatIcon />} colorScheme={"yellow"} isDisabled={selectedBranches.length < 1}>
-						Refresh {selectedBranches.length > 0 ? `${selectedBranches.length} Branch` : ""}
-						{selectedBranches.length > 1 ? "es" : ""}
-					</Button>
-				</Tooltip>
-				<Tooltip label="Requires at least 1 branch" isDisabled={selectedBranches.length > 0} hasArrow>
-					<Button onClick={updateSelectedBranches} leftIcon={<Icon as={MdCloudDownload} />} colorScheme={"yellow"} isDisabled={selectedBranches.length < 1}>
-						Update {selectedBranches.length > 0 ? `${selectedBranches.length} Branch` : ""}
-						{selectedBranches.length > 1 ? "es" : ""}
-					</Button>
-				</Tooltip>
-				<Tooltip label="Requires at least 1 branch" isDisabled={selectedBranches.length > 0} hasArrow>
-					<Button onClick={toggleCommitSelectedBranches} leftIcon={<Icon as={MdCloudUpload} />} colorScheme={"yellow"} isDisabled={selectedBranches.length < 1}>
-						{isCommitMode ? "Undo Commit" : "Commit"}
-					</Button>
-				</Tooltip>
-				<Tooltip label="Requires at least 1 branch" isDisabled={selectedBranches.length > 0} hasArrow>
-					<Button onClick={viewSelectedBranchesLog} leftIcon={<TimeIcon />} colorScheme={"yellow"} isDisabled={selectedBranches.length < 1}>
-						View Logs
-					</Button>
-				</Tooltip>
-			</Flex>
+			<Wrap mb={4} justify={"space-between"}>
+				<Flex columnGap={2}>
+					<Tooltip label="Requires at least 1 branch" isDisabled={selectedBranches.length > 0} hasArrow>
+						<Button onClick={refreshSelected} leftIcon={<RepeatIcon />} colorScheme={"yellow"} isDisabled={selectedBranches.length < 1}>
+							Refresh {selectedBranches.length > 0 ? `${selectedBranches.length} Branch` : ""}
+							{selectedBranches.length > 1 ? "es" : ""}
+						</Button>
+					</Tooltip>
+					<Tooltip label="Requires at least 1 branch" isDisabled={selectedBranches.length > 0} hasArrow>
+						<Button onClick={updateSelectedBranches} leftIcon={<Icon as={MdCloudDownload} />} colorScheme={"yellow"} isDisabled={selectedBranches.length < 1}>
+							Update {selectedBranches.length > 0 ? `${selectedBranches.length} Branch` : ""}
+							{selectedBranches.length > 1 ? "es" : ""}
+						</Button>
+					</Tooltip>
+					<Tooltip label="Requires at least 1 branch" isDisabled={selectedBranches.length > 0} hasArrow>
+						<Button onClick={toggleCommitSelectedBranches} leftIcon={<Icon as={MdCloudUpload} />} colorScheme={"yellow"} isDisabled={selectedBranches.length < 1}>
+							{isCommitMode ? "Undo Commit" : "Commit"}
+						</Button>
+					</Tooltip>
+					<Tooltip label="Requires at least 1 branch" isDisabled={selectedBranches.length > 0} hasArrow>
+						<Button onClick={viewSelectedBranchesLog} leftIcon={<TimeIcon />} colorScheme={"yellow"} isDisabled={selectedBranches.length < 1}>
+							View Logs
+						</Button>
+					</Tooltip>
+				</Flex>
+				<Flex columnGap={2}>
+					<Tooltip label="No outdated branches to update" isDisabled={outdatedBranches.length > 0} hasArrow>
+						<Button onClick={updateOutdatedBranches} leftIcon={<MdOutlineSwitchAccessShortcut  />} colorScheme={"yellow"} isDisabled={outdatedBranches.length < 1}>
+							Update Outdated
+						</Button>
+					</Tooltip>
+				</Flex>
+			</Wrap>
 			<TableBranches rowData={rowDataBranches} onRowValueChanged={onRowValueChanged} />
 			<Flex columnGap={2} mt={4}>
 				<Tooltip label="Please select at least 1 branch" isDisabled={selectedBranches.length > 0} hasArrow>

@@ -54,7 +54,7 @@ export default function AlertUpdateTitan() {
 					setUpdateInProgress(false);
 					onCloseAlert();
 					setTimeout(() => {
-						window.electron.quitApp();
+						window.electron.closeWindow();
 					}, 5000);
 				})
 				.catch((error) => {

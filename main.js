@@ -246,6 +246,7 @@ function checkForUpdates() {
 
 	autoUpdater.on("update-downloaded", () => {
 		logger.info("Update downloaded");
+		mainWindow.webContents.send("update-downloaded");
 		updateDownloaded = true;
 		autoUpdater.quitAndInstall();
 	});

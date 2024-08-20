@@ -46,15 +46,18 @@ export default function AlertUpdateTitan() {
 				.downloadUpdate()
 				.then(() => {
 					RaiseClientNotificaiton("Update has been downloaded successfully. Titan will now restart to apply the update.", "info", 5000);
-					setTimeout(() => {
-						window.electron.closeWindow();
-					}, 5000);
 					onCloseAlert();
 				})
 				.catch((error) => {
 					setUpdateInProgress(false);
 					RaiseClientNotificaiton(`An error occurred while downloading the update: ${error}`, "error", 5000);
 				});
+
+			window.electron.on("update-downloaded", () => {
+				RaiseClientNotificaiton("Update has been downloaded successfully. Titan will now restart to apply the update.", "info", 5000);
+				window.electron.removeAllListeners("update-downloaded");
+				onCloseAlert();
+			});
 
 			window.electron.on("update-not-available", () => {
 				RaiseClientNotificaiton("Titan is up to date", "info", 3000);

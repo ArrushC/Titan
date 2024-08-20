@@ -19,17 +19,12 @@ export default function AlertUpdateTitan() {
 			onOpenAlert();
 		});
 
-		window.electron.on("update-not-available", () => {
-			RaiseClientNotificaiton("Titan is up to date", "info", 3000);
-		});
-
 		window.electron.on("update-error", (error) => {
 			RaiseClientNotificaiton(`An error occurred while checking for updates: ${error}`, "error", 5000);
 		});
 
 		return () => {
 			window.electron.removeAllListeners("update-available");
-			window.electron.removeAllListeners("update-not-available");
 			window.electron.removeAllListeners("update-error");
 		};
 	}, [toast, onOpenAlert]);
@@ -51,16 +46,21 @@ export default function AlertUpdateTitan() {
 				.downloadUpdate()
 				.then(() => {
 					RaiseClientNotificaiton("Update has been downloaded successfully. Titan will now restart to apply the update.", "info", 5000);
-					setUpdateInProgress(false);
-					onCloseAlert();
 					setTimeout(() => {
 						window.electron.closeWindow();
 					}, 5000);
+					onCloseAlert();
 				})
 				.catch((error) => {
 					setUpdateInProgress(false);
 					RaiseClientNotificaiton(`An error occurred while downloading the update: ${error}`, "error", 5000);
 				});
+
+			window.electron.on("update-not-available", () => {
+				RaiseClientNotificaiton("Titan is up to date", "info", 3000);
+				window.electron.removeAllListeners("update-not-available");
+				onCloseAlert();
+			});
 		} else {
 			RaiseClientNotificaiton("Cannot update Titan in a non-desktop application environment", "error", 5000);
 		}

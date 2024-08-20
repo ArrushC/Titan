@@ -17,22 +17,16 @@ export default function Header() {
 		window.electron.checkForUpdates().then((result) => {
 			console.debug("Check for updates result: ", result);
 		});
-	}, []);
+		window.electron.on("update-not-available", () => {
+			RaiseClientNotificaiton("Titan is up to date", "info", 3000);
+			window.electron.removeAllListeners("update-not-available");
+		});
+	}, [RaiseClientNotificaiton]);
 
 	const handleGetAppVersion = useCallback(() => {
 		window.electron.getAppVersion().then((version) => {
 			RaiseClientNotificaiton(`Application Version: v${version}`, "info", 2000);
 		});
-	}, [RaiseClientNotificaiton]);
-
-	useEffect(() => {
-		if (!window.electron) return;
-
-		window.electron.on("update-not-available", () => {
-			RaiseClientNotificaiton("Titan is up to date", "info", 3000);
-		});
-
-		return () => window.electron.removeAllListeners("update-not-available");
 	}, [RaiseClientNotificaiton]);
 
 	return (

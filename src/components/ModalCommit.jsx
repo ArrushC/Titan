@@ -345,7 +345,7 @@ export default function ModalCommit({ isModalOpen, closeModal }) {
 								</Flex>
 								<Box my={4}>
 									<Text fontWeight={600}>Modify the clipboard text to include...</Text>
-									<CheckboxGroup colorScheme="yellow" defaultValue={["BranchFolder", "BranchVersion", "SVNBranch"]} onChange={handleClipboardOption}>
+									<CheckboxGroup colorScheme="yellow" defaultValue={["BranchFolder", "BranchVersion"]} onChange={handleClipboardOption}>
 										<Wrap>
 											<Checkbox value="BranchFolder">Branch Folder</Checkbox>
 											<Checkbox value="BranchVersion">Branch Version</Checkbox>

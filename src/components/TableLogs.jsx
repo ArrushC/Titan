@@ -19,10 +19,10 @@ export default function TableLogs({ rowDataLogs, quickFilterLogsText, setAutoFil
 
 	const colDefs = useMemo(() => {
 		const commonColumns = [
-			{ field: "revision", headerName: "Revision", sort: "desc", width: 100 },
-			{ field: "date", headerName: "Date", width: 130, sortable: false },
+			{ field: "revision", headerName: "Revision", sort: "desc", width: 130 },
+			{ field: "date", headerName: "Date", sortable: false },
 			{ field: "branchFolder", headerName: "Branch Folder", width: 135 },
-			{ field: "branchVersion", headerName: "Branch Version", width: 140 },
+			{ field: "branchVersion", headerName: "Branch Version", width: 125 },
 			{ field: "author", headerName: "Author" },
 			{ field: "message", headerName: "Message", flex: 1 },
 		];

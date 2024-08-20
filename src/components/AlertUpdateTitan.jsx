@@ -53,6 +53,9 @@ export default function AlertUpdateTitan() {
 					RaiseClientNotificaiton("Update has been downloaded successfully. Titan will now restart to apply the update.", "info", 5000);
 					setUpdateInProgress(false);
 					onCloseAlert();
+					setTimeout(() => {
+						window.electron.quitApp();
+					}, 5000);
 				})
 				.catch((error) => {
 					setUpdateInProgress(false);

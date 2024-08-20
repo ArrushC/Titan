@@ -7,29 +7,31 @@ import "ag-grid-community/styles/ag-grid.min.css";
 import "ag-grid-community/styles/ag-theme-balham.min.css";
 import { AppProvider } from "./AppContext";
 import "./css/main.css";
-import { HEADER_HEIGHT } from "./utils/Constants.jsx";
+import { HEADER_HEIGHT, HEADER_HEIGHT_RAW } from "./utils/Constants.jsx";
 
 const { definePartsStyle, defineMultiStyleConfig } = createMultiStyleConfigHelpers(parts.keys);
 
 const modalStyle = definePartsStyle({
 	dialog: {
-		mt: HEADER_HEIGHT, // Margin to account for header height
-		bg: "gray.900", // Dark gray background for drawer dialog
-		color: "white", // White text color
-		boxShadow: "0 4px 12px rgba(255, 255, 255, 0.25)", // Subtle shadow
+		mt: `${HEADER_HEIGHT_RAW + 20}px`,
+		bg: "gray.900",
+		color: "white",
+		boxShadow: "-1px 8px 17px 7px rgba(255, 255, 255, 0.07)",
 	},
 	header: {
-		bg: "gray.700", // Darker gray for header
-		color: "white", // White text color
+		bg: "gray.900",
+		color: "white",
+		borderRadius: "20px",
 	},
 	body: {
-		p: 4, // Standard padding for modal body
-		color: "white", // White text color
+		p: 4,
+		color: "white",
 	},
 	footer: {
-		bg: "gray.700", // Darker gray for footer
-		p: 2, // Standard padding for modal footer
-		color: "white", // White text color
+		bg: "gray.900",
+		p: 2,
+		color: "white",
+		borderRadius: "20px",
 	},
 });
 
@@ -39,23 +41,25 @@ export const modalTheme = defineMultiStyleConfig({
 
 const drawerStyle = definePartsStyle({
 	dialog: {
-		mt: HEADER_HEIGHT, // Margin to account for header height
-		bg: "gray.900", // Dark gray background for drawer dialog
-		color: "white", // White text color
-		boxShadow: "0 4px 12px rgba(255, 255, 255, 0.25)", // Subtle shadow
+		mt: HEADER_HEIGHT,
+		bg: "gray.900",
+		color: "white",
+		boxShadow: "-1px 8px 17px 7px rgba(255, 255, 255, 0.07)",
 	},
 	header: {
-		bg: "gray.700", // Darker gray for header
-		color: "white", // White text color
+		bg: "gray.900",
+		color: "white",
+		borderRadius: "20px",
 	},
 	body: {
-		p: 4, // Standard padding for drawer body
-		color: "white", // White text color
+		p: 4,
+		color: "white",
 	},
 	footer: {
-		bg: "gray.700", // Darker gray for footer
-		p: 2, // Standard padding for drawer footer
-		color: "white", // White text color
+		bg: "gray.900",
+		p: 2,
+		color: "white",
+		borderRadius: "20px",
 	},
 });
 

@@ -72,6 +72,7 @@
 		"files": [
 			"dist/**/*",
 			"icons/**/*",
+			"public/**/*",
 			"server/**/*",
 			"main.js",
 			"preload.js",

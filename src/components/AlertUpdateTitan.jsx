@@ -42,12 +42,10 @@ export default function AlertUpdateTitan() {
 
 		if (window.electron) {
 			setUpdateInProgress(true);
-			window.electron
-				.downloadUpdate()
-				.catch((error) => {
-					setUpdateInProgress(false);
-					RaiseClientNotificaiton(`An error occurred while downloading the update: ${error}`, "error", 5000);
-				});
+			window.electron.downloadUpdate().catch((error) => {
+				setUpdateInProgress(false);
+				RaiseClientNotificaiton(`An error occurred while downloading the update: ${error}`, "error", 5000);
+			});
 
 			window.electron.on("update-downloaded", () => {
 				RaiseClientNotificaiton("Update has been downloaded successfully. Titan will now restart to apply the update.", "info", 5000);
@@ -66,13 +64,13 @@ export default function AlertUpdateTitan() {
 	}, [updateInProgress, RaiseClientNotificaiton, onCloseAlert]);
 
 	return (
-		<AlertDialog isOpen={isAlertOpen} leastDestructiveRef={cancelRef} onClose={onCloseAlert} motionPreset="slideInBottom">
+		<AlertDialog isOpen={isAlertOpen} leastDestructiveRef={cancelRef} onClose={onCloseAlert} motionPreset="slideInBottom" closeOnOverlayClick={!updateInProgress}>
 			<AlertDialogOverlay>
 				<AlertDialogContent>
 					<AlertDialogHeader fontSize="lg" fontWeight="bold">
 						Update Available
 					</AlertDialogHeader>
-					<AlertDialogCloseButton />
+					{updateInProgress ? <></> : <AlertDialogCloseButton />}
 					<AlertDialogBody>A new version of Titan is available. Would you like to download and install the update?</AlertDialogBody>
 					<AlertDialogFooter>
 						<Button colorScheme="red" ref={cancelRef} onClick={handleCancel}>

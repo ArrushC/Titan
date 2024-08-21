@@ -3,7 +3,7 @@ name: Build and Publish Titan Electron App
 on:
   push:
     tags:
-      - 'v*'
+      - "v*"
 
 jobs:
   release:
@@ -15,57 +15,67 @@ jobs:
         os: [windows-latest]
 
     steps:
-    - uses: actions/checkout@v2
-      with:
-        fetch-depth: 0  # Important for generating the changelog
+      - name: Checkout Repository
+        uses: actions/checkout@v2
+        with:
+          fetch-depth: 0 # Important for generating the changelog
 
-    - name: Use Node.js
-      uses: actions/setup-node@v2
-      with:
-        node-version: '18'
+      # Cache Node.js dependencies
+      - name: Cache Node Modules
+        uses: actions/cache@v3
+        with:
+          path: ~/.npm
+          key: ${{ runner.os }}-node-${{ hashFiles('package-lock.json') }}
+          restore-keys: |
+            ${{ runner.os }}-node-
 
-    - name: Install dependencies
-      run: npm ci
+      - name: Use Node.js
+        uses: actions/setup-node@v2
+        with:
+          node-version: "18"
 
-    - name: Generate Changelog
-      id: changelog
-      shell: pwsh
-      run: |
-        $PreviousTag = git describe --tags --abbrev=0 HEAD^ 2>$null
-        if (-not $PreviousTag) {
-          $Changelog = git log --pretty=format:"- %s"
-        } else {
-          $Changelog = git log --pretty=format:"- %s" "$PreviousTag..HEAD"
-        }
-        $Changelog = $Changelog -join "`n"
-        "CHANGELOG<<EOF" >> $env:GITHUB_OUTPUT
-        $Changelog >> $env:GITHUB_OUTPUT
-        "EOF" >> $env:GITHUB_OUTPUT
+      - name: Install Dependencies
+        run: npm ci
 
-    - name: Create Draft Release
-      id: create_release
-      uses: actions/create-release@v1
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      with:
-        tag_name: ${{ github.ref }}
-        release_name: Titan ${{ github.ref }}
-        body: |
-          ## Changelog:
-          ${{ steps.changelog.outputs.CHANGELOG }}
-        draft: true
-        prerelease: false
+      - name: Generate Changelog
+        id: changelog
+        shell: pwsh
+        run: |
+          $PreviousTag = git describe --tags --abbrev=0 HEAD^ 2>$null
+          if (-not $PreviousTag) {
+            $Changelog = git log --pretty=format:"- %s"
+          } else {
+            $Changelog = git log --pretty=format:"- %s" "$PreviousTag..HEAD"
+          }
+          $Changelog = $Changelog -join "`n"
+          "CHANGELOG<<EOF" >> $env:GITHUB_OUTPUT
+          $Changelog >> $env:GITHUB_OUTPUT
+          "EOF" >> $env:GITHUB_OUTPUT
 
-    - name: Build and Publish Electron App
-      env:
-        GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      shell: pwsh
-      run: |
-        if ("${{ matrix.os }}" -eq "windows-latest") {
-          npm run publish:win
-        } elseif ("${{ matrix.os }}" -eq "macos-latest") {
-          npm run publish:mac
-        } else {
-          npm run publish:linux
-        }
+      - name: Create Draft Release
+        id: create_release
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: ${{ github.ref }}
+          release_name: Titan ${{ github.ref }}
+          body: |
+            ## Changelog:
+            ${{ steps.changelog.outputs.CHANGELOG }}
+          draft: true
+          prerelease: false
+
+      - name: Build and Publish Electron App
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        shell: pwsh
+        run: |
+          if ("${{ matrix.os }}" -eq "windows-latest") {
+            npm run publish:win
+          } elseif ("${{ matrix.os }}" -eq "macos-latest") {
+            npm run publish:mac
+          } else {
+            npm run publish:linux
+          }

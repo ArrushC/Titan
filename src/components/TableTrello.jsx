@@ -53,7 +53,7 @@ export default function TableTrello({ rowDataTrello, quickFilterTrelloText, setA
 	}, [setAutoFillSelection]);
 
 	return (
-		<div className="ag-theme-balham-dark" style={{ height: "80%", width: "100%" }}>
+		<div className="ag-theme-balham-dark compact" style={{ height: "80%", width: "100%" }}>
 			<AgGridReact
 				ref={trelloGridRef}
 				rowData={rowDataTrello}

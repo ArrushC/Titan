@@ -288,8 +288,8 @@ export default function ModalCommit({ isModalOpen, closeModal }) {
 									</List>
 								</Box>
 								<Box>
-									<div className="ag-theme-balham-dark" style={{ height: "350px", width: "100%" }}>
-										<AgGridReact rowData={socketPayload["filesToProcess"]} defaultColDef={defaultColDefs} columnDefs={colDefs} domLayout="normal" columnMenu={"new"} />
+									<div className="ag-theme-balham-dark compact" style={{ height: "350px", width: "100%" }}>
+										<AgGridReact rowData={socketPayload["filesToProcess"]} defaultColDef={defaultColDefs} columnDefs={colDefs} domLayout="normal" columnMenu={"new"} pagination={true} paginationAutoPageSize={true} />
 									</div>
 								</Box>
 							</Box>

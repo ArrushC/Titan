@@ -77,7 +77,7 @@ export default function PanelLocalChanges({ rowDataLocalChanges, setRowDataLocal
 						</Text>
 						<Input placeholder="Type to search..." onInput={onQuickFilterFileViewInputChanged} width={"100%"} />
 					</Flex>
-					<div className="ag-theme-balham-dark" style={{ height: "480px", width: "100%" }}>
+					<div className="ag-theme-balham-dark compact" style={{ height: "480px", width: "100%" }}>
 						<AgGridReact
 							ref={localChangesGridRef}
 							rowData={rowDataLocalChanges}
@@ -93,6 +93,8 @@ export default function PanelLocalChanges({ rowDataLocalChanges, setRowDataLocal
 							columnMenu={"new"}
 							enableCellTextSelection={true}
 							ensureDomOrder
+							pagination={true}
+							paginationAutoPageSize={true}
 						/>
 					</div>
 					<Flex mt={4} columnGap={2} justifyContent={"flex-end"}>

@@ -44,10 +44,6 @@ export default function AlertUpdateTitan() {
 			setUpdateInProgress(true);
 			window.electron
 				.downloadUpdate()
-				.then(() => {
-					RaiseClientNotificaiton("Update has been downloaded successfully. Titan will now restart to apply the update.", "info", 5000);
-					onCloseAlert();
-				})
 				.catch((error) => {
 					setUpdateInProgress(false);
 					RaiseClientNotificaiton(`An error occurred while downloading the update: ${error}`, "error", 5000);

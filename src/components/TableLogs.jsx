@@ -56,7 +56,7 @@ export default function TableLogs({ rowDataLogs, quickFilterLogsText, setAutoFil
 	}, [setAutoFillSelection]);
 
 	return (
-		<div className="ag-theme-balham-dark compact" style={{ height: "90%", width: "100%" }}>
+		<div className="ag-theme-balham-dark compact" style={{ height: !isAutofill ? "85%" : "90%", width: "100%" }}>
 			<AgGridReact
 				ref={logsGridRef}
 				rowData={rowDataLogs}

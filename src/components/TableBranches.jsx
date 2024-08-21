@@ -106,7 +106,7 @@ export default function TableBranches({ rowData, onRowValueChanged }) {
 	);
 
 	return (
-		<div className="ag-theme-balham-dark">
+		<div className="ag-theme-balham-dark compact" style={{ height: "55vh", width: "100%"}}>
 			<AgGridReact
 				ref={branchTableGridRef}
 				rowData={rowData}
@@ -115,7 +115,7 @@ export default function TableBranches({ rowData, onRowValueChanged }) {
 				stopEditingWhenCellsLoseFocus={true}
 				getRowStyle={getRowStyle}
 				onRowDragEnd={onRowDragEnd}
-				domLayout="autoHeight"
+				domLayout="normal"
 				suppressRowClickSelection={true}
 				rowSelection={"multiple"}
 				rowMultiSelectWithClick={true}

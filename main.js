@@ -309,17 +309,19 @@ function gracefulShutdown() {
 
 	logger.info("Starting graceful shutdown");
 
-	const shutdownDialog = new BrowserWindow({
-		width: 400,
-		height: 400,
-		frame: false,
-		transparent: true,
-		alwaysOnTop: true,
-		skipTaskbar: true,
-		resizable: false,
-	});
+	if (!updateDownloaded) {
+		const shutdownDialog = new BrowserWindow({
+			width: 400,
+			height: 400,
+			frame: false,
+			transparent: true,
+			alwaysOnTop: true,
+			skipTaskbar: true,
+			resizable: false,
+		});
 
-	shutdownDialog.loadFile(path.join(__dirname, "shutdown.html"));
+		shutdownDialog.loadFile(path.join(__dirname, "shutdown.html"));
+	}
 
 	// Notify the renderer process
 	if (mainWindow && !mainWindow.isDestroyed()) {

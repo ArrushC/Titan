@@ -1,11 +1,10 @@
-import { Heading, Icon, IconButton, Image, Tooltip, Wrap, WrapItem } from "@chakra-ui/react";
-import React, { useCallback, useEffect } from "react";
+import { Heading, Icon, IconButton, Image, Link, Tooltip, Wrap, WrapItem } from "@chakra-ui/react";
+import React, { useCallback } from "react";
 import Logo from "../assets/Titan.png";
 import { useApp } from "../AppContext";
 import { MdBrowserUpdated, MdCode, MdCodeOff } from "react-icons/md";
 import useSocketEmits from "../hooks/useSocketEmits";
 import { LuFileCog } from "react-icons/lu";
-import { FaInfo } from "react-icons/fa6";
 import useNotifications from "../hooks/useNotifications";
 
 export default function Header() {
@@ -24,6 +23,8 @@ export default function Header() {
 	}, [RaiseClientNotificaiton]);
 
 	const handleGetAppVersion = useCallback(() => {
+		if (!window.electron) return;
+
 		window.electron.getAppVersion().then((version) => {
 			RaiseClientNotificaiton(`Application Version: v${version}`, "info", 2000);
 		});
@@ -32,7 +33,9 @@ export default function Header() {
 	return (
 		<Wrap my={5} spacingY={5} justify={"space-between"}>
 			<WrapItem alignItems="center">
-				<Image src={Logo} alt="Titan Logo" boxSize="100px" mr={5} borderRadius={"full"} />
+				<Link onClick={handleGetAppVersion}>
+					<Image src={Logo} alt="Titan Logo" boxSize="100px" mr={5} borderRadius={"full"} />
+				</Link>
 				<Heading as={"h2"} size={"2xl"} noOfLines={1} className={"animation-fadein-forward"}>
 					Welcome back
 				</Heading>
@@ -49,9 +52,6 @@ export default function Header() {
 				</Tooltip>
 				<Tooltip label={"Check for updates"} hasArrow placement="bottom-start" isDisabled={!window.electron}>
 					<IconButton aria-label="Check for updates" colorScheme={"yellow"} icon={<Icon as={MdBrowserUpdated} />} onClick={handleCheckForUpdates} isDisabled={!window.electron} />
-				</Tooltip>
-				<Tooltip label={"Get App Version"} hasArrow placement="bottom-start" isDisabled={!window.electron}>
-					<IconButton aria-label="Get App Version" colorScheme={"yellow"} icon={<Icon as={FaInfo} />} onClick={handleGetAppVersion} isDisabled={!window.electron} />
 				</Tooltip>
 			</WrapItem>
 		</Wrap>

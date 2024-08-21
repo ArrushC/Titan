@@ -101,7 +101,7 @@ body {
 }
 
 .animation-handwave {
-	animation: handwave 2s infinite;
+	animation: handwave 10s infinite;
 }
 
 @keyframes handwave {

@@ -43,13 +43,6 @@ export default function useSocketEmits() {
 		[socket]
 	);
 
-	const emitStatusSingle = useCallback(
-		(selectedBranch) => {
-			socket?.emit("svn-status-single", { selectedBranch: selectedBranch });
-		},
-		[socket]
-	);
-
 	const emitTrelloCardNamesSearch = useCallback(
 		(key, token, query, limit = null) => {
 			socket?.emit("trello-search-names-card", { key, token, query, limit });
@@ -65,7 +58,6 @@ export default function useSocketEmits() {
 		emitCommitPayload,
 		emitFilesRevert,
 		emitFilesAddRemove,
-		emitStatusSingle,
 		emitTrelloCardNamesSearch,
 	};
 }

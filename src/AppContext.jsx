@@ -2,7 +2,7 @@ import React, { createContext, useCallback, useContext, useEffect, useMemo, useR
 import socketIOClient from "socket.io-client";
 import { useToast } from "@chakra-ui/react";
 import _ from "lodash";
-import { branchString } from "./utils/CommonConfig";
+import { branchString, stripBranchInfo } from "./utils/CommonConfig";
 import { createToastConfig, URL_SOCKET_CLIENT } from "./utils/Constants";
 
 const AppContext = createContext({
@@ -154,10 +154,26 @@ export const AppProvider = ({ children }) => {
 	// Scroll to the commit region when it is in commit mode
 	useEffect(() => {
 		if (!isCommitMode || !showCommitView) return;
-		setTimeout(() => {
+		const hookTimeoutCallback = setTimeout(() => {
 			document.getElementById("sectionCommit")?.scrollIntoView({ behavior: "smooth", block: "start", inline: "nearest" });
-		}, 200);
+		}, 100);
+
+		return () => clearTimeout(hookTimeoutCallback);
 	}, [isCommitMode, showCommitView]);
+
+	// Fetch the branch status for each selected branch
+	useEffect(() => {
+		if (selectedBranches.length < 1 || showCommitView) {
+			if (selectedBranches.length < 1) setIsCommitMode(false);
+			return;
+		}
+		setSelectedBranchStatuses([]);
+		setSocketPayload(null);
+		stripBranchInfo(selectedBranches).forEach((selectedBranch) => {
+			console.debug("Emitting svn-status-single for branch:", selectedBranch);
+			socket?.emit("svn-status-single", { selectedBranch: selectedBranch });
+		});
+	}, [socket, selectedBranches, showCommitView]);
 
 	// Refresh the commit section whenever there has been an update on untracked files being tracked by SVN.
 	useEffect(() => {

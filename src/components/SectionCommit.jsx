@@ -13,16 +13,14 @@ import ModalMessageAutoFill from "./ModalMessageAutoFill";
 
 export default function SectionCommit() {
 	const {
+		isDebug,
 		setIsCommitMode,
 		selectedBranchStatuses,
-		setSelectedBranchStatuses,
 		showCommitView,
 		setShowCommitView,
 		selectedBranches,
 		configurableRowData,
-		setSocketPayload,
 	} = useApp();
-	const { emitStatusSingle } = useSocketEmits();
 
 	// Form Data Fields
 	const [fileUpdates, setFileUpdates] = useState({});
@@ -53,18 +51,18 @@ export default function SectionCommit() {
 			if (selectedBranches.length < 1) setIsCommitMode(false);
 			return;
 		}
-		setSelectedBranchStatuses([]);
-		setSocketPayload(null);
 		setFileUpdates({});
-		stripBranchInfo(selectedBranches).forEach((row) => {
-			emitStatusSingle(row);
-		});
-	}, [selectedBranches, showCommitView, emitStatusSingle]);
+	}, [selectedBranches, showCommitView]);
+
+	useEffect(() => {
+		if (!isDebug) return;
+
+		console.debug("Branch Status Rows:", selectedBranchStatuses);
+		console.debug("Selected Rows:", selectedBranches);
+	}, [isDebug, selectedBranchStatuses, selectedBranches]);
 
 	useEffect(() => {
 		if (selectedBranchStatuses.length === selectedBranches.length) {
-			console.debug("Branch Status Rows:", selectedBranchStatuses);
-			console.debug("Selected Rows:", selectedBranches);
 			selectedBranchStatuses.forEach((branchStatus) => {
 				let branchId = branchStatus.id;
 				let filesToCommit = branchStatus.status.filesToCommit;

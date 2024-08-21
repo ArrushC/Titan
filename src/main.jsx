@@ -35,7 +35,7 @@ const modalStyle = definePartsStyle({
 	},
 });
 
-export const modalTheme = defineMultiStyleConfig({
+export const Modal = defineMultiStyleConfig({
 	baseStyle: modalStyle,
 });
 
@@ -63,7 +63,7 @@ const drawerStyle = definePartsStyle({
 	},
 });
 
-export const drawerTheme = defineMultiStyleConfig({
+export const Drawer = defineMultiStyleConfig({
 	baseStyle: drawerStyle,
 });
 
@@ -75,8 +75,8 @@ const config = {
 const theme = extendTheme({
 	config,
 	components: {
-		Modal: modalTheme,
-		Drawer: drawerTheme,
+		Modal,
+		Drawer,
 	},
 });
 

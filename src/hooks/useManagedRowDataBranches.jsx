@@ -4,7 +4,7 @@ import { stripBranchInfo } from "../utils/CommonConfig";
 import _ from "lodash";
 
 export default function useManagedRowDataBranches() {
-	const { updateConfig, isDebug, socket, configurableRowData, setConfigurableRowData, branchInfos, config, setBranchInfos, setSelectedBranches, setSelectedBranchStatuses, setShowCommitView } = useApp();
+	const { updateConfig, isDebug, socket, configurableRowData, setConfigurableRowData, branchInfos, config, setBranchInfos, setSelectedBranches, setSelectedBranchStatuses, showCommitView,  setShowCommitView } = useApp();
 	const [rowDataBranches, setRowDataBranches] = useState([]);
 
 	const onRowValueChanged = useCallback(
@@ -49,13 +49,13 @@ export default function useManagedRowDataBranches() {
 		const socketCallback = (data) => {
 			setBranchInfos((currentBranchInfos) => {
 				const newBranchInfos = { ...currentBranchInfos, [data.id]: data.info };
-				if (isDebug) console.debug("branch-info-single data received:", data);
-				if (isDebug) console.debug("branch-info-single newBranchInfos", newBranchInfos);
+				console.debug("branch-info-single data received:", data);
+				console.debug("branch-info-single newBranchInfos", newBranchInfos);
 				// If branch id is in selectedBranches, refresh the commit region.
 				// ? We're not using the getter function here because we do not want to miss an event fired before the state is updated.
 				setSelectedBranches((currentSelectedRows) => {
 					const selectedRow = currentSelectedRows.find((row) => row.id === data.id);
-					if (selectedRow) {
+					if (selectedRow && showCommitView) {
 						setSelectedBranchStatuses([]);
 						setShowCommitView(false);
 					}
@@ -67,7 +67,7 @@ export default function useManagedRowDataBranches() {
 
 		socket?.on("branch-info-single", socketCallback);
 		return () => socket?.off("branch-info-single");
-	}, [socket, isDebug]);
+	}, [socket, showCommitView]);
 
 	return {
 		rowDataBranches,

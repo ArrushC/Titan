@@ -9,6 +9,10 @@ export default function FooterSectionCommit({ openCommitModal }) {
 	const { setShowCommitView, selectedLocalChanges, sourceBranch, issueNumber, commitMessage, setSocketPayload, selectedBranches } = useApp();
 	const { RaiseClientNotificaiton } = useNotifications();
 
+	const performRefresh = useCallback(() => {
+		setShowCommitView(false);
+	}, [setShowCommitView]);
+
 	const performCommit = useCallback(() => {
 		// Check if the source branch is selected
 		if (!sourceBranch) {
@@ -35,7 +39,7 @@ export default function FooterSectionCommit({ openCommitModal }) {
 	return (
 		<Box>
 			<Flex columnGap={2} justifyContent={"center"}>
-				<Button onClick={() => setShowCommitView(false)} leftIcon={<RepeatIcon />} colorScheme={"yellow"}>
+				<Button onClick={performRefresh} leftIcon={<RepeatIcon />} colorScheme={"yellow"}>
 					Refresh Process
 				</Button>
 				<Tooltip label={"Select at least 1 file"} hasArrow isDisabled={selectedLocalChanges.length > 0}>

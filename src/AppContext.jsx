@@ -31,7 +31,7 @@ const AppContext = createContext({
 	setShowCommitView: (_) => {},
 	sourceBranch: null,
 	setSourceBranch: (_) => {},
-	sourceBranchOptions: [],
+	branchOptions: [],
 	issueNumber: null,
 	setIssueNumber: (_) => {},
 	commitMessage: "",
@@ -123,13 +123,15 @@ export const AppProvider = ({ children }) => {
 	const untrackedChangesGridRef = useRef(null);
 	const [showCommitView, setShowCommitView] = useState(false);
 	const [sourceBranch, setSourceBranch] = useState(null);
-	const sourceBranchOptions = useMemo(
+	const branchOptions = useMemo(
 		() =>
-			selectedBranches.map((row) => ({
-				value: row.id,
-				label: branchString(row["Branch Folder"], row["Branch Version"], row["SVN Branch"]),
-			})),
-		[selectedBranches]
+			configurableRowData
+				.filter((row) => row["Branch Folder"] && row["Branch Version"] && row["SVN Branch"] && row["Branch Folder"] !== "" && row["Branch Version"] !== "" && row["SVN Branch"] !== "")
+				.map((row) => ({
+					value: row.id,
+					label: branchString(row["Branch Folder"], row["Branch Version"], row["SVN Branch"]),
+				})),
+		[configurableRowData]
 	);
 	const [issueNumber, setIssueNumber] = useState(null);
 	const [commitMessage, setCommitMessage] = useState("");
@@ -250,7 +252,7 @@ export const AppProvider = ({ children }) => {
 				setShowCommitView,
 				sourceBranch,
 				setSourceBranch,
-				sourceBranchOptions,
+				branchOptions,
 				issueNumber,
 				setIssueNumber,
 				commitMessage,

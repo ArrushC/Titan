@@ -6,7 +6,7 @@ import { ExternalLinkIcon } from "@chakra-ui/icons";
 import IssueNumberInput from "./IssueNumberInput";
 
 export default function FormSVNMessage({ openMessageAutoFillModal }) {
-	const { sourceBranch, setSourceBranch, sourceBranchOptions, setIssueNumber, commitMessage, setCommitMessage, selectedBranches, isCommitMode } = useApp();
+	const { sourceBranch, setSourceBranch, branchOptions, setIssueNumber, commitMessage, setCommitMessage, isCommitMode } = useApp();
 
 	const handleSourceBranchChange = useCallback(
 		(selectedOption) => {
@@ -23,11 +23,6 @@ export default function FormSVNMessage({ openMessageAutoFillModal }) {
 	);
 
 	useEffect(() => {
-		if (selectedBranches.length === 1) setSourceBranch(sourceBranchOptions[0]);
-		else setSourceBranch(null);
-	}, [selectedBranches, sourceBranchOptions]);
-
-	useEffect(() => {
 		if (!isCommitMode) return;
 		setSourceBranch(null);
 		setIssueNumber("");
@@ -40,7 +35,7 @@ export default function FormSVNMessage({ openMessageAutoFillModal }) {
 				<Box width={"50%"}>
 					<FormControl isRequired>
 						<FormLabel>Source Branch</FormLabel>
-						<Select value={sourceBranch} onChange={handleSourceBranchChange} options={sourceBranchOptions} placeholder="Select branch you would like to commit from" selectedOptionStyle="check" selectedOptionColorScheme="yellow" isClearable />
+						<Select value={sourceBranch} onChange={handleSourceBranchChange} options={branchOptions} placeholder="Select branch you would like to commit from" selectedOptionStyle="check" selectedOptionColorScheme="yellow" isClearable />
 					</FormControl>
 				</Box>
 				<Flex width={"50%"} alignItems={"flex-end"} columnGap={2}>

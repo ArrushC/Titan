@@ -10,7 +10,7 @@ import FilterableTableTrello from "./FilterableTableTrello";
 import { useApp } from "../AppContext";
 
 export default function ModalMessageAutoFill({ isModalOpen, closeModal }) {
-	const { setSourceBranch, sourceBranchOptions, setIssueNumber, setCommitMessage } = useApp();
+	const { setSourceBranch, branchOptions, setIssueNumber, setCommitMessage } = useApp();
 
 	const [tabIndex, setTabIndex] = useState(0);
 	const [autofillSelection, setAutoFillSelection] = useState([null, null]);
@@ -56,7 +56,7 @@ export default function ModalMessageAutoFill({ isModalOpen, closeModal }) {
 			const issueNumber = issueNumMatch ? issueNumMatch[2] : null;
 			const formattedMessage = message.replace(/\s*(Issue)*\s*(\d+)?\s*(\([^\)]+\))*\s?:?\s*/, "");
 
-			if (sourceBranchId) setSourceBranch(sourceBranchOptions.find((option) => option.value === sourceBranchId));
+			if (sourceBranchId) setSourceBranch(branchOptions.find((option) => option.value === sourceBranchId));
 			if (issueNumber) setIssueNumber(issueNumber);
 			if (formattedMessage.trim() !== "") setCommitMessage(formattedMessage);
 		} else {

@@ -111,7 +111,6 @@ export default function SectionBranches() {
 
 	const toggleCommitSelectedBranches = useCallback(() => {
 		setIsCommitMode((currentIsCommitMode) => !currentIsCommitMode);
-		setSelectedBranchStatuses([]);
 		setShowCommitView(false);
 	}, [setIsCommitMode]);
 

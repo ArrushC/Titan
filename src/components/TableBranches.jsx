@@ -46,15 +46,15 @@ export default function TableBranches({ rowData, onRowValueChanged }) {
 		[isDebug, branchTableGridRef, selectedBranches, setSelectedBranches, setShowCommitView]
 	);
 
-	const onRowDragEnd = useCallback(
-		(event) => {
-			const movedRowData = [];
-			event.api.forEachNode((node) => movedRowData.push(node.data));
-			if (isDebug) console.debug("SectionBranches.jsx: onRowDragEnd - movedRowData", movedRowData);
-			updateConfig((currentConfig) => ({ ...currentConfig, branches: stripBranchInfo(movedRowData) }));
-		},
-		[updateConfig, isDebug]
-	);
+	// const onRowDragEnd = useCallback(
+	// 	(event) => {
+	// 		const movedRowData = [];
+	// 		event.api.forEachNode((node) => movedRowData.push(node.data));
+	// 		if (isDebug) console.debug("SectionBranches.jsx: onRowDragEnd - movedRowData", movedRowData);
+	// 		updateConfig((currentConfig) => ({ ...currentConfig, branches: stripBranchInfo(movedRowData) }));
+	// 	},
+	// 	[updateConfig, isDebug]
+	// );
 
 	const getRowStyle = useCallback(
 		(params) => {
@@ -82,7 +82,7 @@ export default function TableBranches({ rowData, onRowValueChanged }) {
 
 	const colDefs = useMemo(
 		() => [
-			{ field: "", rowDrag: true, resizable: false, filter: false, suppressMovable: false, editable: false, width: 20, cellRenderer: DragHandleIcon, headerClass: "branch-table-header-cell", cellClass: "branch-table-body-cell" },
+			// { field: "", rowDrag: true, resizable: false, filter: false, suppressMovable: false, editable: false, width: 20, cellRenderer: DragHandleIcon, headerClass: "branch-table-header-cell", cellClass: "branch-table-body-cell" },
 			{ headerCheckboxSelection: true, checkboxSelection: true, headerCheckboxSelectionFilteredOnly: true, width: 20, resizable: false, suppressMovable: false, filter: false, editable: false, headerClass: "branch-table-header-cell", cellClass: "branch-table-body-cell" },
 			{
 				headerName: "",
@@ -106,7 +106,7 @@ export default function TableBranches({ rowData, onRowValueChanged }) {
 	);
 
 	return (
-		<div className="ag-theme-balham-dark compact" style={{ height: "55vh", width: "100%"}}>
+		<div className="ag-theme-balham-dark compact" style={{ height: "428px", width: "100%"}}>
 			<AgGridReact
 				ref={branchTableGridRef}
 				rowData={rowData}
@@ -114,7 +114,7 @@ export default function TableBranches({ rowData, onRowValueChanged }) {
 				columnDefs={colDefs}
 				stopEditingWhenCellsLoseFocus={true}
 				getRowStyle={getRowStyle}
-				onRowDragEnd={onRowDragEnd}
+				// onRowDragEnd={onRowDragEnd}
 				domLayout="normal"
 				suppressRowClickSelection={true}
 				rowSelection={"multiple"}
@@ -131,6 +131,10 @@ export default function TableBranches({ rowData, onRowValueChanged }) {
 				suppressFlash={true}
 				enableCellTextSelection={true}
 				ensureDomOrder
+				pagination={true}
+				paginationAutoPageSize={false}
+				paginationPageSizeSelector={false}
+				paginationPageSize={10}
 			/>
 		</div>
 	);

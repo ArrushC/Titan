@@ -118,7 +118,7 @@ async function getTrelloCardNames(key, token, query, limit) {
 
 	try {
 		// Create a new URL object
-		const url = new URL('https://api.trello.com/1/search');
+		let url = new URL("https://api.trello.com/1/search");
 
 		// Use URLSearchParams to append query parameters
 		const params = new URLSearchParams({
@@ -126,9 +126,9 @@ async function getTrelloCardNames(key, token, query, limit) {
 			key: key,
 			token: token,
 			cards_limit: limit,
-			card_fields: 'name,dateLastActivity,shortUrl',
-			partial: 'true',
-			modelTypes: 'cards'
+			card_fields: "name,dateLastActivity,shortUrl,idBoard,idChecklists",
+			partial: "true",
+			modelTypes: "cards",
 		});
 
 		// Append the search parameters to the URL
@@ -151,8 +151,23 @@ async function getTrelloCardNames(key, token, query, limit) {
 				id: card.id,
 				name: card.name,
 				lastActivityDate: new Date(card.dateLastActivity).toLocaleString(),
-				url: card.shortUrl
+				url: card.shortUrl,
+				boardId: card.idBoard,
+				checklistIds: card.idChecklists,
 			}));
+
+		let urls = cards.filter((card) => card.checklistIds && card.checklistIds.length > 0).map((card) => card.checklistIds.map((checklistId) => new URL(`https://api.trello.com/1/checklists/${checklistId}`)));
+
+		// Add key and token to each of those URLs, fetch the data and parse the JSON response
+		let checklistData = (await Promise.all(urls.flat().map((url) => fetch(new URL(url.toString() + `?key=${key}&token=${token}`)).then((res) => res.json())))).map((data) => ({
+			id: data.id,
+			name: data.name,
+		}));
+
+		// Add the checklist data to the cards
+		cards.forEach((card) => {
+			card.checklists = card.checklistIds.map((checklistId) => checklistData.find((checklist) => checklist.id === checklistId));
+		});
 
 		logger.debug(`Retrieved ${cards.length} cards`);
 		return cards;

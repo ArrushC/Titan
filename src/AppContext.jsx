@@ -42,6 +42,8 @@ const AppContext = createContext({
 	setSelectedUntrackedChanges: (_) => {},
 	socketPayload: null,
 	setSocketPayload: (_) => {},
+	postCommitData: {},
+	setPostCommitData: (_) => {},
 	logData: [],
 	setLogData: (_) => {},
 });
@@ -138,6 +140,7 @@ export const AppProvider = ({ children }) => {
 	const [selectedLocalChanges, setSelectedLocalChanges] = useState([]);
 	const [selectedUntrackedChanges, setSelectedUntrackedChanges] = useState([]);
 	const [socketPayload, setSocketPayload] = useState(null);
+	const [postCommitData, setPostCommitData] = useState({});
 
 	// Props used in the entire application
 	const [logData, setLogData] = React.useState([]);
@@ -263,6 +266,8 @@ export const AppProvider = ({ children }) => {
 				setSelectedUntrackedChanges,
 				socketPayload,
 				setSocketPayload,
+				postCommitData,
+				setPostCommitData,
 				logData,
 				setLogData,
 			}}>

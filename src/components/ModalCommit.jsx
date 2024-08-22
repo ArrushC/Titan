@@ -9,6 +9,7 @@ import {
 	Code,
 	Flex,
 	Heading,
+	Icon,
 	IconButton,
 	List,
 	ListIcon,
@@ -45,6 +46,7 @@ import { CopyIcon } from "@chakra-ui/icons";
 import ButtonDiff from "./ButtonDiff";
 import useSocketEmits from "../hooks/useSocketEmits";
 import useNotifications from "../hooks/useNotifications";
+import { FaTrello } from "react-icons/fa6";
 
 export default function ModalCommit({ isModalOpen, closeModal }) {
 	const { socket, setIsCommitMode, setSelectedBranchStatuses, setShowCommitView, socketPayload } = useApp();
@@ -120,6 +122,10 @@ export default function ModalCommit({ isModalOpen, closeModal }) {
 		setActiveStep((prev) => prev - 1);
 	}, [setActiveStep]);
 
+	const handleTrelloUpdate = useCallback(() => {
+		// TODO: Implement Trello Autofill
+	}, []);
+
 	const handleNext = useCallback(() => {
 		setActiveStep((prev) => prev + 1);
 	}, [setActiveStep]);
@@ -165,7 +171,7 @@ export default function ModalCommit({ isModalOpen, closeModal }) {
 	 * Hooks
 	 ****************************************************/
 	useEffect(() => {
-		setActiveStep(1);
+		setActiveStep(3);
 		setCommitLiveResponses([]);
 		setRevisionsValue("");
 		setCommitMsgValue("");
@@ -358,7 +364,11 @@ export default function ModalCommit({ isModalOpen, closeModal }) {
 								<Flex columnGap={10} alignItems={"center"}>
 									<Box>
 										<Text fontWeight={600}>Here is your SVN commit message for the source branch:</Text>
-										<Code>{`Issue ${socketPayload["issueNumber"]} (${socketPayload["sourceBranch"]["Branch Folder"]} ${socketPayload["sourceBranch"]["Branch Version"]}): ${commitMsgValue}`}</Code>
+										{socketPayload["sourceBranch"] && socketPayload["sourceBranch"]["Branch Folder"] && socketPayload["sourceBranch"]["Branch Version"] ? (
+											<Code>{`Issue ${socketPayload["issueNumber"]} (${socketPayload["sourceBranch"]["Branch Folder"]} ${socketPayload["sourceBranch"]["Branch Version"]}): ${commitMsgValue}`}</Code>
+										) : (
+											<Code>Source information is undefined. Please check that you have entered the correct details otherwise contact the developer!</Code>
+										)}
 									</Box>
 									<Tooltip hasArrow label={"Copy to clipboard"}>
 										<IconButton aria-label="Copy To Clipboard" onClick={onCommitMsgCopy} icon={<CopyIcon />} colorScheme="yellow" />
@@ -369,16 +379,28 @@ export default function ModalCommit({ isModalOpen, closeModal }) {
 					</Box>
 				</ModalBody>
 				<ModalFooter>
-					<Tooltip hasArrow label={"Cannot undo the commit currently"} isDisabled={activeStep < 2}>
-						<Button onClick={handlePrevious} mr={3} isDisabled={activeStep >= 2}>
-							{activeStep == 1 ? "Cancel" : "Previous"}
-						</Button>
-					</Tooltip>
-					<Tooltip hasArrow label={"Cannot undo the commit currently"} isDisabled={activeStep != 2}>
-						<Button colorScheme="yellow" onClick={handleNext} isDisabled={activeStep == 2}>
-							{activeStep == steps.length ? "Complete" : "Next"}
-						</Button>
-					</Tooltip>
+					<Flex flex={1} justifyContent="space-between">
+						<Flex columnGap={2}>
+							<Tooltip hasArrow label={"Cannot undo the commit currently"} isDisabled={activeStep < 2}>
+								<Button onClick={handlePrevious} mr={3} isDisabled={activeStep >= 2}>
+									{activeStep == 1 ? "Cancel" : "Previous"}
+								</Button>
+							</Tooltip>
+						</Flex>
+						<Flex columnGap={2}>
+							<Tooltip hasArrow label={"Requires Trello Autofill"} isDisabled={activeStep >= 3}>
+								<Button colorScheme="yellow" leftIcon={<Icon as={FaTrello} />} onClick={handleTrelloUpdate} isDisabled={activeStep < 3}>
+									Update Trello
+								</Button>
+							</Tooltip>
+
+							<Tooltip hasArrow label={"Cannot undo the commit currently"} isDisabled={activeStep != 2}>
+								<Button colorScheme="yellow" onClick={handleNext} isDisabled={activeStep == 2}>
+									{activeStep == steps.length ? "Complete" : "Next"}
+								</Button>
+							</Tooltip>
+						</Flex>
+					</Flex>
 				</ModalFooter>
 			</ModalContent>
 		</Modal>

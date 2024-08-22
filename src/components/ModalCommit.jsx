@@ -255,14 +255,11 @@ export default function ModalCommit({ isModalOpen, closeModal }) {
 		<Modal isOpen={isModalOpen} onClose={closeModal} isCentered motionPreset="slideInBottom" scrollBehavior="inside" size="xl" closeOnOverlayClick={activeStep == 1}>
 			<ModalOverlay />
 			<ModalContent maxH={"85%"} maxW="95%">
-				<ModalHeader>
+				<ModalHeader display={"flex"} justifyContent={"space-between"} maxWidth={"90%"}>
 					<Heading as={"h2"} size={"lg"}>
 						Commit Selected Files
 					</Heading>
-				</ModalHeader>
-				{activeStep == 1 ? <ModalCloseButton size={"lg"} /> : <></>}
-				<ModalBody>
-					<Stepper index={activeStep} mb={6} size="lg" colorScheme="yellow">
+					<Stepper index={activeStep-1} mb={0} size={"sm"} colorScheme="yellow">
 						{steps.map((step, index) => (
 							<Step key={index}>
 								<StepIndicator>
@@ -270,12 +267,15 @@ export default function ModalCommit({ isModalOpen, closeModal }) {
 								</StepIndicator>
 								<Box flexShrink="0">
 									<StepTitle>{step.title}</StepTitle>
-									<StepDescription>{step.description}</StepDescription>
+									{/* <StepDescription>{step.description}</StepDescription> */}
 								</Box>
 								<StepSeparator />
 							</Step>
 						))}
 					</Stepper>
+				</ModalHeader>
+				{activeStep == 1 ? <ModalCloseButton size={"lg"} /> : <></>}
+				<ModalBody>
 					<Box>
 						{activeStep != 1 ? (
 							<></>

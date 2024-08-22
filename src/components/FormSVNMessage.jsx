@@ -35,7 +35,7 @@ export default function FormSVNMessage({ openMessageAutoFillModal }) {
 				<Box width={"50%"}>
 					<FormControl isRequired>
 						<FormLabel>Source Branch</FormLabel>
-						<Select value={sourceBranch} onChange={handleSourceBranchChange} options={branchOptions} placeholder="Select branch you would like to commit from" selectedOptionStyle="check" selectedOptionColorScheme="yellow" isClearable />
+						<Select value={sourceBranch} onChange={handleSourceBranchChange} options={branchOptions} placeholder="Enter source branch" selectedOptionStyle="check" selectedOptionColorScheme="yellow" isClearable />
 					</FormControl>
 				</Box>
 				<Flex width={"50%"} alignItems={"flex-end"} columnGap={2}>

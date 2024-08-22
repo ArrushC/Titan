@@ -24,6 +24,9 @@ export default defineConfig({
 		minify: "esbuild", // Use esbuild for faster minification
 		rollupOptions: {
 			output: {
+				entryFileNames: "assets/[name].js",
+				chunkFileNames: "assets/[name].js",
+				assetFileNames: "assets/[name].[ext]",
 				manualChunks(id) {
 					// Separate ag-grid and lodash into their own chunks
 					if (id.includes("node_modules")) {

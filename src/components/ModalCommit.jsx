@@ -49,7 +49,7 @@ import useNotifications from "../hooks/useNotifications";
 import { FaTrello } from "react-icons/fa6";
 
 export default function ModalCommit({ isModalOpen, closeModal }) {
-	const { socket, setIsCommitMode, setSelectedBranchStatuses, setShowCommitView, socketPayload } = useApp();
+	const { socket, setIsCommitMode, setSelectedBranchStatuses, setShowCommitView, socketPayload, postCommitData } = useApp();
 	const { emitUpdateSingle, emitCommitPayload } = useSocketEmits();
 	const { RaiseClientNotificaiton } = useNotifications();
 	const [commitLiveResponses, setCommitLiveResponses] = useState([]);
@@ -388,9 +388,9 @@ export default function ModalCommit({ isModalOpen, closeModal }) {
 							</Tooltip>
 						</Flex>
 						<Flex columnGap={2}>
-							<Tooltip hasArrow label={"Requires Trello Autofill"} isDisabled={activeStep >= 3}>
-								<Button colorScheme="yellow" leftIcon={<Icon as={FaTrello} />} onClick={handleTrelloUpdate} isDisabled={activeStep < 3}>
-									Update Trello
+							<Tooltip hasArrow label={"Requires Trello Autofill"} isDisabled={postCommitData.type === "trello"}>
+								<Button colorScheme="yellow" leftIcon={<Icon as={FaTrello} />} onClick={handleTrelloUpdate} isDisabled={postCommitData.type != "trello"}>
+									Update Card
 								</Button>
 							</Tooltip>
 

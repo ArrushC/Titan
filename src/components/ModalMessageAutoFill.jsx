@@ -65,7 +65,7 @@ export default function ModalMessageAutoFill({ isModalOpen, closeModal }) {
 			if (issueNumber) setIssueNumber(issueNumber);
 			if (formattedMessage.trim() !== "") setCommitMessage(formattedMessage);
 
-			setPostCommitData({type: "Trello", data: selection});
+			setPostCommitData({type: "trello", data: selection});
 		}
 		closeModal();
 	}, [tabIndex, autofillSelection, closeModal]);

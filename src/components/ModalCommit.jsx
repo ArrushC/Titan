@@ -123,8 +123,11 @@ export default function ModalCommit({ isModalOpen, closeModal }) {
 	}, [setActiveStep]);
 
 	const handleTrelloUpdate = useCallback(() => {
-		// TODO: Implement Trello Autofill
-	}, []);
+		if (postCommitData.type !== "trello") {
+			RaiseClientNotificaiton("Trello Autofill is not enabled for this commit", "error", 5000);
+			return;
+		}
+	}, [postCommitData, RaiseClientNotificaiton, ]);
 
 	const handleNext = useCallback(() => {
 		setActiveStep((prev) => prev + 1);
@@ -160,8 +163,8 @@ export default function ModalCommit({ isModalOpen, closeModal }) {
 	);
 
 	const handleClipboardOption = useCallback(
-		(values) => {
-			const formattedText = formatForClipboard(commitLiveResponses, values);
+		(optionValues) => {
+			const formattedText = formatForClipboard(commitLiveResponses, optionValues);
 			setRevisionsValue(formattedText);
 		},
 		[commitLiveResponses, formatForClipboard, setRevisionsValue]

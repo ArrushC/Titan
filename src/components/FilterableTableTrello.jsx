@@ -1,19 +1,14 @@
 import { ExternalLinkIcon, RepeatIcon } from "@chakra-ui/icons";
 import { Box, Flex, IconButton, Input, Tooltip, Text, Link } from "@chakra-ui/react";
-import { AgGridReact } from "ag-grid-react";
 import _ from "lodash";
 import React, { useCallback, useEffect, useState } from "react";
-import useSocketEmits from "../hooks/useSocketEmits";
+import useTrelloIntegration from "../hooks/useTrelloIntegration";
 import { useApp } from "../AppContext";
 import TableTrello from "./TableTrello";
 
 export default function FilterableTableTrello({ setAutoFillSelection }) {
-	const { config, socket } = useApp();
-	const { emitTrelloCardNamesSearch } = useSocketEmits();
-	const configTrelloIntegration = config?.trelloIntegration;
-	const key = configTrelloIntegration?.key || null;
-	const token = configTrelloIntegration?.token || null;
-	const isTrelloIntegrationEnabled = key && token && key.trim() !== "" && token.trim() !== "" && key.toUpperCase() !== "TRELLO_API_KEY" && token.toUpperCase !== "TRELLO_TOKEN";
+	const { socket } = useApp();
+	const { key, token, isTrelloIntegrationEnabled, emitTrelloCardNamesSearch } = useTrelloIntegration();
 
 	const [trelloQuery, setTrelloQuery] = useState("");
 	const [quickFilterTrelloText, setQuickFilterTrelloText] = useState("");

@@ -113,6 +113,15 @@ async function writeTargetsFile(targets = []) {
 /************************************
  * Trello Utilities
  ************************************/
+/**
+ * Fetches the card names from Trello based on the search query.
+ *
+ * @param {String} key The Trello API key
+ * @param {String} token The Trello token
+ * @param {String} query The search query to find the card names
+ * @param {Number} limit The maximum number of cards to fetch
+ * @returns {Promise<Array>} An array of card objects containing the card name, last activity date, URL, board ID, checklist IDs, and checklist data.
+ */
 async function getTrelloCardNames(key, token, query, limit) {
 	// Docs URL: https://developer.atlassian.com/cloud/trello/rest/api-group-search/#api-search-get
 
@@ -125,7 +134,7 @@ async function getTrelloCardNames(key, token, query, limit) {
 			query: `name:"${query}"`,
 			key: key,
 			token: token,
-			cards_limit: limit,
+			cards_limit: String(limit),
 			card_fields: "name,dateLastActivity,shortUrl,idBoard,idChecklists",
 			partial: "true",
 			modelTypes: "cards",
@@ -173,6 +182,71 @@ async function getTrelloCardNames(key, token, query, limit) {
 		return cards;
 	} catch (error) {
 		logger.error("Error fetching data from Trello:", error);
+		throw error;
+	}
+}
+
+/**
+ * Updates the "Commit History" checklist or creates a new one if it doesn't exist, and adds commit responses to it.
+ *
+ * @param {*} key The Trello API key
+ * @param {*} token The Trello token
+ * @param {*} trelloData  The Trello data object containing the card ID, board ID, checklist ID, and commit responses
+ * @param {*} commitResponses The commit responses to add to the checklist
+ */
+async function updateTrelloCard(key, token, trelloData, commitResponses) {
+	try {
+		// Check if the "Commit History" checklist exists and if not, create a new one
+		let checklistId = trelloData.checklists.find((checklist) => checklist.name === "Commit History")?.id;
+
+		if (!checklistId) {
+			const url = new URL(`https://api.trello.com/1/checklists`);
+			const params = new URLSearchParams({
+				key: key,
+				token: token,
+				idCard: trelloData.id,
+				name: "Commit History",
+				pos: "bottom",
+			});
+
+			url.search = params.toString();
+
+			const res = await fetch(url, { method: "POST" });
+
+			if (!res.ok) {
+				throw new Error(`HTTP error! status: ${res.status} - ${res.statusText} - ${await res.text()}`);
+			}
+
+			const data = await res.json();
+			checklistId = data.id;
+		}
+
+		// Add the commit responses to the "Commit History" checklist
+		for (let responseItem of commitResponses) {
+			const url = new URL(`https://api.trello.com/1/checklists/${checklistId}/checkItems`);
+			const params = new URLSearchParams({
+				key: key,
+				token: token,
+				name: responseItem,
+				pos: "bottom",
+			});
+
+			url.search = params.toString();
+
+			const res = await fetch(url, { method: "POST" });
+
+			if (!res.ok) {
+				throw new Error(`HTTP error! status: ${res.status} - ${res.statusText} - ${await res.text()}`);
+			}
+
+			const data = await res.json();
+			logger.debug(`Added commit response to Trello card: ${data.name}`);
+		}
+
+		logger.debug(`Updated Trello card with commit responses`);
+		return true;
+	} catch (error) {
+		logger.error(`Error updating Trello card with commit responses: ${error}`);
 		throw error;
 	}
 }
@@ -869,6 +943,32 @@ io.on("connection", (socket) => {
 
 	socket.on("trello-update-card", async (data) => {
 		debugTask("trello-update-card", data, false);
+
+		if (!data.key || data.key === "" || data.key === "TRELLO_API_KEY" || !data.token || data.token === "" || data.token === "TRELLO_TOKEN") {
+			emitMessage(socket, "Trello API key and token are required for this function", "error");
+			return;
+		}
+
+		if (!data.trelloData || !data.trelloData.id || !data.trelloData.name || !data.trelloData.lastActivityDate || !data.trelloData.url || !data.trelloData.boardId || !data.trelloData.checklistIds || !data.trelloData.checklists) {
+			emitMessage(socket, "Trello data is missing required fields", "error");
+			return;
+		}
+
+		if (!data.commitResponses || data.commitResponses.length === 0) {
+			emitMessage(socket, "No commit responses provided", "error");
+			return;
+		}
+
+		const { key, token, trelloData, commitResponses } = data;
+
+		const result = await updateTrelloCard(key, token, trelloData, commitResponses);
+		if (result) {
+			emitMessage(socket, "Successfully updated Trello card", "success");
+		} else {
+			logger.error(`Failed to update Trello card: ${result}`);
+			emitMessage(socket, "Failed to update Trello card", "error");
+		}
+
 		debugTask("trello-update-card", data, true);
 	});
 

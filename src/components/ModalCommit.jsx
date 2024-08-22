@@ -47,10 +47,12 @@ import ButtonDiff from "./ButtonDiff";
 import useSocketEmits from "../hooks/useSocketEmits";
 import useNotifications from "../hooks/useNotifications";
 import { FaTrello } from "react-icons/fa6";
+import useTrelloIntegration from "../hooks/useTrelloIntegration";
 
 export default function ModalCommit({ isModalOpen, closeModal }) {
-	const { socket, setIsCommitMode, setSelectedBranchStatuses, setShowCommitView, socketPayload, postCommitData } = useApp();
+	const { socket, setIsCommitMode, setSelectedBranchStatuses, setShowCommitView, socketPayload, postCommitData, setPostCommitData } = useApp();
 	const { emitUpdateSingle, emitCommitPayload } = useSocketEmits();
+	const { key, token, isTrelloIntegrationEnabled,  emitTrelloCardUpdate } = useTrelloIntegration();
 	const { RaiseClientNotificaiton } = useNotifications();
 	const [commitLiveResponses, setCommitLiveResponses] = useState([]);
 	const { onCopy: onRevisionsCopy, value: revisionsValue, setValue: setRevisionsValue, hasCopied: hasRevisionsCopied } = useClipboard("");
@@ -118,27 +120,12 @@ export default function ModalCommit({ isModalOpen, closeModal }) {
 	/****************************************************
 	 * Modal Operations
 	 ****************************************************/
-	const handlePrevious = useCallback(() => {
-		setActiveStep((prev) => prev - 1);
-	}, [setActiveStep]);
-
-	const handleTrelloUpdate = useCallback(() => {
-		if (postCommitData.type !== "trello") {
-			RaiseClientNotificaiton("Trello Autofill is not enabled for this commit", "error", 5000);
-			return;
-		}
-	}, [postCommitData, RaiseClientNotificaiton, ]);
-
-	const handleNext = useCallback(() => {
-		setActiveStep((prev) => prev + 1);
-	}, [setActiveStep]);
-
 	const formatForClipboard = useCallback(
-		(responses, options) => {
+		(options, useStringFormat=true) => {
 			const zeroWidthSpace = "\u200B".repeat(7);
 			const newline = options.includes("MarkupSupport") ? `\r\n${zeroWidthSpace}` : "\r\n";
-			const sortedResponses = responses.sort((a, b) => a["Branch Version"].localeCompare(b["Branch Version"]));
-			return sortedResponses
+			const sortedResponses = commitLiveResponses.sort((a, b) => a["Branch Version"].localeCompare(b["Branch Version"]));
+			const finalResponse = sortedResponses
 				.map((response) => {
 					const parts = [];
 					if (options.includes("BranchFolder")) parts.push(response["Branch Folder"]);
@@ -156,25 +143,47 @@ export default function ModalCommit({ isModalOpen, closeModal }) {
 					line += ` Revision [${revision}]`;
 
 					return line;
-				})
-				.join(newline);
+				});
+			return useStringFormat ? finalResponse.join(newline) : finalResponse;
 		},
-		[socketPayload]
+		[commitLiveResponses, socketPayload]
 	);
 
 	const handleClipboardOption = useCallback(
 		(optionValues) => {
-			const formattedText = formatForClipboard(commitLiveResponses, optionValues);
+			const formattedText = formatForClipboard(optionValues);
 			setRevisionsValue(formattedText);
 		},
-		[commitLiveResponses, formatForClipboard, setRevisionsValue]
+		[formatForClipboard, setRevisionsValue]
 	);
+
+	const handlePrevious = useCallback(() => {
+		setActiveStep((prev) => prev - 1);
+	}, [setActiveStep]);
+
+	const handleTrelloUpdate = useCallback(() => {
+		if (postCommitData.type !== "trello") {
+			RaiseClientNotificaiton("Trello Autofill is not enabled for this commit", "error");
+			return;
+		}
+
+		const trelloData = postCommitData.data;
+		const formattedCommitResponses = formatForClipboard(["BranchFolder", "BranchVersion", "IssueNumber"], false);
+
+		emitTrelloCardUpdate(key, token, trelloData, formattedCommitResponses);
+		RaiseClientNotificaiton("Updating Trello card with commit information", "info");
+		setPostCommitData(null);
+	}, [postCommitData, RaiseClientNotificaiton, formatForClipboard]);
+
+	const handleNext = useCallback(() => {
+		setActiveStep((prev) => prev + 1);
+	}, [setActiveStep]);
 
 	/****************************************************
 	 * Hooks
 	 ****************************************************/
 	useEffect(() => {
-		setActiveStep(3);
+		setActiveStep(1);
 		setCommitLiveResponses([]);
 		setRevisionsValue("");
 		setCommitMsgValue("");
@@ -391,8 +400,8 @@ export default function ModalCommit({ isModalOpen, closeModal }) {
 							</Tooltip>
 						</Flex>
 						<Flex columnGap={2}>
-							<Tooltip hasArrow label={"Requires Trello Autofill"} isDisabled={postCommitData.type === "trello"}>
-								<Button colorScheme="yellow" leftIcon={<Icon as={FaTrello} />} onClick={handleTrelloUpdate} isDisabled={postCommitData.type != "trello"}>
+							<Tooltip hasArrow label={"Requires Trello Autofill"} isDisabled={postCommitData?.type === "trello" && isTrelloIntegrationEnabled}>
+								<Button colorScheme="yellow" leftIcon={<Icon as={FaTrello} />} onClick={handleTrelloUpdate} isDisabled={activeStep < 3 || postCommitData?.type != "trello" || !isTrelloIntegrationEnabled}>
 									Update Card
 								</Button>
 							</Tooltip>

@@ -867,6 +867,11 @@ io.on("connection", (socket) => {
 		debugTask("trello-search-names-card", data, true);
 	});
 
+	socket.on("trello-update-card", async (data) => {
+		debugTask("trello-update-card", data, false);
+		debugTask("trello-update-card", data, true);
+	});
+
 	socket.on("client-log", (data) => {
 		let { logType, logMessage } = data;
 		logger.log(logType, `Client Message - ${logMessage}}`);

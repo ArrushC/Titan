@@ -6,7 +6,7 @@ import { useApp } from "../AppContext";
 import useNotifications from "../hooks/useNotifications";
 
 export default function FooterSectionCommit({ openCommitModal }) {
-	const { setShowCommitView, selectedLocalChanges, sourceBranch, issueNumber, commitMessage, setSocketPayload, selectedBranches } = useApp();
+	const { setShowCommitView, selectedLocalChanges, sourceBranch, issueNumber, commitMessage, setSocketPayload, configurableRowData } = useApp();
 	const { RaiseClientNotificaiton } = useNotifications();
 
 	const performRefresh = useCallback(() => {
@@ -32,9 +32,9 @@ export default function FooterSectionCommit({ openCommitModal }) {
 		// 	return;
 		// }
 
-		setSocketPayload({ sourceBranch: selectedBranches.find((row) => row.id == sourceBranch.value), issueNumber: issueNumber, commitMessage, filesToProcess: selectedLocalChanges });
+		setSocketPayload({ sourceBranch: configurableRowData.find((row) => row.id == sourceBranch.value), issueNumber: issueNumber, commitMessage, filesToProcess: selectedLocalChanges });
 		openCommitModal();
-	}, [sourceBranch, issueNumber, commitMessage, RaiseClientNotificaiton, selectedLocalChanges, selectedBranches]);
+	}, [sourceBranch, issueNumber, commitMessage, RaiseClientNotificaiton, selectedLocalChanges, configurableRowData]);
 
 	return (
 		<Box>

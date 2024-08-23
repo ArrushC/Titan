@@ -41,6 +41,16 @@ app.use((req, res, next) => {
 	next();
 });
 
+app.get("*.js", (req, res, next) => {
+	res.type("application/javascript");
+	next();
+});
+
+app.get("*.css", (req, res, next) => {
+	res.type("text/css");
+	next();
+});
+
 // Serve static files from the React app
 app.use(
 	express.static(path.join(__dirname, "../dist"), {

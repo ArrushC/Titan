@@ -24,11 +24,32 @@ export default function PanelLocalChanges({ rowDataLocalChanges, setRowDataLocal
 		[setQuickFilterFileViewText]
 	);
 
-	const onFileViewSelectionChanged = useCallback(() => {
-		const localChanges = localChangesGridRef?.current?.api?.getSelectedNodes().map((node) => node.data);
-		if (isDebug) console.log("CommitRegion.jsx: onFileViewSelectionChanged - selectedBranches", localChanges);
-		setSelectedLocalChanges(localChanges);
-	}, [localChangesGridRef, isDebug]);
+	const onFileViewSelectionChanged = useCallback(
+		(event) => {
+			console.debug("PanelLocalChanges.jsx: onFileViewSelectionChanged - event", event);
+			if (String(event?.source).toLowerCase().includes("api")) return;
+
+			let localChanges = localChangesGridRef?.current?.api?.getSelectedNodes().map((node) => node.data);
+
+			if (isDebug) console.debug("PanelLocalChanges.jsx: onFileViewSelectionChanged - selectedBranches", localChanges);
+
+			// Identify files with 'Added' status
+			const addedFiles = localChanges.filter((file) => file["Local Status"].toLowerCase() === "added");
+
+			// Identify ancestor folders of selected files with 'Added' status from the entire list of local changes, select them and add them to the list of selected files
+			localChangesGridRef?.current?.api?.forEachNode((node) => {
+				const isAncestorFolder = addedFiles.some((file) => file["File Path"].includes(node.data["File Path"]) && file["File Path"] !== node.data["File Path"]);
+				if (isAncestorFolder && node.data["Local Status"].toLowerCase() === "added" && !node.isSelected()) {
+					node.setSelected(true);
+					localChanges.push(node.data);
+					console.debug("PanelLocalChanges.jsx (onFileViewSelectionChanged): Adding ancestor node: ", node);
+				}
+			});
+
+			setSelectedLocalChanges(localChanges);
+		},
+		[localChangesGridRef, isDebug, setSelectedLocalChanges]
+	);
 
 	const handleDiffResult = useCallback(
 		(result) => {

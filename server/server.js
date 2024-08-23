@@ -35,6 +35,8 @@ app.use(compression());
 app.use((req, res, next) => {
 	if (req.url.endsWith(".js")) {
 		res.type("application/javascript");
+	} else if (req.url.endsWith(".css")) {
+		res.type("text/css");
 	}
 	next();
 });
@@ -45,6 +47,8 @@ app.use(
 		setHeaders: (res, path) => {
 			if (path.endsWith(".js")) {
 				res.setHeader("Content-Type", "application/javascript");
+			} else if (path.endsWith(".css")) {
+				res.setHeader("Content-Type", "text/css");
 			}
 		},
 	})

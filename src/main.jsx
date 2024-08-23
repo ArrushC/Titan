@@ -13,7 +13,7 @@ const { definePartsStyle, defineMultiStyleConfig } = createMultiStyleConfigHelpe
 
 const modalStyle = definePartsStyle({
 	dialog: {
-		mt: `${HEADER_HEIGHT_RAW + 20}px`,
+		// mt: `${HEADER_HEIGHT_RAW + 20}px`,
 		bg: "gray.900",
 		color: "white",
 		boxShadow: "-1px 8px 17px 7px rgba(255, 255, 255, 0.07)",

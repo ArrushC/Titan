@@ -255,7 +255,7 @@ export default function ModalCommit({ isModalOpen, closeModal }) {
 		<Modal isOpen={isModalOpen} onClose={closeModal} isCentered motionPreset="slideInBottom" scrollBehavior="inside" size="xl" closeOnOverlayClick={activeStep == 1}>
 			<ModalOverlay />
 			<ModalContent maxH={"85%"} maxW="95%">
-				<ModalHeader display={"flex"} justifyContent={"space-between"} maxWidth={"90%"}>
+				<ModalHeader display={"flex"} justifyContent={"space-between"} maxWidth={activeStep == 1 ? "90%" : "100%"}>
 					<Heading as={"h2"} size={"lg"}>
 						Commit Selected Files
 					</Heading>

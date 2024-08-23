@@ -19,7 +19,7 @@ export default function PanelUntrackedChanges({ rowDataUntrackedChanges, setRowD
 
 	const onUnseenFilesSelectionChanged = useCallback(() => {
 		const untrackedChanges = untrackedChangesGridRef?.current?.api?.getSelectedNodes().map((node) => node.data);
-		if (isDebug) console.log("CommitRegion.jsx: onUnseenFilesSelectionChanged - selectedBranches", untrackedChanges);
+		if (isDebug) console.debug("PanelUntrackedChanges.jsx (onUnseenFilesSelectionChanged): selectedBranches", untrackedChanges);
 		setSelectedUntrackedChanges(untrackedChanges);
 	}, [untrackedChangesGridRef, isDebug]);
 

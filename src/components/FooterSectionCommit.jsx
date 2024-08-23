@@ -15,13 +15,13 @@ export default function FooterSectionCommit({ openCommitModal }) {
 
 	const performCommit = useCallback(() => {
 		// Check if the source branch is selected
-		if (!sourceBranch) {
+		if (!sourceBranch || sourceBranch.value === "") {
 			RaiseClientNotificaiton("Please select the source branch to proceed!", "error");
 			return;
 		}
 
 		// Check if the issue number and commit message is provided
-		if (!issueNumber || commitMessage === "") {
+		if (!issueNumber || !commitMessage  || issueNumber === "" || commitMessage === "") {
 			RaiseClientNotificaiton("Please provide the issue number and the commit message to proceed!", "error");
 			return;
 		}

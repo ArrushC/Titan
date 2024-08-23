@@ -9,6 +9,7 @@ import {
 	Code,
 	Flex,
 	Heading,
+	Icon,
 	IconButton,
 	List,
 	ListIcon,
@@ -45,10 +46,13 @@ import { CopyIcon } from "@chakra-ui/icons";
 import ButtonDiff from "./ButtonDiff";
 import useSocketEmits from "../hooks/useSocketEmits";
 import useNotifications from "../hooks/useNotifications";
+import { FaTrello } from "react-icons/fa6";
+import useTrelloIntegration from "../hooks/useTrelloIntegration";
 
 export default function ModalCommit({ isModalOpen, closeModal }) {
-	const { socket, setIsCommitMode, setSelectedBranchStatuses, setShowCommitView, socketPayload } = useApp();
+	const { socket, setIsCommitMode, setSelectedBranchStatuses, setShowCommitView, socketPayload, postCommitData, setPostCommitData } = useApp();
 	const { emitUpdateSingle, emitCommitPayload } = useSocketEmits();
+	const { key, token, isTrelloIntegrationEnabled,  emitTrelloCardUpdate } = useTrelloIntegration();
 	const { RaiseClientNotificaiton } = useNotifications();
 	const [commitLiveResponses, setCommitLiveResponses] = useState([]);
 	const { onCopy: onRevisionsCopy, value: revisionsValue, setValue: setRevisionsValue, hasCopied: hasRevisionsCopied } = useClipboard("");
@@ -116,20 +120,12 @@ export default function ModalCommit({ isModalOpen, closeModal }) {
 	/****************************************************
 	 * Modal Operations
 	 ****************************************************/
-	const handlePrevious = useCallback(() => {
-		setActiveStep((prev) => prev - 1);
-	}, [setActiveStep]);
-
-	const handleNext = useCallback(() => {
-		setActiveStep((prev) => prev + 1);
-	}, [setActiveStep]);
-
 	const formatForClipboard = useCallback(
-		(responses, options) => {
+		(options, useStringFormat=true) => {
 			const zeroWidthSpace = "\u200B".repeat(7);
 			const newline = options.includes("MarkupSupport") ? `\r\n${zeroWidthSpace}` : "\r\n";
-			const sortedResponses = responses.sort((a, b) => a["Branch Version"].localeCompare(b["Branch Version"]));
-			return sortedResponses
+			const sortedResponses = commitLiveResponses.sort((a, b) => a["Branch Version"].localeCompare(b["Branch Version"]));
+			const finalResponse = sortedResponses
 				.map((response) => {
 					const parts = [];
 					if (options.includes("BranchFolder")) parts.push(response["Branch Folder"]);
@@ -147,19 +143,41 @@ export default function ModalCommit({ isModalOpen, closeModal }) {
 					line += ` Revision [${revision}]`;
 
 					return line;
-				})
-				.join(newline);
+				});
+			return useStringFormat ? finalResponse.join(newline) : finalResponse;
 		},
-		[socketPayload]
+		[commitLiveResponses, socketPayload]
 	);
 
 	const handleClipboardOption = useCallback(
-		(values) => {
-			const formattedText = formatForClipboard(commitLiveResponses, values);
+		(optionValues) => {
+			const formattedText = formatForClipboard(optionValues);
 			setRevisionsValue(formattedText);
 		},
-		[commitLiveResponses, formatForClipboard, setRevisionsValue]
+		[formatForClipboard, setRevisionsValue]
 	);
+
+	const handlePrevious = useCallback(() => {
+		setActiveStep((prev) => prev - 1);
+	}, [setActiveStep]);
+
+	const handleTrelloUpdate = useCallback(() => {
+		if (postCommitData.type !== "trello") {
+			RaiseClientNotificaiton("Trello Autofill is not enabled for this commit", "error");
+			return;
+		}
+
+		const trelloData = postCommitData.data;
+		const formattedCommitResponses = formatForClipboard(["BranchFolder", "BranchVersion", "IssueNumber"], false);
+
+		emitTrelloCardUpdate(key, token, trelloData, formattedCommitResponses);
+		RaiseClientNotificaiton("Updating Trello card with commit information", "info");
+		setPostCommitData(null);
+	}, [postCommitData, RaiseClientNotificaiton, formatForClipboard]);
+
+	const handleNext = useCallback(() => {
+		setActiveStep((prev) => prev + 1);
+	}, [setActiveStep]);
 
 	/****************************************************
 	 * Hooks
@@ -237,14 +255,11 @@ export default function ModalCommit({ isModalOpen, closeModal }) {
 		<Modal isOpen={isModalOpen} onClose={closeModal} isCentered motionPreset="slideInBottom" scrollBehavior="inside" size="xl" closeOnOverlayClick={activeStep == 1}>
 			<ModalOverlay />
 			<ModalContent maxH={"85%"} maxW="95%">
-				<ModalHeader>
+				<ModalHeader display={"flex"} justifyContent={"space-between"} maxWidth={"90%"}>
 					<Heading as={"h2"} size={"lg"}>
 						Commit Selected Files
 					</Heading>
-				</ModalHeader>
-				{activeStep == 1 ? <ModalCloseButton size={"lg"} /> : <></>}
-				<ModalBody>
-					<Stepper index={activeStep} mb={6} size="lg" colorScheme="yellow">
+					<Stepper index={activeStep-1} mb={0} size={"sm"} colorScheme="yellow">
 						{steps.map((step, index) => (
 							<Step key={index}>
 								<StepIndicator>
@@ -252,12 +267,15 @@ export default function ModalCommit({ isModalOpen, closeModal }) {
 								</StepIndicator>
 								<Box flexShrink="0">
 									<StepTitle>{step.title}</StepTitle>
-									<StepDescription>{step.description}</StepDescription>
+									{/* <StepDescription>{step.description}</StepDescription> */}
 								</Box>
 								<StepSeparator />
 							</Step>
 						))}
 					</Stepper>
+				</ModalHeader>
+				{activeStep == 1 ? <ModalCloseButton size={"lg"} /> : <></>}
+				<ModalBody>
 					<Box>
 						{activeStep != 1 ? (
 							<></>
@@ -358,7 +376,11 @@ export default function ModalCommit({ isModalOpen, closeModal }) {
 								<Flex columnGap={10} alignItems={"center"}>
 									<Box>
 										<Text fontWeight={600}>Here is your SVN commit message for the source branch:</Text>
-										<Code>{`Issue ${socketPayload["issueNumber"]} (${socketPayload["sourceBranch"]["Branch Folder"]} ${socketPayload["sourceBranch"]["Branch Version"]}): ${commitMsgValue}`}</Code>
+										{socketPayload["sourceBranch"] && socketPayload["sourceBranch"]["Branch Folder"] && socketPayload["sourceBranch"]["Branch Version"] ? (
+											<Code>{`Issue ${socketPayload["issueNumber"]} (${socketPayload["sourceBranch"]["Branch Folder"]} ${socketPayload["sourceBranch"]["Branch Version"]}): ${commitMsgValue}`}</Code>
+										) : (
+											<Code>Source information is undefined. Please check that you have entered the correct details otherwise contact the developer!</Code>
+										)}
 									</Box>
 									<Tooltip hasArrow label={"Copy to clipboard"}>
 										<IconButton aria-label="Copy To Clipboard" onClick={onCommitMsgCopy} icon={<CopyIcon />} colorScheme="yellow" />
@@ -369,16 +391,28 @@ export default function ModalCommit({ isModalOpen, closeModal }) {
 					</Box>
 				</ModalBody>
 				<ModalFooter>
-					<Tooltip hasArrow label={"Cannot undo the commit currently"} isDisabled={activeStep < 2}>
-						<Button onClick={handlePrevious} mr={3} isDisabled={activeStep >= 2}>
-							{activeStep == 1 ? "Cancel" : "Previous"}
-						</Button>
-					</Tooltip>
-					<Tooltip hasArrow label={"Cannot undo the commit currently"} isDisabled={activeStep != 2}>
-						<Button colorScheme="yellow" onClick={handleNext} isDisabled={activeStep == 2}>
-							{activeStep == steps.length ? "Complete" : "Next"}
-						</Button>
-					</Tooltip>
+					<Flex flex={1} justifyContent="space-between">
+						<Flex columnGap={2}>
+							<Tooltip hasArrow label={"Cannot undo the commit currently"} isDisabled={activeStep < 2}>
+								<Button onClick={handlePrevious} mr={3} isDisabled={activeStep >= 2}>
+									{activeStep == 1 ? "Cancel" : "Previous"}
+								</Button>
+							</Tooltip>
+						</Flex>
+						<Flex columnGap={2}>
+							<Tooltip hasArrow label={"Requires Trello Autofill"} isDisabled={postCommitData?.type === "trello" && isTrelloIntegrationEnabled}>
+								<Button colorScheme="yellow" leftIcon={<Icon as={FaTrello} />} onClick={handleTrelloUpdate} isDisabled={activeStep < 3 || postCommitData?.type != "trello" || !isTrelloIntegrationEnabled}>
+									Update Card
+								</Button>
+							</Tooltip>
+
+							<Tooltip hasArrow label={"Cannot undo the commit currently"} isDisabled={activeStep != 2}>
+								<Button colorScheme="yellow" onClick={handleNext} isDisabled={activeStep == 2}>
+									{activeStep == steps.length ? "Complete" : "Next"}
+								</Button>
+							</Tooltip>
+						</Flex>
+					</Flex>
 				</ModalFooter>
 			</ModalContent>
 		</Modal>

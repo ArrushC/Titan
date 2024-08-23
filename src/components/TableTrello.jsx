@@ -1,6 +1,6 @@
 import { AgGridReact } from "ag-grid-react";
 import React, { useCallback, useMemo, useRef } from "react";
-import ButtonViewTrello from "./ButtonViewTrello";
+import ButtonTrelloView from "./ButtonTrelloView";
 
 export default function TableTrello({ rowDataTrello, quickFilterTrelloText, setAutoFillSelection }) {
 	const defaultColDefs = useMemo(
@@ -38,7 +38,7 @@ export default function TableTrello({ rowDataTrello, quickFilterTrelloText, setA
 				filter: false,
 				sortable: false,
 				resizable: false,
-				cellRenderer: ButtonViewTrello,
+				cellRenderer: ButtonTrelloView,
 				width: 120,
 			},
 		],

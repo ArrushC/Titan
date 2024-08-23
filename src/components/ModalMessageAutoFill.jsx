@@ -1,16 +1,12 @@
-import { Box, Button, Flex, Heading, Modal, ModalBody, ModalCloseButton, ModalContent, ModalFooter, ModalHeader, ModalOverlay, Tooltip, Text, Input, IconButton, Tabs, TabList, Tab, TabPanels, TabPanel } from "@chakra-ui/react";
+import { Box, Button, Heading, Modal, ModalBody, ModalCloseButton, ModalContent, ModalFooter, ModalHeader, ModalOverlay, Tooltip, Tabs, TabList, Tab, TabPanels, TabPanel } from "@chakra-ui/react";
 import React, { useCallback, useEffect, useState } from "react";
-import { RepeatIcon } from "@chakra-ui/icons";
-import useStoreSVNLogs from "../hooks/useStoreSVNLogs";
 import _ from "lodash";
-import TableLogs from "./TableLogs";
-import { TbAlignBoxTopCenter } from "react-icons/tb";
 import FilterableTableLogs from "./FilterableTableLogs";
 import FilterableTableTrello from "./FilterableTableTrello";
 import { useApp } from "../AppContext";
 
 export default function ModalMessageAutoFill({ isModalOpen, closeModal }) {
-	const { setSourceBranch, branchOptions, setIssueNumber, setCommitMessage } = useApp();
+	const { setSourceBranch, branchOptions, setIssueNumber, setCommitMessage, setPostCommitData} = useApp();
 
 	const [tabIndex, setTabIndex] = useState(0);
 	const [autofillSelection, setAutoFillSelection] = useState([null, null]);
@@ -68,6 +64,8 @@ export default function ModalMessageAutoFill({ isModalOpen, closeModal }) {
 
 			if (issueNumber) setIssueNumber(issueNumber);
 			if (formattedMessage.trim() !== "") setCommitMessage(formattedMessage);
+
+			setPostCommitData({type: "trello", data: selection});
 		}
 		closeModal();
 	}, [tabIndex, autofillSelection, closeModal]);

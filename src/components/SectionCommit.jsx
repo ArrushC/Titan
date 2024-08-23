@@ -144,8 +144,10 @@ export default function SectionCommit() {
 				</Tabs>
 			</Skeleton>
 			{showCommitView && !hasChanges ? (
-				<Text mt={4} className="animation-pulse" fontWeight={600}>
-					No changes have been spotted! Please use the refresh button 👇 if you have recently made a change
+				<Text mt={4} className="animation-pulse" fontWeight={600} textAlign={"center"}>
+					No changes have been spotted!
+					<br />
+					Please use the refresh button 👇 if you have recently made a change
 				</Text>
 			) : (
 				<></>

@@ -21,6 +21,7 @@ export default function AlertUpdateTitan() {
 
 		window.electron.on("update-error", (error) => {
 			RaiseClientNotificaiton(`An error occurred while checking for updates: ${error}`, "error", 5000);
+			setUpdateInProgress(false);
 		});
 
 		return () => {
@@ -56,6 +57,7 @@ export default function AlertUpdateTitan() {
 			window.electron.on("update-not-available", () => {
 				RaiseClientNotificaiton("Titan is up to date", "info", 3000);
 				window.electron.removeAllListeners("update-not-available");
+				setUpdateInProgress(false);
 				onCloseAlert();
 			});
 		} else {
@@ -73,7 +75,7 @@ export default function AlertUpdateTitan() {
 					{updateInProgress ? <></> : <AlertDialogCloseButton />}
 					<AlertDialogBody>A new version of Titan is available. Would you like to download and install the update?</AlertDialogBody>
 					<AlertDialogFooter>
-						<Button colorScheme="red" ref={cancelRef} onClick={handleCancel}>
+						<Button colorScheme="red" ref={cancelRef} onClick={handleCancel} isDisabled={updateInProgress}>
 							Cancel
 						</Button>
 						<Button colorScheme="yellow" onClick={handleStartUpdate} ml={3} isDisabled={updateInProgress}>

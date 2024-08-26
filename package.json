@@ -5,7 +5,7 @@
 	"version": "1.2.19",
 	"type": "module",
 	"main": "main.js",
-	"description": "Streamlining your workflow in Revision Control Systems (RCS).",
+	"description": "A desktop application for streamlining your workflow in Revision Control Systems (RCS) like Subversion (SVN).",
 	"author": "ArrushC",
 	"scripts": {
 		"start": "npm run server:start",

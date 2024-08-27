@@ -434,7 +434,7 @@ async function sendConfig(socket) {
 			branches: [],
 			branchFolderColours: {},
 			commitOptions: {
-				useIssuesPerFolder: false,
+				useIssuePerFolder: false,
 			},
 			trelloIntegration: {
 				key: "TRELLO_API_KEY",

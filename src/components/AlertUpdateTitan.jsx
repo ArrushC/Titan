@@ -63,7 +63,7 @@ export default function AlertUpdateTitan() {
 		} else {
 			RaiseClientNotificaiton("Cannot update Titan in a non-desktop application environment", "error", 5000);
 		}
-	}, [updateInProgress, RaiseClientNotificaiton, onCloseAlert]);
+	}, [updateInProgress, RaiseClientNotificaiton, setUpdateInProgress, onCloseAlert]);
 
 	return (
 		<AlertDialog isOpen={isAlertOpen} leastDestructiveRef={cancelRef} onClose={onCloseAlert} motionPreset="slideInBottom" closeOnOverlayClick={!updateInProgress}>

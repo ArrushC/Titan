@@ -104,6 +104,7 @@ export const AppProvider = ({ children }) => {
 		(updateFunction) => {
 			setConfig((currentConfig) => {
 				const newConfig = updateFunction(currentConfig);
+				if (_.isEqual(currentConfig, newConfig)) return currentConfig;
 				saveConfig(newConfig);
 				return newConfig;
 			});

@@ -37,7 +37,7 @@ export default function OptionsCommit() {
 			if (!_.isEqual(currentConfig.commitOptions, commitOptions)) {
 				return {
 					...currentConfig,
-					commitOptions,
+					commitOptions: commitOptions,
 				};
 			}
 			return currentConfig;

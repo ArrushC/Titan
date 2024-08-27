@@ -1,26 +1,18 @@
 import { Box, Skeleton, Tab, TabList, TabPanel, TabPanels, Tabs, Text, Tooltip, useDisclosure } from "@chakra-ui/react";
 import React, { useEffect, useMemo, useState } from "react";
 import { useApp } from "../AppContext";
-import { branchPathFolder, branchString, stripBranchInfo } from "../utils/CommonConfig";
+import { branchPathFolder, branchString } from "../utils/CommonConfig";
 import ModalCommit from "./ModalCommit";
-import useSocketEmits from "../hooks/useSocketEmits";
 import PanelUpdates from "./PanelUpdates";
 import PanelLocalChanges from "./PanelLocalChanges";
 import PanelUntrackedChanges from "./PanelUntrackedChanges";
 import FormSVNMessage from "./FormSVNMessage";
 import FooterSectionCommit from "./FooterSectionCommit";
 import ModalMessageAutoFill from "./ModalMessageAutoFill";
+import OptionsCommit from "./OptionsCommit";
 
 export default function SectionCommit() {
-	const {
-		isDebug,
-		setIsCommitMode,
-		selectedBranchStatuses,
-		showCommitView,
-		setShowCommitView,
-		selectedBranches,
-		configurableRowData,
-	} = useApp();
+	const { isDebug, setIsCommitMode, selectedBranchStatuses, showCommitView, setShowCommitView, selectedBranches, configurableRowData } = useApp();
 
 	// Form Data Fields
 	const [fileUpdates, setFileUpdates] = useState({});
@@ -108,6 +100,7 @@ export default function SectionCommit() {
 
 	return (
 		<Box>
+			<OptionsCommit />
 			<Box mb={6}>
 				<FormSVNMessage openMessageAutoFillModal={openMessageAutoFillModal} />
 			</Box>

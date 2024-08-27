@@ -433,7 +433,7 @@ async function sendConfig(socket) {
 			currentVersion: latestVersion,
 			branches: [],
 			branchFolderColours: {},
-			options: {
+			commitOptions: {
 				useIssuesPerFolder: false,
 			},
 			trelloIntegration: {

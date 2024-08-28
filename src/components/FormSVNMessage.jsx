@@ -66,7 +66,7 @@ export default function FormSVNMessage({ openMessageAutoFillModal }) {
 									</FormControl>
 								)) : null}
 							</Box>
-						) : !sourceBranch || !sourceBranch.value ? (
+						) : commitOptions?.useIssuePerFolder && (!sourceBranch || !sourceBranch.value) ? (
 							<Box width={"50%"} textAlign={"center"} m={"auto"}>
 								<Text fontSize={"lg"} fontWeight={"600"} color={"yellow.500"}>
 									Please select source branch first!

@@ -2,7 +2,7 @@ import { Input, NumberDecrementStepper, NumberIncrementStepper, NumberInput, Num
 import React from "react";
 import { useApp } from "../AppContext";
 
-export default function IssueNumberInput() {
+export default function IssueNumberInput({ targetBranchFolder = "" }) {
 	const { issueNumber, setIssueNumber } = useApp();
 
 	const handleChange = (e) => {

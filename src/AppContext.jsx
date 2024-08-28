@@ -32,7 +32,7 @@ const AppContext = createContext({
 	sourceBranch: null,
 	setSourceBranch: (_) => {},
 	branchOptions: [],
-	issueNumber: null,
+	issueNumber: {},
 	setIssueNumber: (_) => {},
 	commitMessage: "",
 	setCommitMessage: (_) => {},
@@ -127,12 +127,12 @@ export const AppProvider = ({ children }) => {
 	const [showCommitView, setShowCommitView] = useState(false);
 	const [sourceBranch, setSourceBranch] = useState(null);
 	const branchOptions = useMemo(() => {
-		if (config && config.commitOptions && config.commitOptions.useIssuePerFolder) {
-			return selectedBranches.filter((row) => row["Branch Folder"] && row["Branch Version"] && row["SVN Branch"] && row["Branch Folder"] !== "" && row["Branch Version"] !== "" && row["SVN Branch"] !== "").map((row) => ({
-				value: row.id,
-				label: branchString(row["Branch Folder"], row["Branch Version"], row["SVN Branch"]),
-			}));
-		}
+		// if (config && config.commitOptions && config.commitOptions.useIssuePerFolder) {
+		// 	return selectedBranches.filter((row) => row["Branch Folder"] && row["Branch Version"] && row["SVN Branch"] && row["Branch Folder"] !== "" && row["Branch Version"] !== "" && row["SVN Branch"] !== "").map((row) => ({
+		// 		value: row.id,
+		// 		label: branchString(row["Branch Folder"], row["Branch Version"], row["SVN Branch"]),
+		// 	}));
+		// }
 
 		return configurableRowData
 			.filter((row) => row["Branch Folder"] && row["Branch Version"] && row["SVN Branch"] && row["Branch Folder"] !== "" && row["Branch Version"] !== "" && row["SVN Branch"] !== "")
@@ -141,7 +141,7 @@ export const AppProvider = ({ children }) => {
 				label: branchString(row["Branch Folder"], row["Branch Version"], row["SVN Branch"]),
 			}));
 	}, [config, selectedBranches, configurableRowData]);
-	const [issueNumber, setIssueNumber] = useState(null);
+	const [issueNumber, setIssueNumber] = useState({});
 	const [commitMessage, setCommitMessage] = useState("");
 	const [selectedLocalChanges, setSelectedLocalChanges] = useState([]);
 	const [selectedUntrackedChanges, setSelectedUntrackedChanges] = useState([]);

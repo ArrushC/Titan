@@ -45,26 +45,20 @@ export default function FormSVNMessage({ openMessageAutoFillModal }) {
 							</FormControl>
 						</Box>
 						<Flex width={"50%"} alignItems={"flex-end"} columnGap={2}>
-							<FormControl isRequired>
-								<FormLabel>{sourceBranch && sourceBranch.value ? `Issue Number For ${getBranchFolderById(sourceBranch.value)}` : "Issue Number"}</FormLabel>
-								<IssueNumberInput />
-							</FormControl>
+							<IssueNumberInput branchFolder={sourceBranch && sourceBranch.value ? getBranchFolderById(sourceBranch.value) : null} />
 						</Flex>
 					</Flex>
-					<Flex columnGap={2}>
+					<Flex columnGap={2} height={"auto"}>
 						<FormControl width={commitOptions?.useIssuePerFolder ? "50%" : "100%"} isRequired>
 							<FormLabel>Commit Message</FormLabel>
-							<Textarea placeholder={"Enter Commit Message"} resize={"vertical"} onInput={handleCommitMessageChange} value={commitMessage} />
+							<Textarea placeholder={"Enter Commit Message"} height={"76%"} resize={"none"} onInput={handleCommitMessageChange} value={commitMessage} />
 						</FormControl>
 
 						{commitOptions?.useIssuePerFolder && sourceBranch && sourceBranch.value ? (
-							<Box width={"50%"}>
-								{selectedBranches.length > 1 ? selectedBranches.filter((branch) => branch.id != sourceBranch.value).map((branch) => (
-									<FormControl key={branch.id} isRequired>
-										<FormLabel>{`Issue Number For ${getBranchFolderById(branch.id)}`}</FormLabel>
-										<IssueNumberInput />
-									</FormControl>
-								)) : null}
+							<Box width="50%">
+								{selectedBranches.length > 1
+									? [...new Set(selectedBranches.filter((branch) => branch["Branch Folder"] !== getBranchFolderById(sourceBranch.value)).map((branch) => branch["Branch Folder"]))].map((branchFolder) => <IssueNumberInput key={branchFolder} branchFolder={branchFolder} />)
+									: null}
 							</Box>
 						) : commitOptions?.useIssuePerFolder && (!sourceBranch || !sourceBranch.value) ? (
 							<Box width={"50%"} textAlign={"center"} m={"auto"}>

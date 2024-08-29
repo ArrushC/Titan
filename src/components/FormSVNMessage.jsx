@@ -66,11 +66,11 @@ export default function FormSVNMessage({ openMessageAutoFillModal }) {
 						</FormControl>
 
 						{commitOptions?.useIssuePerFolder && sourceBranch && sourceBranch.value ? (
-							<Box width="50%">
-								{selectedBranches.length > 1
+							<Flex width="50%" flexDir={"column"} rowGap={2}>
+								{selectedBranches.length > 0
 									? [...new Set(selectedBranches.filter((branch) => branch["Branch Folder"] !== getBranchFolderById(sourceBranch.value)).map((branch) => branch["Branch Folder"]))].map((branchFolder) => <IssueNumberInput key={branchFolder} branchFolder={branchFolder} />)
 									: null}
-							</Box>
+							</Flex>
 						) : commitOptions?.useIssuePerFolder && (!sourceBranch || !sourceBranch.value) ? (
 							<Box width={"50%"} textAlign={"center"} m={"auto"}>
 								<Text fontSize={"lg"} fontWeight={"600"} color={"yellow.500"}>

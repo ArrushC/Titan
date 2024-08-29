@@ -29,9 +29,20 @@ export default function FormSVNMessage({ openMessageAutoFillModal }) {
 	useEffect(() => {
 		if (!isCommitMode) return;
 		setSourceBranch(null);
-		setIssueNumber("");
-		setCommitMessage("");
+		setIssueNumber({});
 	}, [isCommitMode]);
+
+	// Clear commit message if commit mode has been changed and cannot reuse the same message
+	useEffect(() => {
+		if (!commitOptions?.reusePreviousCommitMessage) {
+			setCommitMessage("");
+		}
+	}, [commitOptions?.reusePreviousCommitMessage, setCommitMessage, isCommitMode]);
+
+	// Clear issue number for branches that are not selected
+	useEffect(() => {
+		setIssueNumber((currIssueNumber) => Object.fromEntries(Object.entries(currIssueNumber).filter(([folder]) => selectedBranches.some((branch) => branch["Branch Folder"] === folder))));
+	}, [selectedBranches]);
 
 	return (
 		<Box>

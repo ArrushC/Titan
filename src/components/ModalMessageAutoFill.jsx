@@ -4,9 +4,11 @@ import _ from "lodash";
 import FilterableTableLogs from "./FilterableTableLogs";
 import FilterableTableTrello from "./FilterableTableTrello";
 import { useApp } from "../AppContext";
+import useConfigUtilities from "../hooks/useConfigUtilities";
 
 export default function ModalMessageAutoFill({ isModalOpen, closeModal }) {
-	const { setSourceBranch, branchOptions, setIssueNumber, setCommitMessage, setPostCommitData} = useApp();
+	const { setSourceBranch, branchOptions, setIssueNumber, setCommitMessage, setPostCommitData } = useApp();
+	const { getBranchFolderById } = useConfigUtilities();
 
 	const [tabIndex, setTabIndex] = useState(0);
 	const [autofillSelection, setAutoFillSelection] = useState([null, null]);
@@ -53,7 +55,11 @@ export default function ModalMessageAutoFill({ isModalOpen, closeModal }) {
 			const formattedMessage = message.replace(/\s*(Issue)*\s*(\d+)?\s*(\([^\)]+\))*\s?:?\s*/, "");
 
 			if (sourceBranchId) setSourceBranch(branchOptions.find((option) => option.value === sourceBranchId));
-			if (issueNumber) setIssueNumber(issueNumber);
+			if (issueNumber)
+				setIssueNumber((currIssueNumber) => ({
+					...currIssueNumber,
+					[getBranchFolderById(selection.branchId)]: issueNumber,
+				}));
 			if (formattedMessage.trim() !== "") setCommitMessage(formattedMessage);
 		} else {
 			const cardName = selection.name;
@@ -62,10 +68,10 @@ export default function ModalMessageAutoFill({ isModalOpen, closeModal }) {
 			const issueNumber = issueNumMatch ? issueNumMatch[2] : null;
 			const formattedMessage = cardName.replace(/\s*(Issue)*\s*(\d+)/, "");
 
-			if (issueNumber) setIssueNumber(issueNumber);
+			if (issueNumber) setIssueNumber((currIssueNumber) => Object.fromEntries(Object.keys(currIssueNumber).map((key) => [key, issueNumber])));
 			if (formattedMessage.trim() !== "") setCommitMessage(formattedMessage);
 
-			setPostCommitData({type: "trello", data: selection});
+			setPostCommitData({ type: "trello", data: selection });
 		}
 		closeModal();
 	}, [tabIndex, autofillSelection, closeModal]);

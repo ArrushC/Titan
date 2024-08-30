@@ -290,7 +290,8 @@ export default function ModalCommit({ isModalOpen, closeModal }) {
 										</ListItem>
 										<ListItem>
 											<ListIcon as={MdCheckCircle} color="yellow.500" />
-											Issue Number: <Code>{socketPayload["issueNumber"]}</Code>
+											Issue Number: <Code>{JSON.stringify(socketPayload["issueNumber"])}</Code>
+											<Code>{JSON.stringify(socketPayload, null, 4)}</Code>
 										</ListItem>
 										<ListItem>
 											<ListIcon as={MdCheckCircle} color="yellow.500" />
@@ -300,7 +301,7 @@ export default function ModalCommit({ isModalOpen, closeModal }) {
 											<ListIcon as={MdCheckCircle} color="yellow.500" />
 											Example:{" "}
 											<Code>
-												Issue {socketPayload["issueNumber"]} ({socketPayload["sourceBranch"]["Branch Folder"]} {socketPayload["sourceBranch"]["Branch Version"]}): {socketPayload["commitMessage"]}
+												{/* Issue {socketPayload["issueNumber"]} ({socketPayload["sourceBranch"]["Branch Folder"]} {socketPayload["sourceBranch"]["Branch Version"]}): {socketPayload["commitMessage"]} */}
 											</Code>
 										</ListItem>
 									</List>

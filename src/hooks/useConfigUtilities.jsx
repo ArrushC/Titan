@@ -1,8 +1,9 @@
 import { useCallback } from "react";
 import { useApp } from "../AppContext";
+import _ from "lodash";
 
 export default function useConfigUtilities() {
-	const { configurableRowData } = useApp();
+	const { configurableRowData, sourceBranch, issueNumber } = useApp();
 
 	const getBranchFolderById = useCallback(
 		(branchId) => {
@@ -25,9 +26,27 @@ export default function useConfigUtilities() {
 		[configurableRowData]
 	);
 
+	const getIssueNumbers = useCallback(
+		(excludeSourceBranch = false) => {
+			if (!issueNumber || _.isEmpty(issueNumber)) return [];
+			if (!sourceBranch || sourceBranch.value == "" ||!excludeSourceBranch) return Object.values(issueNumber);
+
+			const issueNumbers = [];
+
+			_.forIn(issueNumber, (value, key) => {
+				if (excludeSourceBranch && key === getBranchFolderById(sourceBranch.value)) return;
+				issueNumbers.push(value);
+			});
+
+			return issueNumbers;
+		},
+		[issueNumber, sourceBranch, getBranchFolderById]
+	);
+
 	return {
 		getBranchFolderById,
 		getBranchVersionById,
 		getSvnBranchById,
+		getIssueNumbers,
 	};
 }

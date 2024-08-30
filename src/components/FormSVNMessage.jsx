@@ -52,7 +52,16 @@ export default function FormSVNMessage({ openMessageAutoFillModal }) {
 						<Box width={"50%"}>
 							<FormControl isRequired>
 								<FormLabel>Source Branch</FormLabel>
-								<Select value={sourceBranch} onChange={handleSourceBranchChange} options={branchOptions} placeholder="Enter source branch" selectedOptionStyle="check" selectedOptionColorScheme="yellow" isClearable />
+								<Select
+									value={sourceBranch}
+									onChange={handleSourceBranchChange}
+									options={branchOptions}
+									placeholder="Enter source branch"
+									selectedOptionStyle="check"
+									selectedOptionColorScheme="yellow"
+									isClearable
+									classNamePrefix={"chakra-react-select"}
+								/>
 							</FormControl>
 						</Box>
 						<Flex width={"50%"} alignItems={"flex-end"} columnGap={2}>
@@ -65,18 +74,20 @@ export default function FormSVNMessage({ openMessageAutoFillModal }) {
 							<Textarea placeholder={"Enter Commit Message"} height={"76%"} resize={"none"} onInput={handleCommitMessageChange} value={commitMessage} />
 						</FormControl>
 
-						{commitOptions?.useIssuePerFolder && sourceBranch && sourceBranch.value ? (
-							<Flex width="50%" flexDir={"column"} rowGap={2}>
-								{selectedBranches.length > 0
-									? [...new Set(selectedBranches.filter((branch) => branch["Branch Folder"] !== getBranchFolderById(sourceBranch.value)).map((branch) => branch["Branch Folder"]))].map((branchFolder) => <IssueNumberInput key={branchFolder} branchFolder={branchFolder} />)
-									: null}
-							</Flex>
-						) : commitOptions?.useIssuePerFolder && (!sourceBranch || !sourceBranch.value) ? (
-							<Box width={"50%"} textAlign={"center"} m={"auto"}>
-								<Text fontSize={"lg"} fontWeight={"600"} color={"yellow.500"}>
-									Please select source branch first!
-								</Text>
-							</Box>
+						{commitOptions?.useIssuePerFolder ? (
+							sourceBranch?.value ? (
+								<Flex width="50%" flexDir="column" rowGap={2}>
+									{[...new Set(selectedBranches.filter((branch) => branch["Branch Folder"] !== getBranchFolderById(sourceBranch.value)).map((branch) => branch["Branch Folder"]))].map((branchFolder) => (
+										<IssueNumberInput key={branchFolder} branchFolder={branchFolder} />
+									))}
+								</Flex>
+							) : (
+								<Box width="50%" textAlign="center" m="auto">
+									<Text fontSize="lg" fontWeight="600" color="yellow.500">
+										Please select source branch first!
+									</Text>
+								</Box>
+							)
 						) : null}
 					</Flex>
 				</Box>

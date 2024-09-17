@@ -56,7 +56,7 @@ export const AppProvider = ({ children }) => {
 	const [config, setConfig] = useState(null);
 	const [socket, setSocket] = useState(null);
 	const toast = useToast();
-	const [isDebug, setIsDebug] = useState(localStorage.getItem("isDebug") === "true");
+	const [isDebug, setIsDebug] = useState(() => localStorage.getItem("isDebug") === "true");
 
 	useEffect(() => {
 		const newSocket = socketIOClient(URL_SOCKET_CLIENT);

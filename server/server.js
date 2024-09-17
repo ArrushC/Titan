@@ -433,6 +433,10 @@ async function sendConfig(socket) {
 			currentVersion: latestVersion,
 			branches: [],
 			branchFolderColours: {},
+			commitOptions: {
+				useIssuePerFolder: false,
+				reusePreviousCommitMessage: false,
+			},
 			trelloIntegration: {
 				key: "TRELLO_API_KEY",
 				token: "TRELLO_TOKEN",
@@ -809,16 +813,20 @@ io.on("connection", (socket) => {
 			return acc;
 		}, {});
 
+		let originalIssueNumber = issueNumber[sourceBranch["Branch Folder"]] || "";
+
 		for (const [svnBranch, branchInfo] of Object.entries(filesByBranch)) {
 			const { branchId, branchFolder, branchVersion, files } = branchInfo;
 
-			let prefixedCommitMessage;
+			let originalMessage = `(${sourceBranch["Branch Folder"]}${originalIssueNumber !== "" ? ` #${originalIssueNumber}` : ""})`;
 			if (branchFolder === sourceBranch["Branch Folder"]) {
-				prefixedCommitMessage = `Issue ${issueNumber} (${branchFolder} ${sourceBranch["Branch Version"]}): ${commitMessage}`;
-			} else {
-				prefixedCommitMessage = `Issue ${issueNumber} (${sourceBranch["Branch Folder"]}): ${commitMessage}`;
+				originalMessage = `(${branchFolder} ${sourceBranch["Branch Version"]})`;
 			}
-			prefixedCommitMessage = sanitizeCommitMessage(prefixedCommitMessage);
+
+			let branchIssueNumber = issueNumber[branchFolder] || originalIssueNumber;
+			let prefixedCommitMessage = sanitizeCommitMessage(`Issue ${branchIssueNumber} ${originalMessage}: ${commitMessage}`);
+
+			console.log("Commit message:", prefixedCommitMessage);
 
 			const task = {
 				command: "commit",
@@ -844,6 +852,7 @@ io.on("connection", (socket) => {
 							// Emit commit status for frontend
 							io.emit("svn-commit-status-live", {
 								branchId: branchId,
+								branchIssueNumber: branchIssueNumber,
 								"Branch Folder": branchFolder,
 								"Branch Version": branchVersion,
 								"SVN Branch": svnBranch,
@@ -862,6 +871,7 @@ io.on("connection", (socket) => {
 						// Emit commit status for frontend
 						io.emit("svn-commit-status-live", {
 							branchId: branchId,
+							branchIssueNumber: branchIssueNumber,
 							"Branch Folder": branchFolder,
 							"Branch Version": branchVersion,
 							"SVN Branch": svnBranch,

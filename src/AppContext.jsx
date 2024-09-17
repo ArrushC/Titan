@@ -32,7 +32,7 @@ const AppContext = createContext({
 	sourceBranch: null,
 	setSourceBranch: (_) => {},
 	branchOptions: [],
-	issueNumber: null,
+	issueNumber: {},
 	setIssueNumber: (_) => {},
 	commitMessage: "",
 	setCommitMessage: (_) => {},
@@ -56,7 +56,7 @@ export const AppProvider = ({ children }) => {
 	const [config, setConfig] = useState(null);
 	const [socket, setSocket] = useState(null);
 	const toast = useToast();
-	const [isDebug, setIsDebug] = useState(localStorage.getItem("isDebug") === "true");
+	const [isDebug, setIsDebug] = useState(() => localStorage.getItem("isDebug") === "true");
 
 	useEffect(() => {
 		const newSocket = socketIOClient(URL_SOCKET_CLIENT);
@@ -94,7 +94,7 @@ export const AppProvider = ({ children }) => {
 	const saveConfig = useCallback(
 		(configToSave) => {
 			if (configToSave === null || configToSave === undefined) return;
-			console.log("Saving config:", configToSave);
+			console.debug("Saving config:", configToSave);
 			socket?.emit("titan-config-set", configToSave);
 		},
 		[socket]
@@ -104,6 +104,7 @@ export const AppProvider = ({ children }) => {
 		(updateFunction) => {
 			setConfig((currentConfig) => {
 				const newConfig = updateFunction(currentConfig);
+				if (_.isEqual(currentConfig, newConfig)) return currentConfig;
 				saveConfig(newConfig);
 				return newConfig;
 			});
@@ -125,17 +126,22 @@ export const AppProvider = ({ children }) => {
 	const untrackedChangesGridRef = useRef(null);
 	const [showCommitView, setShowCommitView] = useState(false);
 	const [sourceBranch, setSourceBranch] = useState(null);
-	const branchOptions = useMemo(
-		() =>
-			configurableRowData
-				.filter((row) => row["Branch Folder"] && row["Branch Version"] && row["SVN Branch"] && row["Branch Folder"] !== "" && row["Branch Version"] !== "" && row["SVN Branch"] !== "")
-				.map((row) => ({
-					value: row.id,
-					label: branchString(row["Branch Folder"], row["Branch Version"], row["SVN Branch"]),
-				})),
-		[configurableRowData]
-	);
-	const [issueNumber, setIssueNumber] = useState(null);
+	const branchOptions = useMemo(() => {
+		// if (config && config.commitOptions && config.commitOptions.useIssuePerFolder) {
+		// 	return selectedBranches.filter((row) => row["Branch Folder"] && row["Branch Version"] && row["SVN Branch"] && row["Branch Folder"] !== "" && row["Branch Version"] !== "" && row["SVN Branch"] !== "").map((row) => ({
+		// 		value: row.id,
+		// 		label: branchString(row["Branch Folder"], row["Branch Version"], row["SVN Branch"]),
+		// 	}));
+		// }
+
+		return configurableRowData
+			.filter((row) => row["Branch Folder"] && row["Branch Version"] && row["SVN Branch"] && row["Branch Folder"] !== "" && row["Branch Version"] !== "" && row["SVN Branch"] !== "")
+			.map((row) => ({
+				value: row.id,
+				label: branchString(row["Branch Folder"], row["Branch Version"], row["SVN Branch"]),
+			}));
+	}, [config, selectedBranches, configurableRowData]);
+	const [issueNumber, setIssueNumber] = useState({});
 	const [commitMessage, setCommitMessage] = useState("");
 	const [selectedLocalChanges, setSelectedLocalChanges] = useState([]);
 	const [selectedUntrackedChanges, setSelectedUntrackedChanges] = useState([]);

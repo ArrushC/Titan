@@ -1,9 +1,6 @@
 import {
 	Box,
 	Button,
-	Card,
-	CardBody,
-	CardHeader,
 	Checkbox,
 	CheckboxGroup,
 	Code,
@@ -22,7 +19,6 @@ import {
 	ModalHeader,
 	ModalOverlay,
 	Step,
-	StepDescription,
 	StepIcon,
 	StepIndicator,
 	StepNumber,
@@ -135,7 +131,7 @@ export default function ModalCommit({ isModalOpen, closeModal }) {
 					let line = parts.join(" ").trim();
 
 					if (options.includes("IssueNumber")) {
-						const issueNumber = response["Branch Folder"] === socketPayload["sourceBranch"]["Branch Folder"] ? socketPayload["issueNumber"] : "XXXXXX";
+						const issueNumber = response["branchIssueNumber"];
 						line += ` Issue [${issueNumber}]`;
 					}
 
@@ -290,7 +286,7 @@ export default function ModalCommit({ isModalOpen, closeModal }) {
 										</ListItem>
 										<ListItem>
 											<ListIcon as={MdCheckCircle} color="yellow.500" />
-											Issue Number: <Code>{socketPayload["issueNumber"]}</Code>
+											Issue Numbers: <Code>{Object.entries(socketPayload["issueNumber"]).map(((entry) => `${entry[1]} (${entry[0]})`)).join(", ")}</Code>
 										</ListItem>
 										<ListItem>
 											<ListIcon as={MdCheckCircle} color="yellow.500" />
@@ -300,7 +296,7 @@ export default function ModalCommit({ isModalOpen, closeModal }) {
 											<ListIcon as={MdCheckCircle} color="yellow.500" />
 											Example:{" "}
 											<Code>
-												Issue {socketPayload["issueNumber"]} ({socketPayload["sourceBranch"]["Branch Folder"]} {socketPayload["sourceBranch"]["Branch Version"]}): {socketPayload["commitMessage"]}
+												Issue {socketPayload["issueNumber"][socketPayload["sourceBranch"]["Branch Folder"]]} ({socketPayload["sourceBranch"]["Branch Folder"]} {socketPayload["sourceBranch"]["Branch Version"]}): {socketPayload["commitMessage"]}
 											</Code>
 										</ListItem>
 									</List>
@@ -377,7 +373,7 @@ export default function ModalCommit({ isModalOpen, closeModal }) {
 									<Box>
 										<Text fontWeight={600}>Here is your SVN commit message for the source branch:</Text>
 										{socketPayload["sourceBranch"] && socketPayload["sourceBranch"]["Branch Folder"] && socketPayload["sourceBranch"]["Branch Version"] ? (
-											<Code>{`Issue ${socketPayload["issueNumber"]} (${socketPayload["sourceBranch"]["Branch Folder"]} ${socketPayload["sourceBranch"]["Branch Version"]}): ${commitMsgValue}`}</Code>
+											<Code>{`Issue ${socketPayload["issueNumber"][socketPayload["sourceBranch"]["Branch Folder"]]} (${socketPayload["sourceBranch"]["Branch Folder"]} ${socketPayload["sourceBranch"]["Branch Version"]}): ${commitMsgValue}`}</Code>
 										) : (
 											<Code>Source information is undefined. Please check that you have entered the correct details otherwise contact the developer!</Code>
 										)}

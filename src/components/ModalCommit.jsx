@@ -131,7 +131,7 @@ export default function ModalCommit({ isModalOpen, closeModal }) {
 					let line = parts.join(" ").trim();
 
 					if (options.includes("IssueNumber")) {
-						const issueNumber = response["Branch Folder"] === socketPayload["sourceBranch"]["Branch Folder"] ? socketPayload["issueNumber"] : "XXXXXX";
+						const issueNumber = response["branchIssueNumber"];
 						line += ` Issue [${issueNumber}]`;
 					}
 

@@ -1,9 +1,6 @@
 import {
 	Box,
 	Button,
-	Card,
-	CardBody,
-	CardHeader,
 	Checkbox,
 	CheckboxGroup,
 	Code,
@@ -22,7 +19,6 @@ import {
 	ModalHeader,
 	ModalOverlay,
 	Step,
-	StepDescription,
 	StepIcon,
 	StepIndicator,
 	StepNumber,

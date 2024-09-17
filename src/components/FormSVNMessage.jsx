@@ -56,7 +56,7 @@ export default function FormSVNMessage({ openMessageAutoFillModal }) {
 									value={sourceBranch}
 									onChange={handleSourceBranchChange}
 									options={branchOptions}
-									placeholder="Enter source branch"
+									placeholder="SVN Branch you're commiting from"
 									selectedOptionStyle="check"
 									selectedOptionColorScheme="yellow"
 									isClearable

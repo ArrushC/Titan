@@ -94,7 +94,7 @@ export const AppProvider = ({ children }) => {
 	const saveConfig = useCallback(
 		(configToSave) => {
 			if (configToSave === null || configToSave === undefined) return;
-			console.log("Saving config:", configToSave);
+			console.debug("Saving config:", configToSave);
 			socket?.emit("titan-config-set", configToSave);
 		},
 		[socket]

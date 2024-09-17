@@ -56,7 +56,7 @@ export default function OptionsCommit() {
 			<CheckboxGroup colorScheme="yellow">
 				<Stack direction={"row"} spacing={4} mt={2}>
 					<Checkbox isChecked={commitOptions.useIssuePerFolder} onChange={(e) => handleOptionChange("useIssuePerFolder", e.target.checked)}>
-						<Tooltip label={"This option is for users who would like to apply different issue numbers for different branch folders"} hasArrow>
+						<Tooltip label={"This option is for users who would like to apply different issue numbers for different branch folders. Toggling this option will clear the issue number!"} hasArrow placement="bottom-end">
 							Use 1 Issue Per Folder?
 						</Tooltip>
 					</Checkbox>

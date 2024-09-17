@@ -6,11 +6,13 @@ import { useApp } from "../AppContext";
 import useNotifications from "../hooks/useNotifications";
 import _ from "lodash";
 import useConfigUtilities from "../hooks/useConfigUtilities";
+import useCommitOptions from "../hooks/useCommitOptions";
 
 export default function FooterSectionCommit({ openCommitModal }) {
-	const { setShowCommitView, selectedLocalChanges, sourceBranch, issueNumber, commitMessage, setSocketPayload, configurableRowData } = useApp();
+	const { setShowCommitView, selectedLocalChanges, sourceBranch, issueNumber, commitMessage, setSocketPayload, configurableRowData, selectedBranches } = useApp();
 	const { RaiseClientNotificaiton } = useNotifications();
-	const { getIssueNumbers } = useConfigUtilities();
+	const commitOptions = useCommitOptions();
+	const { selectedBranchFolders } = useConfigUtilities();
 
 	const performRefresh = useCallback(() => {
 		setShowCommitView(false);
@@ -23,9 +25,19 @@ export default function FooterSectionCommit({ openCommitModal }) {
 			return;
 		}
 
+		const sourceBranchRow = configurableRowData.find((row) => row.id == sourceBranch.value);
+		const hasFilledIssueNumbers = commitOptions?.useIssuePerFolder ? selectedBranchFolders.every((branchFolder) => issueNumber[branchFolder] && issueNumber[branchFolder] !== "") : true;
+		const hasFilledSourceIssueNumber = commitOptions?.useIssuePerFolder ? !selectedBranches.some((branch) => branch["Branch Folder"] === sourceBranchRow["Branch Folder"]) || issueNumber[sourceBranchRow["Branch Folder"]] : issueNumber[sourceBranchRow["Branch Folder"]];
+
 		// Check if the issue number and commit message is provided
-		if (!issueNumber || _.isEmpty(issueNumber) || getIssueNumbers(true).includes("") || !commitMessage || commitMessage === "") {
-			RaiseClientNotificaiton("Please provide the issue number and the commit message to proceed!", "error");
+		if (!issueNumber || _.isEmpty(issueNumber) || !hasFilledIssueNumbers || !hasFilledSourceIssueNumber) {
+			RaiseClientNotificaiton("Please provide the issue number to proceed!", "error");
+			return;
+		}
+
+		// Check if the commit message is provided
+		if (!commitMessage || commitMessage.trim() === "") {
+			RaiseClientNotificaiton("Please provide the commit message to proceed!", "error");
 			return;
 		}
 
@@ -35,9 +47,9 @@ export default function FooterSectionCommit({ openCommitModal }) {
 		// 	return;
 		// }
 
-		setSocketPayload({ sourceBranch: configurableRowData.find((row) => row.id == sourceBranch.value), issueNumber: issueNumber, commitMessage, filesToProcess: selectedLocalChanges });
+		setSocketPayload({ sourceBranch: sourceBranchRow, issueNumber: issueNumber, commitMessage, filesToProcess: selectedLocalChanges });
 		openCommitModal();
-	}, [sourceBranch, issueNumber, commitMessage, RaiseClientNotificaiton, selectedLocalChanges, configurableRowData]);
+	}, [RaiseClientNotificaiton, sourceBranch, configurableRowData, commitOptions, selectedBranchFolders, issueNumber, selectedBranches, commitMessage, selectedLocalChanges]);
 
 	return (
 		<Box>

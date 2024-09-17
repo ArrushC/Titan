@@ -10,7 +10,7 @@ import useConfigUtilities from "../hooks/useConfigUtilities";
 export default function FormSVNMessage({ openMessageAutoFillModal }) {
 	const { sourceBranch, setSourceBranch, branchOptions, setIssueNumber, commitMessage, setCommitMessage, isCommitMode, selectedBranches } = useApp();
 	const commitOptions = useCommitOptions();
-	const { getBranchFolderById } = useConfigUtilities();
+	const { getBranchFolderById, selectedBranchFolders } = useConfigUtilities();
 
 	const handleSourceBranchChange = useCallback(
 		(selectedOption) => {
@@ -77,7 +77,7 @@ export default function FormSVNMessage({ openMessageAutoFillModal }) {
 						{commitOptions?.useIssuePerFolder ? (
 							sourceBranch?.value ? (
 								<Flex width="50%" flexDir="column" rowGap={2}>
-									{[...new Set(selectedBranches.filter((branch) => branch["Branch Folder"] !== getBranchFolderById(sourceBranch.value)).map((branch) => branch["Branch Folder"]))].map((branchFolder) => (
+									{selectedBranchFolders.map((branchFolder) => (
 										<IssueNumberInput key={branchFolder} branchFolder={branchFolder} />
 									))}
 								</Flex>

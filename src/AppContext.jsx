@@ -127,6 +127,7 @@ export const AppProvider = ({ children }) => {
 	const [showCommitView, setShowCommitView] = useState(false);
 	const [sourceBranch, setSourceBranch] = useState(null);
 	const branchOptions = useMemo(() => {
+		// Old Implementation for source branch:
 		// if (config && config.commitOptions && config.commitOptions.useIssuePerFolder) {
 		// 	return selectedBranches.filter((row) => row["Branch Folder"] && row["Branch Version"] && row["SVN Branch"] && row["Branch Folder"] !== "" && row["Branch Version"] !== "" && row["SVN Branch"] !== "").map((row) => ({
 		// 		value: row.id,
@@ -134,11 +135,22 @@ export const AppProvider = ({ children }) => {
 		// 	}));
 		// }
 
-		return configurableRowData
-			.filter((row) => row["Branch Folder"] && row["Branch Version"] && row["SVN Branch"] && row["Branch Folder"] !== "" && row["Branch Version"] !== "" && row["SVN Branch"] !== "")
+		let isFolderOnlySource = config && config.commitOptions && config.commitOptions.useFolderOnlySource;
+		let filteredBranches = configurableRowData.filter((row) => row["Branch Folder"] && row["Branch Version"] && row["SVN Branch"] && row["Branch Folder"] !== "" && row["Branch Version"] !== "" && row["SVN Branch"] !== "");
+
+		if (isFolderOnlySource) {
+			filteredBranches = filteredBranches.reduce((acc, row) => {
+				if (!acc.some((item) => item["Branch Folder"] === row["Branch Folder"])) {
+					acc.push(row);
+				}
+				return acc;
+			}, []);
+		}
+
+		return filteredBranches
 			.map((row) => ({
 				value: row.id,
-				label: branchString(row["Branch Folder"], row["Branch Version"], row["SVN Branch"]),
+				label: isFolderOnlySource ? row["Branch Folder"] : branchString(row["Branch Folder"], row["Branch Version"], row["SVN Branch"]),
 			}));
 	}, [config, selectedBranches, configurableRowData]);
 	const [issueNumber, setIssueNumber] = useState({});

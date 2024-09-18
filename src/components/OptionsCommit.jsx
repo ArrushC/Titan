@@ -4,7 +4,7 @@ import { useApp } from "../AppContext";
 import _ from "lodash";
 
 export default function OptionsCommit() {
-	const { config, updateConfig, setSourceBranch } = useApp();
+	const { config, updateConfig, setSourceBranch, setIssueNumber } = useApp();
 	const [commitOptions, setCommitOptions] = useState({});
 
 	const handleOptionChange = useCallback(
@@ -52,6 +52,11 @@ export default function OptionsCommit() {
 	useEffect(() => {
 		setSourceBranch(null);
 	}, [commitOptions?.useFolderOnlySource, setSourceBranch]);
+
+	// We're clearing the issue number if the user decides to use toggle the "Use 1 Issue Per Folder" option
+	useEffect(() => {
+		setIssueNumber({});
+	}, [commitOptions?.useIssuePerFolder, setIssueNumber]);
 
 	return (
 		<Box mb={4}>

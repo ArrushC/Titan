@@ -93,7 +93,9 @@ export default function FormSVNMessage({ openMessageAutoFillModal }) {
 				</Box>
 				<Box pt={8}>
 					<Tooltip label="Auto Fill Message" hasArrow>
-						<IconButton colorScheme={"yellow"} aria-label="Auto Fill Message" size="md" onClick={() => openMessageAutoFillModal()} icon={<ExternalLinkIcon />} />
+						<Tooltip label={"Please select source branch first!"} isDisabled={sourceBranch?.value} hasArrow placement="bottom-end">
+							<IconButton colorScheme={"yellow"} aria-label="Auto Fill Message" size="md" onClick={() => openMessageAutoFillModal()} icon={<ExternalLinkIcon />} isDisabled={!sourceBranch?.value} />
+						</Tooltip>
 					</Tooltip>
 				</Box>
 			</Flex>

@@ -13,12 +13,6 @@ export default function IssueNumberInput({ branchFolder }) {
 			// Only accept digits
 			const newValue = String(e.target.value || "").trim();
 
-			if (newValue == "") {
-				setIssueNumber((currIssueNumber) => {
-					return _.omit(currIssueNumber, [branchFolder]);
-				});
-			}
-
 			if (/^\d*$/.test(newValue)) {
 				setIssueNumber((currIssueNumber) => ({
 					...currIssueNumber,
@@ -29,13 +23,25 @@ export default function IssueNumberInput({ branchFolder }) {
 		[branchFolder, setIssueNumber]
 	);
 
-	// We're clearing the issue number if the user decides to use toggle the "Use 1 Issue Per Folder" option
-	useEffect(() => {
-		setIssueNumber({});
-	}, [commitOptions?.useIssuePerFolder, setIssueNumber]);
-
 	const isFieldDisabled = !branchFolder;
 	const isFieldRequired = !branchFolder || !commitOptions?.useIssuePerFolder ? true : selectedBranches?.map((branch) => branch["Branch Folder"]).includes(branchFolder);
+
+	useEffect(() => {
+		if (branchFolder) {
+			setIssueNumber((currIssueNumber) => ({
+				...currIssueNumber,
+				[branchFolder]: "",
+			}));
+		}
+
+		return () => {
+			if (branchFolder && Object.keys(issueNumber).includes(branchFolder)) {
+				setIssueNumber((currIssueNumber) => {
+					return _.omit(currIssueNumber, [branchFolder]);
+				});
+			}
+		}
+	}, [branchFolder, setIssueNumber]);
 
 	return (
 		<Tooltip label={"Please select source branch first!"} isDisabled={!isFieldDisabled} hasArrow>

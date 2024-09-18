@@ -4,11 +4,9 @@ import _ from "lodash";
 import FilterableTableLogs from "./FilterableTableLogs";
 import FilterableTableTrello from "./FilterableTableTrello";
 import { useApp } from "../AppContext";
-import useConfigUtilities from "../hooks/useConfigUtilities";
 
 export default function ModalMessageAutoFill({ isModalOpen, closeModal }) {
-	const { setSourceBranch, branchOptions, setIssueNumber, setCommitMessage, setPostCommitData } = useApp();
-	const { getBranchFolderById } = useConfigUtilities();
+	const { setIssueNumber, setCommitMessage, setPostCommitData } = useApp();
 
 	const [tabIndex, setTabIndex] = useState(0);
 	const [autofillSelection, setAutoFillSelection] = useState([null, null]);
@@ -48,17 +46,13 @@ export default function ModalMessageAutoFill({ isModalOpen, closeModal }) {
 		if (tabIndex === 0) {
 			const message = selection.message;
 
-			const sourceBranchId = selection.branchId;
+			// const sourceBranchId = selection.branchId;
 			const issueNumMatch = message.match(/\s*(Issue)*\s*(\d+)\s*/);
 			const issueNumber = issueNumMatch ? issueNumMatch[2] : null;
 			const formattedMessage = message.replace(/\s*(Issue)*\s*(\d+)?\s*(\([^\)]+\))*\s?:?\s*/, "");
 
-			if (sourceBranchId) setSourceBranch(branchOptions.find((option) => option.value === sourceBranchId));
-			if (issueNumber)
-				setIssueNumber((currIssueNumber) => ({
-					...currIssueNumber,
-					[getBranchFolderById(selection.branchId)]: issueNumber,
-				}));
+			// if (sourceBranchId && commitOptions && !commitOptions.useFolderOnlySource) setSourceBranch(branchOptions.find((option) => option.value === sourceBranchId)); (If including this line, then include commitOptions, branchOptions and setSourceBranch in the dependency array)
+			if (issueNumber) setIssueNumber((currIssueNumber) => Object.fromEntries(Object.keys(currIssueNumber).map((key) => [key, issueNumber])));
 			if (formattedMessage.trim() !== "") setCommitMessage(formattedMessage);
 		} else {
 			const cardName = selection.name;
@@ -73,7 +67,7 @@ export default function ModalMessageAutoFill({ isModalOpen, closeModal }) {
 			setPostCommitData({ type: "trello", data: selection });
 		}
 		closeModal();
-	}, [tabIndex, autofillSelection, closeModal]);
+	}, [tabIndex, autofillSelection, setIssueNumber, setCommitMessage, setPostCommitData, closeModal]);
 
 	useEffect(() => {
 		setDisableSelect(!(autofillSelection.length == 2 && (autofillSelection[0] || autofillSelection[1])));

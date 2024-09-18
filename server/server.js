@@ -797,7 +797,7 @@ io.on("connection", (socket) => {
 			return;
 		}
 
-		const { sourceBranch, issueNumber, commitMessage, filesToProcess } = data;
+		const { sourceBranch, issueNumber, commitMessage, filesToProcess, commitOptions } = data;
 
 		// Group files by SVN Branch
 		const filesByBranch = filesToProcess.reduce((acc, file) => {
@@ -821,7 +821,7 @@ io.on("connection", (socket) => {
 
 			let originalMessage = `(${sourceBranch["Branch Folder"]}${originalIssueNumber !== "" ? ` #${originalIssueNumber}` : ""})`;
 			if (branchFolder === sourceBranch["Branch Folder"]) {
-				originalMessage = `(${branchFolder} ${sourceBranch["Branch Version"]})`;
+				originalMessage = `(${branchFolder}${commitOptions.useFolderOnlySource ? "" : ` ${sourceBranch["Branch Version"]}`})`;
 			}
 
 			let branchIssueNumber = issueNumber[branchFolder] || originalIssueNumber;

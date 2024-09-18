@@ -4,8 +4,7 @@ import { useApp } from "../AppContext";
 import _ from "lodash";
 
 export default function OptionsCommit() {
-	const { config, updateConfig } = useApp();
-
+	const { config, updateConfig, setSourceBranch } = useApp();
 	const [commitOptions, setCommitOptions] = useState({});
 
 	const handleOptionChange = useCallback(
@@ -25,6 +24,7 @@ export default function OptionsCommit() {
 			updateConfig((currentConfig) => ({
 				...currentConfig,
 				commitOptions: {
+					useFolderOnlySource: false,
 					useIssuePerFolder: false,
 					reusePreviousCommitMessage: false,
 				},
@@ -48,6 +48,11 @@ export default function OptionsCommit() {
 		});
 	}, [commitOptions]);
 
+	// Clear source branch option if folder only source is toggled
+	useEffect(() => {
+		setSourceBranch(null);
+	}, [commitOptions?.useFolderOnlySource, setSourceBranch]);
+
 	return (
 		<Box mb={4}>
 			<Heading as={"h6"} size="sm">
@@ -55,13 +60,18 @@ export default function OptionsCommit() {
 			</Heading>
 			<CheckboxGroup colorScheme="yellow">
 				<Stack direction={"row"} spacing={4} mt={2}>
+					<Checkbox isChecked={commitOptions.useFolderOnlySource} onChange={(e) => handleOptionChange("useFolderOnlySource", e.target.checked)}>
+						<Tooltip label={"Removes extra branch details from source branch."} hasArrow placement="bottom-start">
+							Use Folder Only Source Branch?
+						</Tooltip>
+					</Checkbox>
 					<Checkbox isChecked={commitOptions.useIssuePerFolder} onChange={(e) => handleOptionChange("useIssuePerFolder", e.target.checked)}>
-						<Tooltip label={"This option is for users who would like to apply different issue numbers for different branch folders. Toggling this option will clear the issue number!"} hasArrow placement="bottom-end">
+						<Tooltip label={"Allows users to input issue number for each branch folder."} hasArrow placement="bottom-start">
 							Use 1 Issue Per Folder?
 						</Tooltip>
 					</Checkbox>
 					<Checkbox isChecked={commitOptions.reusePreviousCommitMessage} onChange={(e) => handleOptionChange("reusePreviousCommitMessage", e.target.checked)}>
-						<Tooltip label={"Toggling this option will clear the commit message!"} hasArrow>
+						<Tooltip label={"Reuses the commit message from the previous commit made in Titan."} hasArrow>
 							Reuse Previous Commit Message?
 						</Tooltip>
 					</Checkbox>

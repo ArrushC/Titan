@@ -47,7 +47,7 @@ export default function FooterSectionCommit({ openCommitModal }) {
 		// 	return;
 		// }
 
-		setSocketPayload({ sourceBranch: sourceBranchRow, issueNumber: issueNumber, commitMessage, filesToProcess: selectedLocalChanges });
+		setSocketPayload({ sourceBranch: sourceBranchRow, issueNumber: issueNumber, commitMessage, filesToProcess: selectedLocalChanges, commitOptions: commitOptions });
 		openCommitModal();
 	}, [RaiseClientNotificaiton, sourceBranch, configurableRowData, commitOptions, selectedBranchFolders, issueNumber, selectedBranches, commitMessage, selectedLocalChanges]);
 

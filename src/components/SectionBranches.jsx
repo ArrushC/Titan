@@ -2,9 +2,11 @@ import React, { useCallback, useEffect, useState, useRef } from "react";
 import { useApp } from "../AppContext";
 import { Button, Flex, Icon, Tooltip, Wrap } from "@chakra-ui/react";
 import { CloseIcon, RepeatIcon, SmallAddIcon, TimeIcon } from "@chakra-ui/icons";
+import { FaUndo } from "react-icons/fa";
 import AlertConfirmRowDelete from "./AlertConfirmRowDelete";
 import { stripBranchInfo } from "../utils/CommonConfig";
 import { MdCloudDownload, MdCloudUpload, MdOutlineSwitchAccessShortcut } from "react-icons/md";
+import { AiFillDelete } from "react-icons/ai";
 import TableBranches from "./TableBranches";
 import useSocketEmits from "../hooks/useSocketEmits";
 import useNotifications from "../hooks/useNotifications";
@@ -167,7 +169,7 @@ export default function SectionBranches() {
 						</Button>
 					</Tooltip>
 					<Tooltip label="Requires at least 1 branch" isDisabled={selectedBranches.length > 0} hasArrow>
-						<Button onClick={toggleCommitSelectedBranches} leftIcon={<Icon as={MdCloudUpload} />} colorScheme={"yellow"} isDisabled={selectedBranches.length < 1}>
+						<Button onClick={toggleCommitSelectedBranches} leftIcon={<Icon as={isCommitMode ? FaUndo : MdCloudUpload} />} colorScheme={"yellow"} isDisabled={selectedBranches.length < 1}>
 							{isCommitMode ? "Undo Commit" : "Commit"}
 						</Button>
 					</Tooltip>
@@ -179,7 +181,7 @@ export default function SectionBranches() {
 				</Flex>
 				<Flex columnGap={2}>
 					<Tooltip label="No outdated branches to update" isDisabled={outdatedBranches.length > 0} hasArrow>
-						<Button onClick={updateOutdatedBranches} leftIcon={<MdOutlineSwitchAccessShortcut  />} colorScheme={"yellow"} isDisabled={outdatedBranches.length < 1}>
+						<Button onClick={updateOutdatedBranches} leftIcon={<MdOutlineSwitchAccessShortcut />} colorScheme={"yellow"} isDisabled={outdatedBranches.length < 1}>
 							Update Outdated
 						</Button>
 					</Tooltip>
@@ -194,7 +196,7 @@ export default function SectionBranches() {
 					</Button>
 				</Tooltip>
 				<Tooltip label="Please select at least 1 branch" isDisabled={selectedBranches.length > 0} hasArrow>
-					<Button onClick={openAlertDialog} leftIcon={<CloseIcon />} colorScheme={"red"} isDisabled={selectedBranches.length < 1}>
+					<Button onClick={openAlertDialog} leftIcon={<AiFillDelete />} colorScheme={"red"} isDisabled={selectedBranches.length < 1}>
 						Delete {selectedBranches.length > 0 ? `${selectedBranches.length} Branch` : ""}
 						{selectedBranches.length > 1 ? "es" : ""}
 					</Button>

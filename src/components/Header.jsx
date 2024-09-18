@@ -1,8 +1,8 @@
-import { Heading, Icon, IconButton, Image, Link, Tooltip, Wrap, WrapItem } from "@chakra-ui/react";
+import { Heading, Icon, IconButton, Image, Link, Tooltip, useColorMode, Wrap, WrapItem } from "@chakra-ui/react";
 import React, { useCallback } from "react";
 import Logo from "../assets/Titan.png";
 import { useApp } from "../AppContext";
-import { MdBrowserUpdated, MdCode, MdCodeOff } from "react-icons/md";
+import { MdBrowserUpdated, MdCode, MdCodeOff, MdDarkMode, MdSunny } from "react-icons/md";
 import useSocketEmits from "../hooks/useSocketEmits";
 import { LuFileCog } from "react-icons/lu";
 import useNotifications from "../hooks/useNotifications";
@@ -11,6 +11,7 @@ export default function Header() {
 	const { config, isDebug, setIsDebug } = useApp();
 	const { emitOpenConfig } = useSocketEmits();
 	const { RaiseClientNotificaiton } = useNotifications();
+	const { colorMode, toggleColorMode } = useColorMode()
 
 	const handleCheckForUpdates = useCallback(() => {
 		window.electron.checkForUpdates().then((result) => {
@@ -44,14 +45,17 @@ export default function Header() {
 				</Heading>
 			</WrapItem>
 			<WrapItem alignItems={"center"} columnGap={2}>
-				<Tooltip label={`Current Debug Mode: ${isDebug ? "on" : "off"}`} hasArrow placement="left">
-					<IconButton aria-label="Toggle Debug Mode" colorScheme={"yellow"} icon={!isDebug ? <Icon as={MdCodeOff} /> : <Icon as={MdCode} />} onClick={() => setIsDebug((prev) => !prev)} />
+				<Tooltip label={"Toggle Light/Dark Mode"} hasArrow placement="left">
+					<IconButton aria-label="Toggle light/dark mode" colorScheme={"yellow"} icon={<Icon as={colorMode === "light" ? MdSunny : MdDarkMode} />} onClick={toggleColorMode} />
 				</Tooltip>
-				<Tooltip label={"Open configuration file"} hasArrow placement="bottom-start">
+				<Tooltip label={"Check For Updates"} hasArrow placement="bottom-start" isDisabled={!window.electron}>
+					<IconButton aria-label="Check for updates" colorScheme={"yellow"} icon={<Icon as={MdBrowserUpdated} />} onClick={handleCheckForUpdates} isDisabled={!window.electron} />
+				</Tooltip>
+				<Tooltip label={"Open Config File"} hasArrow placement="bottom-start">
 					<IconButton aria-label="Open configuration file" colorScheme={"yellow"} icon={<Icon as={LuFileCog} />} onClick={() => emitOpenConfig()} />
 				</Tooltip>
-				<Tooltip label={"Check for updates"} hasArrow placement="bottom-start" isDisabled={!window.electron}>
-					<IconButton aria-label="Check for updates" colorScheme={"yellow"} icon={<Icon as={MdBrowserUpdated} />} onClick={handleCheckForUpdates} isDisabled={!window.electron} />
+				<Tooltip label={`Current Debug Mode: ${isDebug ? "on" : "off"}`} hasArrow placement="right">
+					<IconButton aria-label="Toggle Debug Mode" colorScheme={"yellow"} icon={!isDebug ? <Icon as={MdCodeOff} /> : <Icon as={MdCode} />} onClick={() => setIsDebug((prev) => !prev)} />
 				</Tooltip>
 			</WrapItem>
 		</Wrap>

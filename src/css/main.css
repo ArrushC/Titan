@@ -1,4 +1,4 @@
-:root, .chakra-ui-dark *:not([data-focus]) {
+body.chakra-ui-dark, .chakra-ui-dark *:not([data-focus]) {
 	--chakra-colors-chakra-body-bg: #121212 !important;
 	--menu-bg: #121212 !important;
 }

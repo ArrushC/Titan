@@ -1,10 +1,12 @@
 import { CloseIcon } from "@chakra-ui/icons";
-import { chakra, Flex, Heading, IconButton } from "@chakra-ui/react";
+import { chakra, Flex, Heading, IconButton, useColorMode } from "@chakra-ui/react";
 import React, { useCallback } from "react";
 import { FaRegSquare, FaWindowMinimize } from "react-icons/fa6";
 
 export default function HeaderApp() {
 	if (!window.electron) return <></>;
+
+	const { colorMode } = useColorMode();
 
 	const handleMinimizeWindow = useCallback(() => {
 		window.electron.minimizeWindow();
@@ -19,7 +21,7 @@ export default function HeaderApp() {
 	}, []);
 
 	return (
-		<chakra.header w={"100%"} position={"fixed"} bgColor={"#121212"} className="titanHead" zIndex={9999999} top={0}>
+		<chakra.header w={"100%"} position={"fixed"} bgColor={colorMode === "light" ? "white" : "#121212"} className="titanHead" zIndex={9999999} top={0}>
 			<Flex justifyContent={"space-between"} alignItems={"center"} p={2} position={"static"}>
 				<Heading as={"h6"} size={"sm"} noOfLines={1} className={"animation-fadein-left-forward"}>
 					Titan

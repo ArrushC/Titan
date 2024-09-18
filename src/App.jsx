@@ -40,7 +40,7 @@ function App() {
 					</Box>
 					<Collapse in={isCommitMode} animateOpacity>
 						<Box id="sectionCommit">
-							<Heading as={"h2"} size={"lg"} noOfLines={1} mb={4} className="animation-pulse">
+							<Heading as={"h2"} size={"lg"} noOfLines={1} mb={4} className="animation-pulse" lineHeight={"1.4"}>
 								Committing {selectedBranches.length == configurableRowData.length ? "All" : `${selectedBranches.length}/${configurableRowData.length}`} Branch{selectedBranches.length == 1 ? "" : "es"}
 							</Heading>
 							<SectionCommit />

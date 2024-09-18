@@ -172,8 +172,30 @@ export default function ModalCommit({ isModalOpen, closeModal }) {
 	}, [postCommitData, RaiseClientNotificaiton, formatForClipboard]);
 
 	const handleNext = useCallback(() => {
-		setActiveStep((prev) => prev + 1);
-	}, [setActiveStep]);
+		setActiveStep((prev) => {
+			switch (prev) {
+				case 1:
+					emitCommitPayload(socketPayload);
+				case 2:
+					// This step has no specific logic for itself as the button utilising this callback would be disabled here.
+					setRevisionsValue("");
+					setCommitMsgValue("");
+					break;
+				case 3:
+					onRevisionsCopy();
+					RaiseClientNotificaiton("Updating selected branches! Please wait", "info", 1500);
+					commitLiveResponses.forEach((response) => {
+						emitUpdateSingle(response.branchId, response["SVN Branch"], response["Branch Version"], response["Branch Folder"]);
+					});
+					setIsCommitMode(false);
+					setSelectedBranchStatuses([]);
+					setShowCommitView(false);
+					closeModal();
+					return 1;
+			}
+			return prev + 1;
+		});
+	}, [setActiveStep, emitCommitPayload, socketPayload, setRevisionsValue, setCommitMsgValue, onRevisionsCopy, RaiseClientNotificaiton, commitLiveResponses, emitUpdateSingle, setIsCommitMode, setSelectedBranchStatuses, setShowCommitView, closeModal]);
 
 	/****************************************************
 	 * Hooks
@@ -195,12 +217,6 @@ export default function ModalCommit({ isModalOpen, closeModal }) {
 		setCommitMsgValue("");
 	}, [activeStep, isModalOpen]);
 
-	// Step 2
-	useEffect(() => {
-		if (!isModalOpen || activeStep != 2) return;
-		emitCommitPayload(socketPayload);
-	}, [activeStep, isModalOpen, emitCommitPayload, socketPayload]);
-
 	// Step 3
 	useEffect(() => {
 		if (!isModalOpen || activeStep != 3) return;
@@ -208,21 +224,6 @@ export default function ModalCommit({ isModalOpen, closeModal }) {
 		handleClipboardOption(["BranchFolder", "BranchVersion", "SVNBranch"]);
 		setCommitMsgValue(socketPayload["commitMessage"] || "");
 	}, [RaiseClientNotificaiton, activeStep, isModalOpen, handleClipboardOption]);
-
-	// Commmit process completion
-	useEffect(() => {
-		if (!isModalOpen || activeStep <= 3) return;
-		onRevisionsCopy();
-		RaiseClientNotificaiton("Updating selected branches! Please wait", "info", 1500);
-		commitLiveResponses.forEach((response) => {
-			emitUpdateSingle(response.branchId, response["SVN Branch"], response["Branch Version"], response["Branch Folder"]);
-		});
-		setIsCommitMode(false);
-		setSelectedBranchStatuses([]);
-		setShowCommitView(false);
-		closeModal();
-		setActiveStep(1);
-	}, [RaiseClientNotificaiton, activeStep, isModalOpen, commitLiveResponses, emitUpdateSingle]);
 
 	useEffect(() => {
 		const socketCallback = (data) => {

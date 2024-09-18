@@ -17,7 +17,7 @@ export default function FilterableTableTrello({ setAutoFillSelection }) {
 	const debouncedSearch = useCallback(
 		_.debounce((query) => {
 			if (query.trim() !== "") emitTrelloCardNamesSearch(key, token, query);
-		}, 250),
+		}, 400),
 		[key, token, emitTrelloCardNamesSearch]
 	);
 

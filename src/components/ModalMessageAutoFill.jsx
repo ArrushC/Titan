@@ -40,7 +40,6 @@ export default function ModalMessageAutoFill({ isModalOpen, closeModal }) {
 	);
 
 	const handleSelect = useCallback(() => {
-		console.warn("Nothing has been developed for this button yet.");
 		console.debug("Selected tab index:", tabIndex);
 		console.debug("Selected autofill selection:", JSON.stringify(autofillSelection, null, 4));
 
@@ -82,6 +81,7 @@ export default function ModalMessageAutoFill({ isModalOpen, closeModal }) {
 
 	useEffect(() => {
 		setAutoFillSelection([null, null]);
+		setTabIndex(0);
 	}, [isModalOpen]);
 
 	return (

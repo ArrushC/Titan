@@ -56,8 +56,13 @@ export default function OptionsCommit() {
 			</Heading>
 			<CheckboxGroup colorScheme="yellow">
 				<Stack direction={"row"} spacing={4} mt={2}>
+					<Checkbox isChecked={commitOptions.useFolderOnlySource} onChange={(e) => handleOptionChange("useFolderOnlySource", e.target.checked)}>
+						<Tooltip label={"Toggling this option will remove extra branch details from source branch."} hasArrow placement="bottom-start">
+							Use Folder Only Source Branch?
+						</Tooltip>
+					</Checkbox>
 					<Checkbox isChecked={commitOptions.useIssuePerFolder} onChange={(e) => handleOptionChange("useIssuePerFolder", e.target.checked)}>
-						<Tooltip label={"This option is for users who would like to apply different issue numbers for different branch folders. Toggling this option will clear the issue number!"} hasArrow placement="bottom-end">
+						<Tooltip label={"This option is for users who would like to apply different issue numbers for different branch folders. Toggling this option will clear the issue number!"} hasArrow placement="bottom-start">
 							Use 1 Issue Per Folder?
 						</Tooltip>
 					</Checkbox>

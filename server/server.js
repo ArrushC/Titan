@@ -434,6 +434,7 @@ async function sendConfig(socket) {
 			branches: [],
 			branchFolderColours: {},
 			commitOptions: {
+				useFolderOnlySource: false,
 				useIssuePerFolder: false,
 				reusePreviousCommitMessage: false,
 			},

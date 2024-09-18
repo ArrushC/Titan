@@ -25,6 +25,7 @@ export default function OptionsCommit() {
 			updateConfig((currentConfig) => ({
 				...currentConfig,
 				commitOptions: {
+					useFolderOnlySource: false,
 					useIssuePerFolder: false,
 					reusePreviousCommitMessage: false,
 				},

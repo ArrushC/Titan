@@ -2,9 +2,12 @@ import { CopyIcon, DragHandleIcon } from "@chakra-ui/icons";
 import { AgGridReact } from "ag-grid-react";
 import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { useApp } from "../AppContext";
-import { IconButton, Tooltip } from "@chakra-ui/react";
+import { Flex, IconButton, Tooltip } from "@chakra-ui/react";
 import { stripBranchInfo } from "../utils/CommonConfig";
 import useWindowDimensions from "../hooks/useWindowDimensions";
+import { VscVscode } from "react-icons/vsc";
+import { FaTerminal } from "react-icons/fa6";
+import { RiFilePaper2Fill } from "react-icons/ri";
 
 export default function TableBranches({ rowData, onRowValueChanged }) {
 	const { config, branchTableGridRef, updateConfig, isDebug, selectedBranches, setSelectedBranches, setSelectedBranchStatuses, setShowCommitView } = useApp();
@@ -85,24 +88,35 @@ export default function TableBranches({ rowData, onRowValueChanged }) {
 
 	const colDefs = useMemo(() => {
 		const commonColDefs = [
-			{ headerCheckboxSelection: true, checkboxSelection: true, headerCheckboxSelectionFilteredOnly: true, width: 20, resizable: false, suppressMovable: false, filter: false, editable: false, headerClass: "branch-table-header-cell", cellClass: "branch-table-body-cell" },
+			{ headerCheckboxSelection: true, checkboxSelection: true, headerCheckboxSelectionFilteredOnly: true, width: 25, resizable: false, suppressMovable: false, filter: false, editable: false, headerClass: "branch-table-header-cell", cellClass: "branch-table-body-cell" },
+			{ field: "Branch Folder", resizable: false, width: 130, valueFormatter: (params) => params.value.toUpperCase() },
+			{ field: "Branch Version", resizable: false, width: 130 },
+			{ field: "SVN Branch", flex: 2 },
+			{ field: "Branch Info", editable: false, resizable: false, width: 125 },
 			{
 				headerName: "",
-				width: 60,
-				resizable: false,
+				resizable: true,
 				sortable: false,
 				filter: false,
 				editable: false,
 				cellRenderer: (params) => (
-					<Tooltip label="Copy Row" hasArrow>
-						<IconButton colorScheme={"yellow"} aria-label="Copy Row" size="sm" onClick={() => copyRow(params.data)} icon={<CopyIcon />} />
-					</Tooltip>
+					<Flex columnGap={1}>
+						<Tooltip label="Open VSCode" hasArrow>
+							<IconButton colorScheme={"yellow"} aria-label="Open VSCode" size="sm" onClick={() => console.warn("Unused button")} icon={<VscVscode />} />
+						</Tooltip>
+						<Tooltip label="Open Terminal" hasArrow>
+							<IconButton colorScheme={"yellow"} aria-label="Open Terminal" size="sm" onClick={() => console.warn("Unused button")} icon={<FaTerminal />} />
+						</Tooltip>
+						{/* Custom commands which is dynamic in size */}
+						<Tooltip label="Script file name" hasArrow>
+							<IconButton colorScheme={"yellow"} aria-label="Script file name" size="sm" onClick={() => console.warn("Unused button")} icon={<RiFilePaper2Fill  />} />
+						</Tooltip>
+						<Tooltip label="Copy Row" hasArrow>
+							<IconButton colorScheme={"yellow"} aria-label="Copy Row" size="sm" onClick={() => copyRow(params.data)} icon={<CopyIcon />} />
+						</Tooltip>
+					</Flex>
 				),
 			},
-			{ field: "Branch Folder", resizable: false, width: 130, valueFormatter: (params) => params.value.toUpperCase() },
-			{ field: "Branch Version", resizable: false, width: 130 },
-			{ field: "SVN Branch", flex: 1 },
-			{ field: "Branch Info", editable: false, resizable: false, width: 200 },
 		];
 
 		return isTallScreen ? [{ field: "", rowDrag: true, resizable: false, filter: false, suppressMovable: false, editable: false, width: 20, cellRenderer: DragHandleIcon, headerClass: "branch-table-header-cell", cellClass: "branch-table-body-cell" }, ...commonColDefs] : commonColDefs;

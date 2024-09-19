@@ -99,10 +99,7 @@ export default function SectionBranches() {
 	}, [selectedBranches, emitInfoSingle]);
 
 	const refreshAll = useCallback(() => {
-		if (isCommitMode) {
-			RaiseClientNotificaiton("Unable to refresh branches while in commit mode", "warning", 0);
-			return;
-		}
+		if (isCommitMode) return;
 		RaiseClientNotificaiton("Refreshing all branches. Please wait until this is done!", "info", 3000);
 		const now = Date.now();
 		configurableRowData.forEach((row) => {

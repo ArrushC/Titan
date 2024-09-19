@@ -19,7 +19,7 @@ const modalStyle = definePartsStyle({
 		// mt: `${HEADER_HEIGHT_RAW + 20}px`,
 		bg: "gray.900",
 		color: "white",
-		boxShadow: "rgba(255, 255, 255, 0.07) 0px -20px 20px 20px",
+		boxShadow: "rgba(255, 255, 255, 0.07) 0px 0px 20px 7px",
 	},
 	header: {
 		bg: "gray.900",
@@ -51,7 +51,7 @@ const drawerStyle = definePartsStyle({
 		mt: HEADER_HEIGHT,
 		bg: "gray.900",
 		color: "white",
-		boxShadow: "rgba(255, 255, 255, 0.07) 0px -20px 20px 20px",
+		boxShadow: "rgba(255, 255, 255, 0.07) 0px 0px 20px 7px",
 	},
 	header: {
 		bg: "gray.900",

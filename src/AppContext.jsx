@@ -66,7 +66,7 @@ export const AppProvider = ({ children }) => {
 			newSocket.emit("titan-config-get", "fetch");
 			newSocket.once("titan-config-get", (data) => {
 				setConfig(data);
-				toast(createToastConfig("Configurations Loaded", "success", 2000));
+				if (!data) toast(createToastConfig("Couldn't load data from the server", "error", 0));
 			});
 		});
 

@@ -8,7 +8,7 @@ const myFormat = printf(({ level, message, timestamp, stack, label }) => {
 	return `${timestamp} [${label}] [${level}]: ${stack || message}`;
 });
 
-export const logFilePath = "C:/ATHive/Titan.app.log";
+export const logFilePath = "C:/Titan/Titan.app.log";
 
 // Ensure the log file exists
 const logDir = path.dirname(logFilePath);

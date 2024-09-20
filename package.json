@@ -7,6 +7,10 @@
 	"main": "main.js",
 	"description": "A desktop application for streamlining your workflow in Revision Control Systems (RCS) like Subversion (SVN).",
 	"author": "ArrushC",
+	"configFolderPath": "C:/Titan",
+	"configFilePath": "C:/Titan/Titan.config.json",
+	"targetsFilePath": "C:/Titan/Titan.targets.txt",
+	"logFilePath": "C:/Titan/Titan.app.log",
 	"scripts": {
 		"start": "npm run server:start",
 		"client:dev": "vite",

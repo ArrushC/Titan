@@ -6,6 +6,9 @@ import { fileURLToPath } from "url";
 import { setupLogger, setupUncaughtExceptionHandler } from "./server/logger.js";
 import { exec } from "child_process";
 
+// Import package.json
+import packageJson from "./package.json" assert { type: "json" };
+
 const { autoUpdater } = electronUpdaterPkg;
 
 const __filename = fileURLToPath(import.meta.url);

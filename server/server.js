@@ -25,8 +25,8 @@ const server = createServer(app);
 const io = new Server(server);
 
 const latestVersion = packageJson.version;
-const configFilePath = "C:/Titan/Titan.config.json";
-const targetsFilePath = "C:/Titan/Titan.targets.txt";
+const configFilePath = packageJson.configFilePath;
+const targetsFilePath = packageJson.targetsFilePath;
 
 // Use compression middleware
 app.use(compression());

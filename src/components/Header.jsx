@@ -6,6 +6,7 @@ import { MdBrowserUpdated, MdCode, MdCodeOff, MdDarkMode, MdSunny } from "react-
 import useSocketEmits from "../hooks/useSocketEmits";
 import { LuFileCog } from "react-icons/lu";
 import useNotifications from "../hooks/useNotifications";
+import ButtonElectron from "./ButtonElectron";
 
 export default function Header() {
 	const { config, isDebug, setIsDebug } = useApp();
@@ -48,9 +49,7 @@ export default function Header() {
 				<Tooltip label={"Toggle Light/Dark Mode"} hasArrow placement="left">
 					<IconButton aria-label="Toggle light/dark mode" colorScheme={"yellow"} icon={<Icon as={colorMode === "light" ? MdSunny : MdDarkMode} />} onClick={toggleColorMode} />
 				</Tooltip>
-				<Tooltip label={"Check For Updates"} hasArrow placement="bottom-start" isDisabled={!window.electron}>
-					<IconButton aria-label="Check for updates" colorScheme={"yellow"} icon={<Icon as={MdBrowserUpdated} />} onClick={handleCheckForUpdates} isDisabled={!window.electron} />
-				</Tooltip>
+				<ButtonElectron icon={<Icon as={MdBrowserUpdated} />} onClick={handleCheckForUpdates} colorScheme={"yellow"} label="Check For Updates" size="md" />
 				<Tooltip label={"Open Config File"} hasArrow placement="bottom-start">
 					<IconButton aria-label="Open configuration file" colorScheme={"yellow"} icon={<Icon as={LuFileCog} />} onClick={() => emitOpenConfig()} />
 				</Tooltip>

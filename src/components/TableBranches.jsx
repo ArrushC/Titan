@@ -102,8 +102,6 @@ export default function TableBranches({ rowData, onRowValueChanged }) {
 				editable: false,
 				cellRenderer: (params) => (
 					<Flex columnGap={1}>
-						<ButtonElectron icon={<VscVscode />} onClick={() => window.electron?.openVSCode({ fullPath: params.data["SVN Branch"] })} colorScheme={"yellow"} label="Open VSCode" size="sm" />
-						<ButtonElectron icon={<FaTerminal />} onClick={() => window.electron?.openTerminal({ folderPath: params.data["SVN Branch"] })} colorScheme={"yellow"} label="Open Terminal" size="sm" />
 						{/* Custom commands which is dynamic in size */}
 						<ButtonElectron icon={<RiFilePaper2Fill />} onClick={() => console.warn("Unused button")} colorScheme={"yellow"} label="Script file name" size="sm" />
 						<Tooltip label="Copy Row" hasArrow>

@@ -1,4 +1,4 @@
-import { Heading, Icon, IconButton, Image, Link, Tooltip, useColorMode, Wrap, WrapItem } from "@chakra-ui/react";
+import { Heading, Icon, Image, Link, useColorMode, Wrap, WrapItem } from "@chakra-ui/react";
 import React, { useCallback } from "react";
 import Logo from "../assets/Titan.png";
 import { useApp } from "../AppContext";
@@ -11,7 +11,7 @@ import ButtonElectron from "./ButtonElectron";
 import ButtonIconTooltip from "./ButtonIconTooltip";
 
 export default function Header() {
-	const { config, isDebug, setIsDebug } = useApp();
+	const { isDebug, setIsDebug } = useApp();
 	const { emitOpenConfig } = useSocketEmits();
 	const { RaiseClientNotificaiton } = useNotifications();
 	const { colorMode, toggleColorMode } = useColorMode();

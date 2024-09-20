@@ -2,18 +2,23 @@ import { CopyIcon, DragHandleIcon } from "@chakra-ui/icons";
 import { AgGridReact } from "ag-grid-react";
 import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { useApp } from "../AppContext";
-import { Flex, IconButton, Tooltip } from "@chakra-ui/react";
+import { Flex } from "@chakra-ui/react";
 import { stripBranchInfo } from "../utils/CommonConfig";
 import useWindowDimensions from "../hooks/useWindowDimensions";
-import { VscVscode } from "react-icons/vsc";
-import { FaTerminal } from "react-icons/fa6";
 import { RiFilePaper2Fill } from "react-icons/ri";
 import ButtonElectron from "./ButtonElectron";
+import ButtonIconTooltip from "./ButtonIconTooltip";
 
 export default function TableBranches({ rowData, onRowValueChanged }) {
-	const { config, branchTableGridRef, updateConfig, isDebug, selectedBranches, setSelectedBranches, setSelectedBranchStatuses, setShowCommitView } = useApp();
+	const { config, branchTableGridRef, updateConfig, isDebug, selectedBranches, setSelectedBranches, setSelectedBranchStatuses, customScripts, setShowCommitView } = useApp();
 	const windowDimensions = useWindowDimensions();
 	const [isTallScreen, setIsTallScreen] = useState(windowDimensions.height > 768);
+
+	const executeCustomScript = useCallback((scriptType, scriptPath, branchData) => {
+		window.electron.runCustomScript({ scriptType, scriptPath, branchData }).then((result) => {
+			console.log("Custom Script Result: ", result);
+		});
+	}, []);
 
 	const copyRow = useCallback(
 		(currentRowData) => {
@@ -102,18 +107,17 @@ export default function TableBranches({ rowData, onRowValueChanged }) {
 				editable: false,
 				cellRenderer: (params) => (
 					<Flex columnGap={1}>
-						{/* Custom commands which is dynamic in size */}
-						<ButtonElectron icon={<RiFilePaper2Fill />} onClick={() => console.warn("Unused button")} colorScheme={"yellow"} label="Script file name" size="sm" />
-						<Tooltip label="Copy Row" hasArrow>
-							<IconButton colorScheme={"yellow"} aria-label="Copy Row" size="sm" onClick={() => copyRow(params.data)} icon={<CopyIcon />} />
-						</Tooltip>
+						{customScripts.map((script) => (
+							<ButtonElectron icon={<RiFilePaper2Fill />} onClick={() => executeCustomScript(script.type, script.path, params.data)} colorScheme={"yellow"} label={script.fileName} size="sm" />
+						))}
+						<ButtonIconTooltip icon={<CopyIcon />} onClick={() => copyRow(params.data)} colorScheme={"yellow"} label="Copy Row" size="sm" />
 					</Flex>
 				),
 			},
 		];
 
 		return isTallScreen ? [{ field: "", rowDrag: true, resizable: false, filter: false, suppressMovable: false, editable: false, width: 20, cellRenderer: DragHandleIcon, headerClass: "branch-table-header-cell", cellClass: "branch-table-body-cell" }, ...commonColDefs] : commonColDefs;
-	}, [config, isTallScreen, copyRow]);
+	}, [isTallScreen, customScripts, copyRow]);
 
 	useEffect(() => {
 		setIsTallScreen(windowDimensions.height > 768);

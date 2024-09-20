@@ -3,6 +3,8 @@ const { contextBridge, ipcRenderer } = require("electron");
 contextBridge.exposeInMainWorld("electron", {
 	getAppVersion: () => ipcRenderer.invoke("app-version"),
 	openTortoiseSVNDiff: (data) => ipcRenderer.invoke("open-tortoisesvn-diff", data),
+	fetchCustomScripts: () => ipcRenderer.invoke("fetch-custom-scripts"),
+	runCustomScript: (data) => ipcRenderer.invoke("run-custom-script", data),
 	onAppClosing: (callback) => ipcRenderer.on("app-closing", callback),
 	removeAppClosingListener: () => ipcRenderer.removeAllListeners("app-closing"),
 	downloadUpdate: () => ipcRenderer.invoke("download-update"),

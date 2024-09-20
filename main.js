@@ -1,5 +1,6 @@
 import { app, BrowserWindow, screen, ipcMain, dialog, session, shell, Menu } from "electron";
 import electronUpdaterPkg from "electron-updater";
+import fs from "fs";
 import path from "path";
 import { fork } from "child_process";
 import { fileURLToPath } from "url";
@@ -390,7 +391,63 @@ ipcMain.handle("open-tortoisesvn-diff", async (event, data) => {
 	});
 });
 
-// Custom command IPCS
+ipcMain.handle("fetch-custom-scripts", async () => {
+	const { configFolderPath } = packageJson;
+	const scripts = [];
+
+	try {
+		const files = fs.readdirSync(configFolderPath);
+
+		files.forEach((file) => {
+			const ext = path.extname(file);
+			if ([".bat", ".ps1"].includes(ext.toLowerCase())) {
+				const fullPath = path.join(configFolderPath, file);
+				scripts.push({
+					fileName: path.parse(file).name,
+					path: fullPath,
+					type: ext.toLowerCase() === ".bat" ? "batch" : "powershell",
+				});
+			}
+		});
+	} catch (error) {
+		logger.error(`Error reading the config folder: ${error.message}`);
+		return { success: false, error: error.message };
+	}
+
+	// Return the list of scripts found
+	return { success: true, scripts };
+});
+
+ipcMain.handle("run-custom-script", async (event, data) => {
+	const { scriptType, scriptPath, branchData } = data;
+	logger.info(`Running custom script: ${scriptPath} (${scriptType}) with branch data: ${JSON.stringify(branchData)}`);
+
+	return new Promise((resolve, reject) => {
+		let command = "";
+		const { id, "Branch Folder": branchFolder, "Branch Version": branchVersion, "SVN Branch": svnBranch } = branchData;
+
+		const args = `"${id}" "${branchFolder}" "${branchVersion}" "${svnBranch}"`;
+
+		if (scriptType === "batch") {
+			command = `start cmd /k "${scriptPath}" ${args}`;
+		} else if (scriptType === "powershell") {
+			command = `start powershell -NoExit -ExecutionPolicy Bypass -File "${scriptPath}" -id "${id}" -branchFolder "${branchFolder}" -branchVersion "${branchVersion}" -svnBranch "${svnBranch}"`;
+		}
+
+		exec(command, (error, stdout, stderr) => {
+			if (error) {
+				console.error(`Error: ${error.message}`);
+				reject({ success: false, error: error.message });
+			} else if (stderr) {
+				console.error(`Stderr: ${stderr}`);
+				reject({ success: false, error: stderr });
+			} else {
+				console.log(`Stdout: ${stdout}`);
+				resolve({ success: true });
+			}
+		});
+	});
+});
 
 ipcMain.handle("download-update", () => {
 	return autoUpdater.downloadUpdate();

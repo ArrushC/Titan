@@ -5,7 +5,6 @@ import { useCallback } from "react";
 export default function ButtonIconTooltip(props) {
 	const { icon, onClick, colorScheme, label, size, placement, isDisabled = false } = props;
 
-
 	const handleClick = useCallback(() => {
 		if (onClick) onClick();
 	}, [onClick]);

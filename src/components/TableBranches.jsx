@@ -2,14 +2,23 @@ import { CopyIcon, DragHandleIcon } from "@chakra-ui/icons";
 import { AgGridReact } from "ag-grid-react";
 import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { useApp } from "../AppContext";
-import { IconButton, Tooltip } from "@chakra-ui/react";
+import { Flex } from "@chakra-ui/react";
 import { stripBranchInfo } from "../utils/CommonConfig";
 import useWindowDimensions from "../hooks/useWindowDimensions";
+import { RiFilePaper2Fill } from "react-icons/ri";
+import ButtonElectron from "./ButtonElectron";
+import ButtonIconTooltip from "./ButtonIconTooltip";
 
 export default function TableBranches({ rowData, onRowValueChanged }) {
-	const { config, branchTableGridRef, updateConfig, isDebug, selectedBranches, setSelectedBranches, setSelectedBranchStatuses, setShowCommitView } = useApp();
+	const { config, branchTableGridRef, updateConfig, isDebug, selectedBranches, setSelectedBranches, setSelectedBranchStatuses, customScripts, setShowCommitView } = useApp();
 	const windowDimensions = useWindowDimensions();
 	const [isTallScreen, setIsTallScreen] = useState(windowDimensions.height > 768);
+
+	const executeCustomScript = useCallback((scriptType, scriptPath, branchData) => {
+		window.electron.runCustomScript({ scriptType, scriptPath, branchData }).then((result) => {
+			console.log("Custom Script Result: ", result);
+		});
+	}, []);
 
 	const copyRow = useCallback(
 		(currentRowData) => {
@@ -85,28 +94,30 @@ export default function TableBranches({ rowData, onRowValueChanged }) {
 
 	const colDefs = useMemo(() => {
 		const commonColDefs = [
-			{ headerCheckboxSelection: true, checkboxSelection: true, headerCheckboxSelectionFilteredOnly: true, width: 20, resizable: false, suppressMovable: false, filter: false, editable: false, headerClass: "branch-table-header-cell", cellClass: "branch-table-body-cell" },
+			{ headerCheckboxSelection: true, checkboxSelection: true, headerCheckboxSelectionFilteredOnly: true, width: 25, resizable: false, suppressMovable: false, filter: false, editable: false, headerClass: "branch-table-header-cell", cellClass: "branch-table-body-cell" },
+			{ field: "Branch Folder", resizable: false, width: 130, valueFormatter: (params) => params.value.toUpperCase() },
+			{ field: "Branch Version", resizable: false, width: 130 },
+			{ field: "SVN Branch", flex: 2 },
+			{ field: "Branch Info", editable: false, resizable: false, width: 125 },
 			{
 				headerName: "",
-				width: 60,
-				resizable: false,
+				resizable: true,
 				sortable: false,
 				filter: false,
 				editable: false,
 				cellRenderer: (params) => (
-					<Tooltip label="Copy Row" hasArrow>
-						<IconButton colorScheme={"yellow"} aria-label="Copy Row" size="sm" onClick={() => copyRow(params.data)} icon={<CopyIcon />} />
-					</Tooltip>
+					<Flex columnGap={1}>
+						{customScripts.map((script) => (
+							<ButtonElectron icon={<RiFilePaper2Fill />} onClick={() => executeCustomScript(script.type, script.path, params.data)} colorScheme={"yellow"} label={script.fileName} size="sm" />
+						))}
+						<ButtonIconTooltip icon={<CopyIcon />} onClick={() => copyRow(params.data)} colorScheme={"yellow"} label="Copy Row" size="sm" />
+					</Flex>
 				),
 			},
-			{ field: "Branch Folder", resizable: false, width: 130, valueFormatter: (params) => params.value.toUpperCase() },
-			{ field: "Branch Version", resizable: false, width: 130 },
-			{ field: "SVN Branch", flex: 1 },
-			{ field: "Branch Info", editable: false, resizable: false, width: 200 },
 		];
 
 		return isTallScreen ? [{ field: "", rowDrag: true, resizable: false, filter: false, suppressMovable: false, editable: false, width: 20, cellRenderer: DragHandleIcon, headerClass: "branch-table-header-cell", cellClass: "branch-table-body-cell" }, ...commonColDefs] : commonColDefs;
-	}, [config, isTallScreen, copyRow]);
+	}, [isTallScreen, customScripts, copyRow]);
 
 	useEffect(() => {
 		setIsTallScreen(windowDimensions.height > 768);

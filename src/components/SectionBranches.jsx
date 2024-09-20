@@ -119,7 +119,7 @@ export default function SectionBranches() {
 
 	// Check for outdated branches when rowDataBranches changes
 	useEffect(() => {
-		const outdatedBranches = rowDataBranches.filter((row) => String(row["Branch Info"]).toLowerCase().includes("behind"));
+		const outdatedBranches = rowDataBranches.filter((row) => String(row["Branch Info"]).toLowerCase().includes("-"));
 		setOutdatedBranches(outdatedBranches);
 	}, [rowDataBranches]);
 

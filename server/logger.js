@@ -2,13 +2,16 @@ import { createLogger, format, transports } from "winston";
 import fs from "fs";
 import path from "path";
 
+// Import package.json
+import packageJson from "../package.json" assert { type: "json" };
+
 const { combine, timestamp, printf, errors } = format;
 
 const myFormat = printf(({ level, message, timestamp, stack, label }) => {
 	return `${timestamp} [${label}] [${level}]: ${stack || message}`;
 });
 
-export const logFilePath = "C:/ATHive/Titan.app.log";
+export const logFilePath = packageJson.logFilePath;
 
 // Ensure the log file exists
 const logDir = path.dirname(logFilePath);

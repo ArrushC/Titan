@@ -137,8 +137,12 @@ body {
 	--ag-font-size: 32px;
 }
 
-.compact {
+.compact *:not(.ag-header-cell-text) {
 	--ag-grid-size: 4px;
 	--ag-list-item-height: 20px;
 	--ag-font-size: 16px;
+}
+
+.compact .ag-header-cell-text {
+	--ag-font-size: 14px !important;
 }

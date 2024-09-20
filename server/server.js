@@ -25,8 +25,8 @@ const server = createServer(app);
 const io = new Server(server);
 
 const latestVersion = packageJson.version;
-const configFilePath = "C:/ATHive/Titan.config.json";
-const targetsFilePath = "C:/ATHive/Titan.targets.txt";
+const configFilePath = packageJson.configFilePath;
+const targetsFilePath = packageJson.targetsFilePath;
 
 // Use compression middleware
 app.use(compression());
@@ -550,7 +550,7 @@ io.on("connection", (socket) => {
 
 			// logger.debug(`Branch: ${branchString(data.folder, data.version, data.branch)} | Revisions Behind: ${count}`);
 
-			let branchInfo = count == 0 ? "Up to date" : `Behind by ${count} revision${count > 1 ? "s" : ""}`;
+			let branchInfo = count == 0 ? "Latest" : `-${count} Revision${count > 1 ? "s" : ""}`;
 
 			emitBranchInfo(socket, data.id, branchInfo);
 		} catch (err) {

@@ -21,6 +21,8 @@ const AppContext = createContext({
 	setSelectedBranches: (_) => {},
 	showSelectedBranchesLog: false,
 	setShowSelectedBranchesLog: (_) => {},
+	customScripts: [],
+	setCustomScripts: (_) => {},
 	isCommitMode: false,
 	setIsCommitMode: (_) => {},
 	selectedBranchStatuses: [],
@@ -118,6 +120,7 @@ export const AppProvider = ({ children }) => {
 	const branchTableGridRef = useRef(null);
 	const [selectedBranches, setSelectedBranches] = useState([]);
 	const [showSelectedBranchesLog, setShowSelectedBranchesLog] = useState(false);
+	const [customScripts, setCustomScripts] = useState([]);
 
 	// Props used in SectionCommit
 	const [isCommitMode, setIsCommitMode] = useState(false);
@@ -171,6 +174,17 @@ export const AppProvider = ({ children }) => {
 	useEffect(() => {
 		setSelectedBranchStatuses([]);
 		setShowCommitView(false);
+	}, [configurableRowData]);
+
+	useEffect(() => {
+		if (!window.electron) return;
+		window.electron.fetchCustomScripts().then((data) => {
+			if (data.success) {
+				setCustomScripts(data.scripts);
+				return;
+			}
+			toast(createToastConfig(data.error, "error", 0, true));
+		});
 	}, [configurableRowData]);
 
 	/**** SectionCommit ****/
@@ -263,6 +277,8 @@ export const AppProvider = ({ children }) => {
 				setSelectedBranches,
 				showSelectedBranchesLog,
 				setShowSelectedBranchesLog,
+				customScripts,
+				setCustomScripts,
 				isCommitMode,
 				setIsCommitMode,
 				selectedBranchStatuses,

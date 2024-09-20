@@ -8,6 +8,7 @@ import useWindowDimensions from "../hooks/useWindowDimensions";
 import { VscVscode } from "react-icons/vsc";
 import { FaTerminal } from "react-icons/fa6";
 import { RiFilePaper2Fill } from "react-icons/ri";
+import ButtonElectron from "./ButtonElectron";
 
 export default function TableBranches({ rowData, onRowValueChanged }) {
 	const { config, branchTableGridRef, updateConfig, isDebug, selectedBranches, setSelectedBranches, setSelectedBranchStatuses, setShowCommitView } = useApp();
@@ -101,16 +102,10 @@ export default function TableBranches({ rowData, onRowValueChanged }) {
 				editable: false,
 				cellRenderer: (params) => (
 					<Flex columnGap={1}>
-						<Tooltip label="Open VSCode" hasArrow>
-							<IconButton colorScheme={"yellow"} aria-label="Open VSCode" size="sm" onClick={() => window.electron?.openVSCode({ fullPath: params.data["SVN Branch"]})} icon={<VscVscode />} />
-						</Tooltip>
-						<Tooltip label="Open Terminal" hasArrow>
-							<IconButton colorScheme={"yellow"} aria-label="Open Terminal" size="sm" onClick={() => window.electron?.openTerminal({ folderPath: params.data["SVN Branch"]})} icon={<FaTerminal />} />
-						</Tooltip>
+						<ButtonElectron icon={<VscVscode />} onClick={() => window.electron?.openVSCode({ fullPath: params.data["SVN Branch"] })} colorScheme={"yellow"} label="Open VSCode" size="sm" />
+						<ButtonElectron icon={<FaTerminal />} onClick={() => window.electron?.openTerminal({ folderPath: params.data["SVN Branch"] })} colorScheme={"yellow"} label="Open Terminal" size="sm" />
 						{/* Custom commands which is dynamic in size */}
-						<Tooltip label="Script file name" hasArrow>
-							<IconButton colorScheme={"yellow"} aria-label="Script file name" size="sm" onClick={() => console.warn("Unused button")} icon={<RiFilePaper2Fill  />} />
-						</Tooltip>
+						<ButtonElectron icon={<RiFilePaper2Fill />} onClick={() => console.warn("Unused button")} colorScheme={"yellow"} label="Script file name" size="sm" />
 						<Tooltip label="Copy Row" hasArrow>
 							<IconButton colorScheme={"yellow"} aria-label="Copy Row" size="sm" onClick={() => copyRow(params.data)} icon={<CopyIcon />} />
 						</Tooltip>

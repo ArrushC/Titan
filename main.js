@@ -387,6 +387,46 @@ ipcMain.handle("open-tortoisesvn-diff", async (event, data) => {
 	});
 });
 
+ipcMain.handle("open-vscode", async (event, data) => {
+	const { fullPath } = data;
+	logger.info(`Opening VSCode for: ${fullPath}`);
+
+	return new Promise((resolve, reject) => {
+		exec(`code "${fullPath}"`, (error, stdout, stderr) => {
+			if (error) {
+				console.error(`Error: ${error.message}`);
+				reject({ success: false, error: error.message });
+			} else if (stderr) {
+				console.error(`Stderr: ${stderr}`);
+				reject({ success: false, error: stderr });
+			} else {
+				console.log(`Stdout: ${stdout}`);
+				resolve({ success: true });
+			}
+		});
+	});
+});
+
+ipcMain.handle("open-terminal", async (event, data) => {
+	const { folderPath } = data;
+	logger.info(`Opening terminal for: ${folderPath}`);
+
+	return new Promise((resolve, reject) => {
+		exec(`start powershell -NoExit -Command "cd '${folderPath}'"`, (error, stdout, stderr) => {
+			if (error) {
+				console.error(`Error: ${error.message}`);
+				reject({ success: false, error: error.message });
+			} else if (stderr) {
+				console.error(`Stderr: ${stderr}`);
+				reject({ success: false, error: stderr });
+			} else {
+				console.log(`Stdout: ${stdout}`);
+				resolve({ success: true });
+			}
+		});
+	});
+});
+
 ipcMain.handle("download-update", () => {
 	return autoUpdater.downloadUpdate();
 });

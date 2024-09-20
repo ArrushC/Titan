@@ -102,10 +102,10 @@ export default function TableBranches({ rowData, onRowValueChanged }) {
 				cellRenderer: (params) => (
 					<Flex columnGap={1}>
 						<Tooltip label="Open VSCode" hasArrow>
-							<IconButton colorScheme={"yellow"} aria-label="Open VSCode" size="sm" onClick={() => console.warn("Unused button")} icon={<VscVscode />} />
+							<IconButton colorScheme={"yellow"} aria-label="Open VSCode" size="sm" onClick={() => window.electron?.openVSCode({ fullPath: params.data["SVN Branch"]})} icon={<VscVscode />} />
 						</Tooltip>
 						<Tooltip label="Open Terminal" hasArrow>
-							<IconButton colorScheme={"yellow"} aria-label="Open Terminal" size="sm" onClick={() => console.warn("Unused button")} icon={<FaTerminal />} />
+							<IconButton colorScheme={"yellow"} aria-label="Open Terminal" size="sm" onClick={() => window.electron?.openTerminal({ folderPath: params.data["SVN Branch"]})} icon={<FaTerminal />} />
 						</Tooltip>
 						{/* Custom commands which is dynamic in size */}
 						<Tooltip label="Script file name" hasArrow>

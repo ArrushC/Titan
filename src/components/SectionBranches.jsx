@@ -89,7 +89,7 @@ export default function SectionBranches() {
 			const newRowData = [...currentRowData];
 			selectedBranches.forEach((row) => {
 				const index = newRowData.findIndex((r) => r.id === row.id);
-				newRowData[index]["Branch Info"] = "Refreshing...";
+				newRowData[index]["Branch Info"] = "Refreshing";
 			});
 			return newRowData;
 		});

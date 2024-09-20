@@ -22,7 +22,7 @@ export default function useManagedRowDataBranches() {
 		const updateRowData = _.debounce(() => {
 			const newRowData = configurableRowData.map((row) => ({
 				...row,
-				"Branch Info": branchInfos[row.id] || "Hasn't been refreshed",
+				"Branch Info": branchInfos[row.id] || "Unrefreshed",
 			}));
 
 			setRowDataBranches((currentRowData) => {

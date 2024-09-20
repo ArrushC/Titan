@@ -25,7 +25,7 @@ export default function TableBranches({ rowData, onRowValueChanged }) {
 			const newRow = {
 				...currentRowData,
 				id: String(Date.now()),
-				"Branch Info": "Hasn't been refreshed",
+				"Branch Info": "Copied",
 			};
 			updateConfig((currentConfig) => ({
 				...currentConfig,
@@ -97,10 +97,11 @@ export default function TableBranches({ rowData, onRowValueChanged }) {
 			{ headerCheckboxSelection: true, checkboxSelection: true, headerCheckboxSelectionFilteredOnly: true, width: 25, resizable: false, suppressMovable: false, filter: false, editable: false, headerClass: "branch-table-header-cell", cellClass: "branch-table-body-cell" },
 			{ field: "Branch Folder", resizable: false, width: 130, valueFormatter: (params) => params.value.toUpperCase() },
 			{ field: "Branch Version", resizable: false, width: 130 },
-			{ field: "SVN Branch", flex: 2 },
-			{ field: "Branch Info", editable: false, resizable: false, width: 125 },
+			{ field: "SVN Branch", flex: 1.5 },
+			{ field: "Branch Info", editable: false, resizable: false, width: 150 },
 			{
 				headerName: "",
+				flex: 0.50,
 				resizable: true,
 				sortable: false,
 				filter: false,

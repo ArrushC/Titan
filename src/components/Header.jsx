@@ -3,16 +3,30 @@ import React, { useCallback } from "react";
 import Logo from "../assets/Titan.png";
 import { useApp } from "../AppContext";
 import { MdBrowserUpdated, MdCode, MdCodeOff, MdDarkMode, MdSunny } from "react-icons/md";
+import { IoReload } from "react-icons/io5";
 import useSocketEmits from "../hooks/useSocketEmits";
 import { LuFileCog } from "react-icons/lu";
 import useNotifications from "../hooks/useNotifications";
 import ButtonElectron from "./ButtonElectron";
+import ButtonIconTooltip from "./ButtonIconTooltip";
 
 export default function Header() {
 	const { config, isDebug, setIsDebug } = useApp();
 	const { emitOpenConfig } = useSocketEmits();
 	const { RaiseClientNotificaiton } = useNotifications();
-	const { colorMode, toggleColorMode } = useColorMode()
+	const { colorMode, toggleColorMode } = useColorMode();
+
+	const handleGetAppVersion = useCallback(() => {
+		if (!window.electron) return;
+
+		window.electron.getAppVersion().then((version) => {
+			RaiseClientNotificaiton(`Application Version: v${version}`, "info", 2000);
+		});
+	}, [RaiseClientNotificaiton]);
+
+	const handleReload = useCallback(() => {
+		window.location.reload();
+	}, []);
 
 	const handleCheckForUpdates = useCallback(() => {
 		window.electron.checkForUpdates().then((result) => {
@@ -24,13 +38,13 @@ export default function Header() {
 		});
 	}, [RaiseClientNotificaiton]);
 
-	const handleGetAppVersion = useCallback(() => {
-		if (!window.electron) return;
+	const handleOpenConfig = useCallback(() => {
+		emitOpenConfig();
+	}, [emitOpenConfig]);
 
-		window.electron.getAppVersion().then((version) => {
-			RaiseClientNotificaiton(`Application Version: v${version}`, "info", 2000);
-		});
-	}, [RaiseClientNotificaiton]);
+	const handleToggleDebug = useCallback(() => {
+		setIsDebug((prev) => !prev);
+	}, [setIsDebug]);
 
 	return (
 		<Wrap my={5} spacingY={5} justify={"space-between"}>
@@ -46,16 +60,11 @@ export default function Header() {
 				</Heading>
 			</WrapItem>
 			<WrapItem alignItems={"center"} columnGap={2}>
-				<Tooltip label={"Toggle Light/Dark Mode"} hasArrow placement="left">
-					<IconButton aria-label="Toggle light/dark mode" colorScheme={"yellow"} icon={<Icon as={colorMode === "light" ? MdSunny : MdDarkMode} />} onClick={toggleColorMode} />
-				</Tooltip>
+				<ButtonIconTooltip icon={<Icon as={colorMode === "light" ? MdSunny : MdDarkMode} />} onClick={toggleColorMode} colorScheme={"yellow"} label="Toggle Light/Dark Mode" placement={"bottom-start"} size="md" />
+				<ButtonIconTooltip icon={<Icon as={IoReload} />} onClick={handleReload} colorScheme={"yellow"} label="Reload" placement={"bottom-start"} size="md" />
 				<ButtonElectron icon={<Icon as={MdBrowserUpdated} />} onClick={handleCheckForUpdates} colorScheme={"yellow"} label="Check For Updates" size="md" />
-				<Tooltip label={"Open Config File"} hasArrow placement="bottom-start">
-					<IconButton aria-label="Open configuration file" colorScheme={"yellow"} icon={<Icon as={LuFileCog} />} onClick={() => emitOpenConfig()} />
-				</Tooltip>
-				<Tooltip label={`Current Debug Mode: ${isDebug ? "on" : "off"}`} hasArrow placement="right">
-					<IconButton aria-label="Toggle Debug Mode" colorScheme={"yellow"} icon={!isDebug ? <Icon as={MdCodeOff} /> : <Icon as={MdCode} />} onClick={() => setIsDebug((prev) => !prev)} />
-				</Tooltip>
+				<ButtonIconTooltip icon={<Icon as={LuFileCog} />} onClick={handleOpenConfig} colorScheme={"yellow"} label="Open Config File" placement={"bottom-start"} size="md" />
+				<ButtonIconTooltip icon={!isDebug ? <Icon as={MdCodeOff} /> : <Icon as={MdCode} />} onClick={handleToggleDebug} colorScheme={"yellow"} label={`Current Debug Mode: ${isDebug ? "on" : "off"}`} placement={"bottom-start"} size="md" />
 			</WrapItem>
 		</Wrap>
 	);

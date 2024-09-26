@@ -48,7 +48,7 @@ import useTrelloIntegration from "../hooks/useTrelloIntegration";
 export default function ModalCommit({ isModalOpen, closeModal }) {
 	const { socket, setIsCommitMode, setSelectedBranchStatuses, setShowCommitView, socketPayload, postCommitData, setPostCommitData } = useApp();
 	const { emitUpdateSingle, emitCommitPayload } = useSocketEmits();
-	const { key, token, isTrelloIntegrationEnabled,  emitTrelloCardUpdate } = useTrelloIntegration();
+	const { key, token, isTrelloIntegrationEnabled, emitTrelloCardUpdate } = useTrelloIntegration();
 	const { RaiseClientNotificaiton } = useNotifications();
 	const [commitLiveResponses, setCommitLiveResponses] = useState([]);
 	const { onCopy: onRevisionsCopy, value: revisionsValue, setValue: setRevisionsValue, hasCopied: hasRevisionsCopied } = useClipboard("");
@@ -117,29 +117,28 @@ export default function ModalCommit({ isModalOpen, closeModal }) {
 	 * Modal Operations
 	 ****************************************************/
 	const formatForClipboard = useCallback(
-		(options, useStringFormat=true) => {
+		(options, useStringFormat = true) => {
 			const zeroWidthSpace = "\u200B".repeat(7);
 			const newline = options.includes("MarkupSupport") ? `\r\n${zeroWidthSpace}` : "\r\n";
 			const sortedResponses = commitLiveResponses.sort((a, b) => a["Branch Version"].localeCompare(b["Branch Version"]));
-			const finalResponse = sortedResponses
-				.map((response) => {
-					const parts = [];
-					if (options.includes("BranchFolder")) parts.push(response["Branch Folder"]);
-					if (options.includes("BranchVersion")) parts.push(response["Branch Version"]);
-					if (options.includes("SVNBranch")) parts.push(response["branchPathFolder"]);
+			const finalResponse = sortedResponses.map((response) => {
+				const parts = [];
+				if (options.includes("BranchFolder")) parts.push(response["Branch Folder"]);
+				if (options.includes("BranchVersion")) parts.push(response["Branch Version"]);
+				if (options.includes("SVNBranch")) parts.push(response["branchPathFolder"]);
 
-					let line = parts.join(" ").trim();
+				let line = parts.join(" ").trim();
 
-					if (options.includes("IssueNumber")) {
-						const issueNumber = response["branchIssueNumber"];
-						line += ` Issue [${issueNumber}]`;
-					}
+				if (options.includes("IssueNumber")) {
+					const issueNumber = response["branchIssueNumber"];
+					line += ` Issue [${issueNumber}]`;
+				}
 
-					const revision = response["revision"] ? response["revision"] : response["errorMessage"] || "Error";
-					line += ` Revision [${revision}]`;
+				const revision = response["revision"] ? response["revision"] : response["errorMessage"] || "Error";
+				line += ` Revision [${revision}]`;
 
-					return line;
-				});
+				return line;
+			});
 			return useStringFormat ? finalResponse.join(newline) : finalResponse;
 		},
 		[commitLiveResponses, socketPayload]
@@ -256,7 +255,7 @@ export default function ModalCommit({ isModalOpen, closeModal }) {
 					<Heading as={"h2"} size={"lg"}>
 						Commit Selected Files
 					</Heading>
-					<Stepper index={activeStep-1} mb={0} size={"sm"} colorScheme="yellow">
+					<Stepper index={activeStep - 1} mb={0} size={"sm"} colorScheme="yellow">
 						{steps.map((step, index) => (
 							<Step key={index}>
 								<StepIndicator>
@@ -287,7 +286,12 @@ export default function ModalCommit({ isModalOpen, closeModal }) {
 										</ListItem>
 										<ListItem>
 											<ListIcon as={MdCheckCircle} color="yellow.500" />
-											Issue Numbers: <Code>{Object.entries(socketPayload["issueNumber"]).map(((entry) => `${entry[1]} (${entry[0]})`)).join(", ")}</Code>
+											Issue Numbers:{" "}
+											<Code>
+												{Object.entries(socketPayload["issueNumber"])
+													.map((entry) => `${entry[1]} (${entry[0]})`)
+													.join(", ")}
+											</Code>
 										</ListItem>
 										<ListItem>
 											<ListIcon as={MdCheckCircle} color="yellow.500" />
@@ -397,11 +401,15 @@ export default function ModalCommit({ isModalOpen, closeModal }) {
 							</Tooltip>
 						</Flex>
 						<Flex columnGap={2}>
-							<Tooltip hasArrow label={"Requires Trello Autofill"} isDisabled={postCommitData?.type === "trello" && isTrelloIntegrationEnabled}>
-								<Button colorScheme="yellow" leftIcon={<Icon as={FaTrello} />} onClick={handleTrelloUpdate} isDisabled={activeStep < 3 || postCommitData?.type != "trello" || !isTrelloIntegrationEnabled}>
-									Update Card
-								</Button>
-							</Tooltip>
+							{activeStep == 3 ? (
+								<Tooltip hasArrow label={"Requires Trello Autofill"} isDisabled={postCommitData?.type === "trello" && isTrelloIntegrationEnabled}>
+									<Button colorScheme="yellow" leftIcon={<Icon as={FaTrello} />} onClick={handleTrelloUpdate} isDisabled={postCommitData?.type != "trello" || !isTrelloIntegrationEnabled}>
+										Update Card
+									</Button>
+								</Tooltip>
+							) : (
+								<></>
+							)}
 
 							<Tooltip hasArrow label={"Cannot undo the commit currently"} isDisabled={activeStep != 2}>
 								<Button colorScheme="yellow" onClick={handleNext} isDisabled={activeStep == 2}>

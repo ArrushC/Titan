@@ -220,7 +220,7 @@ export default function ModalCommit({ isModalOpen, closeModal }) {
 	useEffect(() => {
 		if (!isModalOpen || activeStep != 3) return;
 		RaiseClientNotificaiton("The commit process has been completed successfully", "success", 5000);
-		handleClipboardOption(["BranchFolder", "BranchVersion", "SVNBranch"]);
+		handleClipboardOption(["BranchFolder", "BranchVersion"]);
 		setCommitMsgValue(socketPayload["commitMessage"] || "");
 	}, [RaiseClientNotificaiton, activeStep, isModalOpen, handleClipboardOption]);
 

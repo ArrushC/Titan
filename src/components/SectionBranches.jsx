@@ -13,7 +13,7 @@ import useNotifications from "../hooks/useNotifications";
 import useManagedRowDataBranches from "../hooks/useManagedRowDataBranches";
 
 export default function SectionBranches() {
-	const { socket, updateConfig, isDebug, setShowSelectedBranchesLog, configurableRowData, branchTableGridRef, selectedBranches, setSelectedBranches, isCommitMode, setIsCommitMode, setSelectedBranchStatuses, setShowCommitView } = useApp();
+	const { socket, updateConfig, isDebug, setShowSelectedBranchesLog, configurableRowData, branchTableGridRef, selectedBranches, setSelectedBranches, isCommitMode, setIsCommitMode, setShowCommitView } = useApp();
 	const { emitUpdateSingle, emitInfoSingle } = useSocketEmits();
 	const { RaiseClientNotificaiton } = useNotifications();
 

@@ -35,6 +35,10 @@ const io = new Server(server, {
 	},
 });
 
+const instanceData = {
+	commitLiveResponses: [],
+};
+
 // Use compression middleware
 app.use(compression());
 
@@ -806,6 +810,8 @@ io.on("connection", (socket) => {
 				return;
 			}
 
+			instanceData.commitLiveResponses = [];
+
 			const { sourceBranch, issueNumber, commitMessage, filesToProcess, commitOptions } = data;
 
 			// Group files by SVN Branch
@@ -859,8 +865,7 @@ io.on("connection", (socket) => {
 								logger.error(`Failed to commit files in ${svnBranch}:`, err);
 								emitMessage(socket, `Failed to commit files in ${branchString(branchFolder, branchVersion, svnBranch)}`, "error");
 
-								// Emit commit status for frontend
-								io.emit("svn-commit-status-live", {
+								const liveResponse = {
 									branchId: branchId,
 									branchIssueNumber: branchIssueNumber,
 									"Branch Folder": branchFolder,
@@ -871,15 +876,17 @@ io.on("connection", (socket) => {
 									revision: null,
 									errorMessage: err.message,
 									bulkCommitLength: Object.entries(filesByBranch).length,
-								});
+								};
+
+								io.emit("svn-commit-status-live", liveResponse);
+								instanceData.commitLiveResponses.push(liveResponse);
 							}
 						} else {
 							logger.info(`Successfully committed files in ${svnBranch}`);
 							emitMessage(socket, `Successfully committed files in ${branchString(branchFolder, branchVersion, svnBranch)}`, "success");
 							logger.debug(`Revision Number: ${extractRevisionNumber(result[0].result)}`);
 
-							// Emit commit status for frontend
-							io.emit("svn-commit-status-live", {
+							const liveResponse = {
 								branchId: branchId,
 								branchIssueNumber: branchIssueNumber,
 								"Branch Folder": branchFolder,
@@ -889,7 +896,10 @@ io.on("connection", (socket) => {
 								branchString: branchString(branchFolder, branchVersion, svnBranch),
 								revision: extractRevisionNumber(result[0].result),
 								bulkCommitLength: Object.entries(filesByBranch).length,
-							});
+							};
+
+							io.emit("svn-commit-status-live", liveResponse);
+							instanceData.commitLiveResponses.push(liveResponse);
 						}
 					},
 				};
@@ -1006,6 +1016,12 @@ io.on("connection", (socket) => {
 			debugTask("trello-update-card", data, true);
 		});
 	}
+
+	socket.on("external-svn-commits-get", async () => {
+		debugTask("external-svn-commits-get", null, false);
+		socket.emit("external-svn-commits-get", instanceData.commitLiveResponses);
+		debugTask("external-svn-commits-get", null, true);
+	});
 
 	socket.on("client-log", (data) => {
 		let { logType, logMessage } = data;

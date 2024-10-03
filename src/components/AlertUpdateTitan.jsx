@@ -1,4 +1,4 @@
-import { AlertDialog, AlertDialogBody, AlertDialogCloseButton, AlertDialogContent, AlertDialogFooter, AlertDialogHeader, AlertDialogOverlay, Button, useDisclosure } from "@chakra-ui/react";
+import { AlertDialog, AlertDialogBody, AlertDialogCloseButton, AlertDialogContent, AlertDialogFooter, AlertDialogHeader, AlertDialogOverlay, Button, Flex, Spinner, useDisclosure } from "@chakra-ui/react";
 import React, { useCallback, useEffect, useRef, useState } from "react";
 import useNotifications from "../hooks/useNotifications";
 
@@ -73,7 +73,16 @@ export default function AlertUpdateTitan() {
 						Update Available
 					</AlertDialogHeader>
 					{updateInProgress ? <></> : <AlertDialogCloseButton />}
-					<AlertDialogBody>A new version of Titan is available. Would you like to download and install the update?</AlertDialogBody>
+					<AlertDialogBody>
+						{updateInProgress ? "Downloading the update. Please wait..." : "A new version of Titan is available. Would you like to download and install the update?"}
+						{updateInProgress ? (
+							<Flex justify="center" mt={4}>
+								<Spinner size="xl" thickness="4px" speed="0.65s" color="yellow.500" ml={4} />
+							</Flex>
+						) : (
+							<></>
+						)}
+					</AlertDialogBody>
 					<AlertDialogFooter>
 						<Button colorScheme="red" ref={cancelRef} onClick={handleCancel} isDisabled={updateInProgress}>
 							Cancel

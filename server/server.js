@@ -873,6 +873,7 @@ io.on("connection", (socket) => {
 									"SVN Branch": svnBranch,
 									branchPathFolder: branchPathFolder(svnBranch),
 									branchString: branchString(branchFolder, branchVersion, svnBranch),
+									commitMessage: prefixedCommitMessage,
 									revision: null,
 									errorMessage: err.message,
 									bulkCommitLength: Object.entries(filesByBranch).length,
@@ -894,6 +895,7 @@ io.on("connection", (socket) => {
 								"SVN Branch": svnBranch,
 								branchPathFolder: branchPathFolder(svnBranch),
 								branchString: branchString(branchFolder, branchVersion, svnBranch),
+								commitMessage: prefixedCommitMessage,
 								revision: extractRevisionNumber(result[0].result),
 								bulkCommitLength: Object.entries(filesByBranch).length,
 							};

@@ -2,7 +2,7 @@
 	"name": "titan",
 	"private": true,
 	"proxy": "http://localhost:5173",
-	"version": "1.4.4",
+	"version": "1.4.5",
 	"type": "module",
 	"main": "main.js",
 	"description": "A desktop application for streamlining your workflow in Revision Control Systems (RCS) like Subversion (SVN).",
@@ -107,10 +107,12 @@
 			"perMachine": false,
 			"oneClick": false
 		},
-		"publish": [{
-			"provider": "github",
-			"owner": "ArrushC",
-			"repo": "titan"
-		}]
+		"publish": [
+			{
+				"provider": "github",
+				"owner": "ArrushC",
+				"repo": "titan"
+			}
+		]
 	}
 }

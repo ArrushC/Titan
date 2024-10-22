@@ -3,6 +3,11 @@ body.chakra-ui-dark, .chakra-ui-dark *:not([data-focus]) {
 	--menu-bg: #121212 !important;
 }
 
+body.chakra-ui-light, .chakra-ui-light *:not([data-focus]) {
+	--chakra-colors-chakra-body-bg: cornsilk !important;
+	--menu-bg: cornsilk !important;
+}
+
 .chakra-ui-dark *[data-focus] {
 	--menu-bg: #232323 !important;
 }
@@ -106,6 +111,7 @@ body {
 
 .animation-handwave {
 	animation: handwave 10s infinite;
+	transform-origin: bottom right;
 }
 
 @keyframes handwave {

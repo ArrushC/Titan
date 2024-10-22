@@ -424,7 +424,7 @@ function isSVNConnectionError(socket, err) {
 		io.emit("svn-connection-error", "SVN connection error detected. The server will shut down.");
 
 		// Forcefully shut down the server
-		forceShutdown("SVN Connection Error");
+		// forceShutdown("SVN Connection Error");
 		return true;
 	}
 	return false;
@@ -1023,6 +1023,11 @@ io.on("connection", (socket) => {
 		debugTask("external-svn-commits-get", null, false);
 		socket.emit("external-svn-commits-get", instanceData.commitLiveResponses);
 		debugTask("external-svn-commits-get", null, true);
+	});
+
+	socket.on("external-autofill-issue-numbers" , async (data) => {
+		debugTask("external-autofill-issue-numbers", data, false);
+		debugTask("external-autofill-issue-numbers", data, true);
 	});
 
 	socket.on("client-log", (data) => {

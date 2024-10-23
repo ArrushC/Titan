@@ -5,7 +5,7 @@ import path from "path";
 import { fork } from "child_process";
 import { fileURLToPath } from "url";
 import { setupLogger, setupUncaughtExceptionHandler } from "./server/logger.js";
-import { exec } from "child_process";
+import { exec, execSync } from "child_process";
 
 // Import package.json
 import packageJson from "./package.json" assert { type: "json" };
@@ -353,6 +353,15 @@ function terminateApp() {
 	app.exit(0);
 }
 
+function commandExists(command) {
+	try {
+		execSync(`${command} --version`);
+		return true;
+	} catch (error) {
+		return false;
+	}
+}
+
 process.on("uncaughtException", (error) => {
 	logger.error("Uncaught Exception:", error);
 	if (!isQuitting) {
@@ -431,7 +440,9 @@ ipcMain.handle("run-custom-script", async (event, data) => {
 		if (scriptType === "batch") {
 			command = `start cmd /k "${scriptPath}" ${args}`;
 		} else if (scriptType === "powershell") {
-			command = `start powershell -NoExit -ExecutionPolicy Bypass -File "${scriptPath}" -id "${id}" -branchFolder "${branchFolder}" -branchVersion "${branchVersion}" -svnBranch "${svnBranch}"`;
+			let shell = "powershell";
+			if (commandExists("pwsh")) shell = "pwsh";
+			command = `start ${shell} -ExecutionPolicy Bypass -Command "& {& '${scriptPath}' -id '${id}' -branchFolder '${branchFolder}' -branchVersion '${branchVersion}' -svnBranch '${svnBranch}'}"`;
 		}
 
 		exec(command, (error, stdout, stderr) => {

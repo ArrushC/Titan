@@ -83,7 +83,7 @@ export default function SectionCommit() {
 						};
 					});
 
-					setRowDataLocalChanges((prev) => [...prev, ...rowDataLocalChanges.filter((file) => !["unversioned", "missing"].includes(file["Local Status"]))]);
+					setRowDataLocalChanges((prev) => [...prev, ...rowDataLocalChanges.filter((file) => !["unversioned", "missing", "external"].includes(file["Local Status"]))]);
 					setRowDataUntrackedChanges((prev) => [...prev, ...rowDataLocalChanges.filter((file) => ["unversioned", "missing"].includes(file["Local Status"]))]);
 				}
 			});

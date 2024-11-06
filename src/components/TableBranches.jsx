@@ -2,7 +2,7 @@ import { CopyIcon, DragHandleIcon } from "@chakra-ui/icons";
 import { AgGridReact } from "ag-grid-react";
 import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { useApp } from "../AppContext";
-import { Flex } from "@chakra-ui/react";
+import { Flex, Tooltip } from "@chakra-ui/react";
 import { stripBranchInfo } from "../utils/CommonConfig";
 import useWindowDimensions from "../hooks/useWindowDimensions";
 import { RiFilePaper2Fill } from "react-icons/ri";
@@ -111,7 +111,9 @@ export default function TableBranches({ rowData, onRowValueChanged }) {
 						{customScripts.map((script) => (
 							<ButtonElectron icon={<RiFilePaper2Fill />} onClick={() => executeCustomScript(script.type, script.path, params.data)} colorScheme={"yellow"} label={script.fileName} size="sm" />
 						))}
-						<ButtonIconTooltip icon={<CopyIcon />} onClick={() => copyRow(params.data)} colorScheme={"yellow"} label="Copy Row" size="sm" />
+						<Tooltip label="Copy Row" placement="top" hasArrow>
+							<ButtonIconTooltip icon={<CopyIcon />} onClick={() => copyRow(params.data)} colorScheme={"yellow"} label="Copy Row" size="sm" />
+						</Tooltip>
 					</Flex>
 				),
 			},

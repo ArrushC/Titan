@@ -153,12 +153,12 @@ export default function SectionBranches() {
 		<div>
 			<Wrap mb={4} justify={"space-between"}>
 				<Flex columnGap={2}>
-					<Tooltip label="Requires at least 1 branch" isDisabled={selectedBranches.length > 0} hasArrow>
+					{/* <Tooltip label="Requires at least 1 branch" isDisabled={selectedBranches.length > 0} hasArrow>
 						<Button onClick={refreshSelected} leftIcon={<RepeatIcon />} colorScheme={"yellow"} isDisabled={selectedBranches.length < 1}>
 							Refresh {selectedBranches.length > 0 ? `${selectedBranches.length} Branch` : ""}
 							{selectedBranches.length > 1 ? "es" : ""}
 						</Button>
-					</Tooltip>
+					</Tooltip> */}
 					<Tooltip label="Requires at least 1 branch" isDisabled={selectedBranches.length > 0} hasArrow>
 						<Button onClick={updateSelectedBranches} leftIcon={<Icon as={MdCloudDownload} />} colorScheme={"yellow"} isDisabled={selectedBranches.length < 1}>
 							Update {selectedBranches.length > 0 ? `${selectedBranches.length} Branch` : ""}
@@ -179,7 +179,7 @@ export default function SectionBranches() {
 				<Flex columnGap={2}>
 					<Tooltip label="No outdated branches to update" isDisabled={outdatedBranches.length > 0} hasArrow>
 						<Button onClick={updateOutdatedBranches} leftIcon={<MdOutlineSwitchAccessShortcut />} colorScheme={"yellow"} isDisabled={outdatedBranches.length < 1}>
-							Update Outdated
+							Update All
 						</Button>
 					</Tooltip>
 				</Flex>

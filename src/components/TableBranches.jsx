@@ -9,20 +9,21 @@ import { RiFilePaper2Fill } from "react-icons/ri";
 import ButtonElectron from "./ButtonElectron";
 import { MdAutoFixHigh } from "react-icons/md";
 
-export default function TableBranches({ rowData, onRowValueChanged }) {
+export default function TableBranches({ rowData, onRowValueChanged, refreshAll }) {
 	const { config, branchTableGridRef, updateConfig, isDebug, selectedBranches, setSelectedBranches, setSelectedBranchStatuses, customScripts, setShowCommitView } = useApp();
 	const windowDimensions = useWindowDimensions();
 	const [isTallScreen, setIsTallScreen] = useState(windowDimensions.height > 768);
 
 	const resolveConflicts = useCallback((branchData) => {
 		window.electron.openSvnResolve({ fullPath: branchData["SVN Branch"] }).then((result) => {
-			console.log("Resolve Conflict Result: ", result);
+			console.log("Resolve Conflict Result: ", JSON.stringify(result, null, 4));
+			refreshAll(true);
 		});
-	}, []);
+	}, [refreshAll]);
 
 	const executeCustomScript = useCallback((scriptType, scriptPath, branchData) => {
 		window.electron.runCustomScript({ scriptType, scriptPath, branchData }).then((result) => {
-			console.log("Custom Script Result: ", result);
+			console.log("Custom Script Result: ", JSON.stringify(result, null, 4));
 		});
 	}, []);
 

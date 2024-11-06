@@ -434,24 +434,19 @@ ipcMain.handle("open-svn-resolve", async (event, data) => {
 	const command = `TortoiseProc.exe /command:resolve /path:"${formattedPath}"`;
 
 	return new Promise((resolve, reject) => {
-		try {
-			exec(command, (error, stdout, stderr) => {
-				if (error) {
-					console.warn("This error might be just caused by the TortoiseSVN window being closed by the user.");
-					console.error(`Error: ${error.message}`);
-					reject({ success: false, error: error.message });
-				} else if (stderr) {
-					console.error(`Stderr: ${stderr}`);
-					reject({ success: false, error: stderr });
-				} else {
-					console.log(`Stdout: ${stdout}`);
-					resolve({ success: true });
-				}
-			});
-		} catch (error) {
-			console.error(`Error: ${error.message}`);
-			reject({ success: false, error: error.message });
-		}
+		exec(command, (error, stdout, stderr) => {
+			if (error) {
+				logger.error(`Error: ${error.message}`);
+				logger.warn("This error might be just caused by the TortoiseSVN window being closed by the user.");
+				// reject(JSON.stringify({ success: false, error: error.message }));
+			} else if (stderr) {
+				logger.error(`Stderr: ${stderr}`);
+				// reject(JSON.stringify({ success: false, error: stderr }));
+			} else {
+				logger.debug(`Stdout: ${stdout}`);
+			}
+			resolve({ success: true });
+		});
 	});
 });
 

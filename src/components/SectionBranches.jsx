@@ -98,8 +98,8 @@ export default function SectionBranches() {
 		});
 	}, [selectedBranches, emitInfoSingle]);
 
-	const refreshAll = useCallback(() => {
-		if (isCommitMode) return;
+	const refreshAll = useCallback((forceRefresh = false) => {
+		if (isCommitMode && !forceRefresh) return;
 		RaiseClientNotificaiton("Refreshing all branches. Please wait until this is done!", "info", 3000);
 		const now = Date.now();
 		configurableRowData.forEach((row) => {
@@ -184,7 +184,7 @@ export default function SectionBranches() {
 					</Tooltip>
 				</Flex>
 			</Wrap>
-			<TableBranches rowData={rowDataBranches} onRowValueChanged={onRowValueChanged} />
+			<TableBranches rowData={rowDataBranches} onRowValueChanged={onRowValueChanged} refreshAll={refreshAll} />
 			<Flex columnGap={2} mt={4}>
 				<Tooltip label="Please select at least 1 branch" isDisabled={selectedBranches.length > 0} hasArrow>
 					<Button onClick={clearSelection} leftIcon={<CloseIcon />} colorScheme={"red"} isDisabled={selectedBranches.length < 1}>

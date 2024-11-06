@@ -1,18 +1,24 @@
-import { CopyIcon, DragHandleIcon } from "@chakra-ui/icons";
+import { DragHandleIcon } from "@chakra-ui/icons";
 import { AgGridReact } from "ag-grid-react";
 import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { useApp } from "../AppContext";
-import { Flex, Tooltip } from "@chakra-ui/react";
+import { Flex } from "@chakra-ui/react";
 import { stripBranchInfo } from "../utils/CommonConfig";
 import useWindowDimensions from "../hooks/useWindowDimensions";
 import { RiFilePaper2Fill } from "react-icons/ri";
 import ButtonElectron from "./ButtonElectron";
-import ButtonIconTooltip from "./ButtonIconTooltip";
+import { MdAutoFixHigh } from "react-icons/md";
 
 export default function TableBranches({ rowData, onRowValueChanged }) {
 	const { config, branchTableGridRef, updateConfig, isDebug, selectedBranches, setSelectedBranches, setSelectedBranchStatuses, customScripts, setShowCommitView } = useApp();
 	const windowDimensions = useWindowDimensions();
 	const [isTallScreen, setIsTallScreen] = useState(windowDimensions.height > 768);
+
+	const resolveConflicts = useCallback((branchData) => {
+		window.electron.openSvnResolve({ fullPath: branchData["SVN Branch"] }).then((result) => {
+			console.log("Resolve Conflict Result: ", result);
+		});
+	}, []);
 
 	const executeCustomScript = useCallback((scriptType, scriptPath, branchData) => {
 		window.electron.runCustomScript({ scriptType, scriptPath, branchData }).then((result) => {
@@ -108,12 +114,15 @@ export default function TableBranches({ rowData, onRowValueChanged }) {
 				editable: false,
 				cellRenderer: (params) => (
 					<Flex columnGap={1}>
+						{String(params.data["Branch Info"]).toLowerCase().includes("🤬") ? (
+							<ButtonElectron icon={<MdAutoFixHigh />} onClick={() => resolveConflicts(params.data)} colorScheme={"yellow"} label="Resolve Conflicts" size="sm" />
+						) : null}
 						{customScripts.map((script) => (
 							<ButtonElectron icon={<RiFilePaper2Fill />} onClick={() => executeCustomScript(script.type, script.path, params.data)} colorScheme={"yellow"} label={script.fileName} size="sm" />
 						))}
-						<Tooltip label="Copy Row" placement="top" hasArrow>
+						{/* <Tooltip label="Copy Row" placement="top" hasArrow>
 							<ButtonIconTooltip icon={<CopyIcon />} onClick={() => copyRow(params.data)} colorScheme={"yellow"} label="Copy Row" size="sm" />
-						</Tooltip>
+						</Tooltip> */}
 					</Flex>
 				),
 			},

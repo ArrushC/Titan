@@ -11,7 +11,7 @@ export default function ButtonElectron(props) {
 	}, [onClick]);
 
 	return (
-		<Tooltip label={window.electron ? label : "Feature must be used in desktop application"} >
+		<Tooltip label={window.electron ? label : "Feature must be used in desktop application"} hasArrow>
 			<IconButton aria-label={label} size={size} icon={icon} onClick={handleClick} colorScheme={colorScheme} isDisabled={!window.electron} />
 		</Tooltip>
 	);

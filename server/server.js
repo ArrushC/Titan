@@ -420,8 +420,8 @@ function emitBranchStatus(socket, branchId, branchStatus) {
 
 function isSVNConnectionError(socket, err) {
 	if (err?.message?.includes("svn: E170013: Unable to connect to a repository at URL") || err?.message?.includes("svn: E731001")) {
-		emitMessage(socket, `You have either been disconnected from the site hosting the SVN repository or are unnable to connect to it. Disconnecting from Titan until this issue is resolved`, "error");
-		io.emit("svn-connection-error", "SVN connection error detected. The server will shut down.");
+		emitMessage(socket, "Unable to connect to the SVN repository!", "error");
+		io.emit("svn-connection-error", "Unable to connect to the SVN repository!");
 
 		// Forcefully shut down the server
 		// forceShutdown("SVN Connection Error");
@@ -549,22 +549,34 @@ io.on("connection", (socket) => {
 			const tasks = [
 				{ command: "getWorkingCopyRevision", args: [data.branch], isUtilityCmd: true },
 				{ command: "log", args: [data.branch], options: { revision: "BASE:HEAD" } },
+				{ command: "status", args: [data.branch], options: { quiet: true, params: ["--show-updates"] } },
 			];
 
 			try {
 				const results = await executeSvnCommand(tasks);
 				const wcRevisionResult = results.find((r) => r.command === "getWorkingCopyRevision").result?.low;
 				const logResult = results.find((r) => r.command === "log").result;
+				const statusResult = results.find((r) => r.command === "status").result;
 
+				// Check if there are any conflicts using the status result
+				let conflictsCount = 0;
+				if (statusResult && statusResult.target && statusResult.target.entry) {
+					const entries = Array.isArray(statusResult.target.entry) ? statusResult.target.entry : [statusResult.target.entry];
+					const conflicts = entries.filter((entry) => entry["wc-status"]?.$?.item === "conflicted");
+					if (conflicts.length > 0) {
+						// emitMessage(socket, `Branch ${branchString(data.folder, data.version, data.branch)} has conflicts`, "warning");
+						conflictsCount = conflicts.length;
+					}
+				}
+
+				// Count the number of revisions since the working copy revision
 				let count = 0;
 				if (logResult && logResult.logentry) {
 					let entries = Array.isArray(logResult.logentry) ? logResult.logentry : [logResult.logentry];
 					count = entries.filter((entry) => parseInt(entry["$"].revision) > wcRevisionResult).length;
 				}
 
-				// logger.debug(`Branch: ${branchString(data.folder, data.version, data.branch)} | Revisions Behind: ${count}`);
-
-				let branchInfo = count == 0 ? "Latest" : `-${count} Revision${count > 1 ? "s" : ""}`;
+				let branchInfo = count == 0 ? `Latest${conflictsCount > 0 ? " 🤬" : ""}` : `-${count} Revision${count > 1 ? "s" : ""}${conflictsCount > 0 ? " 🤬" : ""}`;
 
 				emitBranchInfo(socket, data.id, branchInfo);
 			} catch (err) {

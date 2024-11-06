@@ -427,6 +427,34 @@ ipcMain.handle("fetch-custom-scripts", async () => {
 	return { success: true, scripts };
 });
 
+ipcMain.handle("open-svn-resolve", async (event, data) => {
+	const { fullPath } = data;
+	const formattedPath = fullPath.replace(/\\/g, "/");
+	logger.info(`Opening TortoiseSVN resolve for: ${formattedPath}`);
+	const command = `TortoiseProc.exe /command:resolve /path:"${formattedPath}"`;
+
+	return new Promise((resolve, reject) => {
+		try {
+			exec(command, (error, stdout, stderr) => {
+				if (error) {
+					console.warn("This error might be just caused by the TortoiseSVN window being closed by the user.");
+					console.error(`Error: ${error.message}`);
+					reject({ success: false, error: error.message });
+				} else if (stderr) {
+					console.error(`Stderr: ${stderr}`);
+					reject({ success: false, error: stderr });
+				} else {
+					console.log(`Stdout: ${stdout}`);
+					resolve({ success: true });
+				}
+			});
+		} catch (error) {
+			console.error(`Error: ${error.message}`);
+			reject({ success: false, error: error.message });
+		}
+	});
+});
+
 ipcMain.handle("run-custom-script", async (event, data) => {
 	const { scriptType, scriptPath, branchData } = data;
 	logger.info(`Running custom script: ${scriptPath} (${scriptType}) with branch data: ${JSON.stringify(branchData)}`);

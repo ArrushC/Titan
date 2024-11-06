@@ -7,13 +7,15 @@ import { fileURLToPath } from "url";
 import { setupLogger, setupUncaughtExceptionHandler } from "./server/logger.js";
 import { exec, execSync } from "child_process";
 
-// Import package.json
-import packageJson from "./package.json" assert { type: "json" };
-
 const { autoUpdater } = electronUpdaterPkg;
+const isDev = process.env.NODE_ENV === "development";
+const connectionURL = isDev ? "http://localhost:5173" : "http://localhost:4000";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
+
+const packageJsonPath = path.join(__dirname, "package.json");
+const packageJson = JSON.parse(fs.readFileSync(packageJsonPath, "utf-8"));
 
 // Create a logger instance
 const logger = setupLogger("main.js");
@@ -61,23 +63,19 @@ function createWindow() {
 
 	// Set CSP headers
 	session.defaultSession.webRequest.onHeadersReceived((details, callback) => {
+		const csp = isDev
+			? ["default-src 'self' 'unsafe-inline' 'unsafe-eval'", "connect-src 'self' http://localhost:4000 http://localhost:5173 ws://localhost:4000 ws://localhost:5173", "img-src 'self' data:", "style-src 'self' 'unsafe-inline'", "font-src 'self' data:"].join("; ")
+			: ["default-src 'self'", "connect-src 'self' http://localhost:4000 ws://localhost:4000", "img-src 'self' data:", "style-src 'self' 'unsafe-inline'", "font-src 'self' data:"].join("; ");
+
 		callback({
 			responseHeaders: {
 				...details.responseHeaders,
-				"Content-Security-Policy": [
-					"default-src 'self';" +
-						"script-src 'self';" +
-						"style-src 'self' 'unsafe-inline';" + // You might need 'unsafe-inline' for inline styles
-						"img-src 'self' data:;" +
-						"font-src 'self' data:;" +
-						"connect-src 'self' http://localhost:4000;" + // Adjust this if you're connecting to other URLs
-						"frame-src 'none';",
-				],
+				"Content-Security-Policy": [csp],
 			},
 		});
 	});
 
-	mainWindow.loadURL("http://localhost:4000");
+	mainWindow.loadURL(connectionURL);
 
 	// Show window when it's ready to avoid flickering
 	mainWindow.once("ready-to-show", () => {

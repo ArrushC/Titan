@@ -1,7 +1,8 @@
 import express from "express";
 import { createServer } from "http";
 import { Server } from "socket.io";
-import { promises as fs } from "fs";
+import fs from "fs";
+import { promises as fsPromises } from "fs";
 import path from "path";
 import { fileURLToPath } from "url";
 import async from "async";
@@ -9,28 +10,31 @@ import svnUltimate from "node-svn-ultimate";
 import { setupLogger, setupUncaughtExceptionHandler } from "./logger.js";
 import compression from "compression";
 import { exec } from "child_process";
+import fetch from "node-fetch";
 
-// Import package.json
-import packageJson from "../package.json" assert { type: "json" };
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
+const packageJsonPath = path.join(__dirname, "../package.json");
+const packageJson = JSON.parse(fs.readFileSync(packageJsonPath, "utf-8"));
 
 const latestVersion = packageJson.version;
 const configFilePath = packageJson.configFilePath;
 const targetsFilePath = packageJson.targetsFilePath;
 
+const isDev = process.env.NODE_ENV === "development";
 const port = process.env.PORT || 4000;
+const frontendPort = isDev ? 5173 : port;
 
 // Create a logger instance
 const logger = setupLogger("server.js");
 setupUncaughtExceptionHandler(logger);
 
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
-
 const app = express();
 const server = createServer(app);
 const io = new Server(server, {
 	cors: {
-		origin: "*",
+		origin: isDev ? "http://localhost:5173" : "*",
 		credentials: true,
 	},
 });
@@ -95,13 +99,13 @@ function branchPathFolder(branch) {
  ************************************/
 async function deleteFileOrDirectory(pathToDelete) {
 	try {
-		const stats = await fs.lstat(pathToDelete);
+		const stats = await fsPromises.lstat(pathToDelete);
 
 		if (stats.isFile()) {
-			await fs.unlink(pathToDelete);
+			await fsPromises.unlink(pathToDelete);
 			logger.debug("File deleted successfully!");
 		} else if (stats.isDirectory()) {
-			await fs.rmdir(pathToDelete, { recursive: true });
+			await fsPromises.rmdir(pathToDelete, { recursive: true });
 			logger.debug("Directory deleted successfully!");
 		} else {
 			logger.error("Path is not a file or directory.");
@@ -113,7 +117,7 @@ async function deleteFileOrDirectory(pathToDelete) {
 
 async function isDirectory(pathToCheck) {
 	try {
-		const stats = await fs.lstat(pathToCheck);
+		const stats = await fsPromises.lstat(pathToCheck);
 		return stats.isDirectory();
 	} catch (err) {
 		if (err.code === "ENOENT") {
@@ -128,8 +132,8 @@ async function isDirectory(pathToCheck) {
 
 async function writeTargetsFile(targets = []) {
 	try {
-		await fs.mkdir(path.dirname(targetsFilePath), { recursive: true });
-		await fs.writeFile(targetsFilePath, targets.join("\n"));
+		await fsPromises.mkdir(path.dirname(targetsFilePath), { recursive: true });
+		await fsPromises.writeFile(targetsFilePath, targets.join("\n"));
 	} catch (err) {
 		logger.error("Error writing targets file:", err);
 	}
@@ -437,8 +441,8 @@ async function sendConfig(socket) {
 	let config = null;
 
 	try {
-		await fs.mkdir(path.dirname(configFilePath), { recursive: true });
-		await fs.access(configFilePath);
+		await fsPromises.mkdir(path.dirname(configFilePath), { recursive: true });
+		await fsPromises.access(configFilePath);
 	} catch (err) {
 		const defaultConfig = {
 			currentVersion: latestVersion,
@@ -454,17 +458,17 @@ async function sendConfig(socket) {
 				token: "TRELLO_TOKEN",
 			},
 		};
-		await fs.writeFile(configFilePath, JSON.stringify(defaultConfig, null, 4));
+		await fsPromises.writeFile(configFilePath, JSON.stringify(defaultConfig, null, 4));
 		emitMessage(socket, "Config file created with default content", "success");
 	}
 
 	try {
-		const data = await fs.readFile(configFilePath, "utf8");
+		const data = await fsPromises.readFile(configFilePath, "utf8");
 		config = JSON.parse(data);
 		if (!config.currentVersion || config.currentVersion !== latestVersion) {
 			logger.info(`Updating config file with latest version - v${config.currentVersion || "-1"} -> v${latestVersion}`);
 			config.currentVersion = latestVersion;
-			await fs.writeFile(configFilePath, JSON.stringify(config, null, 4));
+			await fsPromises.writeFile(configFilePath, JSON.stringify(config, null, 4));
 			emitMessage(socket, `Successfully updated Titan to v${latestVersion}!`, "success");
 		}
 	} catch (err) {
@@ -477,7 +481,11 @@ async function sendConfig(socket) {
 }
 
 io.on("connection", (socket) => {
-	const isForeignOrigin = socket.handshake.headers["sec-fetch-site"] === "cross-site" || socket.handshake.headers?.referer !== `http://localhost:${port}/`;
+	const origin = socket.handshake.headers.origin || "";
+	const referer = socket.handshake.headers.referer || "";
+	const expectedOrigin = isDev ? `http://localhost:${frontendPort}` : `http://localhost:${port}`;
+
+	const isForeignOrigin = !origin.startsWith(expectedOrigin) && !referer.startsWith(expectedOrigin);
 
 	logger.info(`Connected to ${isForeignOrigin ? "foreign" : "titan"} client`);
 	emitMessage(socket, "Connected To Server!", "success", 1500);
@@ -494,7 +502,7 @@ io.on("connection", (socket) => {
 		socket.on("titan-config-set", async (data) => {
 			debugTask("titan-config-set", data, false);
 			try {
-				await fs.writeFile(configFilePath, JSON.stringify(data, null, 4));
+				await fsPromises.writeFile(configFilePath, JSON.stringify(data, null, 4));
 				emitMessage(socket, "Config file updated", "success");
 			} catch (err) {
 				logger.error(err);
@@ -1037,7 +1045,7 @@ io.on("connection", (socket) => {
 		debugTask("external-svn-commits-get", null, true);
 	});
 
-	socket.on("external-autofill-issue-numbers" , async (data) => {
+	socket.on("external-autofill-issue-numbers", async (data) => {
 		debugTask("external-autofill-issue-numbers", data, false);
 		debugTask("external-autofill-issue-numbers", data, true);
 	});

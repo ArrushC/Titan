@@ -118,8 +118,8 @@ export default function TableBranches({ rowData, onRowValueChanged, refreshAll }
 						{String(params.data["Branch Info"]).toLowerCase().includes("🤬") ? (
 							<ButtonElectron icon={<MdAutoFixHigh />} onClick={() => resolveConflicts(params.data)} colorScheme={"yellow"} label="Resolve Conflicts" size="sm" />
 						) : null}
-						{customScripts.map((script) => (
-							<ButtonElectron icon={<RiFilePaper2Fill />} onClick={() => executeCustomScript(script.type, script.path, params.data)} colorScheme={"yellow"} label={script.fileName} size="sm" />
+						{customScripts.map((script, i) => (
+							<ButtonElectron key={i} icon={<RiFilePaper2Fill />} onClick={() => executeCustomScript(script.type, script.path, params.data)} colorScheme={"yellow"} label={script.fileName} size="sm" />
 						))}
 						{/* <Tooltip label="Copy Row" placement="top" hasArrow>
 							<ButtonIconTooltip icon={<CopyIcon />} onClick={() => copyRow(params.data)} colorScheme={"yellow"} label="Copy Row" size="sm" />

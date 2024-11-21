@@ -119,8 +119,8 @@ export default function PanelLocalChanges({ rowDataLocalChanges, setRowDataLocal
 						/>
 					</div>
 					<Flex mt={4} columnGap={2} justifyContent={"flex-end"}>
-						<Tooltip label={"Requires you to select at least 1 file"} hasArrow isDisabled={selectedLocalChanges.length > 0}>
-							<Button onClick={handleRevertFileViewFiles} colorScheme={"red"} isDisabled={selectedLocalChanges.length < 1}>
+						<Tooltip label={"Requires you to select at least 1 file"} hasArrow disabled={selectedLocalChanges.length > 0}>
+							<Button onClick={handleRevertFileViewFiles} colorPalette={"red"} disabled={selectedLocalChanges.length < 1}>
 								Revert Selected
 							</Button>
 						</Tooltip>

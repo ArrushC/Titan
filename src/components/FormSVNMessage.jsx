@@ -50,9 +50,9 @@ export default function FormSVNMessage({ openMessageAutoFillModal }) {
 				<Box flexGrow={1}>
 					<Flex columnGap={2} mb={2}>
 						<Box width={"50%"}>
-							<FormControl isRequired>
+							<FormControl required>
 								<FormLabel>Source Branch</FormLabel>
-								<Select value={sourceBranch} onChange={handleSourceBranchChange} options={branchOptions} placeholder="SVN Branch you're commiting from" selectedOptionStyle="check" selectedOptionColorScheme="yellow" isClearable classNamePrefix={"chakra-react-select"} />
+								<Select value={sourceBranch} onChange={handleSourceBranchChange} options={branchOptions} placeholder="SVN Branch you're commiting from" selectedOptionStyle="check" selectedOptioncolorPalette="yellow" isClearable classNamePrefix={"chakra-react-select"} />
 							</FormControl>
 						</Box>
 						<Flex width={"50%"} alignItems={"flex-end"} columnGap={2}>
@@ -60,7 +60,7 @@ export default function FormSVNMessage({ openMessageAutoFillModal }) {
 						</Flex>
 					</Flex>
 					<Flex columnGap={2} height={"auto"}>
-						<FormControl width={commitOptions?.useIssuePerFolder ? "50%" : "100%"} isRequired>
+						<FormControl width={commitOptions?.useIssuePerFolder ? "50%" : "100%"} required>
 							<FormLabel>Commit Message</FormLabel>
 							<Textarea placeholder={"Enter Commit Message"} height={"76%"} resize={"none"} onInput={handleCommitMessageChange} value={commitMessage} />
 						</FormControl>
@@ -84,7 +84,7 @@ export default function FormSVNMessage({ openMessageAutoFillModal }) {
 				</Box>
 				<Box pt={8}>
 					<Tooltip label={sourceBranch?.value ? "Auto Fill Message" : "Please select source branch first!"} hasArrow placement="bottom-end">
-						<IconButton colorScheme={"yellow"} aria-label="Auto Fill Message" size="md" onClick={() => openMessageAutoFillModal()} icon={<ExternalLinkIcon />} isDisabled={!sourceBranch?.value} />
+						<IconButton colorPalette={"yellow"} aria-label="Auto Fill Message" size="md" onClick={() => openMessageAutoFillModal()} icon={<ExternalLinkIcon />} disabled={!sourceBranch?.value} />
 					</Tooltip>
 				</Box>
 			</Flex>

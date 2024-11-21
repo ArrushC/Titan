@@ -72,7 +72,7 @@ export default function FilterableTableTrello({ setAutoFillSelection }) {
 				</Flex>
 				<Box>
 					<Tooltip label={"Resubmit Query"} hasArrow>
-						<IconButton onClick={resubmitTrelloQuery} icon={<RepeatIcon />} colorScheme={"yellow"} aria-label="Resubmit" />
+						<IconButton onClick={resubmitTrelloQuery} icon={<RepeatIcon />} colorPalette={"yellow"} aria-label="Resubmit" />
 					</Tooltip>
 				</Box>
 			</Flex>

@@ -248,14 +248,14 @@ export default function ModalCommit({ isModalOpen, closeModal }) {
 	return !isModalOpen || !socketPayload ? (
 		<></>
 	) : (
-		<Modal isOpen={isModalOpen} onClose={closeModal} isCentered motionPreset="slideInBottom" scrollBehavior="inside" size="xl" closeOnOverlayClick={activeStep == 1}>
+		<Modal open={isModalOpen} onOpenChange={closeModal} placement={"center"} motionPreset="slideInBottom" scrollBehavior="inside" size="xl" closeOnOverlayClick={activeStep == 1}>
 			<ModalOverlay />
 			<ModalContent maxH={"85%"} maxW="95%">
 				<ModalHeader display={"flex"} justifyContent={"space-between"} maxWidth={activeStep == 1 ? "94%" : "100%"}>
 					<Heading as={"h2"} size={"lg"}>
 						Commit Selected Files
 					</Heading>
-					<Stepper index={activeStep - 1} mb={0} size={"sm"} colorScheme="yellow">
+					<Stepper index={activeStep - 1} mb={0} size={"sm"} colorPalette="yellow">
 						{steps.map((step, index) => (
 							<Step key={index}>
 								<StepIndicator>
@@ -358,13 +358,13 @@ export default function ModalCommit({ isModalOpen, closeModal }) {
 									</Box>
 									<Box>
 										<Tooltip hasArrow label={"Copy to clipboard"}>
-											<IconButton aria-label="Copy To Clipboard" onClick={onRevisionsCopy} icon={<CopyIcon />} colorScheme="yellow" />
+											<IconButton aria-label="Copy To Clipboard" onClick={onRevisionsCopy} icon={<CopyIcon />} colorPalette="yellow" />
 										</Tooltip>
 									</Box>
 								</Flex>
 								<Box my={4}>
 									<Text fontWeight={600}>Modify the clipboard text to include...</Text>
-									<CheckboxGroup colorScheme="yellow" defaultValue={["BranchFolder", "BranchVersion"]} onChange={handleClipboardOption}>
+									<CheckboxGroup colorPalette="yellow" defaultValue={["BranchFolder", "BranchVersion"]} onChange={handleClipboardOption}>
 										<Wrap>
 											<Checkbox value="BranchFolder">Branch Folder</Checkbox>
 											<Checkbox value="BranchVersion">Branch Version</Checkbox>
@@ -384,7 +384,7 @@ export default function ModalCommit({ isModalOpen, closeModal }) {
 										)}
 									</Box>
 									<Tooltip hasArrow label={"Copy to clipboard"}>
-										<IconButton aria-label="Copy To Clipboard" onClick={onCommitMsgCopy} icon={<CopyIcon />} colorScheme="yellow" />
+										<IconButton aria-label="Copy To Clipboard" onClick={onCommitMsgCopy} icon={<CopyIcon />} colorPalette="yellow" />
 									</Tooltip>
 								</Flex>
 							</Box>
@@ -394,16 +394,16 @@ export default function ModalCommit({ isModalOpen, closeModal }) {
 				<ModalFooter>
 					<Flex flex={1} justifyContent="space-between">
 						<Flex columnGap={2}>
-							<Tooltip hasArrow label={"Cannot undo the commit currently"} isDisabled={activeStep < 2}>
-								<Button onClick={handlePrevious} mr={3} isDisabled={activeStep >= 2}>
+							<Tooltip hasArrow label={"Cannot undo the commit currently"} disabled={activeStep < 2}>
+								<Button onClick={handlePrevious} mr={3} disabled={activeStep >= 2}>
 									{activeStep == 1 ? "Cancel" : "Previous"}
 								</Button>
 							</Tooltip>
 						</Flex>
 						<Flex columnGap={2}>
 							{activeStep == 3 ? (
-								<Tooltip hasArrow label={"Requires Trello Autofill"} isDisabled={postCommitData?.type === "trello" && isTrelloIntegrationEnabled}>
-									<Button colorScheme="yellow" leftIcon={<Icon as={FaTrello} />} onClick={handleTrelloUpdate} isDisabled={postCommitData?.type != "trello" || !isTrelloIntegrationEnabled}>
+								<Tooltip hasArrow label={"Requires Trello Autofill"} disabled={postCommitData?.type === "trello" && isTrelloIntegrationEnabled}>
+									<Button colorPalette="yellow" leftIcon={<Icon as={FaTrello} />} onClick={handleTrelloUpdate} disabled={postCommitData?.type != "trello" || !isTrelloIntegrationEnabled}>
 										Update Card
 									</Button>
 								</Tooltip>
@@ -411,8 +411,8 @@ export default function ModalCommit({ isModalOpen, closeModal }) {
 								<></>
 							)}
 
-							<Tooltip hasArrow label={"Cannot undo the commit currently"} isDisabled={activeStep != 2}>
-								<Button colorScheme="yellow" onClick={handleNext} isDisabled={activeStep == 2}>
+							<Tooltip hasArrow label={"Cannot undo the commit currently"} disabled={activeStep != 2}>
+								<Button colorPalette="yellow" onClick={handleNext} disabled={activeStep == 2}>
 									{activeStep == steps.length ? "Complete" : "Next"}
 								</Button>
 							</Tooltip>

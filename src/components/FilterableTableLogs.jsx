@@ -22,7 +22,7 @@ export default function FilterableTableLogs({ setAutoFillSelection = false, isAu
 				</Flex>
 				<Box>
 					<Tooltip label={"Refresh"} hasArrow>
-						<IconButton onClick={refreshLogs} icon={<RepeatIcon />} colorScheme={"yellow"} aria-label="Refresh" />
+						<IconButton onClick={refreshLogs} icon={<RepeatIcon />} colorPalette={"yellow"} aria-label="Refresh" />
 					</Tooltip>
 				</Box>
 			</Flex>

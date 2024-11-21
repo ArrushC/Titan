@@ -1,13 +1,13 @@
 import React, { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState } from "react";
 import socketIOClient from "socket.io-client";
-import { useToast } from "@chakra-ui/react";
 import _ from "lodash";
 import { branchString, stripBranchInfo } from "./utils/CommonConfig";
 import { createToastConfig, URL_SOCKET_CLIENT } from "./utils/Constants";
+import { toaster } from "./components/ui/toaster";
 
 const AppContext = createContext({
 	socket: null,
-	toast: null,
+	toaster: null,
 	config: null,
 	updateConfig: (_) => {},
 	isDebug: false,
@@ -57,7 +57,6 @@ export const useApp = () => {
 export const AppProvider = ({ children }) => {
 	const [config, setConfig] = useState(null);
 	const [socket, setSocket] = useState(null);
-	const toast = useToast();
 	const [isDebug, setIsDebug] = useState(() => localStorage.getItem("isDebug") === "true");
 
 	useEffect(() => {
@@ -68,20 +67,20 @@ export const AppProvider = ({ children }) => {
 			newSocket.emit("titan-config-get", "fetch");
 			newSocket.once("titan-config-get", (data) => {
 				setConfig(data);
-				if (!data) toast(createToastConfig("Couldn't load data from the server", "error", 0));
+				if (!data) toaster.create(createToastConfig("Couldn't load data from the server", "error", 0));
 			});
 		});
 
 		newSocket.on("notification", (data) => {
-			toast(createToastConfig(data.description, data.status, data.duration, true));
+			toaster.create(createToastConfig(data.description, data.status, data.duration));
 		});
 
 		newSocket.on("disconnect", () => {
-			toast(createToastConfig("Server Has Been Disconnected", "warning", 0, true));
+			toaster.create(createToastConfig("Server Has Been Disconnected", "warning", 0));
 		});
 
 		newSocket.on("reconnect", () => {
-			toast(createToastConfig("Server Has Been Reconnected", "success", 2000, true));
+			toaster.create(createToastConfig("Server Has Been Reconnected", "success", 2000));
 		});
 
 		return () => {
@@ -183,7 +182,7 @@ export const AppProvider = ({ children }) => {
 				setCustomScripts(data.scripts);
 				return;
 			}
-			toast(createToastConfig(data.error, "error", 0, true));
+			toaster.create(createToastConfig(data.error, "error", 0));
 		});
 	}, [configurableRowData]);
 
@@ -263,7 +262,7 @@ export const AppProvider = ({ children }) => {
 		<AppContext.Provider
 			value={{
 				socket,
-				toast,
+				toaster,
 				config,
 				updateConfig,
 				isDebug,

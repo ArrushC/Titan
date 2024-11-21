@@ -3,19 +3,19 @@ import { useApp } from "../AppContext";
 import { createToastConfig } from "../utils/Constants";
 
 export default function useNotifications() {
-	const { toast } = useApp();
+	const { toaster } = useApp();
 
 	const RaiseClientNotificaiton = useCallback(
-		(description = "", status = "info", duration = 3000, manualToast = null) => {
-			const toastConfig = createToastConfig(description, status, duration);
-			if (toast) return toast(toastConfig);
+		(description = "", type = "info", duration = 3000, manualToast = null) => {
+			const toastConfig = createToastConfig(description, type, duration);
+			if (toaster) return toaster.create(toastConfig);
 			else if (manualToast) return manualToast(toastConfig);
 		},
-		[toast]
+		[toaster]
 	);
 
 	return {
-		toast,
+		toaster,
 		RaiseClientNotificaiton,
 	};
 }

@@ -80,13 +80,13 @@ export default function PanelUntrackedChanges({ rowDataUntrackedChanges, setRowD
 						/>
 					</div>
 					<Flex mt={4} columnGap={2} justifyContent={"flex-end"}>
-						<Tooltip label={"Requires you to select at least 1 file"} hasArrow isDisabled={selectedUntrackedChanges.length > 0}>
-							<Button onClick={handleAddRemoveFiles} colorScheme={"green"} isDisabled={selectedUntrackedChanges.length < 1}>
+						<Tooltip label={"Requires you to select at least 1 file"} hasArrow disabled={selectedUntrackedChanges.length > 0}>
+							<Button onClick={handleAddRemoveFiles} colorPalette={"green"} disabled={selectedUntrackedChanges.length < 1}>
 								Add/Remove {selectedUntrackedChanges.length} File{selectedUntrackedChanges.length > 1 ? "s" : ""}
 							</Button>
 						</Tooltip>
-						<Tooltip label={"Requires you to select at least 1 file"} hasArrow isDisabled={selectedUntrackedChanges.length > 0}>
-							<Button onClick={hanldeRevertUnseenFiles} colorScheme={"red"} isDisabled={selectedUntrackedChanges.length < 1}>
+						<Tooltip label={"Requires you to select at least 1 file"} hasArrow disabled={selectedUntrackedChanges.length > 0}>
+							<Button onClick={hanldeRevertUnseenFiles} colorPalette={"red"} disabled={selectedUntrackedChanges.length < 1}>
 								Revert {selectedUntrackedChanges.length} File{selectedUntrackedChanges.length > 1 ? "s" : ""}
 							</Button>
 						</Tooltip>

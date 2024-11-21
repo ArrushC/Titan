@@ -3,7 +3,7 @@ import React from "react";
 
 export default function AlertConfirmRowDelete({ isAlertOpen, onCloseAlert, cancelRef, removeSelectedRows}) {
 	return (
-		<AlertDialog isOpen={isAlertOpen} leastDestructiveRef={cancelRef} onClose={onCloseAlert}>
+		<AlertDialog open={isAlertOpen} leastDestructiveRef={cancelRef} onOpenChange={onCloseAlert}>
 			<AlertDialogOverlay>
 				<AlertDialogContent>
 					<AlertDialogHeader fontSize="lg" fontWeight="bold">
@@ -16,7 +16,7 @@ export default function AlertConfirmRowDelete({ isAlertOpen, onCloseAlert, cance
 						<Button ref={cancelRef} onClick={onCloseAlert}>
 							Cancel
 						</Button>
-						<Button colorScheme="red" onClick={removeSelectedRows} ml={3}>
+						<Button colorPalette="red" onClick={removeSelectedRows} ml={3}>
 							Delete
 						</Button>
 					</AlertDialogFooter>

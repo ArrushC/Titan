@@ -54,11 +54,11 @@ export default function FooterSectionCommit({ openCommitModal }) {
 	return (
 		<Box>
 			<Flex columnGap={2} justifyContent={"center"}>
-				<Button onClick={performRefresh} leftIcon={<RepeatIcon />} colorScheme={"yellow"}>
+				<Button onClick={performRefresh} leftIcon={<RepeatIcon />} colorPalette={"yellow"}>
 					Refresh Process
 				</Button>
-				<Tooltip label={"Select at least 1 file"} hasArrow isDisabled={selectedLocalChanges.length > 0}>
-					<Button onClick={performCommit} leftIcon={<Icon as={MdCloudUpload} />} colorScheme={"yellow"} isDisabled={selectedLocalChanges.length < 1}>
+				<Tooltip label={"Select at least 1 file"} hasArrow disabled={selectedLocalChanges.length > 0}>
+					<Button onClick={performCommit} leftIcon={<Icon as={MdCloudUpload} />} colorPalette={"yellow"} disabled={selectedLocalChanges.length < 1}>
 						Commit {selectedLocalChanges.length > 0 ? `${selectedLocalChanges.length} File` : ""}
 						{selectedLocalChanges.length > 1 ? "s" : ""}
 					</Button>

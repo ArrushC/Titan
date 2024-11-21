@@ -79,7 +79,7 @@ export default function ModalMessageAutoFill({ isModalOpen, closeModal }) {
 	}, [isModalOpen]);
 
 	return (
-		<Modal isOpen={isModalOpen} onClose={closeModal} isCentered motionPreset="slideInBottom" scrollBehavior="inside" size="xl" closeOnOverlayClick={true}>
+		<Modal open={isModalOpen} onOpenChange={closeModal} placement={"center"} motionPreset="slideInBottom" scrollBehavior="inside" size="xl" closeOnOverlayClick={true}>
 			<ModalOverlay />
 			<ModalContent maxH={"95%"} maxW="95%">
 				<ModalHeader>
@@ -90,7 +90,7 @@ export default function ModalMessageAutoFill({ isModalOpen, closeModal }) {
 				<ModalCloseButton size={"lg"} />
 				<ModalBody>
 					<Box height={"70vh"}>
-						<Tabs variant={"solid-rounded"} colorScheme="yellow" defaultIndex={0} isLazy={true} h={"100%"} onChange={(index) => handleTabIndexChange(index)}>
+						<Tabs variant={"solid-rounded"} colorPalette="yellow" defaultIndex={0} isLazy={true} h={"100%"} onChange={(index) => handleTabIndexChange(index)}>
 							<TabList>
 								<Tab>SVN Logs</Tab>
 								<Tab>Trello</Tab>
@@ -110,8 +110,8 @@ export default function ModalMessageAutoFill({ isModalOpen, closeModal }) {
 					<Button mr={3} onClick={() => closeModal()}>
 						Cancel
 					</Button>
-					<Tooltip hasArrow label={"Please select exactly one row!"} placement={"top-start"} isDisabled={!disableSelect}>
-						<Button colorScheme="yellow" onClick={handleSelect} isDisabled={disableSelect}>
+					<Tooltip hasArrow label={"Please select exactly one row!"} placement={"top-start"} disabled={!disableSelect}>
+						<Button colorPalette="yellow" onClick={handleSelect} disabled={disableSelect}>
 							Select
 						</Button>
 					</Tooltip>

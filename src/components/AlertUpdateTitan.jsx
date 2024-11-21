@@ -1,10 +1,10 @@
-import { AlertDialog, AlertDialogBody, AlertDialogCloseButton, AlertDialogContent, AlertDialogFooter, AlertDialogHeader, AlertDialogOverlay, Button, Flex, Spinner, useDisclosure } from "@chakra-ui/react";
+import { Button, DialogBody, DialogCloseTrigger, DialogContent, DialogFooter, DialogHeader, DialogRoot, DialogTitle, Flex, Spinner, useDisclosure } from "@chakra-ui/react";
 import React, { useCallback, useEffect, useRef, useState } from "react";
 import useNotifications from "../hooks/useNotifications";
 
 export default function AlertUpdateTitan() {
 	const { toast, RaiseClientNotificaiton } = useNotifications();
-	const { isOpen: isAlertOpen, onOpen: onOpenAlert, onClose: onCloseAlert } = useDisclosure();
+	const { open: isAlertOpen, onOpen: onOpenAlert, onClose: onCloseAlert } = useDisclosure();
 	const cancelRef = useRef();
 	const [updateInProgress, setUpdateInProgress] = useState(false);
 
@@ -66,33 +66,31 @@ export default function AlertUpdateTitan() {
 	}, [updateInProgress, RaiseClientNotificaiton, setUpdateInProgress, onCloseAlert]);
 
 	return (
-		<AlertDialog isOpen={isAlertOpen} leastDestructiveRef={cancelRef} onClose={onCloseAlert} motionPreset="slideInBottom" closeOnOverlayClick={!updateInProgress}>
-			<AlertDialogOverlay>
-				<AlertDialogContent>
-					<AlertDialogHeader fontSize="lg" fontWeight="bold">
-						Update Available
-					</AlertDialogHeader>
-					{updateInProgress ? <></> : <AlertDialogCloseButton />}
-					<AlertDialogBody>
-						{updateInProgress ? "Downloading the update. Please wait..." : "A new version of Titan is available. Would you like to download and install the update?"}
-						{updateInProgress ? (
-							<Flex justify="center" mt={4}>
-								<Spinner size="xl" thickness="4px" speed="0.65s" color="yellow.500" ml={4} />
-							</Flex>
-						) : (
-							<></>
-						)}
-					</AlertDialogBody>
-					<AlertDialogFooter>
-						<Button colorScheme="red" ref={cancelRef} onClick={handleCancel} isDisabled={updateInProgress}>
-							Cancel
-						</Button>
-						<Button colorScheme="yellow" onClick={handleStartUpdate} ml={3} isDisabled={updateInProgress}>
-							Confirm
-						</Button>
-					</AlertDialogFooter>
-				</AlertDialogContent>
-			</AlertDialogOverlay>
-		</AlertDialog>
+		<DialogRoot role="alertdialog" open={isAlertOpen} leastDestructiveRef={cancelRef} onOpenChange={onCloseAlert} motionPreset="slide-in-bottom" closeOnOverlayClick={!updateInProgress}>
+			<DialogContent>
+				<DialogHeader fontSize="lg" fontWeight="bold">
+					<DialogTitle>Update Available</DialogTitle>
+					<DialogCloseTrigger disabled={updateInProgress} />
+				</DialogHeader>
+				<DialogBody>
+					<p>{updateInProgress ? "Downloading the update. Please wait..." : "A new version of Titan is available. Would you like to download and install the update?"}</p>
+					{updateInProgress ? (
+						<Flex justify="center" mt={4}>
+							<Spinner size="xl" thickness="4px" speed="0.65s" color="yellow.500" ml={4} />
+						</Flex>
+					) : (
+						<></>
+					)}
+				</DialogBody>
+				<DialogFooter>
+					<Button colorPalette="red" ref={cancelRef} onClick={handleCancel} disabled={updateInProgress}>
+						Cancel
+					</Button>
+					<Button colorPalette="yellow" onClick={handleStartUpdate} ml={3} disabled={updateInProgress}>
+						Confirm
+					</Button>
+				</DialogFooter>
+			</DialogContent>
+		</DialogRoot>
 	);
 }

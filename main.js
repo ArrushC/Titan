@@ -2,6 +2,7 @@ import { app, BrowserWindow, screen, ipcMain, dialog, session, shell, Menu } fro
 import electronUpdaterPkg from "electron-updater";
 import fs from "fs";
 import path from "path";
+import os from "os";
 import { fork } from "child_process";
 import { fileURLToPath } from "url";
 import { setupLogger, setupUncaughtExceptionHandler } from "./server/logger.js";
@@ -375,6 +376,17 @@ process.on("uncaughtException", (error) => {
 app.commandLine.appendSwitch("disable-renderer-backgrounding");
 
 // IPC communication
+ipcMain.handle("fetch-username", async () => {
+	const userInfo = os.userInfo();
+    const fullName = userInfo.username; // os.userInfo().username gets the system username
+
+    // Assuming the username is formatted as "FirstName.LastName"
+    // This may need adjusting the parsing logic based on actual system username format
+    const [firstName, lastName] = fullName.split('.');
+
+    return { firstName, lastName };
+});
+
 ipcMain.handle("app-version", () => app.getVersion());
 
 ipcMain.handle("open-tortoisesvn-diff", async (event, data) => {

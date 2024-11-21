@@ -1,6 +1,7 @@
 const { contextBridge, ipcRenderer } = require("electron");
 
 contextBridge.exposeInMainWorld("electron", {
+	fetchUsername: () => ipcRenderer.invoke("fetch-username"),
 	getAppVersion: () => ipcRenderer.invoke("app-version"),
 	openTortoiseSVNDiff: (data) => ipcRenderer.invoke("open-tortoisesvn-diff", data),
 	fetchCustomScripts: () => ipcRenderer.invoke("fetch-custom-scripts"),

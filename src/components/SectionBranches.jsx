@@ -153,32 +153,32 @@ export default function SectionBranches() {
 		<div>
 			<Wrap mb={4} justify={"space-between"}>
 				<Flex columnGap={2}>
-					{/* <Tooltip label="Requires at least 1 branch" isDisabled={selectedBranches.length > 0} hasArrow>
-						<Button onClick={refreshSelected} leftIcon={<RepeatIcon />} colorScheme={"yellow"} isDisabled={selectedBranches.length < 1}>
+					{/* <Tooltip label="Requires at least 1 branch" disabled={selectedBranches.length > 0} hasArrow>
+						<Button onClick={refreshSelected} leftIcon={<RepeatIcon />} colorPalette={"yellow"} disabled={selectedBranches.length < 1}>
 							Refresh {selectedBranches.length > 0 ? `${selectedBranches.length} Branch` : ""}
 							{selectedBranches.length > 1 ? "es" : ""}
 						</Button>
 					</Tooltip> */}
-					<Tooltip label="Requires at least 1 branch" isDisabled={selectedBranches.length > 0} hasArrow>
-						<Button onClick={updateSelectedBranches} leftIcon={<Icon as={MdCloudDownload} />} colorScheme={"yellow"} isDisabled={selectedBranches.length < 1}>
+					<Tooltip label="Requires at least 1 branch" disabled={selectedBranches.length > 0} hasArrow>
+						<Button onClick={updateSelectedBranches} leftIcon={<Icon as={MdCloudDownload} />} colorPalette={"yellow"} disabled={selectedBranches.length < 1}>
 							Update {selectedBranches.length > 0 ? `${selectedBranches.length} Branch` : ""}
 							{selectedBranches.length > 1 ? "es" : ""}
 						</Button>
 					</Tooltip>
-					<Tooltip label="Requires at least 1 branch" isDisabled={selectedBranches.length > 0} hasArrow>
-						<Button onClick={toggleCommitSelectedBranches} leftIcon={<Icon as={isCommitMode ? FaUndo : MdCloudUpload} />} colorScheme={"yellow"} isDisabled={selectedBranches.length < 1}>
+					<Tooltip label="Requires at least 1 branch" disabled={selectedBranches.length > 0} hasArrow>
+						<Button onClick={toggleCommitSelectedBranches} leftIcon={<Icon as={isCommitMode ? FaUndo : MdCloudUpload} />} colorPalette={"yellow"} disabled={selectedBranches.length < 1}>
 							{isCommitMode ? "Undo Commit" : "Commit"}
 						</Button>
 					</Tooltip>
-					<Tooltip label="Requires at least 1 branch" isDisabled={selectedBranches.length > 0} hasArrow>
-						<Button onClick={viewSelectedBranchesLog} leftIcon={<TimeIcon />} colorScheme={"yellow"} isDisabled={selectedBranches.length < 1}>
+					<Tooltip label="Requires at least 1 branch" disabled={selectedBranches.length > 0} hasArrow>
+						<Button onClick={viewSelectedBranchesLog} leftIcon={<TimeIcon />} colorPalette={"yellow"} disabled={selectedBranches.length < 1}>
 							View Logs
 						</Button>
 					</Tooltip>
 				</Flex>
 				<Flex columnGap={2}>
-					<Tooltip label="No outdated branches to update" isDisabled={outdatedBranches.length > 0} hasArrow>
-						<Button onClick={updateOutdatedBranches} leftIcon={<MdOutlineSwitchAccessShortcut />} colorScheme={"yellow"} isDisabled={outdatedBranches.length < 1}>
+					<Tooltip label="No outdated branches to update" disabled={outdatedBranches.length > 0} hasArrow>
+						<Button onClick={updateOutdatedBranches} leftIcon={<MdOutlineSwitchAccessShortcut />} colorPalette={"yellow"} disabled={outdatedBranches.length < 1}>
 							Update All
 						</Button>
 					</Tooltip>
@@ -186,19 +186,19 @@ export default function SectionBranches() {
 			</Wrap>
 			<TableBranches rowData={rowDataBranches} onRowValueChanged={onRowValueChanged} refreshAll={refreshAll} />
 			<Flex columnGap={2} mt={4}>
-				<Tooltip label="Please select at least 1 branch" isDisabled={selectedBranches.length > 0} hasArrow>
-					<Button onClick={clearSelection} leftIcon={<CloseIcon />} colorScheme={"red"} isDisabled={selectedBranches.length < 1}>
+				<Tooltip label="Please select at least 1 branch" disabled={selectedBranches.length > 0} hasArrow>
+					<Button onClick={clearSelection} leftIcon={<CloseIcon />} colorPalette={"red"} disabled={selectedBranches.length < 1}>
 						Deselect {selectedBranches.length > 0 ? `${selectedBranches.length} Branch` : ""}
 						{selectedBranches.length > 1 ? "es" : ""}
 					</Button>
 				</Tooltip>
-				<Tooltip label="Please select at least 1 branch" isDisabled={selectedBranches.length > 0} hasArrow>
-					<Button onClick={openAlertDialog} leftIcon={<AiFillDelete />} colorScheme={"red"} isDisabled={selectedBranches.length < 1}>
+				<Tooltip label="Please select at least 1 branch" disabled={selectedBranches.length > 0} hasArrow>
+					<Button onClick={openAlertDialog} leftIcon={<AiFillDelete />} colorPalette={"red"} disabled={selectedBranches.length < 1}>
 						Delete {selectedBranches.length > 0 ? `${selectedBranches.length} Branch` : ""}
 						{selectedBranches.length > 1 ? "es" : ""}
 					</Button>
 				</Tooltip>
-				<Button onClick={addNewRow} leftIcon={<SmallAddIcon boxSize={8} />} colorScheme={"green"}>
+				<Button onClick={addNewRow} leftIcon={<SmallAddIcon boxSize={8} />} colorPalette={"green"}>
 					New Row
 				</Button>
 			</Flex>

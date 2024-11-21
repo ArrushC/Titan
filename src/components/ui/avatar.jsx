@@ -1,4 +1,4 @@
-'use client'
+
 
 import { Avatar as ChakraAvatar, Group } from '@chakra-ui/react'
 import * as React from 'react'

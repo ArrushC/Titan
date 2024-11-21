@@ -18,5 +18,5 @@ export default function ButtonDiff(props) {
 		}
 	}, [data, onDiffResult]);
 
-	return <IconButton aria-label="Diff" size="sm" icon={<VscDiffSingle />} onClick={handleDiff} colorScheme="yellow" />;
+	return <IconButton aria-label="Diff" size="sm" icon={<VscDiffSingle />} onClick={handleDiff} colorPalette="yellow" />;
 }

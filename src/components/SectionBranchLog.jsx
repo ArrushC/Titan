@@ -7,7 +7,7 @@ export default function SectionBranchLog() {
 	const { showSelectedBranchesLog, setShowSelectedBranchesLog } = useApp();
 
 	return (
-		<Drawer isOpen={showSelectedBranchesLog} onClose={() => setShowSelectedBranchesLog(false)} placement="left" size="full">
+		<Drawer open={showSelectedBranchesLog} onOpenChange={() => setShowSelectedBranchesLog(false)} placement="left" size="full">
 			<DrawerOverlay />
 			<DrawerContent>
 				<DrawerCloseButton size="lg" />

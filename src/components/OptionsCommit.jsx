@@ -63,7 +63,7 @@ export default function OptionsCommit() {
 			<Heading as={"h6"} size="sm">
 				Commit Options
 			</Heading>
-			<CheckboxGroup colorScheme="yellow">
+			<CheckboxGroup colorPalette="yellow">
 				<Stack direction={"row"} spacing={4} mt={2}>
 					<Checkbox isChecked={commitOptions.useFolderOnlySource} onChange={(e) => handleOptionChange("useFolderOnlySource", e.target.checked)}>
 						<Tooltip label={"Removes extra branch details from source branch."} hasArrow placement="bottom-start">

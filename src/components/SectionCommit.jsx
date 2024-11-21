@@ -20,8 +20,8 @@ export default function SectionCommit() {
 	const [rowDataUntrackedChanges, setRowDataUntrackedChanges] = useState([]);
 
 	// Modals
-	const { isOpen: isCommitModalOpen, onOpen: openCommitModal, onClose: closeCommitModal } = useDisclosure();
-	const { isOpen: isMessageAutoFillModalOpen, onOpen: openMessageAutoFillModal, onClose: closeMessageAutoFillModal } = useDisclosure();
+	const { open: isCommitModalOpen, onOpen: openCommitModal, onClose: closeCommitModal } = useDisclosure();
+	const { open: isMessageAutoFillModalOpen, onOpen: openMessageAutoFillModal, onClose: closeMessageAutoFillModal } = useDisclosure();
 
 	const defaultColDefsCommit = useMemo(
 		() => ({
@@ -105,20 +105,20 @@ export default function SectionCommit() {
 				<FormSVNMessage openMessageAutoFillModal={openMessageAutoFillModal} />
 			</Box>
 			<Skeleton isLoaded={showCommitView && hasChanges} startColor="yelow.500" endColor="yellow.500">
-				<Tabs variant={"solid-rounded"} colorScheme="yellow" defaultIndex={hasFileUpdates ? 0 : hasLocalChanges ? 1 : 2} isLazy={false}>
+				<Tabs variant={"solid-rounded"} colorPalette="yellow" defaultIndex={hasFileUpdates ? 0 : hasLocalChanges ? 1 : 2} isLazy={false}>
 					<TabList>
-						<Tab isDisabled={!hasFileUpdates}>
-							<Tooltip label={"No files to update!"} hasArrow isDisabled={hasFileUpdates}>
+						<Tab disabled={!hasFileUpdates}>
+							<Tooltip label={"No files to update!"} hasArrow disabled={hasFileUpdates}>
 								Files to Update
 							</Tooltip>
 						</Tab>
-						<Tab isDisabled={!hasLocalChanges}>
-							<Tooltip label={"No files to commit!"} hasArrow isDisabled={hasLocalChanges}>
+						<Tab disabled={!hasLocalChanges}>
+							<Tooltip label={"No files to commit!"} hasArrow disabled={hasLocalChanges}>
 								Local Changes
 							</Tooltip>
 						</Tab>
-						<Tab isDisabled={!hasUntrackedChanges}>
-							<Tooltip label={"No unversioned/missing files!"} hasArrow isDisabled={hasUntrackedChanges}>
+						<Tab disabled={!hasUntrackedChanges}>
+							<Tooltip label={"No unversioned/missing files!"} hasArrow disabled={hasUntrackedChanges}>
 								Untracked Changes
 							</Tooltip>
 						</Tab>

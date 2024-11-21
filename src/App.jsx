@@ -35,17 +35,17 @@ function App() {
 				<Header />
 				<AlertUpdateTitan />
 				<Flex rowGap={4} flexDirection={"column"}>
-					<Box>
+					{/* <Box>
 						<SectionBranches />
-					</Box>
-					<Collapse in={isCommitMode} animateOpacity>
+					</Box> */}
+					{/* <Collapse in={isCommitMode} animateOpacity>
 						<Box id="sectionCommit">
 							<Heading as={"h2"} size={"lg"} noOfLines={1} mb={4} className="animation-pulse" lineHeight={"1.4"}>
 								Committing {selectedBranches.length == configurableRowData.length ? "All" : `${selectedBranches.length}/${configurableRowData.length}`} Branch{selectedBranches.length == 1 ? "" : "es"}
 							</Heading>
 							<SectionCommit />
 						</Box>
-					</Collapse>
+					</Collapse> */}
 				</Flex>
 				<SectionBranchLog />
 			</Box>

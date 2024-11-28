@@ -43,7 +43,7 @@ export default function Header() {
 
 	return (
 		<HStack wrap="wrap" my={5} gapY={5} justify={"space-between"}>
-			<Flex align={"flex-start"} alignItems="center">
+			<Flex align={"flex-start"} alignItems="center" className="notMono">
 				<Heading as={"h1"} size={"4xl"} fontWeight={700} lineClamp={1} className={"animation-fadein-forward"} userSelect={"none"}>
 					Hello, {username}!
 				</Heading>

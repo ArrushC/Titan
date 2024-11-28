@@ -17,6 +17,8 @@ const AppContext = createContext({
 	branchTableGridRef: null,
 	selectedBranches: {},
 	setSelectedBranches: (_) => {},
+	isDialogSBLogOpen: false,
+	setIsDialogSBLogOpen: (_) => {},
 	showSelectedBranchesLog: false,
 	setShowSelectedBranchesLog: (_) => {},
 	customScripts: [],
@@ -111,6 +113,7 @@ export const AppProvider = ({ children }) => {
 	const [branchInfos, setBranchInfos] = useState({});
 	const branchTableGridRef = useRef(null);
 	const [selectedBranches, setSelectedBranches] = useState({});
+	const [isDialogSBLogOpen, setIsDialogSBLogOpen] = useState(false);
 	const [showSelectedBranchesLog, setShowSelectedBranchesLog] = useState(false);
 	const [customScripts, setCustomScripts] = useState([]);
 
@@ -242,21 +245,6 @@ export const AppProvider = ({ children }) => {
 	// 		});
 	// }, [logData, socket]);
 
-	useEffect(() => {
-		const socketCallback = (data) => {
-			console.debug("Received svn-log-result from socket in SectionBranchLog component in background");
-			setLogData((prevData) => {
-				const isDataExist = prevData.some((logBranch) => logBranch.id === data.id);
-				if (!isDataExist) return [...prevData, data];
-				return prevData;
-			});
-		};
-
-		socket?.on("svn-log-result", socketCallback);
-
-		return () => socket?.off("svn-log-result", socketCallback);
-	}, [socket]);
-
 	return (
 		<AppContext.Provider
 			value={{
@@ -271,6 +259,8 @@ export const AppProvider = ({ children }) => {
 				branchTableGridRef,
 				selectedBranches,
 				setSelectedBranches,
+				isDialogSBLogOpen,
+				setIsDialogSBLogOpen,
 				showSelectedBranchesLog,
 				setShowSelectedBranchesLog,
 				customScripts,

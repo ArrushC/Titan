@@ -12,7 +12,7 @@ import { MdUpdate } from "react-icons/md";
 import useNotifications from "../hooks/useNotifications.jsx";
 
 export default function SectionBranches() {
-	const { updateConfig, configurableRowData, selectedBranches, setSelectedBranches } = useApp();
+	const { updateConfig, configurableRowData, selectedBranches, setSelectedBranches, setIsDialogSBLogOpen } = useApp();
 	const { RaisePromisedClientNotification } = useNotifications();
 	const { emitInfoSingle, emitUpdateSingle } = useSocketEmits();
 	const [selectionMetrics, setSelectionMetrics] = useState({
@@ -130,8 +130,8 @@ export default function SectionBranches() {
 	}, []);
 
 	const logsSelectedBranches = useCallback(() => {
-		console.log("Logs selected branches");
-	}, []);
+		setIsDialogSBLogOpen(true);
+	}, [setIsDialogSBLogOpen]);
 
 	useEffect(() => {
 		if (!selectionMetrics.hasSelection) return;
@@ -181,7 +181,7 @@ export default function SectionBranches() {
 					<Table.Column width="15%" />
 					<Table.Column width="15%" />
 					<Table.Column />
-					<Table.Column width="15%%" />
+					<Table.Column />
 					<Table.Column width="15%" />
 				</Table.ColumnGroup>
 				<Table.Header>
@@ -202,12 +202,10 @@ export default function SectionBranches() {
 						<Table.Cell colSpan={6}>
 							<Flex justifyContent={"space-between"} p={2}>
 								<Flex>
-									<Mark variant={"solid"} colorPalette={"yellow"} px={2} py={2} rounded={"md"} textAlign={"center"}>
-										Total Branches:{" "}
-										<Text as="span" fontWeight={"bold"}>
-											{configurableRowData.length}
-										</Text>
-									</Mark>
+									<Flex alignItems={"center"} color="yellow.focusRing">
+										<Text me={1}>{configurableRowData.length} Branches</Text>
+										<Text fontWeight={900}></Text>
+									</Flex>
 								</Flex>
 								<Flex gapX={2}>
 									<ButtonIconTooltip icon={<MdUpdate />} colorPalette={"yellow"} variant={"subtle"} label={"Update All"} placement={"bottom-end"} onClick={updateAll} />

@@ -271,7 +271,7 @@ var hasRequiredCommon;
 function requireCommon() {
   if (hasRequiredCommon) return common$7;
   hasRequiredCommon = 1;
-  function setup(env) {
+  function setup(env2) {
     createDebug.debug = createDebug;
     createDebug.default = createDebug;
     createDebug.coerce = coerce2;
@@ -280,8 +280,8 @@ function requireCommon() {
     createDebug.enabled = enabled2;
     createDebug.humanize = requireMs$1();
     createDebug.destroy = destroy2;
-    Object.keys(env).forEach((key) => {
-      createDebug[key] = env[key];
+    Object.keys(env2).forEach((key) => {
+      createDebug[key] = env2[key];
     });
     createDebug.names = [];
     createDebug.skips = [];
@@ -603,18 +603,18 @@ function requireBrowser() {
   return browser$1.exports;
 }
 var node$2 = { exports: {} };
-var hasFlag$1;
-var hasRequiredHasFlag$1;
-function requireHasFlag$1() {
-  if (hasRequiredHasFlag$1) return hasFlag$1;
-  hasRequiredHasFlag$1 = 1;
-  hasFlag$1 = (flag, argv = process.argv) => {
+var hasFlag$2;
+var hasRequiredHasFlag;
+function requireHasFlag() {
+  if (hasRequiredHasFlag) return hasFlag$2;
+  hasRequiredHasFlag = 1;
+  hasFlag$2 = (flag, argv = process.argv) => {
     const prefix = flag.startsWith("-") ? "" : flag.length === 1 ? "-" : "--";
     const position = argv.indexOf(prefix + flag);
     const terminatorPosition = argv.indexOf("--");
     return position !== -1 && (terminatorPosition === -1 || position < terminatorPosition);
   };
-  return hasFlag$1;
+  return hasFlag$2;
 }
 var supportsColor_1;
 var hasRequiredSupportsColor;
@@ -623,8 +623,8 @@ function requireSupportsColor() {
   hasRequiredSupportsColor = 1;
   const os2 = require$$0$2;
   const tty = require$$1;
-  const hasFlag2 = requireHasFlag$1();
-  const { env } = process;
+  const hasFlag2 = requireHasFlag();
+  const { env: env2 } = process;
   let flagForceColor;
   if (hasFlag2("no-color") || hasFlag2("no-colors") || hasFlag2("color=false") || hasFlag2("color=never")) {
     flagForceColor = 0;
@@ -632,17 +632,17 @@ function requireSupportsColor() {
     flagForceColor = 1;
   }
   function envForceColor() {
-    if ("FORCE_COLOR" in env) {
-      if (env.FORCE_COLOR === "true") {
+    if ("FORCE_COLOR" in env2) {
+      if (env2.FORCE_COLOR === "true") {
         return 1;
       }
-      if (env.FORCE_COLOR === "false") {
+      if (env2.FORCE_COLOR === "false") {
         return 0;
       }
-      return env.FORCE_COLOR.length === 0 ? 1 : Math.min(Number.parseInt(env.FORCE_COLOR, 10), 3);
+      return env2.FORCE_COLOR.length === 0 ? 1 : Math.min(Number.parseInt(env2.FORCE_COLOR, 10), 3);
     }
   }
-  function translateLevel(level) {
+  function translateLevel2(level) {
     if (level === 0) {
       return false;
     }
@@ -653,13 +653,13 @@ function requireSupportsColor() {
       has16m: level >= 3
     };
   }
-  function supportsColor(haveStream, { streamIsTTY, sniffFlags = true } = {}) {
+  function supportsColor2(haveStream, { streamIsTTY, sniffFlags = true } = {}) {
     const noFlagForceColor = envForceColor();
     if (noFlagForceColor !== void 0) {
       flagForceColor = noFlagForceColor;
     }
-    const forceColor = sniffFlags ? flagForceColor : noFlagForceColor;
-    if (forceColor === 0) {
+    const forceColor2 = sniffFlags ? flagForceColor : noFlagForceColor;
+    if (forceColor2 === 0) {
       return 0;
     }
     if (sniffFlags) {
@@ -670,11 +670,11 @@ function requireSupportsColor() {
         return 2;
       }
     }
-    if (haveStream && !streamIsTTY && forceColor === void 0) {
+    if (haveStream && !streamIsTTY && forceColor2 === void 0) {
       return 0;
     }
-    const min = forceColor || 0;
-    if (env.TERM === "dumb") {
+    const min = forceColor2 || 0;
+    if (env2.TERM === "dumb") {
       return min;
     }
     if (process.platform === "win32") {
@@ -684,49 +684,49 @@ function requireSupportsColor() {
       }
       return 1;
     }
-    if ("CI" in env) {
-      if (["TRAVIS", "CIRCLECI", "APPVEYOR", "GITLAB_CI", "GITHUB_ACTIONS", "BUILDKITE", "DRONE"].some((sign) => sign in env) || env.CI_NAME === "codeship") {
+    if ("CI" in env2) {
+      if (["TRAVIS", "CIRCLECI", "APPVEYOR", "GITLAB_CI", "GITHUB_ACTIONS", "BUILDKITE", "DRONE"].some((sign) => sign in env2) || env2.CI_NAME === "codeship") {
         return 1;
       }
       return min;
     }
-    if ("TEAMCITY_VERSION" in env) {
-      return /^(9\.(0*[1-9]\d*)\.|\d{2,}\.)/.test(env.TEAMCITY_VERSION) ? 1 : 0;
+    if ("TEAMCITY_VERSION" in env2) {
+      return /^(9\.(0*[1-9]\d*)\.|\d{2,}\.)/.test(env2.TEAMCITY_VERSION) ? 1 : 0;
     }
-    if (env.COLORTERM === "truecolor") {
+    if (env2.COLORTERM === "truecolor") {
       return 3;
     }
-    if ("TERM_PROGRAM" in env) {
-      const version2 = Number.parseInt((env.TERM_PROGRAM_VERSION || "").split(".")[0], 10);
-      switch (env.TERM_PROGRAM) {
+    if ("TERM_PROGRAM" in env2) {
+      const version2 = Number.parseInt((env2.TERM_PROGRAM_VERSION || "").split(".")[0], 10);
+      switch (env2.TERM_PROGRAM) {
         case "iTerm.app":
           return version2 >= 3 ? 3 : 2;
         case "Apple_Terminal":
           return 2;
       }
     }
-    if (/-256(color)?$/i.test(env.TERM)) {
+    if (/-256(color)?$/i.test(env2.TERM)) {
       return 2;
     }
-    if (/^screen|^xterm|^vt100|^vt220|^rxvt|color|ansi|cygwin|linux/i.test(env.TERM)) {
+    if (/^screen|^xterm|^vt100|^vt220|^rxvt|color|ansi|cygwin|linux/i.test(env2.TERM)) {
       return 1;
     }
-    if ("COLORTERM" in env) {
+    if ("COLORTERM" in env2) {
       return 1;
     }
     return min;
   }
-  function getSupportLevel(stream2, options = {}) {
-    const level = supportsColor(stream2, {
+  function getSupportLevel2(stream2, options = {}) {
+    const level = supportsColor2(stream2, {
       streamIsTTY: stream2 && stream2.isTTY,
       ...options
     });
-    return translateLevel(level);
+    return translateLevel2(level);
   }
   supportsColor_1 = {
-    supportsColor: getSupportLevel,
-    stdout: getSupportLevel({ isTTY: tty.isatty(1) }),
-    stderr: getSupportLevel({ isTTY: tty.isatty(2) })
+    supportsColor: getSupportLevel2,
+    stdout: getSupportLevel2({ isTTY: tty.isatty(1) }),
+    stderr: getSupportLevel2({ isTTY: tty.isatty(2) })
   };
   return supportsColor_1;
 }
@@ -750,8 +750,8 @@ function requireNode() {
     );
     exports.colors = [6, 2, 3, 4, 5, 1];
     try {
-      const supportsColor = requireSupportsColor();
-      if (supportsColor && (supportsColor.stderr || supportsColor).level >= 2) {
+      const supportsColor2 = requireSupportsColor();
+      if (supportsColor2 && (supportsColor2.stderr || supportsColor2).level >= 2) {
         exports.colors = [
           20,
           21,
@@ -12798,10 +12798,10 @@ function requireBaseUpdater() {
       }
       return command.join(" ");
     }
-    spawnSyncLog(cmd, args = [], env = {}) {
+    spawnSyncLog(cmd, args = [], env2 = {}) {
       this._logger.info(`Executing: ${cmd} with args: ${args}`);
       const response = (0, child_process_12.spawnSync)(cmd, args, {
-        env: { ...process.env, ...env },
+        env: { ...process.env, ...env2 },
         encoding: "utf-8",
         shell: true
       });
@@ -12814,11 +12814,11 @@ function requireBaseUpdater() {
      */
     // https://github.com/electron-userland/electron-builder/issues/1129
     // Node 8 sends errors: https://nodejs.org/dist/latest-v8.x/docs/api/errors.html#errors_common_system_errors
-    async spawnLog(cmd, args = [], env = void 0, stdio = "ignore") {
+    async spawnLog(cmd, args = [], env2 = void 0, stdio = "ignore") {
       this._logger.info(`Executing: ${cmd} with args: ${args}`);
       return new Promise((resolve, reject) => {
         try {
-          const params = { stdio, env, detached: true };
+          const params = { stdio, env: env2, detached: true };
           const p = (0, child_process_12.spawn)(cmd, args, params);
           p.on("error", (error2) => {
             reject(error2);
@@ -12958,15 +12958,15 @@ function requireAppImageUpdater() {
       if (destination !== appImageFile) {
         this.emit("appimage-filename-updated", destination);
       }
-      const env = {
+      const env2 = {
         ...process.env,
         APPIMAGE_SILENT_INSTALL: "true"
       };
       if (options.isForceRunAfter) {
-        this.spawnLog(destination, [], env);
+        this.spawnLog(destination, [], env2);
       } else {
-        env.APPIMAGE_EXIT_AFTER_INSTALL = "true";
-        (0, child_process_12.execFileSync)(destination, [], { env });
+        env2.APPIMAGE_EXIT_AFTER_INSTALL = "true";
+        (0, child_process_12.execFileSync)(destination, [], { env: env2 });
       }
       return true;
     }
@@ -13313,7 +13313,7 @@ Object.defineProperty(windowsExecutableCodeSignatureVerifier, "__esModule", { va
 windowsExecutableCodeSignatureVerifier.verifySignature = verifySignature;
 const builder_util_runtime_1 = out;
 const child_process_1 = require$$1$3;
-const os$2 = require$$0$2;
+const os$3 = require$$0$2;
 const path = path$i;
 function verifySignature(publisherNames, unescapedTempUpdateFile, logger2) {
   return new Promise((resolve, reject) => {
@@ -13408,7 +13408,7 @@ function handleError(logger2, error2, stderr, reject) {
   }
 }
 function isOldWin6() {
-  const winVersion = os$2.release();
+  const winVersion = os$3.release();
   return winVersion.startsWith("6.") && !winVersion.startsWith("6.3");
 }
 var hasRequiredNsisUpdater;
@@ -13717,185 +13717,166 @@ var colorize = { exports: {} };
 var safe = { exports: {} };
 var colors$1 = { exports: {} };
 var styles = { exports: {} };
-var hasRequiredStyles;
-function requireStyles() {
-  if (hasRequiredStyles) return styles.exports;
-  hasRequiredStyles = 1;
-  (function(module) {
-    var styles2 = {};
-    module["exports"] = styles2;
-    var codes2 = {
-      reset: [0, 0],
-      bold: [1, 22],
-      dim: [2, 22],
-      italic: [3, 23],
-      underline: [4, 24],
-      inverse: [7, 27],
-      hidden: [8, 28],
-      strikethrough: [9, 29],
-      black: [30, 39],
-      red: [31, 39],
-      green: [32, 39],
-      yellow: [33, 39],
-      blue: [34, 39],
-      magenta: [35, 39],
-      cyan: [36, 39],
-      white: [37, 39],
-      gray: [90, 39],
-      grey: [90, 39],
-      brightRed: [91, 39],
-      brightGreen: [92, 39],
-      brightYellow: [93, 39],
-      brightBlue: [94, 39],
-      brightMagenta: [95, 39],
-      brightCyan: [96, 39],
-      brightWhite: [97, 39],
-      bgBlack: [40, 49],
-      bgRed: [41, 49],
-      bgGreen: [42, 49],
-      bgYellow: [43, 49],
-      bgBlue: [44, 49],
-      bgMagenta: [45, 49],
-      bgCyan: [46, 49],
-      bgWhite: [47, 49],
-      bgGray: [100, 49],
-      bgGrey: [100, 49],
-      bgBrightRed: [101, 49],
-      bgBrightGreen: [102, 49],
-      bgBrightYellow: [103, 49],
-      bgBrightBlue: [104, 49],
-      bgBrightMagenta: [105, 49],
-      bgBrightCyan: [106, 49],
-      bgBrightWhite: [107, 49],
-      // legacy styles for colors pre v1.0.0
-      blackBG: [40, 49],
-      redBG: [41, 49],
-      greenBG: [42, 49],
-      yellowBG: [43, 49],
-      blueBG: [44, 49],
-      magentaBG: [45, 49],
-      cyanBG: [46, 49],
-      whiteBG: [47, 49]
-    };
-    Object.keys(codes2).forEach(function(key) {
-      var val = codes2[key];
-      var style = styles2[key] = [];
-      style.open = "\x1B[" + val[0] + "m";
-      style.close = "\x1B[" + val[1] + "m";
-    });
-  })(styles);
-  return styles.exports;
-}
-var hasFlag;
-var hasRequiredHasFlag;
-function requireHasFlag() {
-  if (hasRequiredHasFlag) return hasFlag;
-  hasRequiredHasFlag = 1;
-  hasFlag = function(flag, argv) {
-    argv = argv || process.argv || [];
-    var terminatorPos = argv.indexOf("--");
-    var prefix = /^-{1,2}/.test(flag) ? "" : "--";
-    var pos = argv.indexOf(prefix + flag);
-    return pos !== -1 && (terminatorPos === -1 ? true : pos < terminatorPos);
+(function(module) {
+  var styles2 = {};
+  module["exports"] = styles2;
+  var codes2 = {
+    reset: [0, 0],
+    bold: [1, 22],
+    dim: [2, 22],
+    italic: [3, 23],
+    underline: [4, 24],
+    inverse: [7, 27],
+    hidden: [8, 28],
+    strikethrough: [9, 29],
+    black: [30, 39],
+    red: [31, 39],
+    green: [32, 39],
+    yellow: [33, 39],
+    blue: [34, 39],
+    magenta: [35, 39],
+    cyan: [36, 39],
+    white: [37, 39],
+    gray: [90, 39],
+    grey: [90, 39],
+    brightRed: [91, 39],
+    brightGreen: [92, 39],
+    brightYellow: [93, 39],
+    brightBlue: [94, 39],
+    brightMagenta: [95, 39],
+    brightCyan: [96, 39],
+    brightWhite: [97, 39],
+    bgBlack: [40, 49],
+    bgRed: [41, 49],
+    bgGreen: [42, 49],
+    bgYellow: [43, 49],
+    bgBlue: [44, 49],
+    bgMagenta: [45, 49],
+    bgCyan: [46, 49],
+    bgWhite: [47, 49],
+    bgGray: [100, 49],
+    bgGrey: [100, 49],
+    bgBrightRed: [101, 49],
+    bgBrightGreen: [102, 49],
+    bgBrightYellow: [103, 49],
+    bgBrightBlue: [104, 49],
+    bgBrightMagenta: [105, 49],
+    bgBrightCyan: [106, 49],
+    bgBrightWhite: [107, 49],
+    // legacy styles for colors pre v1.0.0
+    blackBG: [40, 49],
+    redBG: [41, 49],
+    greenBG: [42, 49],
+    yellowBG: [43, 49],
+    blueBG: [44, 49],
+    magentaBG: [45, 49],
+    cyanBG: [46, 49],
+    whiteBG: [47, 49]
   };
-  return hasFlag;
+  Object.keys(codes2).forEach(function(key) {
+    var val = codes2[key];
+    var style = styles2[key] = [];
+    style.open = "\x1B[" + val[0] + "m";
+    style.close = "\x1B[" + val[1] + "m";
+  });
+})(styles);
+var stylesExports = styles.exports;
+var hasFlag$1 = function(flag, argv) {
+  argv = argv || process.argv || [];
+  var terminatorPos = argv.indexOf("--");
+  var prefix = /^-{1,2}/.test(flag) ? "" : "--";
+  var pos = argv.indexOf(prefix + flag);
+  return pos !== -1 && (terminatorPos === -1 ? true : pos < terminatorPos);
+};
+var os$2 = require$$0$2;
+var hasFlag = hasFlag$1;
+var env = process.env;
+var forceColor = void 0;
+if (hasFlag("no-color") || hasFlag("no-colors") || hasFlag("color=false")) {
+  forceColor = false;
+} else if (hasFlag("color") || hasFlag("colors") || hasFlag("color=true") || hasFlag("color=always")) {
+  forceColor = true;
 }
-var supportsColors;
-var hasRequiredSupportsColors;
-function requireSupportsColors() {
-  if (hasRequiredSupportsColors) return supportsColors;
-  hasRequiredSupportsColors = 1;
-  var os2 = require$$0$2;
-  var hasFlag2 = requireHasFlag();
-  var env = process.env;
-  var forceColor = void 0;
-  if (hasFlag2("no-color") || hasFlag2("no-colors") || hasFlag2("color=false")) {
-    forceColor = false;
-  } else if (hasFlag2("color") || hasFlag2("colors") || hasFlag2("color=true") || hasFlag2("color=always")) {
-    forceColor = true;
+if ("FORCE_COLOR" in env) {
+  forceColor = env.FORCE_COLOR.length === 0 || parseInt(env.FORCE_COLOR, 10) !== 0;
+}
+function translateLevel(level) {
+  if (level === 0) {
+    return false;
   }
-  if ("FORCE_COLOR" in env) {
-    forceColor = env.FORCE_COLOR.length === 0 || parseInt(env.FORCE_COLOR, 10) !== 0;
+  return {
+    level,
+    hasBasic: true,
+    has256: level >= 2,
+    has16m: level >= 3
+  };
+}
+function supportsColor(stream2) {
+  if (forceColor === false) {
+    return 0;
   }
-  function translateLevel(level) {
-    if (level === 0) {
-      return false;
-    }
-    return {
-      level,
-      hasBasic: true,
-      has256: level >= 2,
-      has16m: level >= 3
-    };
+  if (hasFlag("color=16m") || hasFlag("color=full") || hasFlag("color=truecolor")) {
+    return 3;
   }
-  function supportsColor(stream2) {
-    if (forceColor === false) {
-      return 0;
+  if (hasFlag("color=256")) {
+    return 2;
+  }
+  if (stream2 && !stream2.isTTY && forceColor !== true) {
+    return 0;
+  }
+  var min = forceColor ? 1 : 0;
+  if (process.platform === "win32") {
+    var osRelease = os$2.release().split(".");
+    if (Number(process.versions.node.split(".")[0]) >= 8 && Number(osRelease[0]) >= 10 && Number(osRelease[2]) >= 10586) {
+      return Number(osRelease[2]) >= 14931 ? 3 : 2;
     }
-    if (hasFlag2("color=16m") || hasFlag2("color=full") || hasFlag2("color=truecolor")) {
-      return 3;
-    }
-    if (hasFlag2("color=256")) {
-      return 2;
-    }
-    if (stream2 && !stream2.isTTY && forceColor !== true) {
-      return 0;
-    }
-    var min = forceColor ? 1 : 0;
-    if (process.platform === "win32") {
-      var osRelease = os2.release().split(".");
-      if (Number(process.versions.node.split(".")[0]) >= 8 && Number(osRelease[0]) >= 10 && Number(osRelease[2]) >= 10586) {
-        return Number(osRelease[2]) >= 14931 ? 3 : 2;
-      }
+    return 1;
+  }
+  if ("CI" in env) {
+    if (["TRAVIS", "CIRCLECI", "APPVEYOR", "GITLAB_CI"].some(function(sign) {
+      return sign in env;
+    }) || env.CI_NAME === "codeship") {
       return 1;
-    }
-    if ("CI" in env) {
-      if (["TRAVIS", "CIRCLECI", "APPVEYOR", "GITLAB_CI"].some(function(sign) {
-        return sign in env;
-      }) || env.CI_NAME === "codeship") {
-        return 1;
-      }
-      return min;
-    }
-    if ("TEAMCITY_VERSION" in env) {
-      return /^(9\.(0*[1-9]\d*)\.|\d{2,}\.)/.test(env.TEAMCITY_VERSION) ? 1 : 0;
-    }
-    if ("TERM_PROGRAM" in env) {
-      var version2 = parseInt((env.TERM_PROGRAM_VERSION || "").split(".")[0], 10);
-      switch (env.TERM_PROGRAM) {
-        case "iTerm.app":
-          return version2 >= 3 ? 3 : 2;
-        case "Hyper":
-          return 3;
-        case "Apple_Terminal":
-          return 2;
-      }
-    }
-    if (/-256(color)?$/i.test(env.TERM)) {
-      return 2;
-    }
-    if (/^screen|^xterm|^vt100|^rxvt|color|ansi|cygwin|linux/i.test(env.TERM)) {
-      return 1;
-    }
-    if ("COLORTERM" in env) {
-      return 1;
-    }
-    if (env.TERM === "dumb") {
-      return min;
     }
     return min;
   }
-  function getSupportLevel(stream2) {
-    var level = supportsColor(stream2);
-    return translateLevel(level);
+  if ("TEAMCITY_VERSION" in env) {
+    return /^(9\.(0*[1-9]\d*)\.|\d{2,}\.)/.test(env.TEAMCITY_VERSION) ? 1 : 0;
   }
-  supportsColors = {
-    supportsColor: getSupportLevel,
-    stdout: getSupportLevel(process.stdout),
-    stderr: getSupportLevel(process.stderr)
-  };
-  return supportsColors;
+  if ("TERM_PROGRAM" in env) {
+    var version2 = parseInt((env.TERM_PROGRAM_VERSION || "").split(".")[0], 10);
+    switch (env.TERM_PROGRAM) {
+      case "iTerm.app":
+        return version2 >= 3 ? 3 : 2;
+      case "Hyper":
+        return 3;
+      case "Apple_Terminal":
+        return 2;
+    }
+  }
+  if (/-256(color)?$/i.test(env.TERM)) {
+    return 2;
+  }
+  if (/^screen|^xterm|^vt100|^rxvt|color|ansi|cygwin|linux/i.test(env.TERM)) {
+    return 1;
+  }
+  if ("COLORTERM" in env) {
+    return 1;
+  }
+  if (env.TERM === "dumb") {
+    return min;
+  }
+  return min;
 }
+function getSupportLevel(stream2) {
+  var level = supportsColor(stream2);
+  return translateLevel(level);
+}
+var supportsColors = {
+  supportsColor: getSupportLevel,
+  stdout: getSupportLevel(process.stdout),
+  stderr: getSupportLevel(process.stderr)
+};
 var trap = { exports: {} };
 var hasRequiredTrap;
 function requireTrap() {
@@ -14246,161 +14227,151 @@ function requireRandom() {
   })(random);
   return random.exports;
 }
-var hasRequiredColors;
-function requireColors() {
-  if (hasRequiredColors) return colors$1.exports;
-  hasRequiredColors = 1;
-  (function(module) {
-    var colors2 = {};
-    module["exports"] = colors2;
-    colors2.themes = {};
-    var util2 = require$$0$3;
-    var ansiStyles = colors2.styles = requireStyles();
-    var defineProps = Object.defineProperties;
-    var newLineRegex = new RegExp(/[\r\n]+/g);
-    colors2.supportsColor = requireSupportsColors().supportsColor;
-    if (typeof colors2.enabled === "undefined") {
-      colors2.enabled = colors2.supportsColor() !== false;
+(function(module) {
+  var colors2 = {};
+  module["exports"] = colors2;
+  colors2.themes = {};
+  var util2 = require$$0$3;
+  var ansiStyles = colors2.styles = stylesExports;
+  var defineProps = Object.defineProperties;
+  var newLineRegex = new RegExp(/[\r\n]+/g);
+  colors2.supportsColor = supportsColors.supportsColor;
+  if (typeof colors2.enabled === "undefined") {
+    colors2.enabled = colors2.supportsColor() !== false;
+  }
+  colors2.enable = function() {
+    colors2.enabled = true;
+  };
+  colors2.disable = function() {
+    colors2.enabled = false;
+  };
+  colors2.stripColors = colors2.strip = function(str2) {
+    return ("" + str2).replace(/\x1B\[\d+m/g, "");
+  };
+  colors2.stylize = function stylize(str2, style) {
+    if (!colors2.enabled) {
+      return str2 + "";
     }
-    colors2.enable = function() {
-      colors2.enabled = true;
+    var styleMap = ansiStyles[style];
+    if (!styleMap && style in colors2) {
+      return colors2[style](str2);
+    }
+    return styleMap.open + str2 + styleMap.close;
+  };
+  var matchOperatorsRe = /[|\\{}()[\]^$+*?.]/g;
+  var escapeStringRegexp = function(str2) {
+    if (typeof str2 !== "string") {
+      throw new TypeError("Expected a string");
+    }
+    return str2.replace(matchOperatorsRe, "\\$&");
+  };
+  function build(_styles) {
+    var builder = function builder2() {
+      return applyStyle.apply(builder2, arguments);
     };
-    colors2.disable = function() {
-      colors2.enabled = false;
-    };
-    colors2.stripColors = colors2.strip = function(str2) {
-      return ("" + str2).replace(/\x1B\[\d+m/g, "");
-    };
-    colors2.stylize = function stylize(str2, style) {
-      if (!colors2.enabled) {
-        return str2 + "";
-      }
-      var styleMap = ansiStyles[style];
-      if (!styleMap && style in colors2) {
-        return colors2[style](str2);
-      }
-      return styleMap.open + str2 + styleMap.close;
-    };
-    var matchOperatorsRe = /[|\\{}()[\]^$+*?.]/g;
-    var escapeStringRegexp = function(str2) {
-      if (typeof str2 !== "string") {
-        throw new TypeError("Expected a string");
-      }
-      return str2.replace(matchOperatorsRe, "\\$&");
-    };
-    function build(_styles) {
-      var builder = function builder2() {
-        return applyStyle.apply(builder2, arguments);
+    builder._styles = _styles;
+    builder.__proto__ = proto;
+    return builder;
+  }
+  var styles2 = function() {
+    var ret = {};
+    ansiStyles.grey = ansiStyles.gray;
+    Object.keys(ansiStyles).forEach(function(key) {
+      ansiStyles[key].closeRe = new RegExp(escapeStringRegexp(ansiStyles[key].close), "g");
+      ret[key] = {
+        get: function() {
+          return build(this._styles.concat(key));
+        }
       };
-      builder._styles = _styles;
-      builder.__proto__ = proto;
-      return builder;
-    }
-    var styles2 = function() {
-      var ret = {};
-      ansiStyles.grey = ansiStyles.gray;
-      Object.keys(ansiStyles).forEach(function(key) {
-        ansiStyles[key].closeRe = new RegExp(escapeStringRegexp(ansiStyles[key].close), "g");
-        ret[key] = {
-          get: function() {
-            return build(this._styles.concat(key));
-          }
-        };
-      });
-      return ret;
-    }();
-    var proto = defineProps(function colors3() {
-    }, styles2);
-    function applyStyle() {
-      var args = Array.prototype.slice.call(arguments);
-      var str2 = args.map(function(arg) {
-        if (arg != null && arg.constructor === String) {
-          return arg;
-        } else {
-          return util2.inspect(arg);
-        }
-      }).join(" ");
-      if (!colors2.enabled || !str2) {
-        return str2;
+    });
+    return ret;
+  }();
+  var proto = defineProps(function colors3() {
+  }, styles2);
+  function applyStyle() {
+    var args = Array.prototype.slice.call(arguments);
+    var str2 = args.map(function(arg) {
+      if (arg != null && arg.constructor === String) {
+        return arg;
+      } else {
+        return util2.inspect(arg);
       }
-      var newLinesPresent = str2.indexOf("\n") != -1;
-      var nestedStyles = this._styles;
-      var i = nestedStyles.length;
-      while (i--) {
-        var code = ansiStyles[nestedStyles[i]];
-        str2 = code.open + str2.replace(code.closeRe, code.open) + code.close;
-        if (newLinesPresent) {
-          str2 = str2.replace(newLineRegex, function(match) {
-            return code.close + match + code.open;
-          });
-        }
-      }
+    }).join(" ");
+    if (!colors2.enabled || !str2) {
       return str2;
     }
-    colors2.setTheme = function(theme) {
-      if (typeof theme === "string") {
-        console.log("colors.setTheme now only accepts an object, not a string.  If you are trying to set a theme from a file, it is now your (the caller's) responsibility to require the file.  The old syntax looked like colors.setTheme(__dirname + '/../themes/generic-logging.js'); The new syntax looks like colors.setTheme(require(__dirname + '/../themes/generic-logging.js'));");
-        return;
+    var newLinesPresent = str2.indexOf("\n") != -1;
+    var nestedStyles = this._styles;
+    var i = nestedStyles.length;
+    while (i--) {
+      var code = ansiStyles[nestedStyles[i]];
+      str2 = code.open + str2.replace(code.closeRe, code.open) + code.close;
+      if (newLinesPresent) {
+        str2 = str2.replace(newLineRegex, function(match) {
+          return code.close + match + code.open;
+        });
       }
-      for (var style in theme) {
-        (function(style2) {
-          colors2[style2] = function(str2) {
-            if (typeof theme[style2] === "object") {
-              var out2 = str2;
-              for (var i in theme[style2]) {
-                out2 = colors2[theme[style2][i]](out2);
-              }
-              return out2;
+    }
+    return str2;
+  }
+  colors2.setTheme = function(theme) {
+    if (typeof theme === "string") {
+      console.log("colors.setTheme now only accepts an object, not a string.  If you are trying to set a theme from a file, it is now your (the caller's) responsibility to require the file.  The old syntax looked like colors.setTheme(__dirname + '/../themes/generic-logging.js'); The new syntax looks like colors.setTheme(require(__dirname + '/../themes/generic-logging.js'));");
+      return;
+    }
+    for (var style in theme) {
+      (function(style2) {
+        colors2[style2] = function(str2) {
+          if (typeof theme[style2] === "object") {
+            var out2 = str2;
+            for (var i in theme[style2]) {
+              out2 = colors2[theme[style2][i]](out2);
             }
-            return colors2[theme[style2]](str2);
-          };
-        })(style);
-      }
-    };
-    function init() {
-      var ret = {};
-      Object.keys(styles2).forEach(function(name3) {
-        ret[name3] = {
-          get: function() {
-            return build([name3]);
+            return out2;
           }
+          return colors2[theme[style2]](str2);
         };
-      });
-      return ret;
+      })(style);
     }
-    var sequencer = function sequencer2(map3, str2) {
-      var exploded = str2.split("");
-      exploded = exploded.map(map3);
-      return exploded.join("");
-    };
-    colors2.trap = requireTrap();
-    colors2.zalgo = requireZalgo();
-    colors2.maps = {};
-    colors2.maps.america = requireAmerica()(colors2);
-    colors2.maps.zebra = requireZebra()(colors2);
-    colors2.maps.rainbow = requireRainbow()(colors2);
-    colors2.maps.random = requireRandom()(colors2);
-    for (var map2 in colors2.maps) {
-      (function(map3) {
-        colors2[map3] = function(str2) {
-          return sequencer(colors2.maps[map3], str2);
-        };
-      })(map2);
-    }
-    defineProps(colors2, init());
-  })(colors$1);
-  return colors$1.exports;
-}
-var hasRequiredSafe;
-function requireSafe() {
-  if (hasRequiredSafe) return safe.exports;
-  hasRequiredSafe = 1;
-  (function(module) {
-    var colors2 = requireColors();
-    module["exports"] = colors2;
-  })(safe);
-  return safe.exports;
-}
+  };
+  function init() {
+    var ret = {};
+    Object.keys(styles2).forEach(function(name3) {
+      ret[name3] = {
+        get: function() {
+          return build([name3]);
+        }
+      };
+    });
+    return ret;
+  }
+  var sequencer = function sequencer2(map3, str2) {
+    var exploded = str2.split("");
+    exploded = exploded.map(map3);
+    return exploded.join("");
+  };
+  colors2.trap = requireTrap();
+  colors2.zalgo = requireZalgo();
+  colors2.maps = {};
+  colors2.maps.america = requireAmerica()(colors2);
+  colors2.maps.zebra = requireZebra()(colors2);
+  colors2.maps.rainbow = requireRainbow()(colors2);
+  colors2.maps.random = requireRandom()(colors2);
+  for (var map2 in colors2.maps) {
+    (function(map3) {
+      colors2[map3] = function(str2) {
+        return sequencer(colors2.maps[map3], str2);
+      };
+    })(map2);
+  }
+  defineProps(colors2, init());
+})(colors$1);
+var colorsExports = colors$1.exports;
+(function(module) {
+  var colors2 = colorsExports;
+  module["exports"] = colors2;
+})(safe);
+var safeExports = safe.exports;
 var tripleBeam = {};
 var config$2 = {};
 var cli$1 = {};
@@ -14493,7 +14464,7 @@ syslog.colors = {
     value: config$2
   });
 })(tripleBeam);
-const colors = requireSafe();
+const colors = safeExports;
 const { LEVEL: LEVEL$3, MESSAGE } = tripleBeam;
 colors.enabled = true;
 const hasSpace = /\s+/;
@@ -16049,7 +16020,7 @@ var hasRequiredUncolorize;
 function requireUncolorize() {
   if (hasRequiredUncolorize) return uncolorize;
   hasRequiredUncolorize = 1;
-  const colors2 = requireSafe();
+  const colors2 = safeExports;
   const format2 = format$2;
   const { MESSAGE: MESSAGE2 } = tripleBeam;
   uncolorize = format2((info, opts) => {

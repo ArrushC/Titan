@@ -5,7 +5,7 @@ import SectionBranches from "./components/SectionBranches.jsx";
 // import SectionCommit from "./components/SectionCommit.jsx";
 import { useApp } from "./AppContext.jsx";
 import useNotifications from "./hooks/useNotifications.jsx";
-// import SectionBranchLog from "./components/SectionBranchLog.jsx";
+import DialogBranchesLog from "./components/DialogBranchesLog.jsx";
 import AlertUpdateTitan from "./components/AlertUpdateTitan.jsx";
 import HeaderApp from "./components/HeaderApp.jsx";
 import { Toaster } from "./components/ui/toaster.jsx";
@@ -53,7 +53,7 @@ function App() {
 						</Box>
 					</Collapse> */}
 				</Flex>
-				{/* <SectionBranchLog /> */}
+				<DialogBranchesLog />
 			</Box>
 		</Box>
 	);

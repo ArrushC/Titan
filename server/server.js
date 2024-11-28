@@ -978,8 +978,8 @@ io.on("connection", (socket) => {
 			debugTask("svn-commit", data, true);
 		});
 
-		socket.on("svn-log-selected", async (data) => {
-			debugTask("svn-log-selected", data, false);
+		socket.on("svn-logs-selected", async (data) => {
+			debugTask("svn-logs-selected", data, false);
 
 			if (!data.selectedBranches || data.selectedBranches.length === 0) {
 				emitMessage(socket, "No branches selected", "error");
@@ -1024,7 +1024,7 @@ io.on("connection", (socket) => {
 				if (!isSVNConnectionError(socket, err)) emitMessage(socket, "Error fetching SVN logs", "error");
 			}
 
-			debugTask("svn-log-selected", data, true);
+			debugTask("svn-logs-selected", data, true);
 		});
 
 		socket.on("trello-search-names-card", async (data) => {

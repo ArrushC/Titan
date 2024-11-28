@@ -1,6 +1,6 @@
 import { Button, DialogBody, DialogCloseTrigger, DialogContent, DialogFooter, DialogHeader, DialogRoot, DialogTitle, Flex, Spinner, useDisclosure } from "@chakra-ui/react";
 import React, { useCallback, useEffect, useRef, useState } from "react";
-import useNotifications from "../hooks/useNotifications";
+import useNotifications from "../hooks/useNotifications.jsx";
 
 export default function AlertUpdateTitan() {
 	const { toast, RaiseClientNotificaiton } = useNotifications();

@@ -44,7 +44,7 @@ export default function IssueNumberInput({ branchFolder }) {
 	}, [branchFolder, setIssueNumber]);
 
 	return (
-		<Tooltip label={"Please select source branch first!"} disabled={!isFieldDisabled} hasArrow>
+		<Tooltip label={"Please select source branch first!"} disabled={!isFieldDisabled} showArrow>
 			<FormControl key={branchFolder} disabled={isFieldDisabled} required={isFieldRequired}>
 				<FormLabel>{branchFolder ? `Issue Number For ${branchFolder}` : "Issue Number"}</FormLabel>
 				<Input value={issueNumber[branchFolder] || ""} onInput={handleChange} placeholder="Enter number" />

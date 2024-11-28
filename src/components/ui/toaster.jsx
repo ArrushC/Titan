@@ -26,7 +26,7 @@ import React from "react";
 export const toaster = createToaster({
 	placement: "bottom-end",
 	pauseOnPageIdle: true,
-	max: 3,
+	overlap: true,
 });
 
 export const Toaster = () => {

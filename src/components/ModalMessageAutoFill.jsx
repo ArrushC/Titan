@@ -110,7 +110,7 @@ export default function ModalMessageAutoFill({ isModalOpen, closeModal }) {
 					<Button mr={3} onClick={() => closeModal()}>
 						Cancel
 					</Button>
-					<Tooltip hasArrow label={"Please select exactly one row!"} placement={"top-start"} disabled={!disableSelect}>
+					<Tooltip showArrow label={"Please select exactly one row!"} placement={"top-start"} disabled={!disableSelect}>
 						<Button colorPalette="yellow" onClick={handleSelect} disabled={disableSelect}>
 							Select
 						</Button>

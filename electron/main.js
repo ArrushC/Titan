@@ -1,21 +1,21 @@
-import { app, BrowserWindow, screen, ipcMain, dialog, session, shell, Menu } from "electron";
+import { app, BrowserWindow, screen, ipcMain, dialog, session, shell } from "electron";
 import electronUpdaterPkg from "electron-updater";
 import fs from "fs";
 import path from "path";
 import os from "os";
 import { fork } from "child_process";
 import { fileURLToPath } from "url";
-import { setupLogger, setupUncaughtExceptionHandler } from "./server/logger.js";
+import { setupLogger, setupUncaughtExceptionHandler } from "../server/logger.js";
 import { exec, execSync } from "child_process";
 
 const { autoUpdater } = electronUpdaterPkg;
 const isDev = process.env.NODE_ENV === "development";
-const connectionURL = isDev ? "http://localhost:5173" : "http://localhost:4000";
+const connectionURL = "http://localhost:4000";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-const packageJsonPath = path.join(__dirname, "package.json");
+const packageJsonPath = path.join(__dirname, "../package.json");
 const packageJson = JSON.parse(fs.readFileSync(packageJsonPath, "utf-8"));
 
 // Create a logger instance
@@ -57,7 +57,7 @@ function createWindow() {
 		webPreferences: {
 			nodeIntegration: false,
 			contextIsolation: true,
-			preload: path.join(__dirname, "preload.js"),
+			preload: fs.existsSync(path.join(__dirname, "preload.mjs")) ? path.join(__dirname, "preload.mjs") : path.join(__dirname, "preload.js"),
 			sandbox: true,
 		},
 	});
@@ -65,8 +65,14 @@ function createWindow() {
 	// Set CSP headers
 	session.defaultSession.webRequest.onHeadersReceived((details, callback) => {
 		const csp = isDev
-			? ["default-src 'self' 'unsafe-inline' 'unsafe-eval'", "connect-src 'self' http://localhost:4000 http://localhost:5173 ws://localhost:4000 ws://localhost:5173", "img-src 'self' data:", "style-src 'self' 'unsafe-inline'", "font-src 'self' data:"].join("; ")
-			: ["default-src 'self'", "connect-src 'self' http://localhost:4000 ws://localhost:4000", "img-src 'self' data:", "style-src 'self' 'unsafe-inline'", "font-src 'self' data:"].join("; ");
+			? [
+					"default-src 'self' 'unsafe-inline' 'unsafe-eval'",
+					"connect-src 'self' http://localhost:4000 http://localhost:5173 ws://localhost:4000 ws://localhost:5173",
+					"img-src 'self' data:",
+					"style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
+					"font-src 'self' data: https://fonts.gstatic.com",
+			  ].join("; ")
+			: ["default-src 'self'", "connect-src 'self' http://localhost:4000 ws://localhost:4000", "img-src 'self' data:", "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com", "font-src 'self' data: https://fonts.gstatic.com"].join("; ");
 
 		callback({
 			responseHeaders: {
@@ -76,7 +82,11 @@ function createWindow() {
 		});
 	});
 
-	mainWindow.loadURL(connectionURL);
+	if (process.env.VITE_DEV_SERVER_URL) {
+		mainWindow.loadURL(process.env.VITE_DEV_SERVER_URL);
+	} else {
+		mainWindow.loadURL(connectionURL);
+	}
 
 	// Show window when it's ready to avoid flickering
 	mainWindow.once("ready-to-show", () => {
@@ -114,7 +124,7 @@ function createSplashWindow() {
 		},
 	});
 
-	splashWindow.loadFile(path.join(__dirname, "splash.html"));
+	splashWindow.loadFile(path.join(__dirname, "../splash.html"));
 
 	// Center the splash window on the primary display
 	const primaryDisplay = screen.getPrimaryDisplay();
@@ -126,7 +136,7 @@ function createSplashWindow() {
 }
 
 function startServer() {
-	serverProcess = fork(path.join(__dirname, "server", "server.js"), [], {
+	serverProcess = fork(path.join(__dirname, "../server/server.js"), [], {
 		env: { ...process.env, ELECTRON_RUN_AS_NODE: "1" },
 	});
 
@@ -145,49 +155,6 @@ function startServer() {
 		logger.info(`Server process exited with code ${code} and signal ${signal}`);
 		if (!isQuitting) app.quit();
 	});
-}
-
-// Create application menu
-function createMenu() {
-	const template = [
-		{
-			label: "File",
-			submenu: [
-				{
-					label: "Exit",
-					click: () => {
-						gracefulShutdown();
-					},
-				},
-			],
-		},
-		{
-			label: "Edit",
-			submenu: [{ role: "undo" }, { role: "redo" }, { type: "separator" }, { role: "cut" }, { role: "copy" }, { role: "paste" }],
-		},
-		{
-			label: "View",
-			submenu: [{ role: "reload" }, { role: "forceReload" }, { role: "toggleDevTools" }, { type: "separator" }, { role: "resetZoom" }, { role: "zoomIn" }, { role: "zoomOut" }, { type: "separator" }, { role: "togglefullscreen" }],
-		},
-		{
-			label: "Help",
-			submenu: [
-				{
-					label: "About",
-					click: () => {
-						dialog.showMessageBox(mainWindow, {
-							title: "About",
-							message: `Titan v${app.getVersion()}`,
-							detail: "Created by ArrushC",
-						});
-					},
-				},
-			],
-		},
-	];
-
-	const menu = Menu.buildFromTemplate(template);
-	Menu.setApplicationMenu(menu);
 }
 
 async function getFormattedMemoryInfo() {
@@ -277,14 +244,13 @@ if (!gotTheLock) {
 			title: "Titan",
 			message: "Titan is already running",
 			detail: "Another instance of Titan is already running, please close it before starting a new one.",
-			icon: path.join(__dirname, "icons/Titan.ico"),
+			icon: path.join(__dirname, "../icons/Titan.ico"),
 		});
 	});
 
 	app.on("ready", () => {
 		createSplashWindow();
 		startServer();
-		createMenu();
 		setupMemoryMonitoring();
 		checkForUpdates();
 	});
@@ -323,7 +289,7 @@ function gracefulShutdown() {
 			resizable: false,
 		});
 
-		shutdownDialog.loadFile(path.join(__dirname, "shutdown.html"));
+		shutdownDialog.loadFile(path.join(__dirname, "../shutdown.html"));
 	}
 
 	// Notify the renderer process
@@ -331,25 +297,95 @@ function gracefulShutdown() {
 		mainWindow.webContents.send("app-closing");
 	}
 
-	// Shutdown server process
-	if (serverProcess && !serverProcess.killed && !serverProcess.exited && serverProcess.connected) {
-		logger.info("Sending shutdown signal to server");
-		serverProcess.send("shutdown");
+	// Wait for renderer acknowledgment (optional)
+	const rendererShutdownPromise = new Promise((resolve) => {
+		ipcMain.once("renderer-shutdown-complete", () => {
+			logger.info("Renderer process reported shutdown complete");
+			resolve();
+		});
+
+		// Set a timeout to proceed anyway if renderer doesn't respond
 		setTimeout(() => {
-			if (serverProcess) {
-				logger.warn("Server shutdown timed out, forcing termination");
-				serverProcess.kill();
-			}
+			logger.warn("Renderer shutdown timed out");
+			resolve();
+		}, 5000); // 5-second timeout
+	});
+
+	// Shutdown server process
+	const serverShutdownPromise = shutdownServerProcess();
+
+	// Wait for both renderer and server shutdowns
+	Promise.all([rendererShutdownPromise, serverShutdownPromise])
+		.then(() => {
 			terminateApp();
-		}, 2000);
-	} else {
-		terminateApp();
-	}
+		})
+		.catch((error) => {
+			logger.error("Error during shutdown:", error);
+			terminateApp();
+		});
+}
+
+function shutdownServerProcess() {
+	return /** @type {Promise<void>} */ (
+		new Promise((resolve, reject) => {
+			if (serverProcess && !serverProcess.killed && !serverProcess.exited && serverProcess.connected) {
+				logger.info("Sending shutdown signal to server");
+				serverProcess.send("shutdown");
+
+				const onShutdownComplete = () => {
+					logger.info("Server process reported shutdown complete");
+					cleanup();
+					resolve();
+				};
+
+				const onExit = (code, signal) => {
+					logger.info(`Server process exited with code ${code} and signal ${signal}`);
+					cleanup();
+					resolve();
+				};
+
+				const onError = (error) => {
+					logger.error("Server process error during shutdown:", error);
+					cleanup();
+					reject(error);
+				};
+
+				const cleanup = () => {
+					clearTimeout(timeout);
+					serverProcess.removeListener("message", onMessage);
+					serverProcess.removeListener("exit", onExit);
+					serverProcess.removeListener("error", onError);
+				};
+
+				const onMessage = (message) => {
+					if (message === "shutdown-complete") {
+						onShutdownComplete();
+					}
+				};
+
+				serverProcess.once("message", onMessage);
+				serverProcess.once("exit", onExit);
+				serverProcess.once("error", onError);
+
+				// Set a timeout to force kill if necessary
+				const timeout = setTimeout(() => {
+					if (serverProcess && !serverProcess.killed) {
+						logger.warn("Server shutdown timed out, forcing termination");
+						serverProcess.kill();
+					}
+					cleanup();
+					resolve();
+				}, 5000); // 5-second timeout
+			} else {
+				resolve();
+			}
+		})
+	);
 }
 
 function terminateApp() {
 	logger.info("Terminating application");
-	app.exit(0);
+	app.quit();
 }
 
 function commandExists(command) {
@@ -378,13 +414,13 @@ app.commandLine.appendSwitch("disable-renderer-backgrounding");
 // IPC communication
 ipcMain.handle("fetch-username", async () => {
 	const userInfo = os.userInfo();
-    const fullName = userInfo.username; // os.userInfo().username gets the system username
+	const fullName = userInfo.username; // os.userInfo().username gets the system username
 
-    // Assuming the username is formatted as "FirstName.LastName"
-    // This may need adjusting the parsing logic based on actual system username format
-    const [firstName, lastName] = fullName.split('.');
+	// Assuming the username is formatted as "FirstName.LastName"
+	// This may need adjusting the parsing logic based on actual system username format
+	const [firstName, lastName] = fullName.split(".");
 
-    return { firstName, lastName };
+	return { firstName, lastName };
 });
 
 ipcMain.handle("app-version", () => app.getVersion());
@@ -460,6 +496,15 @@ ipcMain.handle("open-svn-resolve", async (event, data) => {
 	});
 });
 
+ipcMain.handle("select-folder", async () => {
+	const result = await dialog.showOpenDialog(mainWindow, {
+		properties: ["openDirectory"],
+	});
+
+	// If the user cancels, return null
+	return result.canceled ? null : result.filePaths[0];
+});
+
 ipcMain.handle("run-custom-script", async (event, data) => {
 	const { scriptType, scriptPath, branchData } = data;
 	logger.info(`Running custom script: ${scriptPath} (${scriptType}) with branch data: ${JSON.stringify(branchData)}`);
@@ -508,6 +553,10 @@ ipcMain.handle("app-minimize", () => {
 ipcMain.handle("app-maximize", () => {
 	if (mainWindow.isMaximized()) mainWindow.unmaximize();
 	else mainWindow.maximize();
+});
+
+ipcMain.on("renderer-shutdown-complete", () => {
+	logger.info("Received renderer shutdown acknowledgment");
 });
 
 ipcMain.handle("app-close", () => {

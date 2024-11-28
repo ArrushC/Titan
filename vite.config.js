@@ -1,8 +1,18 @@
 import { defineConfig } from "vite";
 import react from "@vitejs/plugin-react-swc";
+import { visualizer } from "rollup-plugin-visualizer";
+import electron from "vite-plugin-electron/simple";
 
 export default defineConfig({
-	plugins: [react()],
+	plugins: [react(), visualizer(), electron({
+		main: {
+			entry: "electron/main.js",
+		},
+		preload: {
+			input: "electron/preload.js",
+		},
+		renderer: {},
+	})],
 	server: {
 		proxy: {
 			'/api': {
@@ -23,9 +33,10 @@ export default defineConfig({
 		],
 	},
 	build: {
-		sourcemap: false, // Disable source maps for production build (optional, improves build speed)
-		minify: "esbuild", // Use esbuild for faster minification
+		sourcemap: false,
+		minify: false,
 		rollupOptions: {
+			treeshake: true,
 			output: {
 				entryFileNames: "assets/[name].js",
 				chunkFileNames: "assets/[name].js",
@@ -47,7 +58,7 @@ export default defineConfig({
 				},
 			},
 		},
-		chunkSizeWarningLimit: 1600, // Increase limit if needed
-		cssCodeSplit: true, // Enable CSS code splitting
+		chunkSizeWarningLimit: 1600,
+		cssCodeSplit: false,
 	},
 });

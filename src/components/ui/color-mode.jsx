@@ -39,7 +39,7 @@ export const ColorModeButton = React.forwardRef(function ColorModeButton(props, 
 				<IconButton
 					onClick={toggleColorMode}
 					colorPalette={"yellow"}
-					variant="solid"
+					variant="subtle"
 					aria-label="Toggle light/dark mode"
 					size="md"
 					ref={ref}

@@ -7,7 +7,7 @@ import ButtonDiff from "./ButtonDiff";
 import useNotifications from "../hooks/useNotifications";
 
 export default function PanelLocalChanges({ rowDataLocalChanges, setRowDataLocalChanges, defaultColDefsCommit }) {
-	const { localChangesGridRef, isDebug, selectedBranches, showCommitView, setSelectedLocalChanges, selectedLocalChanges } = useApp();
+	const { localChangesGridRef, selectedBranches, showCommitView, setSelectedLocalChanges, selectedLocalChanges } = useApp();
 	const { emitFilesRevert } = useSocketEmits();
 	const { RaiseClientNotificaiton } = useNotifications();
 
@@ -31,8 +31,6 @@ export default function PanelLocalChanges({ rowDataLocalChanges, setRowDataLocal
 
 			let localChanges = localChangesGridRef?.current?.api?.getSelectedNodes().map((node) => node.data);
 
-			if (isDebug) console.debug("PanelLocalChanges.jsx: onFileViewSelectionChanged - selectedBranches", localChanges);
-
 			// Identify files with 'Added' status
 			const addedFiles = localChanges.filter((file) => file["Local Status"].toLowerCase() === "added");
 
@@ -48,7 +46,7 @@ export default function PanelLocalChanges({ rowDataLocalChanges, setRowDataLocal
 
 			setSelectedLocalChanges(localChanges);
 		},
-		[localChangesGridRef, isDebug, setSelectedLocalChanges]
+		[localChangesGridRef, setSelectedLocalChanges]
 	);
 
 	const handleDiffResult = useCallback(
@@ -119,7 +117,7 @@ export default function PanelLocalChanges({ rowDataLocalChanges, setRowDataLocal
 						/>
 					</div>
 					<Flex mt={4} columnGap={2} justifyContent={"flex-end"}>
-						<Tooltip label={"Requires you to select at least 1 file"} hasArrow disabled={selectedLocalChanges.length > 0}>
+						<Tooltip label={"Requires you to select at least 1 file"} showArrow disabled={selectedLocalChanges.length > 0}>
 							<Button onClick={handleRevertFileViewFiles} colorPalette={"red"} disabled={selectedLocalChanges.length < 1}>
 								Revert Selected
 							</Button>

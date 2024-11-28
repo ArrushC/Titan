@@ -1,23 +1,21 @@
 import React, { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState } from "react";
 import socketIOClient from "socket.io-client";
-import _ from "lodash";
-import { branchString, stripBranchInfo } from "./utils/CommonConfig";
-import { createToastConfig, URL_SOCKET_CLIENT } from "./utils/Constants";
-import { toaster } from "./components/ui/toaster";
+import { isEqual } from "lodash";
+import { branchString } from "./utils/CommonConfig.jsx";
+import { createToastConfig, URL_SOCKET_CLIENT } from "./utils/Constants.jsx";
+import { toaster } from "./components/ui/toaster.jsx";
 
 const AppContext = createContext({
 	socket: null,
 	toaster: null,
 	config: null,
 	updateConfig: (_) => {},
-	isDebug: false,
-	setIsDebug: (_) => {},
 	configurableRowData: [],
 	setConfigurableRowData: (_) => {},
 	branchInfos: {},
 	setBranchInfos: (_) => {},
 	branchTableGridRef: null,
-	selectedBranches: [],
+	selectedBranches: {},
 	setSelectedBranches: (_) => {},
 	showSelectedBranchesLog: false,
 	setShowSelectedBranchesLog: (_) => {},
@@ -57,7 +55,6 @@ export const useApp = () => {
 export const AppProvider = ({ children }) => {
 	const [config, setConfig] = useState(null);
 	const [socket, setSocket] = useState(null);
-	const [isDebug, setIsDebug] = useState(() => localStorage.getItem("isDebug") === "true");
 
 	useEffect(() => {
 		const newSocket = socketIOClient(URL_SOCKET_CLIENT);
@@ -72,7 +69,7 @@ export const AppProvider = ({ children }) => {
 		});
 
 		newSocket.on("notification", (data) => {
-			toaster.create(createToastConfig(data.description, data.status, data.duration));
+			toaster.create(createToastConfig(data.description, data.type, data.duration));
 		});
 
 		newSocket.on("disconnect", () => {
@@ -88,10 +85,6 @@ export const AppProvider = ({ children }) => {
 		};
 	}, []);
 
-	useEffect(() => {
-		localStorage.setItem("isDebug", String(isDebug));
-	}, [isDebug]);
-
 	const saveConfig = useCallback(
 		(configToSave) => {
 			if (configToSave === null || configToSave === undefined) return;
@@ -105,7 +98,7 @@ export const AppProvider = ({ children }) => {
 		(updateFunction) => {
 			setConfig((currentConfig) => {
 				const newConfig = updateFunction(currentConfig);
-				if (_.isEqual(currentConfig, newConfig)) return currentConfig;
+				if (isEqual(currentConfig, newConfig)) return currentConfig;
 				saveConfig(newConfig);
 				return newConfig;
 			});
@@ -117,7 +110,7 @@ export const AppProvider = ({ children }) => {
 	const [configurableRowData, setConfigurableRowData] = useState([]);
 	const [branchInfos, setBranchInfos] = useState({});
 	const branchTableGridRef = useRef(null);
-	const [selectedBranches, setSelectedBranches] = useState([]);
+	const [selectedBranches, setSelectedBranches] = useState({});
 	const [showSelectedBranchesLog, setShowSelectedBranchesLog] = useState(false);
 	const [customScripts, setCustomScripts] = useState([]);
 
@@ -168,6 +161,13 @@ export const AppProvider = ({ children }) => {
 	/*****************************************
 	 *  Hooks used in both sections
 	 *****************************************/
+	useEffect(() => {
+		setConfigurableRowData((currentData) => {
+			if (config && config.branches && !isEqual(config.branches, currentData)) return config.branches;
+			return currentData;
+		});
+	}, [config]);
+
 	/**** SectionBranches ****/
 	// Refresh commit view when configurableRowData changes
 	useEffect(() => {
@@ -198,18 +198,18 @@ export const AppProvider = ({ children }) => {
 	}, [isCommitMode, showCommitView]);
 
 	// Fetch the branch status for each selected branch
-	useEffect(() => {
-		if (selectedBranches.length < 1 || showCommitView) {
-			if (selectedBranches.length < 1) setIsCommitMode(false);
-			return;
-		}
-		setSelectedBranchStatuses([]);
-		setSocketPayload(null);
-		stripBranchInfo(selectedBranches).forEach((selectedBranch) => {
-			console.debug("Emitting svn-status-single for branch:", selectedBranch);
-			socket?.emit("svn-status-single", { selectedBranch: selectedBranch });
-		});
-	}, [socket, selectedBranches, showCommitView]);
+	// useEffect(() => {
+	// 	if (selectedBranches.length < 1 || showCommitView) {
+	// 		if (selectedBranches.length < 1) setIsCommitMode(false);
+	// 		return;
+	// 	}
+	// 	setSelectedBranchStatuses([]);
+	// 	setSocketPayload(null);
+	// 	stripBranchInfo(selectedBranches).forEach((selectedBranch) => {
+	// 		console.debug("Emitting svn-status-single for branch:", selectedBranch);
+	// 		socket?.emit("svn-status-single", { selectedBranch: selectedBranch });
+	// 	});
+	// }, [socket, selectedBranches, showCommitView]);
 
 	// Refresh the commit section whenever there has been an update on untracked files being tracked by SVN.
 	useEffect(() => {
@@ -223,7 +223,6 @@ export const AppProvider = ({ children }) => {
 
 	useEffect(() => {
 		const socketCallback = (data) => {
-			if (isDebug) console.debug("Received branch status data:", data);
 			setSelectedBranchStatuses((prev) => [...prev, data]);
 		};
 
@@ -235,13 +234,13 @@ export const AppProvider = ({ children }) => {
 		setLogData([]);
 	}, [selectedBranches]);
 
-	useEffect(() => {
-		if (logData.length === 0 && socket)
-			setSelectedBranches((currSelectedBranches) => {
-				if (currSelectedBranches.length > 0) socket.emit("svn-log-selected", { selectedBranches: selectedBranches });
-				return currSelectedBranches;
-			});
-	}, [logData, socket]);
+	// useEffect(() => {
+	// 	if (logData.length === 0 && socket)
+	// 		setSelectedBranches((currSelectedBranches) => {
+	// 			if (currSelectedBranches.length > 0) socket.emit("svn-log-selected", { selectedBranches: selectedBranches });
+	// 			return currSelectedBranches;
+	// 		});
+	// }, [logData, socket]);
 
 	useEffect(() => {
 		const socketCallback = (data) => {
@@ -265,8 +264,6 @@ export const AppProvider = ({ children }) => {
 				toaster,
 				config,
 				updateConfig,
-				isDebug,
-				setIsDebug,
 				configurableRowData,
 				setConfigurableRowData,
 				branchInfos,

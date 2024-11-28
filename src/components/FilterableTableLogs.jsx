@@ -21,7 +21,7 @@ export default function FilterableTableLogs({ setAutoFillSelection = false, isAu
 					<Input placeholder="Type to search..." onInput={onQuickFilterLogsInputChanged} width={"100%"} />
 				</Flex>
 				<Box>
-					<Tooltip label={"Refresh"} hasArrow>
+					<Tooltip label={"Refresh"} showArrow>
 						<IconButton onClick={refreshLogs} icon={<RepeatIcon />} colorPalette={"yellow"} aria-label="Refresh" />
 					</Tooltip>
 				</Box>

@@ -12,7 +12,7 @@ import ModalMessageAutoFill from "./ModalMessageAutoFill";
 import OptionsCommit from "./OptionsCommit";
 
 export default function SectionCommit() {
-	const { isDebug, setIsCommitMode, selectedBranchStatuses, showCommitView, setShowCommitView, selectedBranches, configurableRowData } = useApp();
+	const { setIsCommitMode, selectedBranchStatuses, showCommitView, setShowCommitView, selectedBranches, configurableRowData } = useApp();
 
 	// Form Data Fields
 	const [fileUpdates, setFileUpdates] = useState({});
@@ -45,13 +45,6 @@ export default function SectionCommit() {
 		}
 		setFileUpdates({});
 	}, [selectedBranches, showCommitView]);
-
-	useEffect(() => {
-		if (!isDebug) return;
-
-		console.debug("Branch Status Rows:", selectedBranchStatuses);
-		console.debug("Selected Rows:", selectedBranches);
-	}, [isDebug, selectedBranchStatuses, selectedBranches]);
 
 	useEffect(() => {
 		if (selectedBranchStatuses.length === selectedBranches.length) {
@@ -108,17 +101,17 @@ export default function SectionCommit() {
 				<Tabs variant={"solid-rounded"} colorPalette="yellow" defaultIndex={hasFileUpdates ? 0 : hasLocalChanges ? 1 : 2} isLazy={false}>
 					<TabList>
 						<Tab disabled={!hasFileUpdates}>
-							<Tooltip label={"No files to update!"} hasArrow disabled={hasFileUpdates}>
+							<Tooltip label={"No files to update!"} showArrow disabled={hasFileUpdates}>
 								Files to Update
 							</Tooltip>
 						</Tab>
 						<Tab disabled={!hasLocalChanges}>
-							<Tooltip label={"No files to commit!"} hasArrow disabled={hasLocalChanges}>
+							<Tooltip label={"No files to commit!"} showArrow disabled={hasLocalChanges}>
 								Local Changes
 							</Tooltip>
 						</Tab>
 						<Tab disabled={!hasUntrackedChanges}>
-							<Tooltip label={"No unversioned/missing files!"} hasArrow disabled={hasUntrackedChanges}>
+							<Tooltip label={"No unversioned/missing files!"} showArrow disabled={hasUntrackedChanges}>
 								Untracked Changes
 							</Tooltip>
 						</Tab>

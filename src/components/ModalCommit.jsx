@@ -357,7 +357,7 @@ export default function ModalCommit({ isModalOpen, closeModal }) {
 										</Box>
 									</Box>
 									<Box>
-										<Tooltip hasArrow label={"Copy to clipboard"}>
+										<Tooltip showArrow label={"Copy to clipboard"}>
 											<IconButton aria-label="Copy To Clipboard" onClick={onRevisionsCopy} icon={<CopyIcon />} colorPalette="yellow" />
 										</Tooltip>
 									</Box>
@@ -383,7 +383,7 @@ export default function ModalCommit({ isModalOpen, closeModal }) {
 											<Code>Source information is undefined. Please check that you have entered the correct details otherwise contact the developer!</Code>
 										)}
 									</Box>
-									<Tooltip hasArrow label={"Copy to clipboard"}>
+									<Tooltip showArrow label={"Copy to clipboard"}>
 										<IconButton aria-label="Copy To Clipboard" onClick={onCommitMsgCopy} icon={<CopyIcon />} colorPalette="yellow" />
 									</Tooltip>
 								</Flex>
@@ -394,7 +394,7 @@ export default function ModalCommit({ isModalOpen, closeModal }) {
 				<ModalFooter>
 					<Flex flex={1} justifyContent="space-between">
 						<Flex columnGap={2}>
-							<Tooltip hasArrow label={"Cannot undo the commit currently"} disabled={activeStep < 2}>
+							<Tooltip showArrow label={"Cannot undo the commit currently"} disabled={activeStep < 2}>
 								<Button onClick={handlePrevious} mr={3} disabled={activeStep >= 2}>
 									{activeStep == 1 ? "Cancel" : "Previous"}
 								</Button>
@@ -402,7 +402,7 @@ export default function ModalCommit({ isModalOpen, closeModal }) {
 						</Flex>
 						<Flex columnGap={2}>
 							{activeStep == 3 ? (
-								<Tooltip hasArrow label={"Requires Trello Autofill"} disabled={postCommitData?.type === "trello" && isTrelloIntegrationEnabled}>
+								<Tooltip showArrow label={"Requires Trello Autofill"} disabled={postCommitData?.type === "trello" && isTrelloIntegrationEnabled}>
 									<Button colorPalette="yellow" leftIcon={<Icon as={FaTrello} />} onClick={handleTrelloUpdate} disabled={postCommitData?.type != "trello" || !isTrelloIntegrationEnabled}>
 										Update Card
 									</Button>
@@ -411,7 +411,7 @@ export default function ModalCommit({ isModalOpen, closeModal }) {
 								<></>
 							)}
 
-							<Tooltip hasArrow label={"Cannot undo the commit currently"} disabled={activeStep != 2}>
+							<Tooltip showArrow label={"Cannot undo the commit currently"} disabled={activeStep != 2}>
 								<Button colorPalette="yellow" onClick={handleNext} disabled={activeStep == 2}>
 									{activeStep == steps.length ? "Complete" : "Next"}
 								</Button>

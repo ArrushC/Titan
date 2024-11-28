@@ -11,6 +11,7 @@ import { setupLogger, setupUncaughtExceptionHandler } from "./logger.js";
 import compression from "compression";
 import { exec } from "child_process";
 import fetch from "node-fetch";
+import _ from "lodash";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -41,12 +42,14 @@ const io = new Server(server, {
 
 const instanceData = {
 	commitLiveResponses: [],
+	isConnectionError: false,
+    lastConnectionErrorTime: 0,
+    CONNECTION_ERROR_DEBOUNCE_MS: 5000
 };
 
 // Use compression middleware
 app.use(compression());
 
-// Set correct MIME type for JavaScript modules
 app.use((req, res, next) => {
 	if (req.url.endsWith(".js")) {
 		res.type("application/javascript");
@@ -410,8 +413,8 @@ function sanitizeCommitMessage(commitMessage) {
 /************************************
  * Socket IO Logic
  ************************************/
-function emitMessage(socket, description, status = "info", duration = 3000) {
-	socket.emit("notification", { description: description, status: status, duration: status == "error" ? 0 : duration });
+function emitMessage(socket, description, type = "info", duration = 3000) {
+	socket.emit("notification", { description, type, duration: type == "error" ? 0 : duration });
 }
 
 function emitBranchInfo(socket, branchId, branchInfo) {
@@ -423,15 +426,37 @@ function emitBranchStatus(socket, branchId, branchStatus) {
 }
 
 function isSVNConnectionError(socket, err) {
-	if (err?.message?.includes("svn: E170013: Unable to connect to a repository at URL") || err?.message?.includes("svn: E731001")) {
-		emitMessage(socket, "Unable to connect to the SVN repository!", "error");
-		io.emit("svn-connection-error", "Unable to connect to the SVN repository!");
+    if (err?.message?.includes("svn: E170013") ||
+        err?.message?.includes("svn: E731001")) {
 
-		// Forcefully shut down the server
-		// forceShutdown("SVN Connection Error");
-		return true;
-	}
-	return false;
+        const currentTime = Date.now();
+
+        if (currentTime - instanceData.lastConnectionErrorTime >= instanceData.CONNECTION_ERROR_DEBOUNCE_MS) {
+            const debouncedNotification = _.debounce(() => {
+                emitMessage(socket, "Unable to connect to the SVN repository!", "error", 10000);
+                io.emit("svn-connection-error", "Unable to connect to the SVN repository!");
+                instanceData.isConnectionError = true;
+
+                // Reset after the debounce period
+                setTimeout(() => {
+                    instanceData.isConnectionError = false;
+                }, instanceData.CONNECTION_ERROR_DEBOUNCE_MS);
+            }, instanceData.CONNECTION_ERROR_DEBOUNCE_MS, {
+                leading: true,   // Show first occurrence
+                trailing: false  // Don't show trailing occurrence
+            });
+
+            instanceData.lastConnectionErrorTime = currentTime;
+
+            // Trigger the debounced notification
+            if (!instanceData.isConnectionError) {
+                debouncedNotification();
+            }
+        }
+
+        return true;
+    }
+    return false;
 }
 
 /************************************
@@ -513,19 +538,38 @@ io.on("connection", (socket) => {
 
 		socket.on("titan-config-open", async () => {
 			debugTask("titan-config-open", null, false);
-			exec(`start "" "${configFilePath}"`, (err) => {
-				if (err) {
-					logger.error("Failed to open config file:", err);
-					emitMessage(socket, "Failed to open config file", "error");
+			const notepadPlusPlusPath = `C:\\Program Files\\Notepad++\\notepad++.exe`;
+
+			fs.access(path.normalize(notepadPlusPlusPath), fs.constants.F_OK, (accessErr) => {
+				if (!accessErr) {
+					// Notepad++ exists, open with it
+					exec(`start "" "${notepadPlusPlusPath}" "${configFilePath}"`, (err) => {
+						if (err) {
+							logger.error("Failed to open config file with Notepad++:", err);
+							emitMessage(socket, "Failed to open config file with Notepad++", "error");
+						} else {
+							logger.info("Config file opened successfully with Notepad++");
+							emitMessage(socket, "Config file opened successfully with Notepad++", "success");
+						}
+					});
 				} else {
-					logger.info("Config file opened successfully");
-					emitMessage(socket, "Config file opened successfully", "success");
+					// Fallback to the default application
+					exec(`start "" "${configFilePath}"`, (err) => {
+						if (err) {
+							logger.error("Failed to open config file:", err);
+							emitMessage(socket, "Failed to open config file", "error");
+						} else {
+							logger.info("Config file opened successfully with the default app");
+							emitMessage(socket, "Config file opened successfully with the default app", "success");
+						}
+					});
 				}
 			});
+
 			debugTask("titan-config-open", null, true);
 		});
 
-		socket.on("svn-update-single", async (data) => {
+		socket.on("svn-update-single", async (data, callback) => {
 			debugTask("svn-update-single", data, false);
 			const task = {
 				command: "update",
@@ -533,11 +577,12 @@ io.on("connection", (socket) => {
 				postopCallback: function (err, result) {
 					if (err) {
 						logger.error("Failed to execute SVN command: " + task.command);
-						if (!isSVNConnectionError(socket, err)) emitMessage(socket, `Failed to update ${branchString(data.folder, data.version, data.branch)}`, "error");
+						isSVNConnectionError(socket, err);
+						if (callback) callback({ success: false, error: err });
 					} else {
 						logger.info("Successfully executed SVN command: " + task.command);
-						emitMessage(socket, `Successfully updated ${branchString(data.folder, data.version, data.branch)}`, "success");
-						socket.emit("branch-success-single", { id: data.id, branch: data.branch, version: data.version, folder: data.folder });
+						if (callback) callback({ success: true });
+						else socket.emit("branch-success-single", { id: data.id, branch: data.branch, version: data.version, folder: data.folder });
 					}
 				},
 			};
@@ -545,7 +590,7 @@ io.on("connection", (socket) => {
 			debugTask("svn-update-single", data, true);
 		});
 
-		socket.on("svn-info-single", async (data) => {
+		socket.on("svn-info-single", async (data, callback) => {
 			// debugTask("svn-info-single", data, false);
 			if (!data.branch || data.branch === "") {
 				emitMessage(socket, "Unable to check the status of one or more branches as it is undefined", "error");
@@ -586,7 +631,8 @@ io.on("connection", (socket) => {
 
 				let branchInfo = count == 0 ? `Latest${conflictsCount > 0 ? " 🤬" : ""}` : `-${count} Revision${count > 1 ? "s" : ""}${conflictsCount > 0 ? " 🤬" : ""}`;
 
-				emitBranchInfo(socket, data.id, branchInfo);
+				if (callback) callback({ id: data.id, info: branchInfo });
+				else emitBranchInfo(socket, data.id, branchInfo);
 			} catch (err) {
 				logger.error(`Error executing SVN commands: ${err.message}`, err);
 				if (!isSVNConnectionError(socket, err)) emitMessage(socket, `Failed to retrieve info for ${branchString(data.folder, data.version, data.branch)}`, "error");
@@ -1088,9 +1134,12 @@ function gracefulShutdown(signal) {
 		io.close(() => {
 			logger.info("Socket.IO connections closed.");
 
-			// Close and destroy any resource allocations here
+			// Send shutdown acknowledgment to the main process
+			if (process.send) {
+				process.send("shutdown-complete");
+			}
 
-			// If you don't have any other resources to close, you can exit here
+			// Exit the process
 			logger.info("Graceful shutdown completed.");
 			process.exit(0);
 		});
@@ -1100,12 +1149,7 @@ function gracefulShutdown(signal) {
 	setTimeout(() => {
 		logger.error("Could not close connections in time, forcefully shutting down");
 		process.exit(1);
-	}, 10_000);
-}
-
-function forceShutdown(signal) {
-	logger.warn(`Received ${signal}. Forcing shutdown...`);
-	process.exit(1);
+	}, 10000);
 }
 
 /************************************

@@ -14,12 +14,12 @@ export default function PanelUpdates({fileUpdates}) {
 									<Th>Branch</Th>
 									<Th>Path</Th>
 									<Th>
-										<Tooltip label="Working Copy" hasArrow>
+										<Tooltip label="Working Copy" showArrow>
 											Local Status
 										</Tooltip>
 									</Th>
 									<Th>
-										<Tooltip label="Repository" hasArrow>
+										<Tooltip label="Repository" showArrow>
 											Remote Status
 										</Tooltip>
 									</Th>

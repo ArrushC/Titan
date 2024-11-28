@@ -66,17 +66,17 @@ export default function OptionsCommit() {
 			<CheckboxGroup colorPalette="yellow">
 				<Stack direction={"row"} spacing={4} mt={2}>
 					<Checkbox isChecked={commitOptions.useFolderOnlySource} onChange={(e) => handleOptionChange("useFolderOnlySource", e.target.checked)}>
-						<Tooltip label={"Removes extra branch details from source branch."} hasArrow placement="bottom-start">
+						<Tooltip label={"Removes extra branch details from source branch."} showArrow placement="bottom-start">
 							Use Folder Only Source Branch?
 						</Tooltip>
 					</Checkbox>
 					<Checkbox isChecked={commitOptions.useIssuePerFolder} onChange={(e) => handleOptionChange("useIssuePerFolder", e.target.checked)}>
-						<Tooltip label={"Allows users to input issue number for each branch folder."} hasArrow placement="bottom-start">
+						<Tooltip label={"Allows users to input issue number for each branch folder."} showArrow placement="bottom-start">
 							Use 1 Issue Per Folder?
 						</Tooltip>
 					</Checkbox>
 					<Checkbox isChecked={commitOptions.reusePreviousCommitMessage} onChange={(e) => handleOptionChange("reusePreviousCommitMessage", e.target.checked)}>
-						<Tooltip label={"Reuses the commit message from the previous commit made in Titan."} hasArrow>
+						<Tooltip label={"Reuses the commit message from the previous commit made in Titan."} showArrow>
 							Reuse Previous Commit Message?
 						</Tooltip>
 					</Checkbox>

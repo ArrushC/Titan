@@ -9,15 +9,15 @@ export default function useSocketEmits() {
 	}, [socket]);
 
 	const emitUpdateSingle = useCallback(
-		(branchId, svnBranch, branchVersion, branchFolder) => {
-			socket?.emit("svn-update-single", { id: branchId, branch: svnBranch, version: branchVersion, folder: branchFolder });
+		(branchId, svnBranch, branchVersion, branchFolder, callback) => {
+			socket?.emit("svn-update-single", { id: branchId, branch: svnBranch, version: branchVersion, folder: branchFolder }, callback);
 		},
 		[socket]
 	);
 
 	const emitInfoSingle = useCallback(
-		(branchId, svnBranch, branchVersion, branchFolder) => {
-			socket?.emit("svn-info-single", { id: branchId, branch: svnBranch, version: branchVersion, folder: branchFolder });
+		(branchId, svnBranch, branchVersion, branchFolder, callback) => {
+			socket?.emit("svn-info-single", { id: branchId, branch: svnBranch, version: branchVersion, folder: branchFolder }, callback);
 		},
 		[socket]
 	);

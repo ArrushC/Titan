@@ -1,6 +1,6 @@
 import { Input } from "@chakra-ui/react";
 import React, { useCallback, useEffect, useMemo, useState } from "react";
-import { useApp } from "../AppContext";
+import { useApp } from "../ContextApp.jsx";
 import { debounce } from "lodash";
 
 export default function EditableBranchesRow({ branchId, dataColumn, dataValue, handleDataChange }) {

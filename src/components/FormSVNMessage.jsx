@@ -1,7 +1,7 @@
 import { Box, Flex, FormControl, FormLabel, IconButton, Textarea, Tooltip, Text } from "@chakra-ui/react";
 import { Select } from "chakra-react-select";
 import React, { useCallback, useEffect } from "react";
-import { useApp } from "../AppContext";
+import { useApp } from "../ContextApp.jsx";
 import { ExternalLinkIcon } from "@chakra-ui/icons";
 import IssueNumberInput from "./IssueNumberInput";
 import useCommitOptions from "../hooks/useCommitOptions";

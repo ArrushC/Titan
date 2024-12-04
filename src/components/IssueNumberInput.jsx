@@ -1,6 +1,6 @@
 import { FormControl, FormLabel, Input, Tooltip } from "@chakra-ui/react";
 import React, { useCallback, useEffect } from "react";
-import { useApp } from "../AppContext";
+import { useApp } from "../ContextApp.jsx";
 import _ from "lodash";
 import useCommitOptions from "../hooks/useCommitOptions";
 

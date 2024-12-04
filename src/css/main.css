@@ -10,7 +10,26 @@
 
 * {
 	scroll-behavior: smooth;
-	scrollbar-width: none;
+	scrollbar-width: thin;
+	scrollbar-color: var(--chakra-colors-yellow-fg) var(--chakra-colors-yellow-subtle); /* Firefox */
+}
+
+/* Webkit browsers (Chrome, Safari, Edge) */
+*::-webkit-scrollbar {
+    width: 8px;
+}
+
+*::-webkit-scrollbar-track {
+    background: var(--chakra-colors-yellow-400);
+}
+
+*::-webkit-scrollbar-thumb {
+    background: var(--chakra-colors-yellow-400);
+    border-radius: 4px;
+}
+
+*::-webkit-scrollbar-thumb:hover {
+    background: var(--chakra-colors-yellow-600);
 }
 
 .chakra-portal > div[role="region"] {

@@ -1,9 +1,8 @@
 import { useCallback } from "react";
-import { useApp } from "../AppContext";
-import { createToastConfig } from "../utils/Constants";
+import { createToastConfig } from "../utils/Constants.jsx";
+import { toaster } from "../components/ui/toaster.jsx";
 
 export default function useNotifications() {
-	const { toaster } = useApp();
 
 	const RaiseClientNotificaiton = useCallback(
 		(description = "", type = "info", duration = 3000, manualToast = null) => {

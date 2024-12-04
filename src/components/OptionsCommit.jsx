@@ -1,24 +1,27 @@
-import { Box, Checkbox, CheckboxGroup, Heading, Stack, Tooltip } from "@chakra-ui/react";
 import React, { useCallback, useEffect, useState } from "react";
-import { useApp } from "../AppContext";
-import _ from "lodash";
+import { useApp } from "../ContextApp.jsx";
+import { isEmpty, isEqual } from "lodash";
+import { Checkbox } from "./ui/checkbox.jsx";
+import { Box, Em, Flex, Heading } from "@chakra-ui/react";
+import { useCommit } from "../ContextCommit.jsx";
 
 export default function OptionsCommit() {
-	const { config, updateConfig, setSourceBranch, setIssueNumber } = useApp();
+	const {config, updateConfig} = useApp();
+	const { setSourceBranch, setIssueNumber } = useCommit();
 	const [commitOptions, setCommitOptions] = useState({});
 
 	const handleOptionChange = useCallback(
-		(optionName, isChecked) => {
+		(optionName, checked) => {
 			setCommitOptions((currentOptions) => ({
 				...currentOptions,
-				[optionName]: isChecked,
+				[optionName]: checked,
 			}));
 		},
 		[setCommitOptions]
 	);
 
 	useEffect(() => {
-		if (!config || _.isEmpty(config)) return;
+		if (!config || isEmpty(config)) return;
 
 		if (!config.commitOptions) {
 			updateConfig((currentConfig) => ({
@@ -26,7 +29,6 @@ export default function OptionsCommit() {
 				commitOptions: {
 					useFolderOnlySource: false,
 					useIssuePerFolder: false,
-					reusePreviousCommitMessage: false,
 				},
 			}));
 		} else {
@@ -35,10 +37,10 @@ export default function OptionsCommit() {
 	}, [config]);
 
 	useEffect(() => {
-		if (_.isEmpty(commitOptions)) return;
+		if (isEmpty(commitOptions)) return;
 
 		updateConfig((currentConfig) => {
-			if (!_.isEqual(currentConfig.commitOptions, commitOptions)) {
+			if (!isEqual(currentConfig.commitOptions, commitOptions)) {
 				return {
 					...currentConfig,
 					commitOptions: commitOptions,
@@ -59,29 +61,18 @@ export default function OptionsCommit() {
 	}, [commitOptions?.useIssuePerFolder, setIssueNumber]);
 
 	return (
-		<Box mb={4}>
-			<Heading as={"h6"} size="sm">
+		<Box colorPalette={"yellow"} bgColor={"colorPalette.subtle"} rounded={"md"} p={4}>
+			<Heading as={"h6"} size="sm" fontWeight={700} mb={3}>
 				Commit Options
 			</Heading>
-			<CheckboxGroup colorPalette="yellow">
-				<Stack direction={"row"} spacing={4} mt={2}>
-					<Checkbox isChecked={commitOptions.useFolderOnlySource} onChange={(e) => handleOptionChange("useFolderOnlySource", e.target.checked)}>
-						<Tooltip label={"Removes extra branch details from source branch."} showArrow placement="bottom-start">
-							Use Folder Only Source Branch?
-						</Tooltip>
-					</Checkbox>
-					<Checkbox isChecked={commitOptions.useIssuePerFolder} onChange={(e) => handleOptionChange("useIssuePerFolder", e.target.checked)}>
-						<Tooltip label={"Allows users to input issue number for each branch folder."} showArrow placement="bottom-start">
-							Use 1 Issue Per Folder?
-						</Tooltip>
-					</Checkbox>
-					<Checkbox isChecked={commitOptions.reusePreviousCommitMessage} onChange={(e) => handleOptionChange("reusePreviousCommitMessage", e.target.checked)}>
-						<Tooltip label={"Reuses the commit message from the previous commit made in Titan."} showArrow>
-							Reuse Previous Commit Message?
-						</Tooltip>
-					</Checkbox>
-				</Stack>
-			</CheckboxGroup>
+			<Flex direction={"column"} gap={4} mt={2}>
+				<Checkbox variant="subtle" checked={commitOptions.useFolderOnlySource} onCheckedChange={(e) => handleOptionChange("useFolderOnlySource", e.checked)}>
+					Use Folder Only Source Branch? <Em color={"colorPalette.fg"}> - Removes extra branch details from source branch</Em>
+				</Checkbox>
+				<Checkbox variant="subtle" checked={commitOptions.useIssuePerFolder} onCheckedChange={(e) => handleOptionChange("useIssuePerFolder", e.checked)}>
+					Use 1 Issue Per Folder? <Em color={"colorPalette.fg"}> - Allows users to input issue number for each branch folder</Em>
+				</Checkbox>
+			</Flex>
 		</Box>
 	);
 }

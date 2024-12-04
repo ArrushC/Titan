@@ -1,6 +1,6 @@
-import React, { useCallback, useEffect, useState } from "react";
-import { useApp } from "../AppContext.jsx";
-import { Box, Button, Flex, IconButton, Kbd, Mark, Table, Text } from "@chakra-ui/react";
+import React, { useCallback, useEffect, useMemo, useState } from "react";
+import { useApp } from "../ContextApp.jsx";
+import { Box, Button, Flex, Heading, HStack, IconButton, Kbd, Mark, Table, Text } from "@chakra-ui/react";
 import { Checkbox } from "./ui/checkbox.jsx";
 import { ActionBarContent, ActionBarRoot, ActionBarSelectionTrigger, ActionBarSeparator } from "./ui/action-bar.jsx";
 import DialogRowDeletion from "./DialogRowDeletion.jsx";
@@ -10,16 +10,22 @@ import ButtonIconTooltip from "./ButtonIconTooltip.jsx";
 import useSocketEmits from "../hooks/useSocketEmits.jsx";
 import { MdUpdate } from "react-icons/md";
 import useNotifications from "../hooks/useNotifications.jsx";
+import { useBranches } from "../ContextBranches.jsx";
+import ActionBarSelection from "./ActionBarSelection.jsx";
 
 export default function SectionBranches() {
-	const { updateConfig, configurableRowData, selectedBranches, setSelectedBranches, setIsDialogSBLogOpen } = useApp();
+	const { updateConfig, configurableRowData, selectedBranches, setSelectedBranches, setAppMode, handleBranchSelection, handleBulkSelection, config } = useApp();
+	const { setIsDialogSBLogOpen } = useBranches();
 	const { RaisePromisedClientNotification } = useNotifications();
 	const { emitInfoSingle, emitUpdateSingle } = useSocketEmits();
-	const [selectionMetrics, setSelectionMetrics] = useState({
-		selectedBranchesCount: 0,
-		indeterminate: false,
-		hasSelection: false,
-	});
+	const selectionMetrics = useMemo(() => {
+		const selectedCount = Object.keys(selectedBranches).length;
+		return {
+			selectedBranchesCount: selectedCount,
+			indeterminate: selectedCount > 0 && selectedCount < configurableRowData.length,
+			hasSelection: selectedCount > 0,
+		};
+	}, [selectedBranches, configurableRowData]);
 
 	useEffect(() => {
 		const validBranchIds = new Set(configurableRowData.map((branch) => branch.id));
@@ -38,15 +44,6 @@ export default function SectionBranches() {
 			setSelectedBranches(validSelectedBranches);
 		}
 	}, [configurableRowData, selectedBranches, setSelectedBranches]);
-
-	useEffect(() => {
-		const selectedCount = Object.keys(selectedBranches).filter((key) => selectedBranches[key]).length;
-		setSelectionMetrics({
-			selectedBranchesCount: selectedCount,
-			indeterminate: selectedCount > 0 && selectedCount < configurableRowData.length,
-			hasSelection: selectedCount > 0,
-		});
-	}, [selectedBranches, configurableRowData]);
 
 	const [isRowDialogOpen, setIsRowDialogOpen] = useState(false);
 	const fireRowDialogAction = useCallback(() => {
@@ -126,8 +123,8 @@ export default function SectionBranches() {
 	}, [RaisePromisedClientNotification, configurableRowData, selectedBranches, emitUpdateSingle, emitInfoSingle]);
 
 	const commitSelectedBranches = useCallback(() => {
-		console.log("Committing selected branches");
-	}, []);
+		setAppMode((current) => (current == "commit" ? "branches" : "commit"));
+	}, [setAppMode]);
 
 	const logsSelectedBranches = useCallback(() => {
 		setIsDialogSBLogOpen(true);
@@ -159,35 +156,31 @@ export default function SectionBranches() {
 
 	const selectAllBranches = useCallback(
 		(checked) => {
-			console.log("Select All: ", checked);
-			if (checked) {
-				const newSelection = configurableRowData.reduce((acc, branch) => {
-					acc[branch.id] = true;
-					return acc;
-				}, {});
-				setSelectedBranches(newSelection);
-			} else {
-				setSelectedBranches({});
-			}
+			const ids = configurableRowData.map((row) => row.id);
+			handleBulkSelection(ids, checked);
 		},
 		[configurableRowData, setSelectedBranches]
 	);
 
 	return (
 		<Box>
+			<Heading as={"h2"} size={"2xl"} lineClamp={1} mb={4} lineHeight={"1.4"}>
+				You have {configurableRowData.length} branch{configurableRowData.length > 1 ? "es" : ""}:
+			</Heading>
+
 			<Table.Root size={"sm"} variant={"outline"} transition={"backgrounds"}>
 				<Table.ColumnGroup>
 					<Table.Column width="1%" />
-					<Table.Column width="15%" />
-					<Table.Column width="15%" />
+					<Table.Column width="12%" />
+					<Table.Column width="12%" />
 					<Table.Column />
 					<Table.Column />
-					<Table.Column width="15%" />
+					<Table.Column />
 				</Table.ColumnGroup>
 				<Table.Header>
 					<Table.Row>
 						<Table.ColumnHeader w="6">
-							<Checkbox top="0" aria-label="Select all rows" variant={"subtle"} colorPalette={"yellow"} checked={selectionMetrics.indeterminate ? "indeterminate" : selectionMetrics.selectedBranchesCount === configurableRowData.length} onCheckedChange={(e) => selectAllBranches(e.checked)} />
+							<Checkbox top="0" aria-label="Select all rows" variant="subtle" colorPalette="yellow" checked={selectionMetrics.indeterminate ? "indeterminate" : selectionMetrics.selectedBranchesCount === configurableRowData.length} onCheckedChange={(e) => selectAllBranches(e.checked)} />
 						</Table.ColumnHeader>
 						<Table.ColumnHeader>Branch Folder</Table.ColumnHeader>
 						<Table.ColumnHeader>Branch Version</Table.ColumnHeader>
@@ -196,20 +189,18 @@ export default function SectionBranches() {
 						<Table.ColumnHeader>Custom Scripts</Table.ColumnHeader>
 					</Table.Row>
 				</Table.Header>
-				<Table.Body>{configurableRowData && configurableRowData.length > 0 ? configurableRowData.map((branchRow) => <SectionBranchesRow key={branchRow.id} branchRow={branchRow} />) : null}</Table.Body>
+				<Table.Body>
+					{configurableRowData.map((branchRow) => (
+						<SectionBranchesRow key={branchRow.id} branchRow={branchRow} isSelected={!!selectedBranches[branchRow.id]} onSelectChange={handleBranchSelection}  />
+					))}
+				</Table.Body>
 				<Table.Footer>
 					<Table.Row>
 						<Table.Cell colSpan={6}>
-							<Flex justifyContent={"space-between"} p={2}>
-								<Flex>
-									<Flex alignItems={"center"} color="yellow.focusRing">
-										<Text me={1}>{configurableRowData.length} Branches</Text>
-										<Text fontWeight={900}></Text>
-									</Flex>
-								</Flex>
+							<Flex justifyContent={"start"} p={2}>
 								<Flex gapX={2}>
-									<ButtonIconTooltip icon={<MdUpdate />} colorPalette={"yellow"} variant={"subtle"} label={"Update All"} placement={"bottom-end"} onClick={updateAll} />
 									<ButtonIconTooltip icon={<IoMdAdd />} colorPalette={"yellow"} variant={"subtle"} label={"Add Row"} placement={"bottom-end"} onClick={addRow} />
+									<ButtonIconTooltip icon={<MdUpdate />} colorPalette={"yellow"} variant={"subtle"} label={"Update All"} placement={"bottom-end"} onClick={updateAll} disabled={configurableRowData.length < 1} />
 								</Flex>
 							</Flex>
 						</Table.Cell>
@@ -217,31 +208,15 @@ export default function SectionBranches() {
 				</Table.Footer>
 			</Table.Root>
 
-			<ActionBarRoot open={selectionMetrics.hasSelection} closeOnEscape={false}>
-				<ActionBarContent>
-					<ActionBarSelectionTrigger>{selectionMetrics.selectedBranchesCount} Selected</ActionBarSelectionTrigger>
-					<ActionBarSeparator />
-					<Button variant="outline" size="sm" onClick={() => setIsRowDialogOpen(true)}>
-						Delete <Kbd wordSpacing={0}>Del</Kbd>
-					</Button>
-					<Button variant="outline" size="sm" onClick={() => refreshSelectedBranches()}>
-						Refresh <Kbd wordSpacing={0}>Alt&nbsp;+&nbsp;R</Kbd>
-					</Button>
-					<Button variant="outline" size="sm" onClick={() => updateSelectedBranches()}>
-						Update <Kbd wordSpacing={0}>U</Kbd>
-					</Button>
-					<Button variant="outline" size="sm" onClick={() => commitSelectedBranches()}>
-						Commit <Kbd wordSpacing={0}>C</Kbd>
-					</Button>
-					<Button variant="outline" size="sm" onClick={() => logsSelectedBranches()}>
-						Logs <Kbd wordSpacing={0}>L</Kbd>
-					</Button>
-					<ActionBarSeparator />
-					<IconButton variant={"ghost"} size={"sm"} onClick={() => setSelectedBranches({})} disabled={!window.electron}>
-						<IoMdClose />
-					</IconButton>
-				</ActionBarContent>
-			</ActionBarRoot>
+			<ActionBarSelection
+                selectedCount={selectionMetrics.selectedBranchesCount}
+                onDelete={() => setIsRowDialogOpen(true)}
+                onRefresh={refreshSelectedBranches}
+                onUpdate={updateSelectedBranches}
+                onCommit={commitSelectedBranches}
+                onLogs={logsSelectedBranches}
+                onClear={() => setSelectedBranches({})}
+            />
 
 			<DialogRowDeletion isDialogOpen={isRowDialogOpen} closeDialog={() => setIsRowDialogOpen(false)} fireDialogAction={fireRowDialogAction} />
 		</Box>

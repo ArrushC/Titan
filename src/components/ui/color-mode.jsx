@@ -2,8 +2,8 @@ import { ClientOnly, IconButton, Skeleton } from "@chakra-ui/react";
 import { ThemeProvider, useTheme } from "next-themes";
 
 import * as React from "react";
-import { LuMoon, LuSun } from "react-icons/lu";
 import { Tooltip } from "./tooltip";
+import { FaMoon, FaSun } from "react-icons/fa6";
 
 export function ColorModeProvider(props) {
 	return <ThemeProvider attribute="class" disableTransitionOnChange {...props} />;
@@ -28,7 +28,7 @@ export function useColorModeValue(light, dark) {
 
 export function ColorModeIcon() {
 	const { colorMode } = useColorMode();
-	return colorMode === "light" ? <LuSun /> : <LuMoon />;
+	return colorMode === "light" ? <FaSun /> : <FaMoon />;
 }
 
 export const ColorModeButton = React.forwardRef(function ColorModeButton(props, ref) {

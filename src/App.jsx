@@ -2,22 +2,22 @@ import React, { useEffect } from "react";
 import { Box, Flex } from "@chakra-ui/react";
 import Header from "./components/Header.jsx";
 import SectionBranches from "./components/SectionBranches.jsx";
-// import SectionCommit from "./components/SectionCommit.jsx";
-import { useApp } from "./AppContext.jsx";
+import SectionCommit from "./components/SectionCommit.jsx";
 import useNotifications from "./hooks/useNotifications.jsx";
 import DialogBranchesLog from "./components/DialogBranchesLog.jsx";
 import AlertUpdateTitan from "./components/AlertUpdateTitan.jsx";
 import HeaderApp from "./components/HeaderApp.jsx";
 import { Toaster } from "./components/ui/toaster.jsx";
+import { BranchesProvider } from "./ContextBranches.jsx";
+import { CommitProvider } from "./ContextCommit.jsx";
 
 function App() {
-	const { isCommitMode, selectedBranches, configurableRowData } = useApp();
 	const { RaiseClientNotificaiton } = useNotifications();
 
 	useEffect(() => {
 		if (window.electron) {
 			window.electron.onAppClosing(() => {
-				RaiseClientNotificaiton("App is closing, performing cleanup...", "info", 0);
+				RaiseClientNotificaiton("App is closing, performing cleanup...", "warning", 0);
 
 				// Perform any necessary cleanup in the renderer process
 				// ...
@@ -40,18 +40,17 @@ function App() {
 			<Box p={10} overflowY={"auto"} className="titanBody">
 				<Header />
 				<AlertUpdateTitan />
-				<Flex rowGap={4} flexDirection={"column"}>
+				<Flex rowGap={8} flexDirection={"column"}>
 					<Box>
-						<SectionBranches />
+						<BranchesProvider>
+							<SectionBranches />
+						</BranchesProvider>
 					</Box>
-					{/* <Collapse in={isCommitMode} animateOpacity>
-						<Box id="sectionCommit">
-							<Heading as={"h2"} size={"lg"} lineClamp={1} mb={4} className="animation-pulse" lineHeight={"1.4"}>
-								Committing {selectedBranches.length == configurableRowData.length ? "All" : `${selectedBranches.length}/${configurableRowData.length}`} Branch{selectedBranches.length == 1 ? "" : "es"}
-							</Heading>
+					<Box>
+						<CommitProvider>
 							<SectionCommit />
-						</Box>
-					</Collapse> */}
+						</CommitProvider>
+					</Box>
 				</Flex>
 				<DialogBranchesLog />
 			</Box>

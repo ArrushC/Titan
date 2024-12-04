@@ -3,7 +3,7 @@ import React, { useCallback, useEffect, useState } from "react";
 import _ from "lodash";
 import FilterableTableLogs from "./FilterableTableLogs";
 import FilterableTableTrello from "./FilterableTableTrello";
-import { useApp } from "../AppContext";
+import { useApp } from "../ContextApp.jsx";
 
 export default function ModalMessageAutoFill({ isModalOpen, closeModal }) {
 	const { setIssueNumber, setCommitMessage, setPostCommitData } = useApp();

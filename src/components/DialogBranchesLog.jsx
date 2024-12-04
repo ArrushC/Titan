@@ -1,7 +1,7 @@
 import React, { useCallback, useEffect, useState } from "react";
 import { DialogActionTrigger, DialogBackdrop, DialogBody, DialogCloseTrigger, DialogContent, DialogFooter, DialogHeader, DialogRoot, DialogTitle } from "./ui/dialog.jsx";
 import { Button } from "./ui/button.jsx";
-import { useApp } from "../AppContext.jsx";
+import { useApp } from "../ContextApp.jsx";
 import useSocketEmits from "../hooks/useSocketEmits.jsx";
 import { HStack, Table } from "@chakra-ui/react";
 import { PaginationItems, PaginationNextTrigger, PaginationPrevTrigger, PaginationRoot } from "./ui/pagination.jsx";

@@ -1,5 +1,5 @@
 import { useCallback } from "react";
-import { useApp } from "../AppContext";
+import { useApp } from "../ContextApp.jsx";
 
 export default function useSocketEmits() {
 	const { socket } = useApp();

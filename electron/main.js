@@ -248,7 +248,7 @@ if (!gotTheLock) {
 		});
 	});
 
-	app.on("ready", () => {
+	app.on("ready", async () => {
 		createSplashWindow();
 		startServer();
 		setupMemoryMonitoring();
@@ -571,4 +571,10 @@ app.on("will-quit", () => {
 	if (serverProcess) {
 		serverProcess.removeAllListeners();
 	}
+
+	if (isDev) {
+        session.defaultSession.getAllExtensions().forEach((extension) => {
+            session.defaultSession.removeExtension(extension.id);
+        });
+    }
 });

@@ -43,8 +43,8 @@ const io = new Server(server, {
 const instanceData = {
 	commitLiveResponses: [],
 	isConnectionError: false,
-    lastConnectionErrorTime: 0,
-    CONNECTION_ERROR_DEBOUNCE_MS: 5000
+	lastConnectionErrorTime: 0,
+	CONNECTION_ERROR_DEBOUNCE_MS: 5000,
 };
 
 // Use compression middleware
@@ -383,7 +383,7 @@ const svnQueueSerial = async.queue(async (task) => {
 	debugTask("svnQueueSerial", task, true);
 
 	// 2 seconds delay between each task to prevent flooding the SVN server
-	await new Promise((resolve) => setTimeout(resolve, 2000));
+	await new Promise((resolve) => setTimeout(resolve, 1500));
 }, 1); // Concurrency of 1 ensures tasks are executed sequentially
 
 // Handle job completion
@@ -426,49 +426,26 @@ function emitBranchStatus(socket, branchId, branchStatus) {
 }
 
 function isSVNConnectionError(socket, err) {
-    if (err?.message?.includes("svn: E170013") ||
-        err?.message?.includes("svn: E731001")) {
+	if (err?.message?.includes("svn: E170013") || err?.message?.includes("svn: E731001")) {
+		io.emit("svn-connection-error", "Unable to connect to the SVN repository!");
 
-        const currentTime = Date.now();
-
-        if (currentTime - instanceData.lastConnectionErrorTime >= instanceData.CONNECTION_ERROR_DEBOUNCE_MS) {
-            const debouncedNotification = _.debounce(() => {
-                emitMessage(socket, "Unable to connect to the SVN repository!", "error", 10000);
-                io.emit("svn-connection-error", "Unable to connect to the SVN repository!");
-                instanceData.isConnectionError = true;
-
-                // Reset after the debounce period
-                setTimeout(() => {
-                    instanceData.isConnectionError = false;
-                }, instanceData.CONNECTION_ERROR_DEBOUNCE_MS);
-            }, instanceData.CONNECTION_ERROR_DEBOUNCE_MS, {
-                leading: true,   // Show first occurrence
-                trailing: false  // Don't show trailing occurrence
-            });
-
-            instanceData.lastConnectionErrorTime = currentTime;
-
-            // Trigger the debounced notification
-            if (!instanceData.isConnectionError) {
-                debouncedNotification();
-            }
-        }
-
-        return true;
-    }
-    return false;
+		return true;
+	}
+	return false;
 }
 
 /************************************
  * Socket IO Logic
  ************************************/
-async function sendConfig(socket) {
+async function fetchConfig(socket) {
 	let config = null;
 
 	try {
 		await fsPromises.mkdir(path.dirname(configFilePath), { recursive: true });
 		await fsPromises.access(configFilePath);
 	} catch (err) {
+		// Handle error: maybe log or notify
+		logger.warn("Config file not found, creating a new one.");
 		const defaultConfig = {
 			currentVersion: latestVersion,
 			branches: [],
@@ -476,15 +453,21 @@ async function sendConfig(socket) {
 			commitOptions: {
 				useFolderOnlySource: false,
 				useIssuePerFolder: false,
-				reusePreviousCommitMessage: false,
 			},
 			trelloIntegration: {
 				key: "TRELLO_API_KEY",
 				token: "TRELLO_TOKEN",
 			},
 		};
-		await fsPromises.writeFile(configFilePath, JSON.stringify(defaultConfig, null, 4));
-		emitMessage(socket, "Config file created with default content", "success");
+		try {
+			await fsPromises.writeFile(configFilePath, JSON.stringify(defaultConfig, null, 4));
+			emitMessage(socket, "Config file created with default content", "success");
+			config = defaultConfig; // Assign the default config
+		} catch (writeErr) {
+			logger.error("Error writing default config file:", writeErr);
+			emitMessage(socket, "Error creating default config file", "error");
+			throw writeErr; // Propagate error to be caught in the caller
+		}
 	}
 
 	try {
@@ -497,12 +480,12 @@ async function sendConfig(socket) {
 			emitMessage(socket, `Successfully updated Titan to v${latestVersion}!`, "success");
 		}
 	} catch (err) {
-		logger.error(err);
+		logger.error("Error reading or parsing config file:", err);
 		emitMessage(socket, "Error reading config file", "error");
-		return;
+		throw err; // Propagate error to be caught in the caller
 	}
 
-	socket.emit("titan-config-get", config);
+	return config;
 }
 
 io.on("connection", (socket) => {
@@ -515,10 +498,17 @@ io.on("connection", (socket) => {
 	logger.info(`Connected to ${isForeignOrigin ? "foreign" : "titan"} client`);
 	emitMessage(socket, "Connected To Server!", "success", 1500);
 
-	socket.on("titan-config-get", async (data) => {
+	socket.on("titan-config-get", async (data, callback) => {
 		debugTask("titan-config-get", data, false);
-		if (data === "fetch") {
-			await sendConfig(socket);
+		try {
+			debugTask("titan-config-get", {}, false);
+			const config = await fetchConfig(socket);
+			callback({ config });
+			debugTask("titan-config-get", {}, true);
+		} catch (error) {
+			logger.error("Error in titan-config-get: " + error);
+			emitMessage(socket, "An error occurred while fetching the configuration.", "error");
+			callback({ error: "Failed to fetch configuration." });
 		}
 		debugTask("titan-config-get", data, true);
 	});
@@ -634,8 +624,15 @@ io.on("connection", (socket) => {
 				if (callback) callback({ id: data.id, info: branchInfo });
 				else emitBranchInfo(socket, data.id, branchInfo);
 			} catch (err) {
-				logger.error(`Error executing SVN commands: ${err.message}`, err);
-				if (!isSVNConnectionError(socket, err)) emitMessage(socket, `Failed to retrieve info for ${branchString(data.folder, data.version, data.branch)}`, "error");
+				if (isSVNConnectionError(socket, err)) return;
+				if (err.message.includes("svn: E155010")) {
+					if (callback) callback({ id: data.id, info: "Not Found" });
+					else emitBranchInfo(socket, data.id, "Not Found");
+					return;
+				}
+
+				logger.error(`Error executing SVN commands: ${err.message}` + err);
+				emitMessage(socket, `Failed to retrieve info for ${branchString(data.folder, data.version, data.branch)}`, "error");
 			}
 			// debugTask("svn-info-single", data, true);
 		});
@@ -1106,10 +1103,8 @@ io.on("connection", (socket) => {
 	});
 
 	// On reconnect
-	socket.on("reconnect", () => {
+	socket.on("reconnect", async () => {
 		logger.info("Client reconnected");
-		emitMessage(socket, "Reconnected to server", "success", 1500);
-		sendConfig(socket);
 	});
 });
 
@@ -1174,3 +1169,8 @@ process.on("message", (message) => {
 // Listen for shutdown signals
 process.on("SIGTERM", () => gracefulShutdown("SIGTERM"));
 process.on("SIGINT", () => gracefulShutdown("SIGINT"));
+
+// Listen for unhandled rejections
+process.on("unhandledRejection", (reason, promise) => {
+	logger.error("Unhandled Rejection at:" + JSON.stringify(promise, null, 4) + "reason:" + reason);
+});

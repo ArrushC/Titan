@@ -33,7 +33,7 @@ import {
 } from "react-icons/tb";
 
 export default function ButtonCustomScripts(props) {
-	const { onClick, colorPalette, label, size } = props;
+	const { onClick, colorPalette, label, size, disabled=false } = props;
 
 	const handleClick = useCallback(() => {
 		if (onClick) onClick();
@@ -101,8 +101,8 @@ export default function ButtonCustomScripts(props) {
 	}, [label]);
 
 	return (
-		<Tooltip content={window.electron ? label : "Feature must be used in desktop application"} showArrow>
-			<IconButton aria-label={label} size={size} onClick={handleClick} colorPalette={colorPalette} variant={"subtle"} disabled={!window.electron}>
+		<Tooltip content={window.electron ? label : "Feature must be used in desktop application"} showArrow disabled={!window.electron || disabled}>
+			<IconButton aria-label={label} size={size} onClick={handleClick} colorPalette={colorPalette} variant={"subtle"} disabled={!window.electron || disabled}>
 				{icon}
 			</IconButton>
 		</Tooltip>

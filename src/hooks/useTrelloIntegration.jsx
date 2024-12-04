@@ -1,4 +1,4 @@
-import { useApp } from "../AppContext";
+import { useApp } from "../ContextApp.jsx";
 import useSocketEmits from "./useSocketEmits";
 
 export default function useTrelloIntegration() {

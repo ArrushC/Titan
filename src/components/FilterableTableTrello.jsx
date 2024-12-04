@@ -3,7 +3,7 @@ import { Box, Flex, IconButton, Input, Tooltip, Text, Link } from "@chakra-ui/re
 import _ from "lodash";
 import React, { useCallback, useEffect, useState } from "react";
 import useTrelloIntegration from "../hooks/useTrelloIntegration";
-import { useApp } from "../AppContext";
+import { useApp } from "../ContextApp.jsx";
 import TableTrello from "./TableTrello";
 
 export default function FilterableTableTrello({ setAutoFillSelection }) {

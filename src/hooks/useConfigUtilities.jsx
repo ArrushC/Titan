@@ -1,5 +1,5 @@
 import { useCallback, useMemo } from "react";
-import { useApp } from "../AppContext";
+import { useApp } from "../ContextApp.jsx";
 import _ from "lodash";
 
 export default function useConfigUtilities() {

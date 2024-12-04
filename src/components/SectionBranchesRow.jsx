@@ -1,4 +1,4 @@
-import React, { memo, useCallback, useDeferredValue, useEffect, useMemo, useState } from "react";
+import React, { memo, useCallback, useEffect, useMemo, useState } from "react";
 import { Table, Text, Flex, IconButton, Box } from "@chakra-ui/react";
 import { Checkbox } from "./ui/checkbox.jsx";
 import { Tooltip } from "./ui/tooltip.jsx";
@@ -167,7 +167,7 @@ const SectionBranchesRow = memo(
 		return (
 			<Table.Row bgColor={rowStyle.backgroundColor}>
 				<Table.Cell display={"flex"} alignItems={"center"}>
-					<Checkbox top="2" aria-label="Select row" variant={"subtle"} colorPalette={"yellow"} checked={isSelected} onCheckedChange={(e) => onSelectChange(branchId, e.checked)} disabled={branchInfo === "Not Found"} />
+					<Checkbox top="2" aria-label="Select row" variant={"subtle"} colorPalette={"yellow"} checked={isSelected} onCheckedChange={(e) => onSelectChange(branchId, e.checked)} />
 				</Table.Cell>
 				<Table.Cell>
 					<EditableBranchesRow branchId={branchId} dataColumn={"Branch Folder"} dataValue={branchFolder} handleDataChange={handleDataChange} />

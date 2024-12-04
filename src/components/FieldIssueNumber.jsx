@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useState } from "react";
+import React, { useDeferredValue, useEffect, useState } from "react";
 import { Field } from "./ui/field.jsx";
 import { NumberInputField, NumberInputRoot } from "./ui/number-input.jsx";
 import useCommitOptions from "../hooks/useCommitOptions.jsx";
@@ -9,13 +9,7 @@ export default function FieldIssueNumber({ branchFolder }) {
 	const commitOptions = useCommitOptions();
 
 	const [fieldIssueNumber, setFieldIssueNumber] = useState("");
-
-	const handleIssueNumChange = useCallback(
-		(e) => {
-			setFieldIssueNumber(e.value);
-		},
-		[branchFolder, setIssueNumber]
-	);
+	const deferredFieldIssueNumber = useDeferredValue(fieldIssueNumber);
 
 	const isFieldDisabled = !branchFolder;
 	const isFieldRequired = !branchFolder || !commitOptions?.useIssuePerFolder;
@@ -25,24 +19,26 @@ export default function FieldIssueNumber({ branchFolder }) {
 
 		setIssueNumber((currIssueNumber) => ({
 			...currIssueNumber,
-			[branchFolder]: fieldIssueNumber,
+			[branchFolder]: deferredFieldIssueNumber,
 		}));
 
 		return () => {
 			setIssueNumber((currIssueNumber) => {
-                const { [branchFolder]: _, ...rest } = currIssueNumber;
-                return rest;
-            });
-		}
-	}, [branchFolder, fieldIssueNumber, setIssueNumber]);
+				const { [branchFolder]: _, ...rest } = currIssueNumber;
+				return rest;
+			});
+		};
+	}, [branchFolder, deferredFieldIssueNumber]);
 
 	console.log("FieldIssueNumber rendered");
 
 	return (
 		<Field orientation="horizontal" label={`Issue Number (${branchFolder})`} labelFlex="0.4" required={isFieldRequired} disabled={isFieldDisabled}>
-			<NumberInputRoot variant="flushed" min="0" ms={4} flex="0.95" size={"sm"} value={fieldIssueNumber} onValueChange={handleIssueNumChange}>
+			<NumberInputRoot variant="flushed" min="0" ms={4} flex="0.95" size={"sm"} value={fieldIssueNumber} onValueChange={(e) => setFieldIssueNumber(e.value)}>
 				<NumberInputField placeholder="The issue that your changes are linked to" borderColor="colorPalette.fg" />
 			</NumberInputRoot>
 		</Field>
 	);
+
+	// TODO Use asterisk in branchFolder as a wildcard for all branches.
 }

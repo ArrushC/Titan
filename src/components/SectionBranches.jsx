@@ -136,7 +136,7 @@ export default function SectionBranches() {
 		const handleKeyDown = (event) => {
 			if (event.key === "Delete") {
 				setIsRowDialogOpen(true);
-			} else if (event.key === "r" && event.altKey) {
+			} else if (event.key === "r") {
 				refreshSelectedBranches();
 			} else if (event.key === "u") {
 				updateSelectedBranches();

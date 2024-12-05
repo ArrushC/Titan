@@ -54,6 +54,3 @@ export const BranchesProvider = ({ children }) => {
 
 	return <ContextBranches.Provider value={value}>{children}</ContextBranches.Provider>;
 };
-
-// https://socket.io/how-to/use-with-react#remarks-about-the-useeffect-hook
-// Also, take a look at useDeferredValue to take out re-renders.

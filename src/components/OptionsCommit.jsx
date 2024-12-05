@@ -28,7 +28,6 @@ export default function OptionsCommit() {
 				...currentConfig,
 				commitOptions: {
 					useFolderOnlySource: false,
-					useIssuePerFolder: false,
 				},
 			}));
 		} else {
@@ -68,9 +67,6 @@ export default function OptionsCommit() {
 			<Flex direction={"column"} gap={4} mt={2}>
 				<Checkbox variant="subtle" checked={commitOptions.useFolderOnlySource} onCheckedChange={(e) => handleOptionChange("useFolderOnlySource", e.checked)}>
 					Use Folder Only Source Branch? <Em color={"colorPalette.fg"}> - Removes extra branch details from source branch</Em>
-				</Checkbox>
-				<Checkbox variant="subtle" checked={commitOptions.useIssuePerFolder} onCheckedChange={(e) => handleOptionChange("useIssuePerFolder", e.checked)}>
-					Use 1 Issue Per Folder? <Em color={"colorPalette.fg"}> - Allows users to input issue number for each branch folder</Em>
 				</Checkbox>
 			</Flex>
 		</Box>

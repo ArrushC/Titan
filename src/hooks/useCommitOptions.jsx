@@ -1,4 +1,4 @@
-import { useApp } from "../AppContext";
+import { useApp } from "../ContextApp.jsx";
 
 export default function useCommitOptions() {
 	const { config } = useApp();

@@ -1,6 +1,6 @@
 import { FormControl, FormLabel, Input, Tooltip } from "@chakra-ui/react";
 import React, { useCallback, useEffect } from "react";
-import { useApp } from "../AppContext";
+import { useApp } from "../ContextApp.jsx";
 import _ from "lodash";
 import useCommitOptions from "../hooks/useCommitOptions";
 
@@ -44,8 +44,8 @@ export default function IssueNumberInput({ branchFolder }) {
 	}, [branchFolder, setIssueNumber]);
 
 	return (
-		<Tooltip label={"Please select source branch first!"} isDisabled={!isFieldDisabled} hasArrow>
-			<FormControl key={branchFolder} isDisabled={isFieldDisabled} isRequired={isFieldRequired}>
+		<Tooltip label={"Please select source branch first!"} disabled={!isFieldDisabled} showArrow>
+			<FormControl key={branchFolder} disabled={isFieldDisabled} required={isFieldRequired}>
 				<FormLabel>{branchFolder ? `Issue Number For ${branchFolder}` : "Issue Number"}</FormLabel>
 				<Input value={issueNumber[branchFolder] || ""} onInput={handleChange} placeholder="Enter number" />
 			</FormControl>

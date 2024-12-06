@@ -3,7 +3,7 @@ import { Box, Flex, IconButton, Input, Tooltip, Text, Link } from "@chakra-ui/re
 import _ from "lodash";
 import React, { useCallback, useEffect, useState } from "react";
 import useTrelloIntegration from "../hooks/useTrelloIntegration";
-import { useApp } from "../AppContext";
+import { useApp } from "../ContextApp.jsx";
 import TableTrello from "./TableTrello";
 
 export default function FilterableTableTrello({ setAutoFillSelection }) {
@@ -71,8 +71,8 @@ export default function FilterableTableTrello({ setAutoFillSelection }) {
 					<Input placeholder="Type to search..." onInput={onTrelloQueryInputChanged} width={"100%"} />
 				</Flex>
 				<Box>
-					<Tooltip label={"Resubmit Query"} hasArrow>
-						<IconButton onClick={resubmitTrelloQuery} icon={<RepeatIcon />} colorScheme={"yellow"} aria-label="Resubmit" />
+					<Tooltip label={"Resubmit Query"} showArrow>
+						<IconButton onClick={resubmitTrelloQuery} icon={<RepeatIcon />} colorPalette={"yellow"} aria-label="Resubmit" />
 					</Tooltip>
 				</Box>
 			</Flex>

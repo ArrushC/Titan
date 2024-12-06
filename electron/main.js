@@ -62,6 +62,12 @@ function createWindow() {
 		},
 	});
 
+	if (process.env.VITE_DEV_SERVER_URL) {
+		mainWindow.loadURL(process.env.VITE_DEV_SERVER_URL);
+	} else {
+		mainWindow.loadURL(connectionURL);
+	}
+
 	// Set CSP headers
 	session.defaultSession.webRequest.onHeadersReceived((details, callback) => {
 		const csp = isDev
@@ -82,11 +88,24 @@ function createWindow() {
 		});
 	});
 
-	if (process.env.VITE_DEV_SERVER_URL) {
-		mainWindow.loadURL(process.env.VITE_DEV_SERVER_URL);
-	} else {
-		mainWindow.loadURL(connectionURL);
-	}
+	session.defaultSession.setPermissionRequestHandler((webContents, permission, callback) => {
+		const url = webContents.getURL();
+		if (url.startsWith("https://trello.com") || url.includes(".trello.com")) {
+			callback(true);
+		} else {
+			callback(false);
+		}
+	});
+
+	// Enable iframe loading
+	session.defaultSession.webRequest.onHeadersReceived((details, callback) => {
+		callback({
+			responseHeaders: {
+				...details.responseHeaders,
+				"X-Frame-Options": ["ALLOWALL"],
+			},
+		});
+	});
 
 	// Show window when it's ready to avoid flickering
 	mainWindow.once("ready-to-show", () => {
@@ -573,8 +592,8 @@ app.on("will-quit", () => {
 	}
 
 	if (isDev) {
-        session.defaultSession.getAllExtensions().forEach((extension) => {
-            session.defaultSession.removeExtension(extension.id);
-        });
-    }
+		session.defaultSession.getAllExtensions().forEach((extension) => {
+			session.defaultSession.removeExtension(extension.id);
+		});
+	}
 });

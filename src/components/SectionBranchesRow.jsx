@@ -1,5 +1,5 @@
 import React, { memo, useCallback, useEffect, useMemo, useState } from "react";
-import { Table, Text, Flex, IconButton, Box } from "@chakra-ui/react";
+import { Table, Text, Flex, IconButton } from "@chakra-ui/react";
 import { Checkbox } from "./ui/checkbox.jsx";
 import { Tooltip } from "./ui/tooltip.jsx";
 import { FaFolderOpen } from "react-icons/fa6";
@@ -37,7 +37,7 @@ const SectionBranchesRow = memo(
 			let animation = "";
 			let revisionCount = 0;
 
-			if (branchInfo.toLowerCase().includes("🤬") || branchInfo == "Not Found") {
+			if (branchInfo.toLowerCase().includes("🤬") || branchInfo == "Not Found" || branchInfo == "Connection Error") {
 				gradientFrom = "#800080";
 				gradientTo = "#FF00FF";
 				animation = `${gradientAnimation} 0.5s linear infinite`;
@@ -185,10 +185,8 @@ const SectionBranchesRow = memo(
 						<Text>{branchPath}</Text>
 					</Flex>
 				</Table.Cell>
-				<Table.Cell>
-					<Box {...gradientStyle} bgColor={"green.focusRing"} rounded={"xl"} textAlign={"center"} py={"6px"} px={2}>
-						{renderedBranchInfo}
-					</Box>
+				<Table.Cell {...gradientStyle} bgColor={"green.focusRing"} textAlign={"center"}>
+					{renderedBranchInfo}
 				</Table.Cell>
 				<Table.Cell>
 					<Flex columnGap={1}>

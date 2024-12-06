@@ -428,7 +428,6 @@ function emitBranchStatus(socket, branchId, branchStatus) {
 function isSVNConnectionError(socket, err) {
 	if (err?.message?.includes("svn: E170013") || err?.message?.includes("svn: E731001")) {
 		io.emit("svn-connection-error", "Unable to connect to the SVN repository!");
-
 		return true;
 	}
 	return false;
@@ -452,7 +451,6 @@ async function fetchConfig(socket) {
 			branchFolderColours: {},
 			commitOptions: {
 				useFolderOnlySource: false,
-				useIssuePerFolder: false,
 			},
 			trelloIntegration: {
 				key: "TRELLO_API_KEY",
@@ -624,7 +622,11 @@ io.on("connection", (socket) => {
 				if (callback) callback({ id: data.id, info: branchInfo });
 				else emitBranchInfo(socket, data.id, branchInfo);
 			} catch (err) {
-				if (isSVNConnectionError(socket, err)) return;
+				if (isSVNConnectionError(socket, err)) {
+					if (callback) callback({ id: data.id, info: "Connection Error" });
+					else emitBranchInfo(socket, data.id, "Connection Error");
+					return;
+				}
 				if (err.message.includes("svn: E155010")) {
 					if (callback) callback({ id: data.id, info: "Not Found" });
 					else emitBranchInfo(socket, data.id, "Not Found");

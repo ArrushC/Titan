@@ -20,7 +20,7 @@ export default function SectionCommit() {
 					<OptionsCommit />
 
 					<Box my={6} fontSize={"sm"}>
-						<AccordionRoot size={"sm"} variant={"enclosed"} colorPalette={"yellow"} value={commitStage} collapsible multiple={true} onValueChange={(e) => setCommitStage(e.value)} lazyMount={true}>
+						<AccordionRoot size={"sm"} variant={"enclosed"} colorPalette={"yellow"} value={commitStage} collapsible multiple={true} onValueChange={(e) => setCommitStage(e.value)} lazyMount={false}>
 							{accordionSection}
 						</AccordionRoot>
 

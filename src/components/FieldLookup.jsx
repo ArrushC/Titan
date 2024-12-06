@@ -18,6 +18,10 @@ export const FieldLookup = memo(() => {
 	const { setIsLookupTrelloOn } = useCommit();
 	const textColor = useColorModeValue("black", "white");
 
+	const handleSelectedTrelloCard = useCallback((card) => {
+		console.log("Selected Trello Card", card);
+	}, []);
+
 	return (
 		<Box colorPalette={"yellow"}>
 			<Box>
@@ -39,7 +43,7 @@ export const FieldLookup = memo(() => {
 				</Button>
 			</Flex>
 
-			<DialogLookupTrello />
+			<DialogLookupTrello fireDialogAction={handleSelectedTrelloCard} />
 		</Box>
 	);
 });

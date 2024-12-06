@@ -1,8 +1,8 @@
-import React, { useCallback, useState, useEffect } from "react";
+import React, { useCallback, useState, useEffect, useMemo } from "react";
 import { DialogActionTrigger, DialogBackdrop, DialogBody, DialogCloseTrigger, DialogContent, DialogFooter, DialogHeader, DialogRoot, DialogTitle } from "./ui/dialog.jsx";
-import { Box, Button, HStack, Input, Kbd, Link, Spinner, Table, Text } from "@chakra-ui/react";
+import { Box, Button, HStack, Input, Kbd, Link, Spinner, Table, Text, chakra } from "@chakra-ui/react";
 import { useCommit } from "../ContextCommit.jsx";
-import { FaTrello } from "react-icons/fa6";
+import { FaChevronDown, FaChevronUp, FaTrello } from "react-icons/fa6";
 import { InputGroup } from "./ui/input-group.jsx";
 import { LuExternalLink, LuSearch } from "react-icons/lu";
 import { MdKeyboardReturn } from "react-icons/md";
@@ -16,6 +16,10 @@ export default function DialogLookupTrello({ fireDialogAction }) {
 	const [fetchedCards, setFetchedCards] = useState([]);
 	const [loading, setLoading] = useState(false);
 	const [searchPerformed, setSearchPerformed] = useState(false);
+
+	// Sorting state: which column and direction
+	// direction: 'asc', 'desc', or null (no sort)
+	const [sortConfig, setSortConfig] = useState({ column: null, direction: null });
 
 	const processDialogAction = useCallback(
 		(card) => {
@@ -32,6 +36,8 @@ export default function DialogLookupTrello({ fireDialogAction }) {
 		emitTrelloCardNamesSearch(key, token, trelloQuery, null, (response) => {
 			setFetchedCards(response.cards || []);
 			setLoading(false);
+			// Reset sort on new search
+			setSortConfig({ column: null, direction: null });
 		});
 	}, [trelloQuery, key, token, emitTrelloCardNamesSearch]);
 
@@ -45,15 +51,51 @@ export default function DialogLookupTrello({ fireDialogAction }) {
 	);
 
 	useEffect(() => {
-		// If the query is emptied out after a search, reset cards and loading states.
+		// If the query is emptied out after a search, reset cards
 		if (trelloQuery.trim().length === 0) {
 			setFetchedCards([]);
-			// We do not reset searchPerformed because that indicates a previous search occurred.
 		}
 	}, [trelloQuery]);
 
+	const sortedCards = useMemo(() => {
+		if (!sortConfig.column || !sortConfig.direction) {
+			return fetchedCards;
+		}
+
+		let sorted = [...fetchedCards];
+		if (sortConfig.column === "name") {
+			sorted.sort((a, b) => a.name.localeCompare(b.name));
+		} else if (sortConfig.column === "lastActivityDate") {
+			sorted.sort((a, b) => new Date(a.lastActivityDate) - new Date(b.lastActivityDate));
+		}
+
+		if (sortConfig.direction === "desc") {
+			sorted.reverse();
+		}
+
+		return sorted;
+	}, [fetchedCards, sortConfig]);
+
+	const toggleSort = (column) => {
+		setSortConfig((prev) => {
+			if (prev.column !== column) {
+				return { column, direction: "asc" };
+			} else {
+				// Cycle through asc -> desc -> none
+				if (prev.direction === "asc") return { column, direction: "desc" };
+				if (prev.direction === "desc") return { column: null, direction: null };
+				return { column, direction: "asc" };
+			}
+		});
+	};
+
+	const renderSortIcon = (column) => {
+		if (sortConfig.column !== column) return null;
+		return sortConfig.direction === "asc" ? <FaChevronUp /> : <FaChevronDown />;
+	};
+
 	return (
-		<DialogRoot role="dialog" size="cover" open={true} onOpenChange={() => setIsLookupTrelloOn(false)} closeOnEscape={true} initialFocusEl={null}>
+		<DialogRoot role="dialog" size="cover" open={isLookupTrelloOn} onOpenChange={() => setIsLookupTrelloOn(false)} closeOnEscape={true} initialFocusEl={null}>
 			<DialogBackdrop />
 			<DialogContent>
 				<DialogHeader fontSize="lg" fontWeight="bold">
@@ -91,18 +133,18 @@ export default function DialogLookupTrello({ fireDialogAction }) {
 						</Text>
 					)}
 
-					{searchPerformed && !loading && fetchedCards.length === 0 && (
+					{searchPerformed && !loading && sortedCards.length === 0 && (
 						<Text textAlign="center" fontSize="lg" color="whiteAlpha" py={4}>
 							No results found. Try a different query.
 						</Text>
 					)}
 
-					{!loading && fetchedCards.length > 0 && (
+					{!loading && sortedCards.length > 0 && (
 						<>
-							<Text fontSize="sm" color="gray.600" mb={2}>
+							<Text fontSize="sm" color="gray.400" mb={2}>
 								Double-click a card to select it.
 							</Text>
-							<Table.ScrollArea borderWidth="1px" maxH="2xl">
+							<Table.ScrollArea borderWidth="1px" maxH="60vh">
 								<Table.Root size="sm" variant="outline" stickyHeader={true} showColumnBorder={true} interactive={true}>
 									<Table.ColumnGroup>
 										<Table.Column width="" />
@@ -110,16 +152,29 @@ export default function DialogLookupTrello({ fireDialogAction }) {
 									</Table.ColumnGroup>
 									<Table.Header>
 										<Table.Row>
-											<Table.ColumnHeader>Card Title</Table.ColumnHeader>
-											<Table.ColumnHeader>Last Activity</Table.ColumnHeader>
+											<Table.ColumnHeader onClick={() => toggleSort("name")}>
+												<HStack>
+													<chakra.span me={1}>Card Title</chakra.span>
+													{renderSortIcon("name")}
+												</HStack>
+											</Table.ColumnHeader>
+											<Table.ColumnHeader onClick={() => toggleSort("lastActivityDate")}>
+												<HStack>
+													<chakra.span me={1}>Last Activity</chakra.span>
+													{renderSortIcon("lastActivityDate")}
+												</HStack>
+											</Table.ColumnHeader>
 										</Table.Row>
 									</Table.Header>
 									<Table.Body>
-										{fetchedCards.map((card) => (
+										{sortedCards.map((card) => (
 											<Table.Row key={card.id} onDoubleClick={() => processDialogAction(card)}>
 												<Table.Cell>
-													<Link href={card.url} isExternal>
-														{card.name} <LuExternalLink color="yellow.500" />
+													<Link onClick={() => window.open(card.url)} display={"flex"} alignItems={"center"} width={"fit-content"}>
+														{card.name}
+														<chakra.span color="yellow.fg" fontSize={"16px"}>
+															<LuExternalLink />
+														</chakra.span>
 													</Link>
 												</Table.Cell>
 												<Table.Cell>{card.lastActivityDate}</Table.Cell>
@@ -128,8 +183,8 @@ export default function DialogLookupTrello({ fireDialogAction }) {
 									</Table.Body>
 									<Table.Footer>
 										<Table.Row>
-											<Table.Cell colSpan={2}>
-												{fetchedCards.length} {fetchedCards.length === 1 ? "card" : "cards"} found from Trello
+											<Table.Cell colSpan={2} fontWeight={900}>
+												{sortedCards.length} {sortedCards.length === 1 ? "card" : "cards"} found from Trello
 											</Table.Cell>
 										</Table.Row>
 									</Table.Footer>

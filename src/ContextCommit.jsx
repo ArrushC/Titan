@@ -11,15 +11,17 @@ import { FiEdit, FiHelpCircle } from "react-icons/fi";
 import SubSectionUnknownChanges from "./components/SubSectionUnknownChanges.jsx";
 
 const initialState = {
+	isLookupTrelloOn: false,
+	setIsLookupTrelloOn: (_) => {},
 	sourceBranch: "",
-	setSourceBranch: () => {},
+	setSourceBranch: (_) => {},
 	issueNumber: {},
-	setIssueNumber: () => {},
+	setIssueNumber: (_) => {},
 	isCommitMode: false,
 	selectedBranchesCount: 0,
 	accordionSection: [],
 	commitStage: [],
-	setCommitStage: () => {},
+	setCommitStage: (_) => {},
 }
 
 const ContextCommit = createContext(initialState);
@@ -29,8 +31,9 @@ export const useCommit = () => {
 };
 
 export const CommitProvider = ({ children }) => {
-	const { socket, config, updateConfig, configurableRowData, selectedBranches, appMode } = useApp();
+	const { selectedBranches, appMode } = useApp();
 
+	const [isLookupTrelloOn, setIsLookupTrelloOn] = useState(false);
 	const [sourceBranch, setSourceBranch ] = useState("");
 	const [issueNumber, setIssueNumber] = useState({});
 	const isCommitMode = useMemo(() => appMode === "commit", [appMode]);
@@ -97,6 +100,8 @@ export const CommitProvider = ({ children }) => {
 
 	const value = useMemo(
 		() => ({
+			isLookupTrelloOn,
+			setIsLookupTrelloOn,
 			sourceBranch,
 			setSourceBranch,
 			issueNumber,
@@ -107,7 +112,7 @@ export const CommitProvider = ({ children }) => {
 			commitStage,
 			setCommitStage,
 		}),
-		[sourceBranch, issueNumber, isCommitMode, selectedBranchesCount, accordionSection, commitStage]
+		[isLookupTrelloOn, sourceBranch, issueNumber, isCommitMode, selectedBranchesCount, accordionSection, commitStage]
 	);
 
 	useEffect(() => {

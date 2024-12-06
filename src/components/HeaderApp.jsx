@@ -4,10 +4,12 @@ import { FaRegSquare } from "react-icons/fa6";
 import { IoMdClose } from "react-icons/io";
 import { VscChromeMinimize } from "react-icons/vsc";
 import Logo from "../assets/Titan.png";
+import { useApp } from "../ContextApp";
 
 export default function HeaderApp() {
 	if (!window.electron) return <></>;
 
+	const { setAppClosing } = useApp();
 	const [appVersion, setAppVersion] = useState("");
 
 	useEffect(() => {
@@ -26,6 +28,7 @@ export default function HeaderApp() {
 
 	const handleCloseWindow = useCallback(() => {
 		window.electron.closeWindow();
+		setAppClosing(true);
 	}, []);
 
 	return (

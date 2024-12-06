@@ -6,6 +6,8 @@ import socketIOClient from "socket.io-client";
 import { flushSync } from "react-dom";
 
 const initialState = {
+	appClosing: false,
+	setAppClosing: (_) => {},
 	socket: null,
 	config: null,
 	updateConfig: () => {},
@@ -28,6 +30,7 @@ export const useApp = () => {
 };
 
 export const AppProvider = ({ children }) => {
+	const [appClosing, setAppClosing] = useState(false);
 	const [socket, setSocket] = useState(null);
 	const [config, setConfig] = useState({});
 	const [selectedBranches, setSelectedBranches] = useState({});
@@ -136,6 +139,8 @@ export const AppProvider = ({ children }) => {
 
 	const value = useMemo(
 		() => ({
+			appClosing,
+			setAppClosing,
 			socket,
 			config,
 			updateConfig,
@@ -150,7 +155,7 @@ export const AppProvider = ({ children }) => {
 			handleBranchSelection,
 			handleBulkSelection,
 		}),
-		[socket, config, updateConfig, emitSocketEvent, configurableRowData, selectedBranches, logData, appMode, handleBranchSelection, handleBulkSelection]
+		[appClosing, socket, config, updateConfig, emitSocketEvent, configurableRowData, selectedBranches, logData, appMode, handleBranchSelection, handleBulkSelection]
 	);
 
 	return <ContextApp.Provider value={value}>{children}</ContextApp.Provider>;

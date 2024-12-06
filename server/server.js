@@ -1026,7 +1026,7 @@ io.on("connection", (socket) => {
 			debugTask("svn-logs-selected", data, true);
 		});
 
-		socket.on("trello-search-names-card", async (data) => {
+		socket.on("trello-search-names-card", async (data, callback) => {
 			debugTask("trello-search-names-card", data, false);
 
 			if (!data.query || data.query === "") {
@@ -1043,7 +1043,8 @@ io.on("connection", (socket) => {
 
 			try {
 				const cards = await getTrelloCardNames(data.key, data.token, data.query, limit);
-				socket.emit("trello-result-search-names-card", cards);
+				if (callback) callback({ cards });
+				else socket.emit("trello-result-search-names-card", cards);
 			} catch (err) {
 				logger.error("Error fetching Trello card names:", JSON.stringify(err, null, 2));
 				emitMessage(socket, "Error fetching Trello card names", "error");

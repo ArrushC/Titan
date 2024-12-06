@@ -51,8 +51,8 @@ export default function useSocketEmits() {
 	);
 
 	const emitTrelloCardNamesSearch = useCallback(
-		(key, token, query, limit = null) => {
-			socket?.emit("trello-search-names-card", { key, token, query, limit });
+		(key, token, query, limit = null, callback = null) => {
+			socket?.emit("trello-search-names-card", { key, token, query, limit }, callback);
 		},
 		[socket]
 	);

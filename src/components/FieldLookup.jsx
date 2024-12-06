@@ -21,7 +21,7 @@ export const FieldLookup = memo(() => {
 	return (
 		<Box colorPalette={"yellow"}>
 			<Box>
-				<Text fontWeight={900} bgGradient="to-r" gradientFrom={textColor} gradientVia="colorPalette.fg" gradientTo={textColor} backgroundSize="200% auto" bgClip="text" animation={`${shineAnimation} 4s ease-in infinite`}>
+				<Text fontWeight={900} bgGradient="to-r" gradientFrom={textColor} gradientVia="colorPalette.500" gradientTo={textColor} backgroundSize="200% auto" bgClip="text" animation={`${shineAnimation} 7s ease-in infinite`}>
 					You can lookup and automatically fill in the following commit details using the options below:
 				</Text>
 			</Box>

@@ -1,10 +1,9 @@
 import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { useApp } from "../ContextApp.jsx";
-import { Box, Button, Flex, Heading, HStack, IconButton, Kbd, Mark, Table, Text } from "@chakra-ui/react";
+import { Box, Flex, Heading, Table } from "@chakra-ui/react";
 import { Checkbox } from "./ui/checkbox.jsx";
-import { ActionBarContent, ActionBarRoot, ActionBarSelectionTrigger, ActionBarSeparator } from "./ui/action-bar.jsx";
 import DialogRowDeletion from "./DialogRowDeletion.jsx";
-import { IoMdAdd, IoMdClose } from "react-icons/io";
+import { IoMdAdd } from "react-icons/io";
 import SectionBranchesRow from "./SectionBranchesRow.jsx";
 import ButtonIconTooltip from "./ButtonIconTooltip.jsx";
 import useSocketEmits from "../hooks/useSocketEmits.jsx";

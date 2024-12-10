@@ -7,13 +7,11 @@ export const TOAST_CONTAINER_STYLE = {
 	marginTop: HEADER_HEIGHT,
 };
 
-export function createToastConfig(description, status = "info", duration = 3000, isServer = false) {
+export function createToastConfig(description, type = "info", duration = 3000) {
 	return {
-		position: "top",
 		variant: "solid",
-		title: isServer ? "Server Notification" : "Client Notification",
 		description: description,
-		status: status,
+		type: type,
 		duration: duration,
 		isClosable: true,
 		// containerStyle: TOAST_CONTAINER_STYLE

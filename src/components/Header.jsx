@@ -1,30 +1,40 @@
-import { Heading, Icon, Image, Link, useColorMode, Wrap, WrapItem } from "@chakra-ui/react";
-import React, { useCallback } from "react";
-import Logo from "../assets/Titan.png";
-import { useApp } from "../AppContext";
-import { MdBrowserUpdated, MdCode, MdCodeOff, MdDarkMode, MdSunny } from "react-icons/md";
+import { Flex, Heading, HStack } from "@chakra-ui/react";
+import React, { useCallback, useEffect, useState } from "react";
+import { MdBrowserUpdated } from "react-icons/md";
 import { IoReload } from "react-icons/io5";
-import useSocketEmits from "../hooks/useSocketEmits";
+import useSocketEmits from "../hooks/useSocketEmits.jsx";
 import { LuFileCog } from "react-icons/lu";
-import useNotifications from "../hooks/useNotifications";
-import ButtonElectron from "./ButtonElectron";
-import ButtonIconTooltip from "./ButtonIconTooltip";
+import useNotifications from "../hooks/useNotifications.jsx";
+import ButtonElectron from "./ButtonElectron.jsx";
+import ButtonIconTooltip from "./ButtonIconTooltip.jsx";
+import { ColorModeButton } from "./ui/color-mode.jsx";
+import { Button } from "./ui/button.jsx";
+import { PopoverArrow, PopoverBody, PopoverContent, PopoverRoot, PopoverTrigger } from "./ui/popover.jsx";
+import { useApp } from "../ContextApp.jsx";
 
 export default function Header() {
-	const { isDebug, setIsDebug } = useApp();
+	const { setAppClosing } = useApp();
 	const { emitOpenConfig } = useSocketEmits();
 	const { RaiseClientNotificaiton } = useNotifications();
-	const { colorMode, toggleColorMode } = useColorMode();
 
-	const handleGetAppVersion = useCallback(() => {
-		if (!window.electron) return;
+	const [username, setUsername] = useState("User");
+	const [reloadPopover, setReloadPopover] = useState(false);
 
-		window.electron.getAppVersion().then((version) => {
-			RaiseClientNotificaiton(`Application Version: v${version}`, "info", 2000);
-		});
-	}, [RaiseClientNotificaiton]);
+	useEffect(() => {
+		if (window.electron) {
+			window.electron.fetchUsername().then((username) => {
+				setUsername(username.firstName);
+			});
+		}
+	}, []);
 
-	const handleReload = useCallback(() => {
+	const handleReload = useCallback((isAppRestart = false) => {
+		if (isAppRestart) {
+			window.electron.restartApp();
+			setAppClosing(true);
+			return;
+		}
+
 		window.location.reload();
 	}, []);
 
@@ -42,30 +52,39 @@ export default function Header() {
 		emitOpenConfig();
 	}, [emitOpenConfig]);
 
-	const handleToggleDebug = useCallback(() => {
-		setIsDebug((prev) => !prev);
-	}, [setIsDebug]);
-
 	return (
-		<Wrap my={5} spacingY={5} justify={"space-between"}>
-			<WrapItem alignItems="center">
-				<Link onClick={handleGetAppVersion}>
-					<Image src={Logo} alt="Titan Logo" boxSize="100px" mr={5} borderRadius={"full"} />
-				</Link>
-				<Heading as={"h2"} size={"2xl"} noOfLines={1} className={"animation-fadein-forward"}>
-					Welcome back
+		<HStack wrap="wrap" my={5} gapY={5} justify={"space-between"}>
+			<Flex align={"flex-start"} alignItems="center" className="notMono">
+				<Heading as={"h1"} size={"4xl"} fontWeight={700} lineClamp={1} className={"animation-fadein-forward"} userSelect={"none"}>
+					Hello, {username}!
 				</Heading>
-				<Heading as={"h2"} size={"2xl"} noOfLines={1} p={2} className={"animation-handwave"}>
+				<Heading as={"h1"} size={"4xl"} lineClamp={1} ms={3} p={2} className={"animation-handwave"} userSelect={"none"}>
 					👋
 				</Heading>
-			</WrapItem>
-			<WrapItem alignItems={"center"} columnGap={2}>
-				<ButtonIconTooltip icon={<Icon as={colorMode === "light" ? MdSunny : MdDarkMode} />} onClick={toggleColorMode} colorScheme={"yellow"} label="Toggle Light/Dark Mode" placement={"bottom-start"} size="md" />
-				<ButtonIconTooltip icon={<Icon as={IoReload} />} onClick={handleReload} colorScheme={"yellow"} label="Reload" placement={"bottom-start"} size="md" />
-				<ButtonElectron icon={<Icon as={MdBrowserUpdated} />} onClick={handleCheckForUpdates} colorScheme={"yellow"} label="Check For Updates" size="md" />
-				<ButtonIconTooltip icon={<Icon as={LuFileCog} />} onClick={handleOpenConfig} colorScheme={"yellow"} label="Open Config File" placement={"bottom-start"} size="md" />
-				<ButtonIconTooltip icon={!isDebug ? <Icon as={MdCodeOff} /> : <Icon as={MdCode} />} onClick={handleToggleDebug} colorScheme={"yellow"} label={`Current Debug Mode: ${isDebug ? "on" : "off"}`} placement={"bottom-start"} size="md" />
-			</WrapItem>
-		</Wrap>
+			</Flex>
+			<Flex align={"flex-start"} alignItems={"center"} columnGap={2}>
+				<ColorModeButton />
+				<ButtonIconTooltip icon={<LuFileCog />} onClick={handleOpenConfig} colorPalette={"yellow"} variant={"subtle"} label="Open Config File" placement={"bottom-start"} size="md" />
+				<ButtonElectron icon={<MdBrowserUpdated />} onClick={handleCheckForUpdates} colorPalette={"yellow"} variant={"subtle"} label="Check For Updates" size="md" />
+				<PopoverRoot open={window.electron && reloadPopover} onOpenChange={(e) => setReloadPopover(e.open)}>
+					<PopoverTrigger as={"div"}>
+						<ButtonIconTooltip icon={<IoReload />} onClick={() => setReloadPopover((prev) => !prev)} colorPalette={"yellow"} label={"Reload"} variant={"subtle"} size="md" />
+					</PopoverTrigger>
+					<PopoverContent>
+						<PopoverArrow />
+						<PopoverBody>
+							<Flex gap={8}>
+								<Button colorPalette={"yellow"} variant={"subtle"} onClick={(e) => handleReload(false)}>
+									Refresh
+								</Button>
+								<Button colorPalette={"yellow"} variant={"subtle"} onClick={(e) => handleReload(true)}>
+									Restart
+								</Button>
+							</Flex>
+						</PopoverBody>
+					</PopoverContent>
+				</PopoverRoot>
+			</Flex>
+		</HStack>
 	);
 }

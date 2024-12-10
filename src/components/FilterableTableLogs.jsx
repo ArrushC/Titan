@@ -5,7 +5,7 @@ import useStoreSVNLogs from "../hooks/useStoreSVNLogs";
 import TableLogs from "./TableLogs";
 import { branchString } from "../utils/CommonConfig";
 import { MdDirectionsRun, MdCheckCircle } from "react-icons/md";
-import { useApp } from "../AppContext";
+import { useApp } from "../ContextApp.jsx";
 
 export default function FilterableTableLogs({ setAutoFillSelection = false, isAutofill = false }) {
 	const { selectedBranches, logData} = useApp();
@@ -21,8 +21,8 @@ export default function FilterableTableLogs({ setAutoFillSelection = false, isAu
 					<Input placeholder="Type to search..." onInput={onQuickFilterLogsInputChanged} width={"100%"} />
 				</Flex>
 				<Box>
-					<Tooltip label={"Refresh"} hasArrow>
-						<IconButton onClick={refreshLogs} icon={<RepeatIcon />} colorScheme={"yellow"} aria-label="Refresh" />
+					<Tooltip label={"Refresh"} showArrow>
+						<IconButton onClick={refreshLogs} icon={<RepeatIcon />} colorPalette={"yellow"} aria-label="Refresh" />
 					</Tooltip>
 				</Box>
 			</Flex>

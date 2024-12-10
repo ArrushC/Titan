@@ -1,27 +1,41 @@
-import React, { useCallback, useEffect, useRef, useState } from "react";
+import React, { useCallback, useEffect, useRef, useState, useMemo } from "react";
 import { DialogActionTrigger, DialogBackdrop, DialogBody, DialogCloseTrigger, DialogContent, DialogFooter, DialogHeader, DialogRoot, DialogTitle } from "./ui/dialog.jsx";
 import { Button } from "./ui/button.jsx";
 import { useApp } from "../ContextApp.jsx";
 import { useBranches } from "../ContextBranches.jsx";
-import { Table, IconButton, Box } from "@chakra-ui/react";
+import { Table, IconButton, Box, Input, Text, Code, Flex, HStack } from "@chakra-ui/react";
 import { SiSubversion } from "react-icons/si";
 import { FaChevronDown, FaChevronRight } from "react-icons/fa6";
+import { InputGroup } from "./ui/input-group.jsx";
+import { LuSearch } from "react-icons/lu";
+import { VscDiffSingle } from "react-icons/vsc";
 
-// Configuration for virtualization
-const ROW_HEIGHT = 37; // Adjust this as needed
+const ROW_HEIGHT = 40;
 const OVERSCAN = 5;
 
-// A memoized component for a single log row
+const getPathActionolour = (action) => {
+	switch (action) {
+		case "A":
+			return "green.500";
+		case "M":
+			return "cyan.600";
+		case "D":
+			return "red.500";
+		default:
+			return "gray";
+	}
+};
+
 const LogRow = React.memo(function LogRow({ entry, isExpanded, onToggleExpand }) {
 	return (
 		<React.Fragment>
-			<Table.Row height={`${ROW_HEIGHT}px`}>
+			<Table.Row height={`${ROW_HEIGHT}px`} _light={{ bgColor: "yellow.fg", color: "white" }} _dark={{ bgColor: "yellow.800" }}>
 				<Table.Cell>
-					<IconButton aria-label="Expand/Collapse" size="2xs" onClick={() => onToggleExpand(entry.revision)} variant="ghost">
+					<IconButton aria-label="Expand/Collapse" size="2xs" onClick={() => onToggleExpand(entry.revision)} variant="subtle">
 						{isExpanded ? <FaChevronDown /> : <FaChevronRight />}
 					</IconButton>
 				</Table.Cell>
-				<Table.Cell>{entry.revision}</Table.Cell>
+				<Table.Cell fontWeight={900}>{entry.revision}</Table.Cell>
 				<Table.Cell>{entry.date}</Table.Cell>
 				<Table.Cell>{entry.author}</Table.Cell>
 				<Table.Cell
@@ -38,36 +52,41 @@ const LogRow = React.memo(function LogRow({ entry, isExpanded, onToggleExpand })
 			{isExpanded && entry.filesChanged && entry.filesChanged.length > 0 && (
 				<Table.Row bgColor={"gray.subtle"} height={`${ROW_HEIGHT}px`}>
 					<Table.Cell colSpan={5}>
-						<Table.Root variant="simple" size="sm">
-							<Table.ColumnGroup>
-								<Table.Column width="10%" />
-								<Table.Column width="" />
-								<Table.Column width="10%" />
-							</Table.ColumnGroup>
-							<Table.Header>
-								<Table.Row>
-									<Table.ColumnHeader>Action</Table.ColumnHeader>
-									<Table.ColumnHeader>Path</Table.ColumnHeader>
-									<Table.ColumnHeader></Table.ColumnHeader>
-								</Table.Row>
-							</Table.Header>
-							<Table.Body>
-								{/* For simplicity, assume each changed file row also fits into ROW_HEIGHT */}
-								{entry.filesChanged.map((file, idx) => (
-									<Table.Row key={`${entry.revision}-file-${idx}`} height={`${ROW_HEIGHT}px`}>
-										<Table.Cell>{file.action.toUpperCase()}</Table.Cell>
-										<Table.Cell>
-											{file.path} ({file.kind})
-										</Table.Cell>
-										<Table.Cell>
-											<Button variant="subtle" size={"2xs"}>
-												Dummy Action
-											</Button>
-										</Table.Cell>
+						<Box p={3}>
+							<Flex alignItems={"center"} mb={5} gap={3} p={2}>
+								Commit Message: <Text color={"yellow.fg"}>{entry.message}</Text>
+							</Flex>
+
+							<Table.Root variant="simple" size="sm">
+								<Table.ColumnGroup>
+									<Table.Column width="10%" />
+									<Table.Column width="" />
+									<Table.Column width="10%" />
+								</Table.ColumnGroup>
+								<Table.Header>
+									<Table.Row>
+										<Table.ColumnHeader>Action</Table.ColumnHeader>
+										<Table.ColumnHeader>Path</Table.ColumnHeader>
+										<Table.ColumnHeader></Table.ColumnHeader>
 									</Table.Row>
-								))}
-							</Table.Body>
-						</Table.Root>
+								</Table.Header>
+								<Table.Body>
+									{entry.filesChanged.map((file, idx) => (
+										<Table.Row key={`${entry.revision}-file-${idx}`} height={`${ROW_HEIGHT}px`} color={getPathActionolour(file.action.toUpperCase())}>
+											<Table.Cell>{file.action.toUpperCase()}</Table.Cell>
+											<Table.Cell>
+												{file.path} ({file.kind === "dir" ? "Directory" : "File"})
+											</Table.Cell>
+											<Table.Cell>
+												<IconButton variant="subtle" size={"xs"} disabled={!window.electron} aria-label="Diff" onClick={() => window.electron.openSvnDiff({ fullPath: `${entry.repositoryRoot}${file.path}`, revision: entry.revision })}>
+													<VscDiffSingle />
+												</IconButton>
+											</Table.Cell>
+										</Table.Row>
+									))}
+								</Table.Body>
+							</Table.Root>
+						</Box>
 					</Table.Cell>
 				</Table.Row>
 			)}
@@ -80,6 +99,7 @@ export default function DialogBranchesLog() {
 	const { isDialogSBLogOpen, setIsDialogSBLogOpen } = useBranches();
 
 	const [expandedRows, setExpandedRows] = useState(() => new Set());
+	const [searchTerm, setSearchTerm] = useState("");
 
 	const closeDialog = useCallback(() => {
 		setIsDialogSBLogOpen(false);
@@ -97,12 +117,21 @@ export default function DialogBranchesLog() {
 		});
 	}, []);
 
-	// Virtualization states
+	const filteredData = useMemo(() => {
+		if (!searchTerm) return logsData;
+		const lowerSearch = searchTerm.toLowerCase();
+		return logsData.filter((entry) => {
+			const mainFields = [entry.revision, entry.date, entry.author, entry.message, entry.branchFolder, entry.branchVersion];
+			const mainMatch = mainFields.some((field) => field?.toString().toLowerCase().includes(lowerSearch));
+			const filesMatch = entry.filesChanged && entry.filesChanged.some((file) => [file.action, file.path, file.kind].some((field) => field?.toString().toLowerCase().includes(lowerSearch)));
+			return mainMatch || filesMatch;
+		});
+	}, [logsData, searchTerm]);
+
 	const containerRef = useRef(null);
 	const [containerHeight, setContainerHeight] = useState(0);
 	const [scrollTop, setScrollTop] = useState(0);
 
-	// Measure the container height on mount and window resize
 	useEffect(() => {
 		const measure = () => {
 			if (containerRef.current) {
@@ -114,24 +143,18 @@ export default function DialogBranchesLog() {
 		return () => window.removeEventListener("resize", measure);
 	}, []);
 
-	// Update scrollTop on scroll
 	const onScroll = useCallback(() => {
 		if (containerRef.current) {
 			setScrollTop(containerRef.current.scrollTop);
 		}
 	}, []);
 
-	// Calculate the number of rows that fit in the container
-	const totalRows = logsData.length;
+	const totalRows = filteredData.length;
 	const visibleCount = Math.ceil(containerHeight / ROW_HEIGHT) + OVERSCAN * 2;
-
-	// Determine start and end indices of the rendered slice
 	const startIndex = Math.max(0, Math.floor(scrollTop / ROW_HEIGHT) - OVERSCAN);
 	const endIndex = Math.min(totalRows, startIndex + visibleCount);
-
 	const offsetY = startIndex * ROW_HEIGHT;
-
-	const visibleRows = logsData.slice(startIndex, endIndex);
+	const visibleRows = filteredData.slice(startIndex, endIndex);
 
 	return (
 		<DialogRoot role="dialog" size="cover" placement="center" open={isDialogSBLogOpen} onOpenChange={closeDialog} closeOnEscape={false} initialFocusEl={undefined}>
@@ -145,10 +168,13 @@ export default function DialogBranchesLog() {
 				</DialogHeader>
 
 				<DialogBody>
+					<HStack gap="6" mb={4} width="full" colorPalette="yellow">
+						<InputGroup flex="1" startElement={<LuSearch />} startElementProps={{ color: "colorPalette.fg" }}>
+							<Input placeholder="Quick search..." variant="flushed" borderColor="colorPalette.fg" value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)} />
+						</InputGroup>
+					</HStack>
 					<Box ref={containerRef} overflowY={"auto"} height={"60vh"} colorPalette={"yellow"} onScroll={onScroll} position="relative">
-						{/* We set a large padding (or spacer) to represent the total scrollable area */}
 						<Box position="relative" height={`${totalRows * ROW_HEIGHT}px`}>
-							{/* Absolutely positioned container for visible rows */}
 							<Box position="absolute" width="100%" top={`${offsetY}px`}>
 								<Table.Root size="sm" variant="outline" stickyHeader={true} interactive={true}>
 									<Table.ColumnGroup>
@@ -159,12 +185,20 @@ export default function DialogBranchesLog() {
 										<Table.Column width="60%" />
 									</Table.ColumnGroup>
 									<Table.Header>
-										<Table.Row height={`${ROW_HEIGHT}px`}>
-											<Table.ColumnHeader></Table.ColumnHeader>
-											<Table.ColumnHeader>Revision</Table.ColumnHeader>
-											<Table.ColumnHeader>Date</Table.ColumnHeader>
-											<Table.ColumnHeader>Author</Table.ColumnHeader>
-											<Table.ColumnHeader>Message</Table.ColumnHeader>
+										<Table.Row height={`${ROW_HEIGHT}px`} bgColor={"colorPalette.500"}>
+											<Table.ColumnHeader color={"black"} fontWeight={900}></Table.ColumnHeader>
+											<Table.ColumnHeader color={"black"} fontWeight={900}>
+												Revision
+											</Table.ColumnHeader>
+											<Table.ColumnHeader color={"black"} fontWeight={900}>
+												Date
+											</Table.ColumnHeader>
+											<Table.ColumnHeader color={"black"} fontWeight={900}>
+												Author
+											</Table.ColumnHeader>
+											<Table.ColumnHeader color={"black"} fontWeight={900}>
+												Message
+											</Table.ColumnHeader>
 										</Table.Row>
 									</Table.Header>
 									<Table.Body>

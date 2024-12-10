@@ -17,6 +17,7 @@ const initialState = {
 	setSelectedBranches: (_) => {},
 	svnLogs: {},
 	setSvnLogs: (_) => {},
+	logsData: [],
 	appMode: "app",
 	setAppMode: (_) => {},
 };
@@ -158,6 +159,11 @@ export const AppProvider = ({ children }) => {
 		return () => socket?.off("svn-log-result", socketCallback);
 	}, [socket]);
 
+	const logsData = useMemo(() => {
+		const allLogs = Object.values(svnLogs || {}).flat();
+		return allLogs.filter((log) => !!log.revision).sort((a, b) => parseInt(b.revision, 10) - parseInt(a.revision, 10));
+	}, [svnLogs]);
+
 	const value = useMemo(
 		() => ({
 			appClosing,
@@ -171,12 +177,13 @@ export const AppProvider = ({ children }) => {
 			setSelectedBranches,
 			svnLogs,
 			setSvnLogs,
+			logsData,
 			appMode,
 			setAppMode,
 			handleBranchSelection,
 			handleBulkSelection,
 		}),
-		[appClosing, socket, config, updateConfig, emitSocketEvent, configurableRowData, selectedBranches, svnLogs, appMode, handleBranchSelection, handleBulkSelection]
+		[appClosing, socket, config, updateConfig, emitSocketEvent, configurableRowData, selectedBranches, svnLogs, logsData, appMode, handleBranchSelection, handleBulkSelection]
 	);
 
 	return <ContextApp.Provider value={value}>{children}</ContextApp.Provider>;

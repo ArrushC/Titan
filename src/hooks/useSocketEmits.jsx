@@ -43,13 +43,6 @@ export default function useSocketEmits() {
 		[socket]
 	);
 
-	const emitLogsSelected = useCallback(
-		(selectedBranches) => {
-			socket?.emit("svn-logs-selected", { selectedBranches: selectedBranches });
-		},
-		[socket]
-	);
-
 	const emitTrelloCardNamesSearch = useCallback(
 		(key, token, query, limit = null, callback = null) => {
 			socket?.emit("trello-search-names-card", { key, token, query, limit }, callback);
@@ -71,7 +64,6 @@ export default function useSocketEmits() {
 		emitCommitPayload,
 		emitFilesRevert,
 		emitFilesAddRemove,
-		emitLogsSelected,
 		emitTrelloCardNamesSearch,
 		emitTrelloCardUpdate,
 	};

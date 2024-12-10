@@ -15,7 +15,7 @@ import DialogBranchesLog from "./DialogBranchesLog.jsx";
 
 export default function SectionBranches() {
 	const { updateConfig, configurableRowData, selectedBranches, setSelectedBranches, setAppMode, handleBranchSelection, handleBulkSelection } = useApp();
-	const { setIsDialogSBLogOpen, selectionMetrics } = useBranches();
+	const { isDialogSBLogOpen, setIsDialogSBLogOpen, selectionMetrics } = useBranches();
 	const { RaisePromisedClientNotification } = useNotifications();
 	const { emitInfoSingle, emitUpdateSingle } = useSocketEmits();
 
@@ -108,6 +108,8 @@ export default function SectionBranches() {
 		if (!selectionMetrics.hasSelection) return;
 
 		const handleKeyDown = (event) => {
+			if (isDialogSBLogOpen) return;
+
 			if (event.key === "Delete") {
 				setIsRowDialogOpen(true);
 			} else if (event.key === "r") {
@@ -126,7 +128,7 @@ export default function SectionBranches() {
 		return () => {
 			window.removeEventListener("keydown", handleKeyDown);
 		};
-	}, [selectionMetrics.hasSelection, setIsRowDialogOpen, refreshSelectedBranches, updateSelectedBranches]);
+	}, [selectionMetrics.hasSelection, isDialogSBLogOpen, refreshSelectedBranches, updateSelectedBranches]);
 
 	const selectAllBranches = useCallback(
 		(checked) => {

@@ -515,6 +515,26 @@ ipcMain.handle("open-svn-resolve", async (event, data) => {
 	});
 });
 
+ipcMain.handle("open-svn-diff", async (event, data) => {
+	const { fullPath, revision } = data;
+	const command = `TortoiseProc.exe /command:diff /path:"${fullPath}" /startrev:${Number(revision)-1} /endrev:${revision}`;
+
+	return new Promise((resolve, reject) => {
+		exec(command, (error, stdout, stderr) => {
+			if (error) {
+				console.error(`Error: ${error.message}`);
+				reject({ success: false, error: error.message });
+			} else if (stderr) {
+				console.error(`Stderr: ${stderr}`);
+				reject({ success: false, error: stderr });
+			} else {
+				console.log(`Stdout: ${stdout}`);
+				resolve({ success: true });
+			}
+		});
+	});
+});
+
 ipcMain.handle("select-folder", async () => {
 	const result = await dialog.showOpenDialog(mainWindow, {
 		properties: ["openDirectory"],

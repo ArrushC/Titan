@@ -7,6 +7,7 @@ contextBridge.exposeInMainWorld("electron", {
 	selectFolder: () => ipcRenderer.invoke('select-folder'),
 	fetchCustomScripts: () => ipcRenderer.invoke("fetch-custom-scripts"),
 	openSvnResolve: (data) => ipcRenderer.invoke("open-svn-resolve", data),
+	openSvnDiff: (data) => ipcRenderer.invoke("open-svn-diff", data),
 	runCustomScript: (data) => ipcRenderer.invoke("run-custom-script", data),
 	fireShutdownComplete: () => ipcRenderer.send("renderer-shutdown-complete"),
 	onAppClosing: (callback) => ipcRenderer.on("app-closing", callback),

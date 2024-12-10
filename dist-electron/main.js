@@ -25852,6 +25852,24 @@ ipcMain.handle("open-svn-resolve", async (event, data) => {
     });
   });
 });
+ipcMain.handle("open-svn-diff", async (event, data) => {
+  const { fullPath, revision } = data;
+  const command = `TortoiseProc.exe /command:diff /path:"${fullPath}" /startrev:${Number(revision) - 1} /endrev:${revision}`;
+  return new Promise((resolve, reject) => {
+    exec(command, (error2, stdout, stderr) => {
+      if (error2) {
+        console.error(`Error: ${error2.message}`);
+        reject({ success: false, error: error2.message });
+      } else if (stderr) {
+        console.error(`Stderr: ${stderr}`);
+        reject({ success: false, error: stderr });
+      } else {
+        console.log(`Stdout: ${stdout}`);
+        resolve({ success: true });
+      }
+    });
+  });
+});
 ipcMain.handle("select-folder", async () => {
   const result = await dialog.showOpenDialog(mainWindow, {
     properties: ["openDirectory"]
@@ -25906,6 +25924,10 @@ ipcMain.handle("app-close", () => {
   if (!isQuitting) {
     gracefulShutdown();
   }
+});
+ipcMain.handle("app-restart", () => {
+  app.relaunch();
+  app.quit();
 });
 app.on("will-quit", () => {
   ipcMain.removeAllListeners();

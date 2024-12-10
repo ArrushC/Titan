@@ -45,6 +45,7 @@ const instanceData = {
 	isConnectionError: false,
 	lastConnectionErrorTime: 0,
 	CONNECTION_ERROR_DEBOUNCE_MS: 5000,
+	subversionLogsCache: {},
 };
 
 // Use compression middleware
@@ -417,8 +418,8 @@ function emitMessage(socket, description, type = "info", duration = 3000) {
 	socket.emit("notification", { description, type, duration: type == "error" ? 0 : duration });
 }
 
-function emitBranchInfo(socket, branchId, branchInfo) {
-	socket.emit("branch-info-single", { id: branchId, info: branchInfo });
+function emitBranchInfo(socket, branchId, branchInfo, baseRevision) {
+	socket.emit("branch-info-single", { id: branchId, info: branchInfo, baseRevision });
 }
 
 function emitBranchStatus(socket, branchId, branchStatus) {
@@ -589,6 +590,7 @@ io.on("connection", (socket) => {
 
 			const tasks = [
 				{ command: "getWorkingCopyRevision", args: [data.branch], isUtilityCmd: true },
+				{ command: "info", args: [data.branch] },
 				{ command: "log", args: [data.branch], options: { revision: "BASE:HEAD" } },
 				{ command: "status", args: [data.branch], options: { quiet: true, params: ["--show-updates"] } },
 			];
@@ -596,6 +598,7 @@ io.on("connection", (socket) => {
 			try {
 				const results = await executeSvnCommand(tasks);
 				const wcRevisionResult = results.find((r) => r.command === "getWorkingCopyRevision").result?.low;
+				const infoResult = results.find((r) => r.command === "info").result;
 				const logResult = results.find((r) => r.command === "log").result;
 				const statusResult = results.find((r) => r.command === "status").result;
 
@@ -619,8 +622,8 @@ io.on("connection", (socket) => {
 
 				let branchInfo = count == 0 ? `Latest${conflictsCount > 0 ? " 🤬" : ""}` : `-${count} Revision${count > 1 ? "s" : ""}${conflictsCount > 0 ? " 🤬" : ""}`;
 
-				if (callback) callback({ id: data.id, info: branchInfo });
-				else emitBranchInfo(socket, data.id, branchInfo);
+				if (callback) callback({ id: data.id, info: branchInfo, baseRevision: infoResult.entry.$.revision });
+				else emitBranchInfo(socket, data.id, branchInfo, infoResult.entry.$.revision);
 			} catch (err) {
 				if (isSVNConnectionError(socket, err)) {
 					if (callback) callback({ id: data.id, info: "Connection Error" });
@@ -985,19 +988,60 @@ io.on("connection", (socket) => {
 				return;
 			}
 
-			const tasks = data.selectedBranches.map((branch) => {
-				return {
-					command: "log",
-					args: [branch["SVN Branch"]],
-					options: { revision: "1:HEAD", params: ["--stop-on-copy"] },
-					postopCallback: (err, result) => {
+			// We will run `info` first to get repository root, then `log`.
+			const infoTasks = data.selectedBranches.map((branch) => {
+				return new Promise((resolve, reject) => {
+					const svnBranchPath = branch["SVN Branch"];
+					svnUltimate.commands.info(svnBranchPath, (err, infoResult) => {
 						if (err) {
-							logger.error(`Failed to fetch logs for branch ${branch["SVN Branch"]}:`, err);
-							if (!isSVNConnectionError(socket, err)) emitMessage(socket, `Failed to fetch logs for branch ${branch["SVN Branch"]}`, "error");
-						} else {
-							const logs = result.logentry || [];
+							logger.error(`Failed to fetch info for branch ${svnBranchPath}:`, err);
+							if (!isSVNConnectionError(socket, err)) emitMessage(socket, `Failed to fetch info for branch ${svnBranchPath}`, "error");
+							return reject(err);
+						}
+
+						const repositoryRoot = infoResult?.entry?.repository?.root;
+						resolve({ branch, repositoryRoot });
+					});
+				});
+			});
+
+			try {
+				const branchesWithRoot = await Promise.all(infoTasks);
+
+				// Now run `log` for each branch, using the repositoryRoot data we just collected.
+				const logTasks = branchesWithRoot.map((branchData) => {
+					const { branch, repositoryRoot } = branchData;
+					const svnBranchPath = branch["SVN Branch"];
+
+					// Check cache and define startRevision as before
+					const cachedLogs = instanceData.subversionLogsCache[svnBranchPath];
+					let startRevision = 1;
+					if (cachedLogs && cachedLogs.length > 0) {
+						const lastKnownRevision = parseInt(cachedLogs[0].revision, 10);
+						startRevision = Number.isNaN(lastKnownRevision) ? 1 : lastKnownRevision + 1;
+					}
+
+					return new Promise((resolve, reject) => {
+						svnUltimate.commands.log(svnBranchPath, { revision: `${startRevision}:HEAD`, params: ["--stop-on-copy", "--verbose"] }, (err, logResult) => {
+							if (err) {
+								logger.error(`Failed to fetch logs for branch ${svnBranchPath}:`, err);
+								if (!isSVNConnectionError(socket, err)) emitMessage(socket, `Failed to fetch logs for branch ${svnBranchPath}`, "error");
+								return reject(err);
+							}
+
+							const logs = logResult.logentry || [];
 							const logsArray = Array.isArray(logs) ? logs : [logs];
-							const formattedLogs = logsArray.map((entry) => {
+							const fetchedLogs = logsArray.map((entry) => {
+								let filesChanged = [];
+								if (entry.paths && entry.paths.path) {
+									let pathEntries = Array.isArray(entry.paths.path) ? entry.paths.path : [entry.paths.path];
+									filesChanged = pathEntries.map((p) => ({
+										path: p._,
+										kind: p.$.kind,
+										action: p.$.action,
+									}));
+								}
+
 								return {
 									revision: entry["$"].revision,
 									branchId: branch.id,
@@ -1006,21 +1050,34 @@ io.on("connection", (socket) => {
 									author: entry.author,
 									message: entry.msg,
 									date: new Date(entry.date).toLocaleString("en-GB"),
+									filesChanged,
+									repositoryRoot: repositoryRoot, // Include the repository root here
 								};
 							});
 
-							socket.emit("svn-log-result", { ...branch, logs: formattedLogs });
-						}
-					},
-				};
-			});
+							fetchedLogs.sort((a, b) => parseInt(b.revision, 10) - parseInt(a.revision, 10));
 
-			try {
-				// Execute SVN commands in parallel
-				executeSvnCommandParallel(tasks);
+							// Merge with cache
+							if (!instanceData.subversionLogsCache[svnBranchPath]) {
+								instanceData.subversionLogsCache[svnBranchPath] = [];
+							}
+
+							if (fetchedLogs.length > 0) {
+								instanceData.subversionLogsCache[svnBranchPath] = [...fetchedLogs, ...instanceData.subversionLogsCache[svnBranchPath]];
+								instanceData.subversionLogsCache[svnBranchPath].sort((a, b) => parseInt(b.revision, 10) - parseInt(a.revision, 10));
+							}
+
+							socket.emit("svn-log-result", { ...branch, logs: instanceData.subversionLogsCache[svnBranchPath] });
+							resolve();
+						});
+					});
+				});
+
+				// Execute all log tasks in parallel
+				await Promise.all(logTasks);
 			} catch (err) {
-				logger.error("Error fetching SVN logs:", err);
-				if (!isSVNConnectionError(socket, err)) emitMessage(socket, "Error fetching SVN logs", "error");
+				logger.error("Error fetching SVN logs with repository root:", err);
+				if (!isSVNConnectionError(socket, err)) emitMessage(socket, "Error fetching SVN logs with repository root", "error");
 			}
 
 			debugTask("svn-logs-selected", data, true);

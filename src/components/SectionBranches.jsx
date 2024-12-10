@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useMemo, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import { useApp } from "../ContextApp.jsx";
 import { Box, Flex, Heading, Table } from "@chakra-ui/react";
 import { Checkbox } from "./ui/checkbox.jsx";
@@ -11,38 +11,13 @@ import { MdUpdate } from "react-icons/md";
 import useNotifications from "../hooks/useNotifications.jsx";
 import { useBranches } from "../ContextBranches.jsx";
 import ActionBarSelection from "./ActionBarSelection.jsx";
+import DialogBranchesLog from "./DialogBranchesLog.jsx";
 
 export default function SectionBranches() {
-	const { updateConfig, configurableRowData, selectedBranches, setSelectedBranches, setAppMode, handleBranchSelection, handleBulkSelection, config } = useApp();
-	const { setIsDialogSBLogOpen } = useBranches();
+	const { updateConfig, configurableRowData, selectedBranches, setSelectedBranches, setAppMode, handleBranchSelection, handleBulkSelection } = useApp();
+	const { setIsDialogSBLogOpen, selectionMetrics } = useBranches();
 	const { RaisePromisedClientNotification } = useNotifications();
 	const { emitInfoSingle, emitUpdateSingle } = useSocketEmits();
-	const selectionMetrics = useMemo(() => {
-		const selectedCount = Object.keys(selectedBranches).length;
-		return {
-			selectedBranchesCount: selectedCount,
-			indeterminate: selectedCount > 0 && selectedCount < configurableRowData.length,
-			hasSelection: selectedCount > 0,
-		};
-	}, [selectedBranches, configurableRowData]);
-
-	useEffect(() => {
-		const validBranchIds = new Set(configurableRowData.map((branch) => branch.id));
-		const selectedBranchIds = Object.keys(selectedBranches).filter((id) => selectedBranches[id]);
-
-		const hasInvalidSelections = selectedBranchIds.some((id) => !validBranchIds.has(id));
-
-		if (hasInvalidSelections) {
-			const validSelectedBranches = Object.entries(selectedBranches).reduce((acc, [id, isSelected]) => {
-				if (isSelected && validBranchIds.has(id)) {
-					acc[id] = true;
-				}
-				return acc;
-			}, {});
-
-			setSelectedBranches(validSelectedBranches);
-		}
-	}, [configurableRowData, selectedBranches, setSelectedBranches]);
 
 	const [isRowDialogOpen, setIsRowDialogOpen] = useState(false);
 	const fireRowDialogAction = useCallback(() => {
@@ -218,6 +193,8 @@ export default function SectionBranches() {
             />
 
 			<DialogRowDeletion isDialogOpen={isRowDialogOpen} closeDialog={() => setIsRowDialogOpen(false)} fireDialogAction={fireRowDialogAction} />
+
+			<DialogBranchesLog />
 		</Box>
 	);
 }

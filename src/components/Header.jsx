@@ -8,12 +8,17 @@ import useNotifications from "../hooks/useNotifications.jsx";
 import ButtonElectron from "./ButtonElectron.jsx";
 import ButtonIconTooltip from "./ButtonIconTooltip.jsx";
 import { ColorModeButton } from "./ui/color-mode.jsx";
+import { Button } from "./ui/button.jsx";
+import { PopoverArrow, PopoverBody, PopoverContent, PopoverRoot, PopoverTrigger } from "./ui/popover.jsx";
+import { useApp } from "../ContextApp.jsx";
 
 export default function Header() {
+	const { setAppClosing } = useApp();
 	const { emitOpenConfig } = useSocketEmits();
 	const { RaiseClientNotificaiton } = useNotifications();
 
 	const [username, setUsername] = useState("User");
+	const [reloadPopover, setReloadPopover] = useState(false);
 
 	useEffect(() => {
 		if (window.electron) {
@@ -23,7 +28,13 @@ export default function Header() {
 		}
 	}, []);
 
-	const handleReload = useCallback(() => {
+	const handleReload = useCallback((isAppRestart = false) => {
+		if (isAppRestart) {
+			window.electron.restartApp();
+			setAppClosing(true);
+			return;
+		}
+
 		window.location.reload();
 	}, []);
 
@@ -55,7 +66,24 @@ export default function Header() {
 				<ColorModeButton />
 				<ButtonIconTooltip icon={<LuFileCog />} onClick={handleOpenConfig} colorPalette={"yellow"} variant={"subtle"} label="Open Config File" placement={"bottom-start"} size="md" />
 				<ButtonElectron icon={<MdBrowserUpdated />} onClick={handleCheckForUpdates} colorPalette={"yellow"} variant={"subtle"} label="Check For Updates" size="md" />
-				<ButtonIconTooltip icon={<IoReload />} onClick={handleReload} colorPalette={"yellow"} variant={"subtle"} label="Reload" placement={"bottom-start"} size="md" />
+				<PopoverRoot open={window.electron && reloadPopover} onOpenChange={(e) => setReloadPopover(e.open)}>
+					<PopoverTrigger as={"div"}>
+						<ButtonIconTooltip icon={<IoReload />} onClick={() => setReloadPopover((prev) => !prev)} colorPalette={"yellow"} label={"Reload"} variant={"subtle"} size="md" />
+					</PopoverTrigger>
+					<PopoverContent>
+						<PopoverArrow />
+						<PopoverBody>
+							<Flex gap={8}>
+								<Button colorPalette={"yellow"} variant={"subtle"} onClick={(e) => handleReload(false)}>
+									Refresh
+								</Button>
+								<Button colorPalette={"yellow"} variant={"subtle"} onClick={(e) => handleReload(true)}>
+									Restart
+								</Button>
+							</Flex>
+						</PopoverBody>
+					</PopoverContent>
+				</PopoverRoot>
 			</Flex>
 		</HStack>
 	);

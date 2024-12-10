@@ -10,6 +10,7 @@ import { useCommit } from "../ContextCommit.jsx";
 import DialogLookupTrello from "./DialogLookupTrello.jsx";
 import useTrelloIntegration from "../hooks/useTrelloIntegration.jsx";
 import { PopoverArrow, PopoverBody, PopoverContent, PopoverRoot, PopoverTitle, PopoverTrigger } from "./ui/popover.jsx";
+import DialogLookupSVNLogs from "./DialogLookupSVNLogs.jsx";
 
 const shineAnimation = keyframes`
     from { background-position: 200% center; }
@@ -17,7 +18,7 @@ const shineAnimation = keyframes`
 `;
 
 export const FieldLookup = memo(() => {
-	const { setIsLookupTrelloOn } = useCommit();
+	const { setIsLookupTrelloOn, setIsLookupSLogsOn } = useCommit();
 	const { isTrelloIntegrationSupported } = useTrelloIntegration();
 	const textColor = useColorModeValue("black", "white");
 
@@ -36,7 +37,7 @@ export const FieldLookup = memo(() => {
 			</Box>
 			<Box my={4}></Box>
 			<Flex gapX={2}>
-				<Button variant="subtle">
+				<Button variant="subtle" onClick={() => setIsLookupSLogsOn(true)}>
 					<SiSubversion />
 					Use SVN Logs
 				</Button>
@@ -58,6 +59,7 @@ export const FieldLookup = memo(() => {
 				</PopoverRoot>
 			</Flex>
 
+			<DialogLookupSVNLogs fireDialogAction={() => console.log("hello!")} />
 			<DialogLookupTrello fireDialogAction={handleSelectedTrelloCard} />
 		</Box>
 	);

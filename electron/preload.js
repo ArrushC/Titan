@@ -16,6 +16,7 @@ contextBridge.exposeInMainWorld("electron", {
 	minimizeWindow: () => ipcRenderer.invoke("app-minimize"),
 	maximizeWindow: () => ipcRenderer.invoke("app-maximize"),
 	closeWindow: () => ipcRenderer.invoke("app-close"),
+	restartApp: () => ipcRenderer.invoke("app-restart"),
 	on: (channel, func) => {
 		ipcRenderer.on(channel, (event, ...args) => func(...args));
 	},

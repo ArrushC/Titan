@@ -10,13 +10,13 @@ const initialState = {
 	setAppClosing: (_) => {},
 	socket: null,
 	config: null,
-	updateConfig: () => {},
+	updateConfig: (_) => {},
 	emitSocketEvent: (_) => {},
 	configurableRowData: [],
 	selectedBranches: {},
 	setSelectedBranches: (_) => {},
-	logData: [],
-	setLogData: (_) => {},
+	svnLogs: {},
+	setSvnLogs: (_) => {},
 	appMode: "app",
 	setAppMode: (_) => {},
 };
@@ -34,7 +34,7 @@ export const AppProvider = ({ children }) => {
 	const [socket, setSocket] = useState(null);
 	const [config, setConfig] = useState({});
 	const [selectedBranches, setSelectedBranches] = useState({});
-	const [logData, setLogData] = useState([]);
+	const [svnLogs, setSvnLogs] = useState({});
 	const [appMode, setAppMode] = useState("app");
 
 	const _handleTitanConfigEvent = useCallback((response) => {
@@ -137,6 +137,27 @@ export const AppProvider = ({ children }) => {
 
 	const configurableRowData = useMemo(() => config?.branches || [], [config?.branches]);
 
+	useEffect(() => {
+		if (configurableRowData?.length < 1 || Object.keys(selectedBranches).length < 1) return;
+		setSvnLogs({});
+		socket?.emit("svn-logs-selected", { selectedBranches: configurableRowData.filter((branchRow) => selectedBranches[branchRow.id]) });
+	}, [selectedBranches, configurableRowData]);
+
+	useEffect(() => {
+		const socketCallback = (data) => {
+			console.debug("Received svn-log-result from socket in DialogBranchesLog component in background");
+			console.log(JSON.stringify(data.logs[0], null, 2));
+			setSvnLogs((prevData) => ({
+				...prevData,
+				[data["SVN Branch"]]: data.logs
+			}));
+		};
+
+		socket?.on("svn-log-result", socketCallback);
+
+		return () => socket?.off("svn-log-result", socketCallback);
+	}, [socket]);
+
 	const value = useMemo(
 		() => ({
 			appClosing,
@@ -148,14 +169,14 @@ export const AppProvider = ({ children }) => {
 			configurableRowData,
 			selectedBranches,
 			setSelectedBranches,
-			logData,
-			setLogData,
+			svnLogs,
+			setSvnLogs,
 			appMode,
 			setAppMode,
 			handleBranchSelection,
 			handleBulkSelection,
 		}),
-		[appClosing, socket, config, updateConfig, emitSocketEvent, configurableRowData, selectedBranches, logData, appMode, handleBranchSelection, handleBulkSelection]
+		[appClosing, socket, config, updateConfig, emitSocketEvent, configurableRowData, selectedBranches, svnLogs, appMode, handleBranchSelection, handleBulkSelection]
 	);
 
 	return <ContextApp.Provider value={value}>{children}</ContextApp.Provider>;

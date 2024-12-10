@@ -11,12 +11,16 @@ import { FiEdit, FiHelpCircle } from "react-icons/fi";
 import SubSectionUnknownChanges from "./components/SubSectionUnknownChanges.jsx";
 
 const initialState = {
+	isLookupSLogsOn: false,
+	setIsLookupSLogsOn: (_) => {},
 	isLookupTrelloOn: false,
 	setIsLookupTrelloOn: (_) => {},
 	sourceBranch: "",
 	setSourceBranch: (_) => {},
 	issueNumber: {},
 	setIssueNumber: (_) => {},
+	commitMessage: "",
+	setCommitMessage: (_) => {},
 	isCommitMode: false,
 	selectedBranchesCount: 0,
 	accordionSection: [],
@@ -33,9 +37,11 @@ export const useCommit = () => {
 export const CommitProvider = ({ children }) => {
 	const { selectedBranches, appMode } = useApp();
 
+	const [isLookupSLogsOn, setIsLookupSLogsOn] = useState(false);
 	const [isLookupTrelloOn, setIsLookupTrelloOn] = useState(false);
 	const [sourceBranch, setSourceBranch ] = useState("");
 	const [issueNumber, setIssueNumber] = useState({});
+	const [commitMessage, setCommitMessage] = useState("");
 	const isCommitMode = useMemo(() => appMode === "commit", [appMode]);
 	const selectedBranchesCount = useMemo(() => Object.keys(selectedBranches).length, [selectedBranches]);
 
@@ -57,18 +63,18 @@ export const CommitProvider = ({ children }) => {
 				component: SubSectionConflictingChanges,
 			},
 			{
-				value: "modifiedChanges",
-				icon: FiEdit,
-				title: "Modified Changes",
-				description: "Files and directories listed for committing",
-				component: SubSectionModifiedChanges,
-			},
-			{
 				value: "unknownChanges",
 				icon: FiHelpCircle,
 				title: "Unknown Changes",
 				description: "Added and deleted files currently not tracked by SVN",
 				component: SubSectionUnknownChanges,
+			},
+			{
+				value: "modifiedChanges",
+				icon: FiEdit,
+				title: "Modified Changes",
+				description: "Files and directories listed for committing",
+				component: SubSectionModifiedChanges,
 			},
 		],
 		[]
@@ -100,19 +106,23 @@ export const CommitProvider = ({ children }) => {
 
 	const value = useMemo(
 		() => ({
+			isLookupSLogsOn,
+			setIsLookupSLogsOn,
 			isLookupTrelloOn,
 			setIsLookupTrelloOn,
 			sourceBranch,
 			setSourceBranch,
 			issueNumber,
 			setIssueNumber,
+			commitMessage,
+			setCommitMessage,
 			isCommitMode,
 			selectedBranchesCount,
 			accordionSection,
 			commitStage,
 			setCommitStage,
 		}),
-		[isLookupTrelloOn, sourceBranch, issueNumber, isCommitMode, selectedBranchesCount, accordionSection, commitStage]
+		[isLookupSLogsOn, isLookupTrelloOn, sourceBranch, issueNumber, commitMessage, isCommitMode, selectedBranchesCount, accordionSection, commitStage]
 	);
 
 	useEffect(() => {

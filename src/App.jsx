@@ -4,7 +4,6 @@ import Header from "./components/Header.jsx";
 import SectionBranches from "./components/SectionBranches.jsx";
 import SectionCommit from "./components/SectionCommit.jsx";
 import useNotifications from "./hooks/useNotifications.jsx";
-import DialogBranchesLog from "./components/DialogBranchesLog.jsx";
 import AlertUpdateTitan from "./components/AlertUpdateTitan.jsx";
 import HeaderApp from "./components/HeaderApp.jsx";
 import { Toaster } from "./components/ui/toaster.jsx";
@@ -22,8 +21,7 @@ function App() {
 			window.electron.onAppClosing(() => {
 				RaiseClientNotificaiton("App is closing, performing cleanup...", "warning", 0);
 
-				// Perform any necessary cleanup in the renderer process
-				// ...
+				// TODO Perform any necessary cleanup in the renderer process...
 
 				window.electron.fireShutdownComplete();
 			});
@@ -56,7 +54,6 @@ function App() {
 							</CommitProvider>
 						</Box>
 					</Flex>
-					<DialogBranchesLog />
 				</Box>
 			) : (
 				<Flex alignItems="center" justifyContent="center" className="titanBody" h="100%" flexDirection="column" gap={60}>

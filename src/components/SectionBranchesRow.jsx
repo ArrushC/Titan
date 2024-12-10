@@ -24,6 +24,7 @@ const SectionBranchesRow = memo(
 		const branchVersion = branchRow?.["Branch Version"];
 		const branchPath = branchRow?.["SVN Branch"];
 		const [branchInfo, setBranchInfo] = useState(branchRow?.["Branch Info"] || "Refreshing...");
+		const themedBgColor = config?.branchFolderColours[branchFolder] || "transparent";
 
 		const gradientAnimation = keyframes`
 			0% { background-position: 0% 50%; }
@@ -70,13 +71,6 @@ const SectionBranchesRow = memo(
 				color: revisionCount == 0 || revisionCount > 10 ? "white" : "black",
 			};
 		}, [branchInfo, gradientAnimation]);
-
-		const rowStyle = useMemo(() => {
-			const color = config?.branchFolderColours[branchFolder];
-			return {
-				backgroundColor: color ? `${color}20` : "transparent",
-			};
-		}, [branchFolder, config?.branchFolderColours]);
 
 		const handleSelectFolder = useCallback(async () => {
 			const path = await window.electron.selectFolder();
@@ -165,7 +159,7 @@ const SectionBranchesRow = memo(
 		}, [branchInfo]);
 
 		return (
-			<Table.Row bgColor={rowStyle.backgroundColor}>
+			<Table.Row _light={{bgColor: themedBgColor == "transparent" ? "transparent" : `${themedBgColor}20`}} _dark={{bgColor: themedBgColor == "transparent" ? "transparent" : `${themedBgColor}80`}}>
 				<Table.Cell display={"flex"} alignItems={"center"}>
 					<Checkbox top="2" aria-label="Select row" variant={"subtle"} colorPalette={"yellow"} checked={isSelected} onCheckedChange={(e) => onSelectChange(branchId, e.checked)} />
 				</Table.Cell>

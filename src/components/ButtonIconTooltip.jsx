@@ -11,7 +11,7 @@ export default function ButtonIconTooltip(props) {
 	}, [onClick]);
 
 	const iconButton = (
-		<IconButton aria-label={label} size={size} onClick={handleClick} colorPalette={colorPalette} variant={variant} disabled={disabled}>
+		<IconButton aria-label={label || ""} size={size} onClick={handleClick} colorPalette={colorPalette} variant={variant} disabled={disabled}>
 			{icon}
 		</IconButton>
 	);

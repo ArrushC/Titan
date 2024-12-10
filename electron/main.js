@@ -584,6 +584,13 @@ ipcMain.handle("app-close", () => {
 	}
 });
 
+ipcMain.handle("app-restart", () => {
+	app.relaunch();
+	app.quit();
+});
+
+
+
 // Cleanup any remaining listeners
 app.on("will-quit", () => {
 	ipcMain.removeAllListeners();

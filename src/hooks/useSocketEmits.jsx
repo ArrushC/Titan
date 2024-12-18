@@ -16,8 +16,8 @@ export default function useSocketEmits() {
 	);
 
 	const emitInfoSingle = useCallback(
-		(branchId, svnBranch, branchVersion, branchFolder, callback) => {
-			socket?.emit("svn-info-single", { id: branchId, branch: svnBranch, version: branchVersion, folder: branchFolder }, callback);
+		(branchId, svnBranch, branchVersion, branchFolder) => {
+			socket?.emit("svn-info-single", { id: branchId, branch: svnBranch, version: branchVersion, folder: branchFolder });
 		},
 		[socket]
 	);

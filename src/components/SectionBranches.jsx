@@ -44,7 +44,7 @@ export default function SectionBranches() {
 					emitUpdateSingle(branchRow.id, branchRow["SVN Branch"], branchRow["Branch Version"], branchRow["Branch Folder"], (response) => {
 						if (response.success) {
 							onSuccess();
-							emitInfoSingle(branchRow.id, branchRow["SVN Branch"], branchRow["Branch Version"], branchRow["Branch Folder"], null);
+							emitInfoSingle(branchRow.id, branchRow["SVN Branch"], branchRow["Branch Version"], branchRow["Branch Folder"]);
 						}
 						resolveUpdate();
 					});
@@ -73,7 +73,7 @@ export default function SectionBranches() {
 		configurableRowData
 			.filter((branchRow) => selectedBranches[branchRow.id])
 			.forEach((branchRow) => {
-				emitInfoSingle(branchRow.id, branchRow["SVN Branch"], branchRow["Branch Version"], branchRow["Branch Folder"], null);
+				emitInfoSingle(branchRow.id, branchRow["SVN Branch"], branchRow["Branch Version"], branchRow["Branch Folder"]);
 			});
 	}, [configurableRowData, selectedBranches]);
 
@@ -90,7 +90,7 @@ export default function SectionBranches() {
 					emitUpdateSingle(branchRow.id, branchRow["SVN Branch"], branchRow["Branch Version"], branchRow["Branch Folder"], (response) => {
 						if (response.success) {
 							onSuccess();
-							emitInfoSingle(branchRow.id, branchRow["SVN Branch"], branchRow["Branch Version"], branchRow["Branch Folder"], null);
+							emitInfoSingle(branchRow.id, branchRow["SVN Branch"], branchRow["Branch Version"], branchRow["Branch Folder"]);
 						}
 						resolveUpdate();
 					});

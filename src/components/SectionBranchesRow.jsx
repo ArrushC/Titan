@@ -98,10 +98,7 @@ const SectionBranchesRow = memo(
 		);
 
 		const refreshRow = useCallback(() => {
-			emitInfoSingle(branchId, branchPath, branchVersion, branchFolder, (response) => {
-				if (response.id != branchId) return;
-				setBranchInfo(response.info);
-			});
+			emitInfoSingle(branchId, branchPath, branchVersion, branchFolder);
 		}, [emitInfoSingle, branchId, branchPath, branchVersion, branchFolder]);
 
 		const resolveConflicts = useCallback(() => {

@@ -579,7 +579,7 @@ io.on("connection", (socket) => {
 			debugTask("svn-update-single", data, true);
 		});
 
-		socket.on("svn-info-single", async (data, callback) => {
+		socket.on("svn-info-single", async (data) => {
 			// debugTask("svn-info-single", data, false);
 			if (!data.branch || data.branch === "") {
 				emitMessage(socket, "Unable to check the status of one or more branches as it is undefined", "error");
@@ -622,17 +622,14 @@ io.on("connection", (socket) => {
 
 				let branchInfo = count == 0 ? `Latest${conflictsCount > 0 ? " 🤬" : ""}` : `-${count} Revision${count > 1 ? "s" : ""}${conflictsCount > 0 ? " 🤬" : ""}`;
 
-				if (callback) callback({ id: data.id, info: branchInfo, baseRevision: infoResult.entry.$.revision });
-				else emitBranchInfo(socket, data.id, branchInfo, infoResult.entry.$.revision);
+				emitBranchInfo(socket, data.id, branchInfo, infoResult.entry.$.revision);
 			} catch (err) {
 				if (isSVNConnectionError(socket, err)) {
-					if (callback) callback({ id: data.id, info: "Connection Error" });
-					else emitBranchInfo(socket, data.id, "Connection Error");
+					emitBranchInfo(socket, data.id, "Connection Error");
 					return;
 				}
 				if (err.message.includes("svn: E155010")) {
-					if (callback) callback({ id: data.id, info: "Not Found" });
-					else emitBranchInfo(socket, data.id, "Not Found");
+					emitBranchInfo(socket, data.id, "Not Found");
 					return;
 				}
 

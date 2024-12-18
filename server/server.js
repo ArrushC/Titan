@@ -1014,7 +1014,7 @@ io.on("connection", (socket) => {
 					const svnBranchPath = branch["SVN Branch"];
 
 					// Check cache and define startRevision as before
-					const cachedLogs = instanceData.subversionLogsCache[svnBranchPath];
+					const cachedLogs = instanceData.subversionLogsCache[svnBranchPath] || [];
 					let startRevision = 1;
 					if (cachedLogs && cachedLogs.length > 0) {
 						const lastKnownRevision = parseInt(cachedLogs[0].revision, 10);
@@ -1057,14 +1057,11 @@ io.on("connection", (socket) => {
 
 							fetchedLogs.sort((a, b) => parseInt(b.revision, 10) - parseInt(a.revision, 10));
 
-							// Merge with cache
-							if (!instanceData.subversionLogsCache[svnBranchPath]) {
-								instanceData.subversionLogsCache[svnBranchPath] = [];
-							}
-
 							if (fetchedLogs.length > 0) {
-								instanceData.subversionLogsCache[svnBranchPath] = [...fetchedLogs, ...instanceData.subversionLogsCache[svnBranchPath]];
-								instanceData.subversionLogsCache[svnBranchPath].sort((a, b) => parseInt(b.revision, 10) - parseInt(a.revision, 10));
+								const combinedLogs = [...fetchedLogs, ...cachedLogs];
+								const uniqueLogs = _.uniqBy(combinedLogs, 'revision');
+								uniqueLogs.sort((a, b) => parseInt(b.revision, 10) - parseInt(a.revision, 10));
+								instanceData.subversionLogsCache[svnBranchPath] = uniqueLogs;
 							}
 
 							socket.emit("svn-log-result", { ...branch, logs: instanceData.subversionLogsCache[svnBranchPath] });

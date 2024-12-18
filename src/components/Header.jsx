@@ -13,7 +13,7 @@ import { PopoverArrow, PopoverBody, PopoverContent, PopoverRoot, PopoverTrigger 
 import { useApp } from "../ContextApp.jsx";
 
 export default function Header() {
-	const { setAppClosing } = useApp();
+	const setAppClosing = useApp((ctx) => ctx.setAppClosing);
 	const { emitOpenConfig } = useSocketEmits();
 	const { RaiseClientNotificaiton } = useNotifications();
 

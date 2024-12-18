@@ -6,8 +6,10 @@ import { Box, Em, Flex, Heading } from "@chakra-ui/react";
 import { useCommit } from "../ContextCommit.jsx";
 
 export default function OptionsCommit() {
-	const {config, updateConfig} = useApp();
-	const { setSourceBranch, setIssueNumber } = useCommit();
+	const config = useApp(ctx => ctx.config);
+	const updateConfig = useApp(ctx => ctx.updateConfig);
+	const setSourceBranch = useCommit((ctx) => ctx.setSourceBranch);
+	const setIssueNumber = useCommit((ctx) => ctx.setIssueNumber);
 	const [commitOptions, setCommitOptions] = useState({});
 
 	const handleOptionChange = useCallback(

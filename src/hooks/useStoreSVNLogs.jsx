@@ -3,7 +3,9 @@ import { useApp } from "../ContextApp.jsx";
 import _ from "lodash";
 
 export default function useStoreSVNLogs() {
-	const {selectedBranches, logData, setLogData} = useApp();
+	const selectedBranches = useApp((ctx) => ctx.selectedBranches);
+	const logData = useApp((ctx) => ctx.logsData);
+	const setLogData = useApp((ctx) => ctx.setSvnLogs);
 
 	const [rowDataLogs, setRowDataLogs] = useState([]);
 

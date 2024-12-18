@@ -1,102 +1,180 @@
-import React, { useCallback, useState, useEffect, useMemo } from "react";
+import React, { useCallback, useEffect, useRef, useState, useMemo } from "react";
 import { DialogActionTrigger, DialogBackdrop, DialogBody, DialogCloseTrigger, DialogContent, DialogFooter, DialogHeader, DialogRoot, DialogTitle } from "./ui/dialog.jsx";
-import { Box, Button, HStack, Input, Kbd, Link, Spinner, Table, Text, chakra } from "@chakra-ui/react";
-import { useCommit } from "../ContextCommit.jsx";
-import { FaChevronDown, FaChevronUp, FaTrello } from "react-icons/fa6";
-import { InputGroup } from "./ui/input-group.jsx";
-import { LuExternalLink, LuSearch } from "react-icons/lu";
-import { MdKeyboardReturn } from "react-icons/md";
-import useTrelloIntegration from "../hooks/useTrelloIntegration.jsx";
+import { Button } from "./ui/button.jsx";
+import { useApp } from "../ContextApp.jsx";
+import { Table, IconButton, Box, Input, Text, Flex, HStack } from "@chakra-ui/react";
 import { SiSubversion } from "react-icons/si";
+import { FaChevronDown, FaChevronRight } from "react-icons/fa6";
+import { InputGroup } from "./ui/input-group.jsx";
+import { LuSearch } from "react-icons/lu";
+import { VscDiffSingle } from "react-icons/vsc";
+import { useCommit } from "../ContextCommit.jsx";
+import { useColorModeValue } from "./ui/color-mode.jsx";
+import { keyframes } from "@emotion/react";
+
+const shineAnimation = keyframes`
+	from { background-position: 200% center; }
+	to { background-position: -200% center; }
+`;
+
+const ROW_HEIGHT = 40;
+const OVERSCAN = 10;
+
+const getPathActionolour = (action) => {
+	switch (action) {
+		case "A":
+			return "green.500";
+		case "M":
+			return "cyan.500";
+		case "D":
+			return "red.500";
+		default:
+			return "gray";
+	}
+};
+
+const LogRow = React.memo(function LogRow({ entry, isExpanded, onToggleExpand, processDialogAction }) {
+	return (
+		<React.Fragment>
+			<Table.Row height={`${ROW_HEIGHT}px`} _light={{ bgColor: "yellow.fg", color: "white" }} _dark={{ bgColor: "yellow.800" }} onDoubleClick={() => processDialogAction(entry)}>
+				<Table.Cell>
+					<IconButton aria-label="Expand/Collapse" size="2xs" onClick={() => onToggleExpand(entry.revision)} variant="subtle">
+						{isExpanded ? <FaChevronDown /> : <FaChevronRight />}
+					</IconButton>
+				</Table.Cell>
+				<Table.Cell fontWeight={900}>{entry.revision}</Table.Cell>
+				<Table.Cell>{entry.date}</Table.Cell>
+				<Table.Cell>{entry.author}</Table.Cell>
+				<Table.Cell
+					style={{
+						whiteSpace: "nowrap",
+						overflow: "hidden",
+						textOverflow: "ellipsis",
+						maxWidth: "500px",
+					}}>
+					{entry.message}
+				</Table.Cell>
+			</Table.Row>
+
+			{isExpanded && entry.filesChanged && entry.filesChanged.length > 0 && (
+				<Table.Row bgColor={"gray.subtle"} height={`${ROW_HEIGHT}px`} onDoubleClick={() => processDialogAction(entry)}>
+					<Table.Cell colSpan={5}>
+						<Box p={3}>
+							<Flex alignItems={"center"} mb={5} gap={3} p={2}>
+								Commit Message: <Text color={"yellow.fg"}>{entry.message}</Text>
+							</Flex>
+
+							<Table.Root variant="simple" size="sm">
+								<Table.ColumnGroup>
+									<Table.Column width="10%" />
+									<Table.Column width="" />
+									<Table.Column width="10%" />
+								</Table.ColumnGroup>
+								<Table.Header>
+									<Table.Row>
+										<Table.ColumnHeader>Action</Table.ColumnHeader>
+										<Table.ColumnHeader>Path</Table.ColumnHeader>
+										<Table.ColumnHeader></Table.ColumnHeader>
+									</Table.Row>
+								</Table.Header>
+								<Table.Body>
+									{entry.filesChanged.map((file, idx) => (
+										<Table.Row key={`${entry.revision}-file-${idx}`} height={`${ROW_HEIGHT}px`} color={getPathActionolour(file.action.toUpperCase())}>
+											<Table.Cell>{file.action.toUpperCase()}</Table.Cell>
+											<Table.Cell>
+												{file.path} ({file.kind === "dir" ? "Directory" : "File"})
+											</Table.Cell>
+											<Table.Cell>
+												<IconButton variant="subtle" size={"xs"} disabled={!window.electron} aria-label="Diff" onClick={() => window.electron.openSvnDiff({ fullPath: `${entry.repositoryRoot}${file.path}`, revision: entry.revision })}>
+													<VscDiffSingle />
+												</IconButton>
+											</Table.Cell>
+										</Table.Row>
+									))}
+								</Table.Body>
+							</Table.Root>
+						</Box>
+					</Table.Cell>
+				</Table.Row>
+			)}
+		</React.Fragment>
+	);
+});
 
 export default function DialogLookupSVNLogs({ fireDialogAction }) {
-	const { isLookupSLogsOn, setIsLookupSLogsOn } = useCommit();
-	const { key, token, emitTrelloCardNamesSearch } = useTrelloIntegration();
+	const logsData = useApp((ctx) => ctx.logsData);
+	const isLookupSLogsOn = useCommit((ctx) => ctx.isLookupSLogsOn);
+	const setIsLookupSLogsOn = useCommit((ctx) => ctx.setIsLookupSLogsOn);
+	const textColor = useColorModeValue("black", "white");
 
-	const [trelloQuery, setTrelloQuery] = useState("");
-	const [fetchedCards, setFetchedCards] = useState([]);
-	const [loading, setLoading] = useState(false);
-	const [searchPerformed, setSearchPerformed] = useState(false);
+	const [expandedRows, setExpandedRows] = useState(() => new Set());
+	const [searchTerm, setSearchTerm] = useState("");
 
-	// Sorting state: which column and direction
-	// direction: 'asc', 'desc', or null (no sort)
-	const [sortConfig, setSortConfig] = useState({ column: null, direction: null });
+	const closeDialog = useCallback(() => {
+		setIsLookupSLogsOn(false);
+	}, [setIsLookupSLogsOn]);
 
 	const processDialogAction = useCallback(
-		(card) => {
-			fireDialogAction(card);
+		(entry) => {
+			fireDialogAction(entry);
 			setIsLookupSLogsOn(false);
 		},
 		[fireDialogAction, setIsLookupSLogsOn]
 	);
 
-	const handleSearch = useCallback(() => {
-		if (!trelloQuery.trim()) return;
-		setSearchPerformed(true);
-		setLoading(true);
-		emitTrelloCardNamesSearch(key, token, trelloQuery, null, (response) => {
-			setFetchedCards(response.cards || []);
-			setLoading(false);
-			// Reset sort on new search
-			setSortConfig({ column: null, direction: null });
-		});
-	}, [trelloQuery, key, token, emitTrelloCardNamesSearch]);
-
-	const handleKeyPress = useCallback(
-		(event) => {
-			if (event.key === "Enter") {
-				handleSearch();
+	const toggleExpand = useCallback((revision) => {
+		setExpandedRows((prev) => {
+			const newSet = new Set(prev);
+			if (newSet.has(revision)) {
+				newSet.delete(revision);
+			} else {
+				newSet.add(revision);
 			}
-		},
-		[handleSearch]
-	);
+			return newSet;
+		});
+	}, []);
+
+	const filteredData = useMemo(() => {
+		if (!searchTerm) return logsData;
+		const lowerSearch = searchTerm.toLowerCase();
+		return logsData.filter((entry) => {
+			const mainFields = [entry.revision, entry.date, entry.author, entry.message, entry.branchFolder, entry.branchVersion];
+			const mainMatch = mainFields.some((field) => field?.toString().toLowerCase().includes(lowerSearch));
+			const filesMatch = entry.filesChanged && entry.filesChanged.some((file) => [file.action, file.path, file.kind].some((field) => field?.toString().toLowerCase().includes(lowerSearch)));
+			return mainMatch || filesMatch;
+		});
+	}, [logsData, searchTerm]);
+
+	const containerRef = useRef(null);
+	const [containerHeight, setContainerHeight] = useState(0);
+	const [scrollTop, setScrollTop] = useState(0);
 
 	useEffect(() => {
-		// If the query is emptied out after a search, reset cards
-		if (trelloQuery.trim().length === 0) {
-			setFetchedCards([]);
-		}
-	}, [trelloQuery]);
-
-	const sortedCards = useMemo(() => {
-		if (!sortConfig.column || !sortConfig.direction) {
-			return fetchedCards;
-		}
-
-		let sorted = [...fetchedCards];
-		if (sortConfig.column === "name") {
-			sorted.sort((a, b) => a.name.localeCompare(b.name));
-		} else if (sortConfig.column === "lastActivityDate") {
-			sorted.sort((a, b) => new Date(a.lastActivityDate) - new Date(b.lastActivityDate));
-		}
-
-		if (sortConfig.direction === "desc") {
-			sorted.reverse();
-		}
-
-		return sorted;
-	}, [fetchedCards, sortConfig]);
-
-	const toggleSort = (column) => {
-		setSortConfig((prev) => {
-			if (prev.column !== column) {
-				return { column, direction: "asc" };
-			} else {
-				// Cycle through asc -> desc -> none
-				if (prev.direction === "asc") return { column, direction: "desc" };
-				if (prev.direction === "desc") return { column: null, direction: null };
-				return { column, direction: "asc" };
+		const measure = () => {
+			if (containerRef.current) {
+				setContainerHeight(containerRef.current.clientHeight);
 			}
-		});
-	};
+		};
+		measure();
+		window.addEventListener("resize", measure);
+		return () => window.removeEventListener("resize", measure);
+	}, []);
 
-	const renderSortIcon = (column) => {
-		if (sortConfig.column !== column) return null;
-		return sortConfig.direction === "asc" ? <FaChevronUp /> : <FaChevronDown />;
-	};
+	const onScroll = useCallback(() => {
+		if (containerRef.current) {
+			setScrollTop(containerRef.current.scrollTop);
+		}
+	}, []);
+
+	const totalRows = filteredData.length;
+	const visibleCount = Math.ceil(containerHeight / ROW_HEIGHT) + OVERSCAN * 2;
+	const startIndex = Math.max(0, Math.floor(scrollTop / ROW_HEIGHT) - OVERSCAN);
+	const endIndex = Math.min(totalRows, startIndex + visibleCount);
+	const offsetY = startIndex * ROW_HEIGHT;
+	const visibleRows = filteredData.slice(startIndex, endIndex);
 
 	return (
-		<DialogRoot role="dialog" size="cover" open={isLookupSLogsOn} onOpenChange={() => setIsLookupSLogsOn(false)} closeOnEscape={true} initialFocusEl={null}>
+		<DialogRoot role="dialog" size="cover" placement="center" open={isLookupSLogsOn} onOpenChange={closeDialog} closeOnEscape={false} initialFocusEl={undefined}>
 			<DialogBackdrop />
 			<DialogContent>
 				<DialogHeader fontSize="lg" fontWeight="bold">
@@ -107,93 +185,64 @@ export default function DialogLookupSVNLogs({ fireDialogAction }) {
 				</DialogHeader>
 
 				<DialogBody>
-					<Box mb={6}>
-						<HStack gap="6" width="full" colorPalette="yellow" onKeyDown={handleKeyPress}>
-							<InputGroup flex="1" startElement={<LuSearch />} startElementProps={{ color: "colorPalette.fg" }}>
-								<Input placeholder="Type a card title and press Enter" variant="flushed" borderColor="colorPalette.fg" value={trelloQuery} onChange={(e) => setTrelloQuery(e.target.value)} />
-							</InputGroup>
-							<Button onClick={handleSearch} isDisabled={!trelloQuery.trim()}>
-								Search
-								<Kbd variant="subtle">
-									<MdKeyboardReturn />
-								</Kbd>
-							</Button>
-						</HStack>
-					</Box>
+					<HStack gap="6" mb={4} width="full" colorPalette="yellow">
+						<InputGroup flex="1" startElement={<LuSearch />} startElementProps={{ color: "colorPalette.fg" }}>
+							<Input placeholder="Quick search..." variant="flushed" borderColor="colorPalette.fg" value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)} />
+						</InputGroup>
+					</HStack>
 
-					{loading && (
-						<HStack justifyContent="center" alignItems="center" py={4}>
-							<Spinner size="lg" color={"yellow.fg"} borderWidth={"4px"} />
-							<Text ml={2}>Searching...</Text>
-						</HStack>
-					)}
+					<Text fontSize={"sm"} mb={2} fontWeight={900} bgGradient="to-r" gradientFrom={textColor} gradientVia="yellow.500" gradientTo={textColor} backgroundSize="200% auto" bgClip="text" animation={`${shineAnimation} 7s ease-in infinite`}>
+						Double-click a SVN revision row to select it.
+					</Text>
+					<Table.Root size="sm" variant="outline" colorPalette={"yellow"}>
+						<Table.ColumnGroup>
+							<Table.Column width="5%" />
+							<Table.Column width="10%" />
+							<Table.Column width="15%" />
+							<Table.Column width="10%" />
+							<Table.Column width="60%" />
+						</Table.ColumnGroup>
+						<Table.Header>
+							<Table.Row height={`${ROW_HEIGHT}px`} bgColor={"colorPalette.400"}>
+								<Table.ColumnHeader color={"black"} fontWeight={900}></Table.ColumnHeader>
+								<Table.ColumnHeader color={"black"} fontWeight={900}>
+									Revision
+								</Table.ColumnHeader>
+								<Table.ColumnHeader color={"black"} fontWeight={900}>
+									Date
+								</Table.ColumnHeader>
+								<Table.ColumnHeader color={"black"} fontWeight={900}>
+									Author
+								</Table.ColumnHeader>
+								<Table.ColumnHeader color={"black"} fontWeight={900} ms={0}>
+									Message
+								</Table.ColumnHeader>
+							</Table.Row>
+						</Table.Header>
+					</Table.Root>
 
-					{!loading && !searchPerformed && fetchedCards.length === 0 && (
-						<Text textAlign="center" fontSize="md" color="gray.500" py={4}>
-							Enter a card title above and press Enter or click "Search".
-						</Text>
-					)}
-
-					{searchPerformed && !loading && sortedCards.length === 0 && (
-						<Text textAlign="center" fontSize="lg" color="whiteAlpha" py={4}>
-							No results found. Try a different query.
-						</Text>
-					)}
-
-					{!loading && sortedCards.length > 0 && (
-						<>
-							<Text fontSize="sm" color="gray.400" mb={2}>
-								Double-click a card to select it.
-							</Text>
-							<Table.ScrollArea borderWidth="1px" maxH="60vh">
-								<Table.Root size="sm" variant="outline" stickyHeader={true} showColumnBorder={true} interactive={true}>
+					<Box ref={containerRef} overflowY="auto" maxH={"md"} colorPalette={"yellow"} onScroll={onScroll} position="relative">
+						<Box position="relative" height={`${totalRows * ROW_HEIGHT}px`}>
+							<Box position="absolute" width="100%" top={`${offsetY}px`}>
+								<Table.Root size="sm" variant="outline">
 									<Table.ColumnGroup>
-										<Table.Column width="" />
-										<Table.Column width="30%" />
+										<Table.Column width="5%" />
+										<Table.Column width="10%" />
+										<Table.Column width="15%" />
+										<Table.Column width="10%" />
+										<Table.Column width="60%" />
 									</Table.ColumnGroup>
-									<Table.Header>
-										<Table.Row>
-											<Table.ColumnHeader onClick={() => toggleSort("name")}>
-												<HStack>
-													<chakra.span me={1}>Card Title</chakra.span>
-													{renderSortIcon("name")}
-												</HStack>
-											</Table.ColumnHeader>
-											<Table.ColumnHeader onClick={() => toggleSort("lastActivityDate")}>
-												<HStack>
-													<chakra.span me={1}>Last Activity</chakra.span>
-													{renderSortIcon("lastActivityDate")}
-												</HStack>
-											</Table.ColumnHeader>
-										</Table.Row>
-									</Table.Header>
 									<Table.Body>
-										{sortedCards.map((card) => (
-											<Table.Row key={card.id} onDoubleClick={() => processDialogAction(card)}>
-												<Table.Cell>
-													<Link onClick={() => window.open(card.url)} display={"flex"} alignItems={"center"} width={"fit-content"}>
-														{card.name}
-														<chakra.span color="yellow.fg" fontSize={"16px"}>
-															<LuExternalLink />
-														</chakra.span>
-													</Link>
-												</Table.Cell>
-												<Table.Cell>{card.lastActivityDate}</Table.Cell>
-											</Table.Row>
+										{visibleRows.map((entry) => (
+											<LogRow key={`${entry.branchFolder}-${entry.branchVersion}-${entry.revision}`} entry={entry} isExpanded={expandedRows.has(entry.revision)} onToggleExpand={toggleExpand} processDialogAction={processDialogAction} />
 										))}
 									</Table.Body>
-									<Table.Footer>
-										<Table.Row>
-											<Table.Cell colSpan={2} fontWeight={900}>
-												{sortedCards.length} {sortedCards.length === 1 ? "card" : "cards"} found from Trello
-											</Table.Cell>
-										</Table.Row>
-									</Table.Footer>
 								</Table.Root>
-							</Table.ScrollArea>
-						</>
-					)}
+							</Box>
+						</Box>
+					</Box>
 				</DialogBody>
+
 				<DialogFooter>
 					<DialogActionTrigger asChild>
 						<Button>Cancel</Button>

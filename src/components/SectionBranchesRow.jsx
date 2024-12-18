@@ -14,9 +14,13 @@ import EditableBranchesRow from "./EditableBranchesRow.jsx";
 import { useBranches } from "../ContextBranches.jsx";
 
 const SectionBranchesRow = memo(
-	({ branchRow, isSelected, onSelectChange }) => {
-		const { socket, config, configurableRowData, updateConfig } = useApp();
-		const { customScripts } = useBranches();
+	({ branchRow, isSelected }) => {
+		const socket = useApp((ctx) => ctx.socket);
+		const config = useApp((ctx) => ctx.config);
+		const configurableRowData = useApp((ctx) => ctx.configurableRowData);
+		const handleBranchSelection = useApp((ctx) => ctx.handleBranchSelection);
+		const updateConfig = useApp((ctx) => ctx.updateConfig);
+		const customScripts = useBranches(ctx => ctx.customScripts);
 		const { emitInfoSingle } = useSocketEmits();
 
 		const branchId = branchRow?.id;
@@ -161,7 +165,7 @@ const SectionBranchesRow = memo(
 		return (
 			<Table.Row _light={{bgColor: themedBgColor == "transparent" ? "transparent" : `${themedBgColor}20`}} _dark={{bgColor: themedBgColor == "transparent" ? "transparent" : `${themedBgColor}80`}}>
 				<Table.Cell display={"flex"} alignItems={"center"}>
-					<Checkbox top="2" aria-label="Select row" variant={"subtle"} colorPalette={"yellow"} checked={isSelected} onCheckedChange={(e) => onSelectChange(branchId, e.checked)} />
+					<Checkbox top="2" aria-label="Select row" variant={"subtle"} colorPalette={"yellow"} checked={isSelected} onCheckedChange={(e) => handleBranchSelection(branchPath, e.checked)} />
 				</Table.Cell>
 				<Table.Cell>
 					<EditableBranchesRow branchId={branchId} dataColumn={"Branch Folder"} dataValue={branchFolder} handleDataChange={handleDataChange} />

@@ -2,7 +2,7 @@ import { useCallback } from "react";
 import { useApp } from "../ContextApp.jsx";
 
 export default function useSocketEmits() {
-	const { socket } = useApp();
+	const socket = useApp((ctx) => ctx.socket);
 
 	const emitOpenConfig = useCallback(() => {
 		socket?.emit("titan-config-open", {});

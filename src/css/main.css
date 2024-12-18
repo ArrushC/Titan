@@ -168,3 +168,8 @@
 .compact .ag-header-cell-text {
 	--ag-font-size: 14px !important;
 }
+
+textarea:focus {
+	--focus-color: var(--chakra-colors-color-palette-focus-ring);
+	box-shadow: 0px 1px 0px 0px var(--focus-color) !important;
+}

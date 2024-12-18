@@ -2,7 +2,7 @@ import { useApp } from "../ContextApp.jsx";
 import useSocketEmits from "./useSocketEmits";
 
 export default function useTrelloIntegration() {
-	const { config } = useApp();
+	const config = useApp(ctx => ctx.config);
 	const { emitTrelloCardNamesSearch, emitTrelloCardUpdate } = useSocketEmits();
 
 	const configTrelloIntegration = config?.trelloIntegration;

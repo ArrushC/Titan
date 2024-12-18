@@ -4,7 +4,8 @@ import { useApp } from "../ContextApp.jsx";
 import { debounce } from "lodash";
 
 export default function EditableBranchesRow({ branchId, dataColumn, dataValue, handleDataChange }) {
-	const { configurableRowData, updateConfig } = useApp();
+	const configurableRowData = useApp((ctx) => ctx.configurableRowData);
+	const updateConfig = useApp((ctx) => ctx.updateConfig);
 	const [cellData, setCellData] = useState(dataValue);
 
 	const debouncedUpdate = useMemo(

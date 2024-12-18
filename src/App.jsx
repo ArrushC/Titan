@@ -13,7 +13,7 @@ import { useApp } from "./ContextApp.jsx";
 import Logo from "./assets/Titan.png";
 
 function App() {
-	const { appClosing } = useApp();
+	const appClosing = useApp((ctx) => ctx.appClosing);
 	const { RaiseClientNotificaiton } = useNotifications();
 
 	useEffect(() => {

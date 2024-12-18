@@ -14,8 +14,14 @@ import ActionBarSelection from "./ActionBarSelection.jsx";
 import DialogBranchesLog from "./DialogBranchesLog.jsx";
 
 export default function SectionBranches() {
-	const { updateConfig, configurableRowData, selectedBranches, setSelectedBranches, setAppMode, handleBranchSelection, handleBulkSelection } = useApp();
-	const { isDialogSBLogOpen, setIsDialogSBLogOpen, selectionMetrics } = useBranches();
+	const updateConfig = useApp((ctx) => ctx.updateConfig);
+	const configurableRowData = useApp((ctx) => ctx.configurableRowData);
+	const selectedBranches = useApp((ctx) => ctx.selectedBranches);
+	const setSelectedBranches = useApp((ctx) => ctx.setSelectedBranches);
+	const setAppMode = useApp((ctx) => ctx.setAppMode);
+	const handleBulkSelection = useBranches((ctx) => ctx.handleBulkSelection);
+	const setIsDialogSBLogOpen = useBranches(ctx => ctx.setIsDialogSBLogOpen);
+	const selectionMetrics = useBranches(ctx => ctx.selectionMetrics);
 	const { RaisePromisedClientNotification } = useNotifications();
 	const { emitInfoSingle, emitUpdateSingle } = useSocketEmits();
 
@@ -101,14 +107,14 @@ export default function SectionBranches() {
 	}, [setAppMode]);
 
 	const logsSelectedBranches = useCallback(() => {
-		setIsDialogSBLogOpen(true);
+		setIsDialogSBLogOpen((prev) => !prev);
 	}, [setIsDialogSBLogOpen]);
 
 	useEffect(() => {
 		if (!selectionMetrics.hasSelection) return;
 
 		const handleKeyDown = (event) => {
-			if (isDialogSBLogOpen) return;
+			if (!event.altKey) return;
 
 			if (event.key === "Delete") {
 				setIsRowDialogOpen(true);
@@ -128,12 +134,12 @@ export default function SectionBranches() {
 		return () => {
 			window.removeEventListener("keydown", handleKeyDown);
 		};
-	}, [selectionMetrics.hasSelection, isDialogSBLogOpen, refreshSelectedBranches, updateSelectedBranches]);
+	}, [selectionMetrics.hasSelection, refreshSelectedBranches, updateSelectedBranches]);
 
 	const selectAllBranches = useCallback(
 		(checked) => {
-			const ids = configurableRowData.map((row) => row.id);
-			handleBulkSelection(ids, checked);
+			const paths = configurableRowData.map((row) => row["SVN Branch"]);
+			handleBulkSelection(paths, checked);
 		},
 		[configurableRowData, setSelectedBranches]
 	);
@@ -167,7 +173,7 @@ export default function SectionBranches() {
 				</Table.Header>
 				<Table.Body>
 					{configurableRowData.map((branchRow) => (
-						<SectionBranchesRow key={branchRow.id} branchRow={branchRow} isSelected={!!selectedBranches[branchRow.id]} onSelectChange={handleBranchSelection}  />
+						<SectionBranchesRow key={branchRow.id} branchRow={branchRow} isSelected={!!selectedBranches[branchRow["SVN Branch"]]}  />
 					))}
 				</Table.Body>
 				<Table.Footer>

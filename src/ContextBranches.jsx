@@ -1,4 +1,5 @@
-import React, { createContext, useContext, useEffect, useMemo, useRef, useState } from "react";
+import React, {  useEffect, useMemo, useState } from "react";
+import { createContext, useContextSelector } from "use-context-selector";
 import { createToastConfig } from "./utils/Constants.jsx";
 import { toaster } from "./components/ui/toaster.jsx";
 import { useApp } from "./ContextApp.jsx";
@@ -19,14 +20,15 @@ const initialState = {
 
 const ContextBranches = createContext(initialState);
 
-export const useBranches = () => {
-	const context = useContext(ContextBranches);
-	if (!context) throw new Error("useApp must be used within a BranchesProvider");
+export const useBranches = (selector) => {
+	const context = useContextSelector(ContextBranches, selector);
 	return context;
 };
 
 export const BranchesProvider = ({ children }) => {
-	const { configurableRowData, selectedBranches, setSelectedBranches } = useApp();
+	const configurableRowData = useApp(ctx => ctx.configurableRowData);
+	const selectedBranches = useApp(ctx => ctx.selectedBranches);
+	const setSelectedBranches = useApp(ctx => ctx.setSelectedBranches);
 
 	const [isDialogSBLogOpen, setIsDialogSBLogOpen] = useState(false);
 	const [customScripts, setCustomScripts] = useState([]);
@@ -52,15 +54,15 @@ export const BranchesProvider = ({ children }) => {
 	}, [configurableRowData]);
 
 	useEffect(() => {
-		const validBranchIds = new Set(configurableRowData.map((branch) => branch.id));
-		const selectedBranchIds = Object.keys(selectedBranches).filter((id) => selectedBranches[id]);
+		const validBranchPaths = new Set(configurableRowData.map((branch) => branch["SVN Branch"]));
+		const selectedBranchPaths = Object.keys(selectedBranches).filter((path) => selectedBranches[path]);
 
-		const hasInvalidSelections = selectedBranchIds.some((id) => !validBranchIds.has(id));
+		const hasInvalidSelections = selectedBranchPaths.some((path) => !validBranchPaths.has(path));
 
 		if (hasInvalidSelections) {
-			const validSelectedBranches = Object.entries(selectedBranches).reduce((acc, [id, isSelected]) => {
-				if (isSelected && validBranchIds.has(id)) {
-					acc[id] = true;
+			const validSelectedBranches = Object.entries(selectedBranches).reduce((acc, [path, isSelected]) => {
+				if (isSelected && validBranchPaths.has(path)) {
+					acc[path] = true;
 				}
 				return acc;
 			}, {});

@@ -9,7 +9,7 @@ import { useApp } from "../ContextApp";
 export default function HeaderApp() {
 	if (!window.electron) return <></>;
 
-	const { setAppClosing } = useApp();
+	const setAppClosing = useApp((ctx) => ctx.setAppClosing);
 	const [appVersion, setAppVersion] = useState("");
 
 	useEffect(() => {
@@ -32,7 +32,7 @@ export default function HeaderApp() {
 	}, []);
 
 	return (
-		<chakra.header w="100%" position="fixed" bgGradient={"to-r"} gradientFrom={"yellow.500"} gradientTo={"yellow.400"} className="titanHead notMono" zIndex={9999999} top={0} overflow={"none"}>
+		<chakra.header w="100%" position="fixed" bgColor={"yellow.400"} className="titanHead notMono" zIndex={9999999} top={0} overflow={"none"}>
 			<Flex justifyContent="space-between" alignItems="center" p={0} position="static">
 				<Flex alignItems={"center"} gapX={1} ms={1}>
 					<Image src={Logo} alt="Titan Logo" boxSize="20px" borderRadius={"full"} userSelect={"none"} />

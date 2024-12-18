@@ -1,4 +1,5 @@
-import React, { createContext, useContext, useEffect, useMemo, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
+import { createContext, useContextSelector } from "use-context-selector";
 import { useApp } from "./ContextApp.jsx";
 import { AccordionItem, AccordionItemContent, AccordionItemTrigger } from "./components/ui/accordion.jsx";
 import { Flex, Stack, Text } from "@chakra-ui/react";
@@ -26,20 +27,22 @@ const initialState = {
 	accordionSection: [],
 	commitStage: [],
 	setCommitStage: (_) => {},
-}
+};
 
 const ContextCommit = createContext(initialState);
 
-export const useCommit = () => {
-	return useContext(ContextCommit);
+export const useCommit = (selector) => {
+	const context = useContextSelector(ContextCommit, selector);
+	return context;
 };
 
 export const CommitProvider = ({ children }) => {
-	const { selectedBranches, appMode } = useApp();
+	const selectedBranches = useApp((ctx) => ctx.selectedBranches);
+	const appMode = useApp((ctx) => ctx.appMode);
 
 	const [isLookupSLogsOn, setIsLookupSLogsOn] = useState(false);
 	const [isLookupTrelloOn, setIsLookupTrelloOn] = useState(false);
-	const [sourceBranch, setSourceBranch ] = useState("");
+	const [sourceBranch, setSourceBranch] = useState("");
 	const [issueNumber, setIssueNumber] = useState({});
 	const [commitMessage, setCommitMessage] = useState("");
 	const isCommitMode = useMemo(() => appMode === "commit", [appMode]);
@@ -102,7 +105,6 @@ export const CommitProvider = ({ children }) => {
 			)),
 		[accordionSections]
 	);
-
 
 	const value = useMemo(
 		() => ({

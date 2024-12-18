@@ -11,14 +11,14 @@ import { LuSearch } from "react-icons/lu";
 import { VscDiffSingle } from "react-icons/vsc";
 
 const ROW_HEIGHT = 40;
-const OVERSCAN = 5;
+const OVERSCAN = 10;
 
 const getPathActionolour = (action) => {
 	switch (action) {
 		case "A":
 			return "green.500";
 		case "M":
-			return "cyan.600";
+			return "cyan.500";
 		case "D":
 			return "red.500";
 		default:
@@ -45,7 +45,7 @@ const LogRow = React.memo(function LogRow({ entry, isExpanded, onToggleExpand })
 						textOverflow: "ellipsis",
 						maxWidth: "500px",
 					}}>
-					{entry.message} ({entry.branchFolder} {entry.branchVersion})
+					{entry.message}
 				</Table.Cell>
 			</Table.Row>
 
@@ -95,8 +95,9 @@ const LogRow = React.memo(function LogRow({ entry, isExpanded, onToggleExpand })
 });
 
 export default function DialogBranchesLog() {
-	const { logsData } = useApp();
-	const { isDialogSBLogOpen, setIsDialogSBLogOpen } = useBranches();
+	const logsData = useApp((ctx) => ctx.logsData);
+	const isDialogSBLogOpen = useBranches(ctx => ctx.isDialogSBLogOpen);
+	const setIsDialogSBLogOpen = useBranches(ctx => ctx.setIsDialogSBLogOpen);
 
 	const [expandedRows, setExpandedRows] = useState(() => new Set());
 	const [searchTerm, setSearchTerm] = useState("");
@@ -173,10 +174,38 @@ export default function DialogBranchesLog() {
 							<Input placeholder="Quick search..." variant="flushed" borderColor="colorPalette.fg" value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)} />
 						</InputGroup>
 					</HStack>
-					<Box ref={containerRef} overflowY={"auto"} height={"60vh"} colorPalette={"yellow"} onScroll={onScroll} position="relative">
+
+					<Table.Root size="sm" variant="outline" colorPalette={"yellow"}>
+						<Table.ColumnGroup>
+							<Table.Column width="5%" />
+							<Table.Column width="10%" />
+							<Table.Column width="15%" />
+							<Table.Column width="10%" />
+							<Table.Column width="60%" />
+						</Table.ColumnGroup>
+						<Table.Header>
+							<Table.Row height={`${ROW_HEIGHT}px`} bgColor={"colorPalette.400"}>
+								<Table.ColumnHeader color={"black"} fontWeight={900}></Table.ColumnHeader>
+								<Table.ColumnHeader color={"black"} fontWeight={900}>
+									Revision
+								</Table.ColumnHeader>
+								<Table.ColumnHeader color={"black"} fontWeight={900}>
+									Date
+								</Table.ColumnHeader>
+								<Table.ColumnHeader color={"black"} fontWeight={900}>
+									Author
+								</Table.ColumnHeader>
+								<Table.ColumnHeader color={"black"} fontWeight={900} ms={0}>
+									Message
+								</Table.ColumnHeader>
+							</Table.Row>
+						</Table.Header>
+					</Table.Root>
+
+					<Box ref={containerRef} overflowY="auto" maxH={"md"} colorPalette={"yellow"} onScroll={onScroll} position="relative">
 						<Box position="relative" height={`${totalRows * ROW_HEIGHT}px`}>
 							<Box position="absolute" width="100%" top={`${offsetY}px`}>
-								<Table.Root size="sm" variant="outline" stickyHeader={true} interactive={true}>
+								<Table.Root size="sm" variant="outline">
 									<Table.ColumnGroup>
 										<Table.Column width="5%" />
 										<Table.Column width="10%" />
@@ -184,26 +213,9 @@ export default function DialogBranchesLog() {
 										<Table.Column width="10%" />
 										<Table.Column width="60%" />
 									</Table.ColumnGroup>
-									<Table.Header>
-										<Table.Row height={`${ROW_HEIGHT}px`} bgColor={"colorPalette.500"}>
-											<Table.ColumnHeader color={"black"} fontWeight={900}></Table.ColumnHeader>
-											<Table.ColumnHeader color={"black"} fontWeight={900}>
-												Revision
-											</Table.ColumnHeader>
-											<Table.ColumnHeader color={"black"} fontWeight={900}>
-												Date
-											</Table.ColumnHeader>
-											<Table.ColumnHeader color={"black"} fontWeight={900}>
-												Author
-											</Table.ColumnHeader>
-											<Table.ColumnHeader color={"black"} fontWeight={900}>
-												Message
-											</Table.ColumnHeader>
-										</Table.Row>
-									</Table.Header>
 									<Table.Body>
 										{visibleRows.map((entry) => (
-											<LogRow key={entry.revision} entry={entry} isExpanded={expandedRows.has(entry.revision)} onToggleExpand={toggleExpand} />
+											<LogRow key={`${entry.branchFolder}-${entry.branchVersion}-${entry.revision}`} entry={entry} isExpanded={expandedRows.has(entry.revision)} onToggleExpand={toggleExpand} />
 										))}
 									</Table.Body>
 								</Table.Root>

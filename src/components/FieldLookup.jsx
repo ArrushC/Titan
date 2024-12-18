@@ -18,11 +18,16 @@ const shineAnimation = keyframes`
 `;
 
 export const FieldLookup = memo(() => {
-	const { setIsLookupTrelloOn, setIsLookupSLogsOn } = useCommit();
+	const setIsLookupTrelloOn = useCommit((ctx) => ctx.setIsLookupTrelloOn);
+	const setIsLookupSLogsOn = useCommit((ctx) => ctx.setIsLookupSLogsOn);
 	const { isTrelloIntegrationSupported } = useTrelloIntegration();
 	const textColor = useColorModeValue("black", "white");
 
 	const [trelloPopover, setTrelloPopover] = useState(false);
+
+	const handleSelectedSvnRevision = useCallback((entry) => {
+		console.log("Selected SVN Revision", entry);
+	}, []);
 
 	const handleSelectedTrelloCard = useCallback((card) => {
 		console.log("Selected Trello Card", card);
@@ -59,7 +64,7 @@ export const FieldLookup = memo(() => {
 				</PopoverRoot>
 			</Flex>
 
-			<DialogLookupSVNLogs fireDialogAction={() => console.log("hello!")} />
+			<DialogLookupSVNLogs fireDialogAction={handleSelectedSvnRevision} />
 			<DialogLookupTrello fireDialogAction={handleSelectedTrelloCard} />
 		</Box>
 	);

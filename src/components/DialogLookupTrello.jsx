@@ -7,10 +7,19 @@ import { InputGroup } from "./ui/input-group.jsx";
 import { LuExternalLink, LuSearch } from "react-icons/lu";
 import { MdKeyboardReturn } from "react-icons/md";
 import useTrelloIntegration from "../hooks/useTrelloIntegration.jsx";
+import { useColorModeValue } from "./ui/color-mode.jsx";
+import { keyframes } from "@emotion/react";
+
+const shineAnimation = keyframes`
+	from { background-position: 200% center; }
+	to { background-position: -200% center; }
+`;
 
 export default function DialogLookupTrello({ fireDialogAction }) {
-	const { isLookupTrelloOn, setIsLookupTrelloOn } = useCommit();
+	const isLookupTrelloOn = useCommit((ctx) => ctx.isLookupTrelloOn);
+	const setIsLookupTrelloOn = useCommit((ctx) => ctx.setIsLookupTrelloOn);
 	const { key, token, emitTrelloCardNamesSearch } = useTrelloIntegration();
+	const textColor = useColorModeValue("black", "white");
 
 	const [trelloQuery, setTrelloQuery] = useState("");
 	const [fetchedCards, setFetchedCards] = useState([]);
@@ -141,7 +150,7 @@ export default function DialogLookupTrello({ fireDialogAction }) {
 
 					{!loading && sortedCards.length > 0 && (
 						<>
-							<Text fontSize="sm" color="gray.400" mb={2}>
+							<Text fontSize={"sm"} mb={2} fontWeight={900} bgGradient="to-r" gradientFrom={textColor} gradientVia="yellow.500" gradientTo={textColor} backgroundSize="200% auto" bgClip="text" animation={`${shineAnimation} 7s ease-in infinite`}>
 								Double-click a card to select it.
 							</Text>
 							<Table.ScrollArea borderWidth="1px" maxH="60vh">
@@ -151,16 +160,20 @@ export default function DialogLookupTrello({ fireDialogAction }) {
 										<Table.Column width="30%" />
 									</Table.ColumnGroup>
 									<Table.Header>
-										<Table.Row>
+										<Table.Row bgColor="yellow.400">
 											<Table.ColumnHeader onClick={() => toggleSort("name")}>
 												<HStack>
-													<chakra.span me={1}>Card Title</chakra.span>
+													<chakra.span color={"black"} fontWeight={900} me={1}>
+														Card Title
+													</chakra.span>
 													{renderSortIcon("name")}
 												</HStack>
 											</Table.ColumnHeader>
 											<Table.ColumnHeader onClick={() => toggleSort("lastActivityDate")}>
 												<HStack>
-													<chakra.span me={1}>Last Activity</chakra.span>
+													<chakra.span color={"black"} fontWeight={900} me={1}>
+														Last Activity
+													</chakra.span>
 													{renderSortIcon("lastActivityDate")}
 												</HStack>
 											</Table.ColumnHeader>
@@ -182,7 +195,7 @@ export default function DialogLookupTrello({ fireDialogAction }) {
 										))}
 									</Table.Body>
 									<Table.Footer>
-										<Table.Row>
+										<Table.Row bgColor="yellow.400">
 											<Table.Cell colSpan={2} fontWeight={900}>
 												{sortedCards.length} {sortedCards.length === 1 ? "card" : "cards"} found from Trello
 											</Table.Cell>

@@ -13,19 +13,19 @@ const ActionBarSelection = memo(({ selectedCount, onDelete, onRefresh, onUpdate,
 				<ActionBarSeparator />
 				<HStack wrap="wrap">
 					<Button variant="subtle" size="sm" onClick={onDelete}>
-						Delete <Kbd variant={"subtle"} wordSpacing={0}>Del</Kbd>
+						Delete <Kbd variant={"subtle"} wordSpacing={0}>Alt+Del</Kbd>
 					</Button>
 					<Button variant="subtle" size="sm" onClick={onRefresh}>
-						Refresh <Kbd variant={"subtle"} wordSpacing={0}>R</Kbd>
+						Refresh <Kbd variant={"subtle"} wordSpacing={0}>Alt+R</Kbd>
 					</Button>
 					<Button variant="subtle" size="sm" onClick={onUpdate}>
-						Update <Kbd variant={"subtle"} wordSpacing={0}>U</Kbd>
+						Update <Kbd variant={"subtle"} wordSpacing={0}>Alt+U</Kbd>
 					</Button>
 					<Button variant="subtle" size="sm" onClick={onCommit}>
-						Commit <Kbd variant={"subtle"} wordSpacing={0}>C</Kbd>
+						Commit <Kbd variant={"subtle"} wordSpacing={0}>Alt+C</Kbd>
 					</Button>
 					<Button variant="subtle" size="sm" onClick={onLogs}>
-						Logs <Kbd variant={"subtle"} wordSpacing={0}>L</Kbd>
+						Logs <Kbd variant={"subtle"} wordSpacing={0}>Alt+L</Kbd>
 					</Button>
 				</HStack>
 				<ActionBarSeparator />

@@ -1,9 +1,10 @@
-import React, { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState } from "react";
+import React, { useState, useEffect, useCallback, useMemo } from "react";
 import { isEqual } from "lodash";
 import { createToastConfig, URL_SOCKET_CLIENT } from "./utils/Constants.jsx";
 import { toaster } from "./components/ui/toaster.jsx";
 import socketIOClient from "socket.io-client";
 import { flushSync } from "react-dom";
+import { createContext, useContextSelector } from "use-context-selector";
 
 const initialState = {
 	appClosing: false,
@@ -24,9 +25,8 @@ const initialState = {
 
 const ContextApp = createContext(initialState);
 
-export const useApp = () => {
-	const context = useContext(ContextApp);
-	if (!context) throw new Error("useApp must be used within an AppProvider");
+export const useApp = (selector) => {
+	const context = useContextSelector(ContextApp, selector);
 	return context;
 };
 
@@ -55,11 +55,11 @@ export const AppProvider = ({ children }) => {
 		};
 
 		const onDisconnect = () => {
-			toaster.create(createToastConfig("Server Has Been Disconnected", "warning", 0));
+			toaster.create(createToastConfig("Server Disconnected", "warning", 0));
 		};
 
 		const onReconnect = () => {
-			toaster.create(createToastConfig("Server Has Been Reconnected", "success", 2000));
+			toaster.create(createToastConfig("Server Reconnected", "success", 2000));
 		};
 
 		const onNotification = (data) => {
@@ -87,7 +87,6 @@ export const AppProvider = ({ children }) => {
 			setConfig((currentConfig) => {
 				const newConfig = updateFunction(currentConfig);
 				if (isEqual(currentConfig, newConfig)) return currentConfig;
-
 				socket?.emit("titan-config-set", newConfig);
 				return newConfig;
 			});
@@ -106,30 +105,24 @@ export const AppProvider = ({ children }) => {
 		[socket]
 	);
 
-	const handleBranchSelection = useCallback((branchId, isSelected) => {
+	const handleBranchSelection = useCallback((branchPath, isSelected) => {
 		flushSync(() => {
 			setSelectedBranches((prev) => {
 				const newState = { ...prev };
-				if (isSelected) {
-					newState[branchId] = true;
-				} else {
-					delete newState[branchId];
-				}
+				if (isSelected) newState[branchPath] = true;
+				else delete newState[branchPath];
 				return newState;
 			});
 		});
 	}, []);
 
-	const handleBulkSelection = useCallback((branchIds, isSelected) => {
+	const handleBulkSelection = useCallback((branchPaths, isSelected) => {
 		flushSync(() => {
 			setSelectedBranches((prev) => {
 				const newState = { ...prev };
-				branchIds.forEach((id) => {
-					if (isSelected) {
-						newState[id] = true;
-					} else {
-						delete newState[id];
-					}
+				branchPaths.forEach((path) => {
+					if (isSelected) newState[path] = true;
+					else delete newState[path];
 				});
 				return newState;
 			});
@@ -140,24 +133,28 @@ export const AppProvider = ({ children }) => {
 
 	useEffect(() => {
 		if (configurableRowData?.length < 1 || Object.keys(selectedBranches).length < 1) return;
-		setSvnLogs({});
-		socket?.emit("svn-logs-selected", { selectedBranches: configurableRowData.filter((branchRow) => selectedBranches[branchRow.id]) });
-	}, [selectedBranches, configurableRowData]);
+		console.debug("Emitting svn-logs-selected event in DialogBranchesLog component in background");
+		socket?.emit("svn-logs-selected", { selectedBranches: configurableRowData.filter((branchRow) => selectedBranches[branchRow["SVN Branch"]]) });
+	}, [selectedBranches, configurableRowData, socket]);
 
 	useEffect(() => {
 		const socketCallback = (data) => {
 			console.debug("Received svn-log-result from socket in DialogBranchesLog component in background");
-			console.log(JSON.stringify(data.logs[0], null, 2));
-			setSvnLogs((prevData) => ({
-				...prevData,
-				[data["SVN Branch"]]: data.logs
-			}));
+			setSvnLogs((prevData) => {
+				const newData = {};
+				Object.entries(prevData).forEach(([branch, logs]) => {
+					if (selectedBranches[branch]) {
+						newData[branch] = logs;
+					}
+				});
+				newData[data["SVN Branch"]] = data.logs;
+				return newData;
+			});
 		};
 
 		socket?.on("svn-log-result", socketCallback);
-
 		return () => socket?.off("svn-log-result", socketCallback);
-	}, [socket]);
+	}, [socket, selectedBranches]);
 
 	const logsData = useMemo(() => {
 		const allLogs = Object.values(svnLogs || {}).flat();

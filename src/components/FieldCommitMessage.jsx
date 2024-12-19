@@ -6,7 +6,7 @@ import AutoResize from "react-textarea-autosize";
 
 const ChakraAutoResize = chakra(AutoResize);
 
-export const FieldCommitMessage = () => {
+export default function FieldCommitMessage () {
 	const commitMessage = useCommit((ctx) => ctx.commitMessage);
 	const setCommitMessage = useCommit((ctx) => ctx.setCommitMessage);
 

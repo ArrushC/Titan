@@ -18,6 +18,8 @@ const initialState = {
 	setIsLookupTrelloOn: (_) => {},
 	sourceBranch: "",
 	setSourceBranch: (_) => {},
+	sourceIssueNumber: "",
+	setSourceIssueNumber: (_) => {},
 	issueNumber: {},
 	setIssueNumber: (_) => {},
 	commitMessage: "",
@@ -43,6 +45,7 @@ export const CommitProvider = ({ children }) => {
 	const [isLookupSLogsOn, setIsLookupSLogsOn] = useState(false);
 	const [isLookupTrelloOn, setIsLookupTrelloOn] = useState(false);
 	const [sourceBranch, setSourceBranch] = useState("");
+	const [sourceIssueNumber, setSourceIssueNumber] = useState("");
 	const [issueNumber, setIssueNumber] = useState({});
 	const [commitMessage, setCommitMessage] = useState("");
 	const isCommitMode = useMemo(() => appMode === "commit", [appMode]);
@@ -114,6 +117,8 @@ export const CommitProvider = ({ children }) => {
 			setIsLookupTrelloOn,
 			sourceBranch,
 			setSourceBranch,
+			sourceIssueNumber,
+			setSourceIssueNumber,
 			issueNumber,
 			setIssueNumber,
 			commitMessage,
@@ -124,7 +129,7 @@ export const CommitProvider = ({ children }) => {
 			commitStage,
 			setCommitStage,
 		}),
-		[isLookupSLogsOn, isLookupTrelloOn, sourceBranch, issueNumber, commitMessage, isCommitMode, selectedBranchesCount, accordionSection, commitStage]
+		[isLookupSLogsOn, isLookupTrelloOn, sourceBranch, sourceIssueNumber, issueNumber, commitMessage, isCommitMode, selectedBranchesCount, accordionSection, commitStage]
 	);
 
 	useEffect(() => {

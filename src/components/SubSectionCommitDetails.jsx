@@ -2,14 +2,16 @@ import { Code, Flex, Stack, Text } from "@chakra-ui/react";
 import React, { useMemo, useEffect } from "react";
 import { useApp } from "../ContextApp.jsx";
 import FieldIssueNumber from "./FieldIssueNumber.jsx";
-import { FieldSourceBranch } from "./FieldSourceBranch.jsx";
-import { FieldCommitMessage } from "./FieldCommitMessage.jsx";
+import FieldSourceBranch from "./FieldSourceBranch.jsx";
+import FieldCommitMessage from "./FieldCommitMessage.jsx";
 import { FieldLookup } from "./FieldLookup.jsx";
 import { useCommit } from "../ContextCommit.jsx";
 
 export default function SubSectionCommitDetails() {
 	const selectedBranches = useApp((ctx) => ctx.selectedBranches);
 	const configurableRowData = useApp((ctx) => ctx.configurableRowData);
+	const sourceBranch = useCommit((ctx) => ctx.sourceBranch);
+	const sourceIssueNumber = useCommit((ctx) => ctx.sourceIssueNumber);
 	const commitMessage = useCommit((ctx) => ctx.commitMessage);
 	const selectedFolders = useMemo(() => {
 		return Array.from(configurableRowData.filter((branchRow) => selectedBranches[branchRow["SVN Branch"]]).reduce((acc, branchRow) => acc.add(branchRow["Branch Folder"]), new Set()));
@@ -27,7 +29,17 @@ export default function SubSectionCommitDetails() {
 			</Stack>
 
 			<Text mt={6}>
-				Your final commit message: <Code>Issue XXXX (YYY): {commitMessage.trim() == "" ? "Enter commit message above" : commitMessage.trim().replace(/\s*\n+\s*/g, "; ").replace(/[;\s]+$/, "").trim()}</Code>
+				Your final commit message:{" "}
+				<Code>
+					Issue XXXX{sourceBranch.trim() !== "" ? ` (${sourceBranch.trim()}${sourceIssueNumber !== "" ? " #" + String(sourceIssueNumber) : ""})` : ""}:{" "}
+					{commitMessage.trim() == ""
+						? "Enter commit message above"
+						: commitMessage
+								.trim()
+								.replace(/\s*\n+\s*/g, "; ")
+								.replace(/[;\s]+$/, "")
+								.trim()}
+				</Code>
 			</Text>
 		</Flex>
 	);

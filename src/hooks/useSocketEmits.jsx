@@ -1,16 +1,16 @@
 import { useCallback } from "react";
-import { useApp } from "../AppContext";
+import { useApp } from "../ContextApp.jsx";
 
 export default function useSocketEmits() {
-	const { socket } = useApp();
+	const socket = useApp((ctx) => ctx.socket);
 
 	const emitOpenConfig = useCallback(() => {
 		socket?.emit("titan-config-open", {});
 	}, [socket]);
 
 	const emitUpdateSingle = useCallback(
-		(branchId, svnBranch, branchVersion, branchFolder) => {
-			socket?.emit("svn-update-single", { id: branchId, branch: svnBranch, version: branchVersion, folder: branchFolder });
+		(branchId, svnBranch, branchVersion, branchFolder, callback) => {
+			socket?.emit("svn-update-single", { id: branchId, branch: svnBranch, version: branchVersion, folder: branchFolder }, callback);
 		},
 		[socket]
 	);
@@ -44,8 +44,8 @@ export default function useSocketEmits() {
 	);
 
 	const emitTrelloCardNamesSearch = useCallback(
-		(key, token, query, limit = null) => {
-			socket?.emit("trello-search-names-card", { key, token, query, limit });
+		(key, token, query, limit = null, callback = null) => {
+			socket?.emit("trello-search-names-card", { key, token, query, limit }, callback);
 		},
 		[socket]
 	);

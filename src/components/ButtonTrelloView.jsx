@@ -8,5 +8,5 @@ export default function ButtonTrelloView(props) {
 		window.open(data.url, "_blank");
 	};
 
-	return <IconButton aria-label="Diff" size="sm" icon={<FaExternalLinkAlt  />} onClick={handleTrelloView} colorScheme="yellow" />;
+	return <IconButton aria-label="Diff" size="sm" icon={<FaExternalLinkAlt  />} onClick={handleTrelloView} colorPalette="yellow" />;
 }

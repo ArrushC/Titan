@@ -11,6 +11,7 @@ import { setupLogger, setupUncaughtExceptionHandler } from "./logger.js";
 import compression from "compression";
 import { exec } from "child_process";
 import fetch from "node-fetch";
+import _ from "lodash";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -41,12 +42,15 @@ const io = new Server(server, {
 
 const instanceData = {
 	commitLiveResponses: [],
+	isConnectionError: false,
+	lastConnectionErrorTime: 0,
+	CONNECTION_ERROR_DEBOUNCE_MS: 5000,
+	subversionLogsCache: {},
 };
 
 // Use compression middleware
 app.use(compression());
 
-// Set correct MIME type for JavaScript modules
 app.use((req, res, next) => {
 	if (req.url.endsWith(".js")) {
 		res.type("application/javascript");
@@ -380,7 +384,7 @@ const svnQueueSerial = async.queue(async (task) => {
 	debugTask("svnQueueSerial", task, true);
 
 	// 2 seconds delay between each task to prevent flooding the SVN server
-	await new Promise((resolve) => setTimeout(resolve, 2000));
+	await new Promise((resolve) => setTimeout(resolve, 1500));
 }, 1); // Concurrency of 1 ensures tasks are executed sequentially
 
 // Handle job completion
@@ -410,12 +414,12 @@ function sanitizeCommitMessage(commitMessage) {
 /************************************
  * Socket IO Logic
  ************************************/
-function emitMessage(socket, description, status = "info", duration = 3000) {
-	socket.emit("notification", { description: description, status: status, duration: status == "error" ? 0 : duration });
+function emitMessage(socket, description, type = "info", duration = 3000) {
+	socket.emit("notification", { description, type, duration: type == "error" ? 0 : duration });
 }
 
-function emitBranchInfo(socket, branchId, branchInfo) {
-	socket.emit("branch-info-single", { id: branchId, info: branchInfo });
+function emitBranchInfo(socket, branchId, branchInfo, baseRevision) {
+	socket.emit("branch-info-single", { id: branchId, info: branchInfo, baseRevision });
 }
 
 function emitBranchStatus(socket, branchId, branchStatus) {
@@ -423,12 +427,8 @@ function emitBranchStatus(socket, branchId, branchStatus) {
 }
 
 function isSVNConnectionError(socket, err) {
-	if (err?.message?.includes("svn: E170013: Unable to connect to a repository at URL") || err?.message?.includes("svn: E731001")) {
-		emitMessage(socket, "Unable to connect to the SVN repository!", "error");
+	if (err?.message?.includes("svn: E170013") || err?.message?.includes("svn: E731001")) {
 		io.emit("svn-connection-error", "Unable to connect to the SVN repository!");
-
-		// Forcefully shut down the server
-		// forceShutdown("SVN Connection Error");
 		return true;
 	}
 	return false;
@@ -437,29 +437,36 @@ function isSVNConnectionError(socket, err) {
 /************************************
  * Socket IO Logic
  ************************************/
-async function sendConfig(socket) {
+async function fetchConfig(socket) {
 	let config = null;
 
 	try {
 		await fsPromises.mkdir(path.dirname(configFilePath), { recursive: true });
 		await fsPromises.access(configFilePath);
 	} catch (err) {
+		// Handle error: maybe log or notify
+		logger.warn("Config file not found, creating a new one.");
 		const defaultConfig = {
 			currentVersion: latestVersion,
 			branches: [],
 			branchFolderColours: {},
 			commitOptions: {
 				useFolderOnlySource: false,
-				useIssuePerFolder: false,
-				reusePreviousCommitMessage: false,
 			},
 			trelloIntegration: {
 				key: "TRELLO_API_KEY",
 				token: "TRELLO_TOKEN",
 			},
 		};
-		await fsPromises.writeFile(configFilePath, JSON.stringify(defaultConfig, null, 4));
-		emitMessage(socket, "Config file created with default content", "success");
+		try {
+			await fsPromises.writeFile(configFilePath, JSON.stringify(defaultConfig, null, 4));
+			emitMessage(socket, "Config file created with default content", "success");
+			config = defaultConfig; // Assign the default config
+		} catch (writeErr) {
+			logger.error("Error writing default config file:", writeErr);
+			emitMessage(socket, "Error creating default config file", "error");
+			throw writeErr; // Propagate error to be caught in the caller
+		}
 	}
 
 	try {
@@ -472,12 +479,12 @@ async function sendConfig(socket) {
 			emitMessage(socket, `Successfully updated Titan to v${latestVersion}!`, "success");
 		}
 	} catch (err) {
-		logger.error(err);
+		logger.error("Error reading or parsing config file:", err);
 		emitMessage(socket, "Error reading config file", "error");
-		return;
+		throw err; // Propagate error to be caught in the caller
 	}
 
-	socket.emit("titan-config-get", config);
+	return config;
 }
 
 io.on("connection", (socket) => {
@@ -490,10 +497,17 @@ io.on("connection", (socket) => {
 	logger.info(`Connected to ${isForeignOrigin ? "foreign" : "titan"} client`);
 	emitMessage(socket, "Connected To Server!", "success", 1500);
 
-	socket.on("titan-config-get", async (data) => {
+	socket.on("titan-config-get", async (data, callback) => {
 		debugTask("titan-config-get", data, false);
-		if (data === "fetch") {
-			await sendConfig(socket);
+		try {
+			debugTask("titan-config-get", {}, false);
+			const config = await fetchConfig(socket);
+			callback({ config });
+			debugTask("titan-config-get", {}, true);
+		} catch (error) {
+			logger.error("Error in titan-config-get: " + error);
+			emitMessage(socket, "An error occurred while fetching the configuration.", "error");
+			callback({ error: "Failed to fetch configuration." });
 		}
 		debugTask("titan-config-get", data, true);
 	});
@@ -513,19 +527,38 @@ io.on("connection", (socket) => {
 
 		socket.on("titan-config-open", async () => {
 			debugTask("titan-config-open", null, false);
-			exec(`start "" "${configFilePath}"`, (err) => {
-				if (err) {
-					logger.error("Failed to open config file:", err);
-					emitMessage(socket, "Failed to open config file", "error");
+			const notepadPlusPlusPath = `C:\\Program Files\\Notepad++\\notepad++.exe`;
+
+			fs.access(path.normalize(notepadPlusPlusPath), fs.constants.F_OK, (accessErr) => {
+				if (!accessErr) {
+					// Notepad++ exists, open with it
+					exec(`start "" "${notepadPlusPlusPath}" "${configFilePath}"`, (err) => {
+						if (err) {
+							logger.error("Failed to open config file with Notepad++:", err);
+							emitMessage(socket, "Failed to open config file with Notepad++", "error");
+						} else {
+							logger.info("Config file opened successfully with Notepad++");
+							emitMessage(socket, "Config file opened successfully with Notepad++", "success");
+						}
+					});
 				} else {
-					logger.info("Config file opened successfully");
-					emitMessage(socket, "Config file opened successfully", "success");
+					// Fallback to the default application
+					exec(`start "" "${configFilePath}"`, (err) => {
+						if (err) {
+							logger.error("Failed to open config file:", err);
+							emitMessage(socket, "Failed to open config file", "error");
+						} else {
+							logger.info("Config file opened successfully with the default app");
+							emitMessage(socket, "Config file opened successfully with the default app", "success");
+						}
+					});
 				}
 			});
+
 			debugTask("titan-config-open", null, true);
 		});
 
-		socket.on("svn-update-single", async (data) => {
+		socket.on("svn-update-single", async (data, callback) => {
 			debugTask("svn-update-single", data, false);
 			const task = {
 				command: "update",
@@ -533,11 +566,12 @@ io.on("connection", (socket) => {
 				postopCallback: function (err, result) {
 					if (err) {
 						logger.error("Failed to execute SVN command: " + task.command);
-						if (!isSVNConnectionError(socket, err)) emitMessage(socket, `Failed to update ${branchString(data.folder, data.version, data.branch)}`, "error");
+						isSVNConnectionError(socket, err);
+						if (callback) callback({ success: false, error: err });
 					} else {
 						logger.info("Successfully executed SVN command: " + task.command);
-						emitMessage(socket, `Successfully updated ${branchString(data.folder, data.version, data.branch)}`, "success");
-						socket.emit("branch-success-single", { id: data.id, branch: data.branch, version: data.version, folder: data.folder });
+						if (callback) callback({ success: true });
+						else socket.emit("branch-success-single", { id: data.id, branch: data.branch, version: data.version, folder: data.folder });
 					}
 				},
 			};
@@ -556,6 +590,7 @@ io.on("connection", (socket) => {
 
 			const tasks = [
 				{ command: "getWorkingCopyRevision", args: [data.branch], isUtilityCmd: true },
+				{ command: "info", args: [data.branch] },
 				{ command: "log", args: [data.branch], options: { revision: "BASE:HEAD" } },
 				{ command: "status", args: [data.branch], options: { quiet: true, params: ["--show-updates"] } },
 			];
@@ -563,6 +598,7 @@ io.on("connection", (socket) => {
 			try {
 				const results = await executeSvnCommand(tasks);
 				const wcRevisionResult = results.find((r) => r.command === "getWorkingCopyRevision").result?.low;
+				const infoResult = results.find((r) => r.command === "info").result;
 				const logResult = results.find((r) => r.command === "log").result;
 				const statusResult = results.find((r) => r.command === "status").result;
 
@@ -586,10 +622,19 @@ io.on("connection", (socket) => {
 
 				let branchInfo = count == 0 ? `Latest${conflictsCount > 0 ? " 🤬" : ""}` : `-${count} Revision${count > 1 ? "s" : ""}${conflictsCount > 0 ? " 🤬" : ""}`;
 
-				emitBranchInfo(socket, data.id, branchInfo);
+				emitBranchInfo(socket, data.id, branchInfo, infoResult.entry.$.revision);
 			} catch (err) {
-				logger.error(`Error executing SVN commands: ${err.message}`, err);
-				if (!isSVNConnectionError(socket, err)) emitMessage(socket, `Failed to retrieve info for ${branchString(data.folder, data.version, data.branch)}`, "error");
+				if (isSVNConnectionError(socket, err)) {
+					emitBranchInfo(socket, data.id, "Connection Error");
+					return;
+				}
+				if (err.message.includes("svn: E155010")) {
+					emitBranchInfo(socket, data.id, "Not Found");
+					return;
+				}
+
+				logger.error(`Error executing SVN commands: ${err.message}` + err);
+				emitMessage(socket, `Failed to retrieve info for ${branchString(data.folder, data.version, data.branch)}`, "error");
 			}
 			// debugTask("svn-info-single", data, true);
 		});
@@ -932,27 +977,68 @@ io.on("connection", (socket) => {
 			debugTask("svn-commit", data, true);
 		});
 
-		socket.on("svn-log-selected", async (data) => {
-			debugTask("svn-log-selected", data, false);
+		socket.on("svn-logs-selected", async (data) => {
+			debugTask("svn-logs-selected", data, false);
 
 			if (!data.selectedBranches || data.selectedBranches.length === 0) {
 				emitMessage(socket, "No branches selected", "error");
 				return;
 			}
 
-			const tasks = data.selectedBranches.map((branch) => {
-				return {
-					command: "log",
-					args: [branch["SVN Branch"]],
-					options: { revision: "1:HEAD", params: ["--stop-on-copy"] },
-					postopCallback: (err, result) => {
+			// We will run `info` first to get repository root, then `log`.
+			const infoTasks = data.selectedBranches.map((branch) => {
+				return new Promise((resolve, reject) => {
+					const svnBranchPath = branch["SVN Branch"];
+					svnUltimate.commands.info(svnBranchPath, (err, infoResult) => {
 						if (err) {
-							logger.error(`Failed to fetch logs for branch ${branch["SVN Branch"]}:`, err);
-							if (!isSVNConnectionError(socket, err)) emitMessage(socket, `Failed to fetch logs for branch ${branch["SVN Branch"]}`, "error");
-						} else {
-							const logs = result.logentry || [];
+							logger.error(`Failed to fetch info for branch ${svnBranchPath}:`, err);
+							if (!isSVNConnectionError(socket, err)) emitMessage(socket, `Failed to fetch info for branch ${svnBranchPath}`, "error");
+							return reject(err);
+						}
+
+						const repositoryRoot = infoResult?.entry?.repository?.root;
+						resolve({ branch, repositoryRoot });
+					});
+				});
+			});
+
+			try {
+				const branchesWithRoot = await Promise.all(infoTasks);
+
+				// Now run `log` for each branch, using the repositoryRoot data we just collected.
+				const logTasks = branchesWithRoot.map((branchData) => {
+					const { branch, repositoryRoot } = branchData;
+					const svnBranchPath = branch["SVN Branch"];
+
+					// Check cache and define startRevision as before
+					const cachedLogs = instanceData.subversionLogsCache[svnBranchPath] || [];
+					let startRevision = 1;
+					if (cachedLogs && cachedLogs.length > 0) {
+						const lastKnownRevision = parseInt(cachedLogs[0].revision, 10);
+						startRevision = Number.isNaN(lastKnownRevision) ? 1 : lastKnownRevision + 1;
+					}
+
+					return new Promise((resolve, reject) => {
+						svnUltimate.commands.log(svnBranchPath, { revision: `${startRevision}:HEAD`, params: ["--stop-on-copy", "--verbose"] }, (err, logResult) => {
+							if (err) {
+								logger.error(`Failed to fetch logs for branch ${svnBranchPath}:`, err);
+								if (!isSVNConnectionError(socket, err)) emitMessage(socket, `Failed to fetch logs for branch ${svnBranchPath}`, "error");
+								return reject(err);
+							}
+
+							const logs = logResult.logentry || [];
 							const logsArray = Array.isArray(logs) ? logs : [logs];
-							const formattedLogs = logsArray.map((entry) => {
+							const fetchedLogs = logsArray.map((entry) => {
+								let filesChanged = [];
+								if (entry.paths && entry.paths.path) {
+									let pathEntries = Array.isArray(entry.paths.path) ? entry.paths.path : [entry.paths.path];
+									filesChanged = pathEntries.map((p) => ({
+										path: p._,
+										kind: p.$.kind,
+										action: p.$.action,
+									}));
+								}
+
 								return {
 									revision: entry["$"].revision,
 									branchId: branch.id,
@@ -961,27 +1047,37 @@ io.on("connection", (socket) => {
 									author: entry.author,
 									message: entry.msg,
 									date: new Date(entry.date).toLocaleString("en-GB"),
+									filesChanged,
+									repositoryRoot: repositoryRoot, // Include the repository root here
 								};
 							});
 
-							socket.emit("svn-log-result", { ...branch, logs: formattedLogs });
-						}
-					},
-				};
-			});
+							fetchedLogs.sort((a, b) => parseInt(b.revision, 10) - parseInt(a.revision, 10));
 
-			try {
-				// Execute SVN commands in parallel
-				executeSvnCommandParallel(tasks);
+							if (fetchedLogs.length > 0) {
+								const combinedLogs = [...fetchedLogs, ...cachedLogs];
+								const uniqueLogs = _.uniqBy(combinedLogs, 'revision');
+								uniqueLogs.sort((a, b) => parseInt(b.revision, 10) - parseInt(a.revision, 10));
+								instanceData.subversionLogsCache[svnBranchPath] = uniqueLogs;
+							}
+
+							socket.emit("svn-log-result", { ...branch, logs: instanceData.subversionLogsCache[svnBranchPath] });
+							resolve();
+						});
+					});
+				});
+
+				// Execute all log tasks in parallel
+				await Promise.all(logTasks);
 			} catch (err) {
-				logger.error("Error fetching SVN logs:", err);
-				if (!isSVNConnectionError(socket, err)) emitMessage(socket, "Error fetching SVN logs", "error");
+				logger.error("Error fetching SVN logs with repository root:", err);
+				if (!isSVNConnectionError(socket, err)) emitMessage(socket, "Error fetching SVN logs with repository root", "error");
 			}
 
-			debugTask("svn-log-selected", data, true);
+			debugTask("svn-logs-selected", data, true);
 		});
 
-		socket.on("trello-search-names-card", async (data) => {
+		socket.on("trello-search-names-card", async (data, callback) => {
 			debugTask("trello-search-names-card", data, false);
 
 			if (!data.query || data.query === "") {
@@ -998,7 +1094,8 @@ io.on("connection", (socket) => {
 
 			try {
 				const cards = await getTrelloCardNames(data.key, data.token, data.query, limit);
-				socket.emit("trello-result-search-names-card", cards);
+				if (callback) callback({ cards });
+				else socket.emit("trello-result-search-names-card", cards);
 			} catch (err) {
 				logger.error("Error fetching Trello card names:", JSON.stringify(err, null, 2));
 				emitMessage(socket, "Error fetching Trello card names", "error");
@@ -1060,10 +1157,8 @@ io.on("connection", (socket) => {
 	});
 
 	// On reconnect
-	socket.on("reconnect", () => {
+	socket.on("reconnect", async () => {
 		logger.info("Client reconnected");
-		emitMessage(socket, "Reconnected to server", "success", 1500);
-		sendConfig(socket);
 	});
 });
 
@@ -1088,9 +1183,12 @@ function gracefulShutdown(signal) {
 		io.close(() => {
 			logger.info("Socket.IO connections closed.");
 
-			// Close and destroy any resource allocations here
+			// Send shutdown acknowledgment to the main process
+			if (process.send) {
+				process.send("shutdown-complete");
+			}
 
-			// If you don't have any other resources to close, you can exit here
+			// Exit the process
 			logger.info("Graceful shutdown completed.");
 			process.exit(0);
 		});
@@ -1100,12 +1198,7 @@ function gracefulShutdown(signal) {
 	setTimeout(() => {
 		logger.error("Could not close connections in time, forcefully shutting down");
 		process.exit(1);
-	}, 10_000);
-}
-
-function forceShutdown(signal) {
-	logger.warn(`Received ${signal}. Forcing shutdown...`);
-	process.exit(1);
+	}, 10000);
 }
 
 /************************************
@@ -1130,3 +1223,8 @@ process.on("message", (message) => {
 // Listen for shutdown signals
 process.on("SIGTERM", () => gracefulShutdown("SIGTERM"));
 process.on("SIGINT", () => gracefulShutdown("SIGINT"));
+
+// Listen for unhandled rejections
+process.on("unhandledRejection", (reason, promise) => {
+	logger.error("Unhandled Rejection at:" + JSON.stringify(promise, null, 4) + "reason:" + reason);
+});

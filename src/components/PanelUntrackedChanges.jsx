@@ -1,11 +1,11 @@
 import { Box, Button, Flex, Input, Text, Tooltip } from "@chakra-ui/react";
 import { AgGridReact } from "ag-grid-react";
 import React, { useCallback, useEffect, useMemo, useState } from "react";
-import { useApp } from "../AppContext";
+import { useApp } from "../ContextApp.jsx";
 import useSocketEmits from "../hooks/useSocketEmits";
 
 export default function PanelUntrackedChanges({ rowDataUntrackedChanges, setRowDataUntrackedChanges, defaultColDefsCommit }) {
-	const { untrackedChangesGridRef, selectedUntrackedChanges, setSelectedUntrackedChanges, isDebug, selectedBranches, showCommitView } = useApp();
+	const { untrackedChangesGridRef, selectedUntrackedChanges, setSelectedUntrackedChanges, selectedBranches, showCommitView } = useApp();
 	const { emitFilesAddRemove, emitFilesRevert } = useSocketEmits();
 
 	const [quickFilterUnseenText, setQuickFilterUnseenText] = useState("");
@@ -19,9 +19,8 @@ export default function PanelUntrackedChanges({ rowDataUntrackedChanges, setRowD
 
 	const onUnseenFilesSelectionChanged = useCallback(() => {
 		const untrackedChanges = untrackedChangesGridRef?.current?.api?.getSelectedNodes().map((node) => node.data);
-		if (isDebug) console.debug("PanelUntrackedChanges.jsx (onUnseenFilesSelectionChanged): selectedBranches", untrackedChanges);
 		setSelectedUntrackedChanges(untrackedChanges);
-	}, [untrackedChangesGridRef, isDebug]);
+	}, [untrackedChangesGridRef]);
 
 	const handleAddRemoveFiles = useCallback(() => {
 		emitFilesAddRemove(selectedUntrackedChanges);
@@ -80,13 +79,13 @@ export default function PanelUntrackedChanges({ rowDataUntrackedChanges, setRowD
 						/>
 					</div>
 					<Flex mt={4} columnGap={2} justifyContent={"flex-end"}>
-						<Tooltip label={"Requires you to select at least 1 file"} hasArrow isDisabled={selectedUntrackedChanges.length > 0}>
-							<Button onClick={handleAddRemoveFiles} colorScheme={"green"} isDisabled={selectedUntrackedChanges.length < 1}>
+						<Tooltip label={"Requires you to select at least 1 file"} showArrow disabled={selectedUntrackedChanges.length > 0}>
+							<Button onClick={handleAddRemoveFiles} colorPalette={"green"} disabled={selectedUntrackedChanges.length < 1}>
 								Add/Remove {selectedUntrackedChanges.length} File{selectedUntrackedChanges.length > 1 ? "s" : ""}
 							</Button>
 						</Tooltip>
-						<Tooltip label={"Requires you to select at least 1 file"} hasArrow isDisabled={selectedUntrackedChanges.length > 0}>
-							<Button onClick={hanldeRevertUnseenFiles} colorScheme={"red"} isDisabled={selectedUntrackedChanges.length < 1}>
+						<Tooltip label={"Requires you to select at least 1 file"} showArrow disabled={selectedUntrackedChanges.length > 0}>
+							<Button onClick={hanldeRevertUnseenFiles} colorPalette={"red"} disabled={selectedUntrackedChanges.length < 1}>
 								Revert {selectedUntrackedChanges.length} File{selectedUntrackedChanges.length > 1 ? "s" : ""}
 							</Button>
 						</Tooltip>

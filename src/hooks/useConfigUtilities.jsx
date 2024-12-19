@@ -1,9 +1,11 @@
 import { useCallback, useMemo } from "react";
-import { useApp } from "../AppContext";
+import { useApp } from "../ContextApp.jsx";
 import _ from "lodash";
 
 export default function useConfigUtilities() {
-	const { configurableRowData, sourceBranch,  selectedBranches } = useApp();
+	const configurableRowData = useApp((ctx) => ctx.configurableRowData);
+	const sourceBranch = useApp((ctx) => ctx.sourceBranch);
+	const selectedBranches = useApp((ctx) => ctx.selectedBranches);
 
 	const getBranchFolderById = useCallback(
 		(branchId) => {

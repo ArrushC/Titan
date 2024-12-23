@@ -35,6 +35,8 @@ const initialState = {
 	setSelectedUnknownChanges: (_) => {},
 	selectedModifiedChanges: {},
 	setSelectedModifiedChanges: (_) => {},
+	trelloData: {},
+	setTrelloData: (_) => {},
 	isCommitMode: false,
 	selectedBranchesCount: 0,
 	accordionSection: [],
@@ -74,6 +76,8 @@ export const CommitProvider = ({ children }) => {
 	const [selectedConflictingChanges, setSelectedConflictingChanges] = useState({});
 	const [selectedUnknownChanges, setSelectedUnknownChanges] = useState({});
 	const [selectedModifiedChanges, setSelectedModifiedChanges] = useState({});
+
+	const [trelloData, setTrelloData] = useState({});
 
 	const [commitStage, setCommitStage] = useState(["commitDetails"]);
 	const accordionSections = useMemo(
@@ -156,13 +160,33 @@ export const CommitProvider = ({ children }) => {
 			setSelectedUnknownChanges,
 			selectedModifiedChanges,
 			setSelectedModifiedChanges,
+			trelloData,
+			setTrelloData,
 			isCommitMode,
 			selectedBranchesCount,
 			accordionSection,
 			commitStage,
 			setCommitStage,
 		}),
-		[isLookupSLogsOn, isLookupTrelloOn, sourceBranch, sourceIssueNumber, issueNumber, commitMessage, conflictingChanges, unknownChanges, modifiedChanges, selectedConflictingChanges, selectedUnknownChanges, selectedModifiedChanges, isCommitMode, selectedBranchesCount, accordionSection, commitStage]
+		[
+			isLookupSLogsOn,
+			isLookupTrelloOn,
+			sourceBranch,
+			sourceIssueNumber,
+			issueNumber,
+			commitMessage,
+			conflictingChanges,
+			unknownChanges,
+			modifiedChanges,
+			selectedConflictingChanges,
+			selectedUnknownChanges,
+			selectedModifiedChanges,
+			trelloData,
+			isCommitMode,
+			selectedBranchesCount,
+			accordionSection,
+			commitStage,
+		]
 	);
 
 	useEffect(() => {
@@ -261,7 +285,7 @@ export const CommitProvider = ({ children }) => {
 
 		socket?.on("branch-paths-update", socketCallback);
 		return () => socket?.off("branch-paths-update", socketCallback);
-	}, [socket, isCommitMode, selectedBranchesCount])
+	}, [socket, isCommitMode, selectedBranchesCount]);
 
 	return <ContextCommit.Provider value={value}>{children}</ContextCommit.Provider>;
 };

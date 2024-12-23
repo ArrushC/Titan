@@ -36,6 +36,7 @@ export default function EditableBranchesRow({ branchId, dataColumn, dataValue, h
 			variant={"subtle"}
 			value={cellData}
 			onChange={onEditableChange}
+			h={7}
 		/>
 	);
 }

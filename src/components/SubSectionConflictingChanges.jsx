@@ -289,7 +289,7 @@ export default function SubSectionConflictingChanges() {
 						{Object.keys(selectedConflictingChanges).length}
 					</Box>
 				</Flex>
-				<Flex>
+				<Flex color={"yellow.fg"}>
 					Revert them or update the branch and resolve potential conflicts
 				</Flex>
 				<HStack gap={3}>

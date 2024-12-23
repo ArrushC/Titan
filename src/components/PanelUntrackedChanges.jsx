@@ -6,7 +6,7 @@ import useSocketEmits from "../hooks/useSocketEmits";
 
 export default function PanelUntrackedChanges({ rowDataUntrackedChanges, setRowDataUntrackedChanges, defaultColDefsCommit }) {
 	const { untrackedChangesGridRef, selectedUntrackedChanges, setSelectedUntrackedChanges, selectedBranches, showCommitView } = useApp();
-	const { emitFilesAddRemove, emitFilesRevert } = useSocketEmits();
+	const { emitFilesAddDelete, emitFilesRevert } = useSocketEmits();
 
 	const [quickFilterUnseenText, setQuickFilterUnseenText] = useState("");
 
@@ -23,8 +23,8 @@ export default function PanelUntrackedChanges({ rowDataUntrackedChanges, setRowD
 	}, [untrackedChangesGridRef]);
 
 	const handleAddRemoveFiles = useCallback(() => {
-		emitFilesAddRemove(selectedUntrackedChanges);
-	}, [emitFilesAddRemove, selectedUntrackedChanges]);
+		emitFilesAddDelete(selectedUntrackedChanges);
+	}, [emitFilesAddDelete, selectedUntrackedChanges]);
 
 	const hanldeRevertUnseenFiles = useCallback(() => {
 		emitFilesRevert(selectedUntrackedChanges);

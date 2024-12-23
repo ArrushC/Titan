@@ -12,6 +12,7 @@ import compression from "compression";
 import { exec } from "child_process";
 import fetch from "node-fetch";
 import _ from "lodash";
+import chokidar from "chokidar";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -127,21 +128,6 @@ async function deleteFileOrDirectory(pathToDelete) {
 		}
 	} catch (err) {
 		logger.error("Error deleting file/directory:", err);
-	}
-}
-
-async function isDirectory(pathToCheck) {
-	try {
-		const stats = await fsPromises.lstat(pathToCheck);
-		return stats.isDirectory();
-	} catch (err) {
-		if (err.code === "ENOENT") {
-			// Fallback heuristic method: Check if path lacks a file extension
-			const ext = path.extname(pathToCheck);
-			return ext === "";
-		} else {
-			throw err;
-		}
 	}
 }
 
@@ -690,10 +676,11 @@ io.on("connection", (socket) => {
 							const path = String(entry.$.path);
 							try {
 								const stats = await fsPromises.stat(path);
-								return { entry, path, lastModified: stats.mtime.toLocaleString() };
+								const isDirectory = stats.isDirectory();
+								return { entry, path, lastModified: stats.mtime.toLocaleString(), type: isDirectory ? "directory" : "file" };
 							} catch (error) {
 								console.error(`Error retrieving stats for ${path}:`, error.message);
-								return { entry, path, lastModified: null };
+								return { entry, path, lastModified: null, type: "unknown" };
 							}
 						})
 					);
@@ -711,7 +698,7 @@ io.on("connection", (socket) => {
 						batchedResults.push(...batchResults);
 					}
 
-					batchedResults.forEach(({ entry, path, lastModified }) => {
+					batchedResults.forEach(({ entry, path, lastModified, type }) => {
 						const wcStatus = entry["wc-status"]?.$?.item;
 						const reposStatus = entry["repos-status"]?.$?.item || null;
 						const pathDisplay = path.replace(pathFilter, "");
@@ -722,6 +709,8 @@ io.on("connection", (socket) => {
 							wcStatus,
 							reposStatus,
 							lastModified,
+							branchPath,
+							type
 						};
 
 						if (wcStatus && !["normal", "none"].includes(wcStatus)) {
@@ -753,18 +742,20 @@ io.on("connection", (socket) => {
 		socket.on("svn-files-revert", async (data) => {
 			debugTask("svn-files-revert", data, false);
 
-			if (!data.filesToProcess || data.filesToProcess.length === 0) {
+			if (!data.filesToProcess ||Object.keys(data.filesToProcess).length === 0) {
 				emitMessage(socket, "No files to undo", "error");
 				return;
 			}
 
+			const { filesToProcess } = data;
+
 			let directoryPaths = [];
 			let files = [];
 
-			for (const file of data.filesToProcess) {
-				const isPathDirectory = await isDirectory(file.path);
-				if (isPathDirectory) directoryPaths.push(file);
-				else files.push(file);
+			for (const path of Object.values(filesToProcess)) {
+				const isPathDirectory = path.type === "directory";
+				if (isPathDirectory) directoryPaths.push(path);
+				else files.push(path);
 			}
 
 			if (files.length > 0) {
@@ -783,7 +774,7 @@ io.on("connection", (socket) => {
 						} else {
 							logger.info(`Successfully reverted files`);
 							emitMessage(socket, `Successfully reverted files`, "success");
-							for (const file of files.filter((f) => f.status == "unversioned")) {
+							for (const file of files.filter((f) => f.wcStatus == "unversioned")) {
 								await deleteFileOrDirectory(file.path);
 							}
 							socket.emit("branch-paths-update", {
@@ -815,7 +806,7 @@ io.on("connection", (socket) => {
 						} else {
 							logger.info(`Successfully reverted directories`);
 							emitMessage(socket, `Successfully reverted directories`, "success");
-							for (const dir of directoryPaths.filter((d) => d.status == "unversioned")) {
+							for (const dir of directoryPaths.filter((d) => d.wcStatus == "unversioned")) {
 								await deleteFileOrDirectory(dir.path);
 							}
 							socket.emit("branch-paths-update", {
@@ -833,25 +824,21 @@ io.on("connection", (socket) => {
 			debugTask("svn-files-revert", data, true);
 		});
 
-		socket.on("svn-files-add-remove", async (data) => {
-			debugTask("svn-files-add-remove", data, false);
+		socket.on("svn-files-add-delete", async (data) => {
+			debugTask("svn-files-add-delete", data, false);
 
 			if (!data.filesToProcess || data.filesToProcess.length === 0) {
-				emitMessage(socket, "No files to add or remove", "error");
+				emitMessage(socket, "No files to add or delete", "error");
 				return;
 			}
 
-			const unversionedPaths = data.filesToProcess.filter((file) => file["Local Status"] == "unversioned");
-			const missingPaths = data.filesToProcess.filter((file) => file["Local Status"] == "missing");
+			const { filesToProcess } = data;
+
+			const unversionedPaths = Object.values(filesToProcess).filter((file) => file.wcStatus == "unversioned");
+			const missingPaths = Object.values(filesToProcess).filter((file) => file.wcStatus == "missing");
 
 			if (unversionedPaths.length > 0) {
-				let allPaths = unversionedPaths.map((file) => file["Full Path"]);
-				let files = [];
-
-				for (const path of allPaths) {
-					const isPathDirectory = await isDirectory(path);
-					if (!isPathDirectory) files.push(path);
-				}
+				let files = unversionedPaths.filter((file) => file.type === "file");
 
 				let task = {
 					command: "add",
@@ -859,7 +846,7 @@ io.on("connection", (socket) => {
 						params: [`--targets ${targetsFilePath}`],
 					},
 					preopCallback: async () => {
-						await writeTargetsFile(allPaths);
+						await writeTargetsFile(unversionedPaths.map((file) => file.path));
 					},
 					postopCallback: (err, result) => {
 						if (err) {
@@ -868,7 +855,8 @@ io.on("connection", (socket) => {
 						} else {
 							logger.info(`Successfully added all unversioned paths`);
 							emitMessage(socket, `Successfully added all unversioned paths`, "success");
-							if (files.length < 1) socket.emit("branch-refresh-unseen");
+							const directoryPaths = unversionedPaths.filter((file) => file.type !== "file");
+							if (directoryPaths.length > 0) socket.emit("branch-paths-update", { paths: directoryPaths.map((file) => ({ ...file, action: "add" })) });
 						}
 					},
 				};
@@ -879,7 +867,7 @@ io.on("connection", (socket) => {
 						command: "propset",
 						args: ["svn:keywords", '"Id Author Date Revision HeadURL"', `--targets ${targetsFilePath}`],
 						preopCallback: async () => {
-							await writeTargetsFile(files);
+							await writeTargetsFile(files.map((file) => file.path));
 						},
 						postopCallback: (err, result) => {
 							if (err) {
@@ -888,7 +876,7 @@ io.on("connection", (socket) => {
 							} else {
 								logger.info(`Successfully set SVN properties for all unversioned files`);
 								emitMessage(socket, `SVN properties for all unversioned files have been set. Please check that you have added SVN comments to ensure that your SVN client can automatically update them`, "warning", 10_000);
-								socket.emit("branch-refresh-unseen");
+								socket.emit("branch-paths-update", { paths: files.map((file) => ({ ...file, action: "add" })) });
 							}
 						},
 					};
@@ -903,24 +891,45 @@ io.on("connection", (socket) => {
 						params: [`--targets ${targetsFilePath}`],
 					},
 					preopCallback: async () => {
-						await writeTargetsFile(missingPaths.map((file) => file["Full Path"]));
+						await writeTargetsFile(missingPaths.map((file) => file.path));
 					},
 					postopCallback: (err, result) => {
 						if (err) {
-							logger.error(`Failed to remove all missing files:` + err);
-							if (!isSVNConnectionError(socket, err)) emitMessage(socket, `Failed to remove all missing files`, "error");
+							logger.error(`Failed to delete all missing files:` + err);
+							if (!isSVNConnectionError(socket, err)) emitMessage(socket, `Failed to delete all missing files`, "error");
 						} else {
-							logger.info(`Successfully removed all missing files`);
-							emitMessage(socket, `Successfully removed all missing files`, "success");
-							socket.emit("branch-refresh-unseen");
+							logger.info(`Successfully deleted all missing files`);
+							emitMessage(socket, `Successfully deleted all missing files`, "success");
+							socket.emit("branch-paths-update", { paths: missingPaths.map((file) => ({ ...file, action: "delete" })) });
 						}
 					},
 				};
 				svnQueueSerial.push(task);
 			}
 
-			debugTask("svn-files-add-remove", data, true);
+			debugTask("svn-files-add-delete", data, true);
 		});
+
+		socket.on("watcher-branches-update", async (data) => {
+			debugTask("watcher-branches-update", data, false);
+
+			/*
+			data: {
+				"selectedBranchPaths": [
+					"C:\\SVN\\trunk\\Websites\\Fin"
+				]
+			}
+
+			Goal:
+			- For every branch in selectedBranches that doesn't exist in branchWatchers, create a new watcher and start watching.
+			- For every branch in branchWatchers that doesn't exist in selectedBranches, simply pause the watcher.
+			*/
+
+			const { selectedBranchPaths } = data;
+
+			debugTask("watcher-branches-update", data, true);
+		});
+
 		socket.on("svn-commit", async (data) => {
 			debugTask("svn-commit", data, false);
 

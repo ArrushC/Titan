@@ -160,6 +160,10 @@ export const AppProvider = ({ children }) => {
 		return () => socket?.off("svn-log-result", socketCallback);
 	}, [socket, selectedBranches]);
 
+	useEffect(() => {
+		socket?.emit("watcher-branches-update", { selectedBranchPaths: Array.from(selectedBranchPaths) });
+	}, [socket, selectedBranchPaths])
+
 	const logsData = useMemo(() => {
 		const allLogs = Object.values(svnLogs || {}).flat();
 		return allLogs.filter((log) => !!log.revision).sort((a, b) => parseInt(b.revision, 10) - parseInt(a.revision, 10));

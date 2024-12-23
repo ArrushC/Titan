@@ -107,10 +107,10 @@ export default function SubSectionModifiedChanges() {
 	}, []);
 
 	const handlePathSelection = useCallback(
-		(path, pathStatus, checked) => {
+		(file, checked) => {
 			setSelectedModifiedChanges((currentSelection) => {
-				if (checked) return { ...currentSelection, [path]: pathStatus };
-				const { [path]: _, ...newSelection } = currentSelection;
+				if (checked) return { ...currentSelection, [file.path]: file.wcStatus };
+				const { [file.path]: _, ...newSelection } = currentSelection;
 				return newSelection;
 			});
 		},
@@ -202,7 +202,7 @@ export default function SubSectionModifiedChanges() {
 				setSelectedModifiedChanges((currentSelection) => {
 					const newSelection = { ...currentSelection };
 					for (const path of allFilteredPaths) {
-						newSelection[path] = true;
+						newSelection[path] = allFilteredRows.find((p) => p.file.path === path).file;
 					}
 					return newSelection;
 				});
@@ -216,16 +216,12 @@ export default function SubSectionModifiedChanges() {
 				});
 			}
 		},
-		[allFilteredPaths, setSelectedModifiedChanges]
+		[allFilteredPaths, allFilteredRows, setSelectedModifiedChanges]
 	);
 
 	const handleRevertFileViewFiles = useCallback(() => {
 		console.debug("Reverting selected files: ", selectedModifiedChanges);
-		const filesToRevert = Object.entries(selectedModifiedChanges).map(([path, status]) => ({
-			path,
-			status,
-		}));
-		emitFilesRevert(filesToRevert);
+		emitFilesRevert(selectedModifiedChanges);
 		setSelectedModifiedChanges({});
 	}, [selectedModifiedChanges, setSelectedModifiedChanges]);
 
@@ -271,7 +267,7 @@ export default function SubSectionModifiedChanges() {
 								return (
 									<Table.Row key={file.path}>
 										<Table.Cell>
-											<Checkbox aria-label="Select path" variant="subtle" colorPalette="yellow" checked={!!selectedModifiedChanges[file.path]} onCheckedChange={(e) => handlePathSelection(file.path, file.wcStatus, e.checked)} />
+											<Checkbox aria-label="Select path" variant="subtle" colorPalette="yellow" checked={!!selectedModifiedChanges[file.path]} onCheckedChange={(e) => handlePathSelection(file, e.checked)} />
 										</Table.Cell>
 										<Table.Cell color={getStatusColor(file.wcStatus)}>{branchString}</Table.Cell>
 										<Table.Cell color={getStatusColor(file.wcStatus)}>{`${branchPath.split("\\").at(-1)}\\${file.pathDisplay}`}</Table.Cell>

@@ -56,7 +56,7 @@ function getSortIndicator(columnKey, sortStack) {
 }
 
 export default function SubSectionUnknownChanges() {
-	const { emitFilesRevert } = useSocketEmits();
+	const { emitFilesRevert, emitFilesAddDelete } = useSocketEmits();
 	const { RaiseClientNotificaiton } = useNotifications();
 	const unknownChanges = useCommit((ctx) => ctx.unknownChanges);
 	const selectedUnknownChanges = useCommit((ctx) => ctx.selectedUnknownChanges);
@@ -107,10 +107,10 @@ export default function SubSectionUnknownChanges() {
 	}, []);
 
 	const handlePathSelection = useCallback(
-		(path, pathStatus, checked) => {
+		(file, checked) => {
 			setSelectedUnknownChanges((currentSelection) => {
-				if (checked) return { ...currentSelection, [path]: pathStatus };
-				const { [path]: _, ...newSelection } = currentSelection;
+				if (checked) return { ...currentSelection, [file.path]: file };
+				const { [file.path]: _, ...newSelection } = currentSelection;
 				return newSelection;
 			});
 		},
@@ -137,7 +137,12 @@ export default function SubSectionUnknownChanges() {
 
 			const filteredFiles = filesToTrack.filter((file) => {
 				const fieldsToCheck = [branchString, branchFolder, branchVersion, branchPath, file.pathDisplay, file.wcStatus, file.lastModified];
-				return fieldsToCheck.some((field, i) => field?.toString().toLowerCase().includes(i === 4 ? lowerSearch.replace(/\//g, '\\') : lowerSearch));
+				return fieldsToCheck.some((field, i) =>
+					field
+						?.toString()
+						.toLowerCase()
+						.includes(i === 4 ? lowerSearch.replace(/\//g, "\\") : lowerSearch)
+				);
 			});
 
 			if (filteredFiles.length > 0) {
@@ -197,7 +202,7 @@ export default function SubSectionUnknownChanges() {
 				setSelectedUnknownChanges((currentSelection) => {
 					const newSelection = { ...currentSelection };
 					for (const path of allFilteredPaths) {
-						newSelection[path] = true;
+						newSelection[path] = allFilteredRows.find((p) => p.file.path === path).file;
 					}
 					return newSelection;
 				});
@@ -211,18 +216,20 @@ export default function SubSectionUnknownChanges() {
 				});
 			}
 		},
-		[allFilteredPaths, setSelectedUnknownChanges]
+		[allFilteredPaths, allFilteredRows, setSelectedUnknownChanges]
 	);
 
-	const handleRevertFileViewFiles = useCallback(() => {
+	const handleRevertFiles = useCallback(() => {
 		console.debug("Reverting selected files: ", selectedUnknownChanges);
-		const filesToRevert = Object.entries(selectedUnknownChanges).map(([path, status]) => ({
-			path,
-			status,
-		}));
-		emitFilesRevert(filesToRevert);
+		emitFilesRevert(selectedUnknownChanges);
 		setSelectedUnknownChanges({});
-	}, [selectedUnknownChanges, setSelectedUnknownChanges]);
+	}, [selectedUnknownChanges]);
+
+	const handleTrackFiles = useCallback(() => {
+		console.debug("Tracking selected files: ", selectedUnknownChanges);
+		emitFilesAddDelete(selectedUnknownChanges)
+		setSelectedUnknownChanges({});
+	}, [selectedUnknownChanges]);
 
 	return (
 		<Box ms={9}>
@@ -266,7 +273,7 @@ export default function SubSectionUnknownChanges() {
 								return (
 									<Table.Row key={file.path}>
 										<Table.Cell>
-											<Checkbox aria-label="Select path" variant="subtle" colorPalette="yellow" checked={!!selectedUnknownChanges[file.path]} onCheckedChange={(e) => handlePathSelection(file.path, file.wcStatus, e.checked)} />
+											<Checkbox aria-label="Select path" variant="subtle" colorPalette="yellow" checked={!!selectedUnknownChanges[file.path]} onCheckedChange={(e) => handlePathSelection(file, e.checked)} />
 										</Table.Cell>
 										<Table.Cell color={getStatusColor(file.wcStatus)}>{branchString}</Table.Cell>
 										<Table.Cell color={getStatusColor(file.wcStatus)}>{`${branchPath.split("\\").at(-1)}\\${file.pathDisplay}`}</Table.Cell>
@@ -293,13 +300,13 @@ export default function SubSectionUnknownChanges() {
 					<Button onClick={() => setIsRevertDialogOpen(true)} colorPalette={"red"} disabled={Object.keys(selectedUnknownChanges).length < 1}>
 						Revert Selected
 					</Button>
-					<Button onClick={() => console.warn("Missing button logic here")} colorPalette={"green"} disabled={Object.keys(selectedUnknownChanges).length < 1}>
-						Add/Remove Selected
+					<Button onClick={() => handleTrackFiles()} colorPalette={"green"} disabled={Object.keys(selectedUnknownChanges).length < 1}>
+						Add/Delete Selected
 					</Button>
 				</HStack>
 			</Flex>
 
-			<DialogModifiedChangesRevert selectedCount={Object.keys(selectedUnknownChanges).length} isDialogOpen={isRevertDialogOpen} closeDialog={() => setIsRevertDialogOpen(false)} fireDialogAction={handleRevertFileViewFiles} />
+			<DialogModifiedChangesRevert selectedCount={Object.keys(selectedUnknownChanges).length} isDialogOpen={isRevertDialogOpen} closeDialog={() => setIsRevertDialogOpen(false)} fireDialogAction={handleRevertFiles} />
 		</Box>
 	);
 }

@@ -47,9 +47,9 @@ export default function useSocketEmits() {
 		[socket]
 	);
 
-	const emitFilesAddRemove = useCallback(
+	const emitFilesAddDelete = useCallback(
 		(filesToProcess) => {
-			socket?.emit("svn-files-add-remove", { filesToProcess });
+			socket?.emit("svn-files-add-delete", { filesToProcess });
 		},
 		[socket]
 	);
@@ -76,7 +76,7 @@ export default function useSocketEmits() {
 		emitCommitPayload,
 		emitFlushSvnLogs,
 		emitFilesRevert,
-		emitFilesAddRemove,
+		emitFilesAddDelete,
 		emitTrelloCardNamesSearch,
 		emitTrelloCardUpdate,
 	};

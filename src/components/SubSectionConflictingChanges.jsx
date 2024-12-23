@@ -107,10 +107,10 @@ export default function SubSectionConflictingChanges() {
 	}, []);
 
 	const handlePathSelection = useCallback(
-		(path, pathStatus, checked) => {
+		(file, checked) => {
 			setSelectedConflictingChanges((currentSelection) => {
-				if (checked) return { ...currentSelection, [path]: pathStatus };
-				const { [path]: _, ...newSelection } = currentSelection;
+				if (checked) return { ...currentSelection, [file.path]: file.wcStatus };
+				const { [file.path]: _, ...newSelection } = currentSelection;
 				return newSelection;
 			});
 		},
@@ -197,7 +197,7 @@ export default function SubSectionConflictingChanges() {
 				setSelectedConflictingChanges((currentSelection) => {
 					const newSelection = { ...currentSelection };
 					for (const path of allFilteredPaths) {
-						newSelection[path] = true;
+						newSelection[path] = allFilteredRows.find((p) => p.file.path === path).file;
 					}
 					return newSelection;
 				});
@@ -211,16 +211,12 @@ export default function SubSectionConflictingChanges() {
 				});
 			}
 		},
-		[allFilteredPaths, setSelectedConflictingChanges]
+		[allFilteredPaths, allFilteredRows, setSelectedConflictingChanges]
 	);
 
 	const handleRevertFileViewFiles = useCallback(() => {
 		console.debug("Reverting selected files: ", selectedConflictingChanges);
-		const filesToRevert = Object.entries(selectedConflictingChanges).map(([path, status]) => ({
-			path,
-			status,
-		}));
-		emitFilesRevert(filesToRevert);
+		emitFilesRevert(selectedConflictingChanges);
 		setSelectedConflictingChanges({});
 	}, [selectedConflictingChanges, setSelectedConflictingChanges]);
 
@@ -266,7 +262,7 @@ export default function SubSectionConflictingChanges() {
 								return (
 									<Table.Row key={file.path}>
 										<Table.Cell>
-											<Checkbox aria-label="Select path" variant="subtle" colorPalette="yellow" checked={!!selectedConflictingChanges[file.path]} onCheckedChange={(e) => handlePathSelection(file.path, file.wcStatus, e.checked)} />
+											<Checkbox aria-label="Select path" variant="subtle" colorPalette="yellow" checked={!!selectedConflictingChanges[file.path]} onCheckedChange={(e) => handlePathSelection(file, e.checked)} />
 										</Table.Cell>
 										<Table.Cell color={getStatusColor(file.wcStatus)}>{branchString}</Table.Cell>
 										<Table.Cell color={getStatusColor(file.wcStatus)}>{`${branchPath.split("\\").at(-1)}\\${file.pathDisplay}`}</Table.Cell>

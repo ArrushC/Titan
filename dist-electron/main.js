@@ -25455,7 +25455,6 @@ function setupUncaughtExceptionHandler(logger2) {
 }
 const { autoUpdater } = electronUpdaterPkg;
 const isDev = process.env.NODE_ENV === "development";
-const connectionURL = "http://localhost:4000";
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 const packageJsonPath = path.join(__dirname, "../package.json");
@@ -25473,7 +25472,6 @@ const gotTheLock = app.requestSingleInstanceLock();
 app.commandLine.appendSwitch("js-flags", "--max-old-space-size=4096");
 app.commandLine.appendSwitch("enable-features", "V8CodeCache");
 let mainWindow;
-let splashWindow;
 let serverProcess;
 let isQuitting = false;
 let updateDownloaded = false;
@@ -25495,11 +25493,7 @@ function createWindow() {
       sandbox: true
     }
   });
-  if (process.env.VITE_DEV_SERVER_URL) {
-    mainWindow.loadURL(process.env.VITE_DEV_SERVER_URL);
-  } else {
-    mainWindow.loadURL(connectionURL);
-  }
+  mainWindow.loadFile(path.join(__dirname, "../splash.html"));
   session.defaultSession.webRequest.onHeadersReceived((details, callback) => {
     const csp = isDev ? [
       "default-src 'self' 'unsafe-inline' 'unsafe-eval'",
@@ -25532,7 +25526,6 @@ function createWindow() {
     });
   });
   mainWindow.once("ready-to-show", () => {
-    splashWindow.destroy();
     mainWindow.show();
     mainWindow.focus();
   });
@@ -25547,34 +25540,18 @@ function createWindow() {
     return { action: "deny" };
   });
 }
-function createSplashWindow() {
-  splashWindow = new BrowserWindow({
-    width: 400,
-    height: 400,
-    frame: false,
-    transparent: true,
-    alwaysOnTop: true,
-    skipTaskbar: true,
-    resizable: false,
-    webPreferences: {
-      nodeIntegration: true,
-      contextIsolation: false
-    }
-  });
-  splashWindow.loadFile(path.join(__dirname, "../splash.html"));
-  const primaryDisplay = screen.getPrimaryDisplay();
-  const { width, height } = primaryDisplay.workAreaSize;
-  splashWindow.setPosition(Math.round(width / 2 - 200), Math.round(height / 2 - 150));
-  splashWindow.setSkipTaskbar(true);
-  splashWindow.removeMenu();
-}
 function startServer() {
   serverProcess = fork(path.join(__dirname, "../server/server.js"), [], {
-    env: { ...process.env, ELECTRON_RUN_AS_NODE: "1" }
+    env: { ...process.env, ELECTRON_RUN_AS_NODE: "1" },
+    stdio: ["pipe", "pipe", "pipe", "ipc"]
   });
   serverProcess.on("message", (message) => {
     if (message === "server-ready") {
-      createWindow();
+      if (process.env.VITE_DEV_SERVER_URL) {
+        mainWindow.loadURL(process.env.VITE_DEV_SERVER_URL);
+      } else {
+        mainWindow.loadFile(path.join(__dirname, "../dist/index.html"));
+      }
     }
   });
   serverProcess.on("error", (error2) => {
@@ -25661,7 +25638,7 @@ if (!gotTheLock) {
     });
   });
   app.on("ready", async () => {
-    createSplashWindow();
+    createWindow();
     startServer();
     setupMemoryMonitoring();
     checkForUpdates();

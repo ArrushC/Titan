@@ -11,10 +11,11 @@ import { ColorModeButton } from "./ui/color-mode.jsx";
 import { Button } from "./ui/button.jsx";
 import { PopoverArrow, PopoverBody, PopoverContent, PopoverRoot, PopoverTrigger } from "./ui/popover.jsx";
 import { useApp } from "../ContextApp.jsx";
+import { LiaToiletSolid } from "react-icons/lia";
 
 export default function Header() {
 	const setAppClosing = useApp((ctx) => ctx.setAppClosing);
-	const { emitOpenConfig } = useSocketEmits();
+	const { emitOpenConfig, emitFlushSvnLogs } = useSocketEmits();
 	const { RaiseClientNotificaiton } = useNotifications();
 
 	const [username, setUsername] = useState("User");
@@ -52,6 +53,10 @@ export default function Header() {
 		emitOpenConfig();
 	}, [emitOpenConfig]);
 
+	const handleFlushSvnLogs = useCallback(() => {
+		emitFlushSvnLogs();
+	}, [emitFlushSvnLogs]);
+
 	return (
 		<HStack wrap="wrap" my={5} gapY={5} justify={"space-between"}>
 			<Flex align={"flex-start"} alignItems="center" className="notMono">
@@ -65,6 +70,7 @@ export default function Header() {
 			<Flex align={"flex-start"} alignItems={"center"} columnGap={2}>
 				<ColorModeButton />
 				<ButtonIconTooltip icon={<LuFileCog />} onClick={handleOpenConfig} colorPalette={"yellow"} variant={"subtle"} label="Open Config File" placement={"bottom-start"} size="md" />
+				<ButtonIconTooltip icon={<LiaToiletSolid  />} onClick={handleFlushSvnLogs} colorPalette={"yellow"} variant={"subtle"} label="Flush SVN Logs" placement={"bottom-start"} size="md" />
 				<ButtonElectron icon={<MdBrowserUpdated />} onClick={handleCheckForUpdates} colorPalette={"yellow"} variant={"subtle"} label="Check For Updates" size="md" />
 				<PopoverRoot open={window.electron && reloadPopover} onOpenChange={(e) => setReloadPopover(e.open)}>
 					<PopoverTrigger as={"div"}>
@@ -73,14 +79,14 @@ export default function Header() {
 					<PopoverContent>
 						<PopoverArrow />
 						<PopoverBody>
-							<Flex gap={8}>
+							<HStack gap={8}>
 								<Button colorPalette={"yellow"} variant={"subtle"} onClick={(e) => handleReload(false)}>
 									Refresh
 								</Button>
 								<Button colorPalette={"yellow"} variant={"subtle"} onClick={(e) => handleReload(true)}>
 									Restart
 								</Button>
-							</Flex>
+							</HStack>
 						</PopoverBody>
 					</PopoverContent>
 				</PopoverRoot>

@@ -16,6 +16,7 @@ import DialogBranchesLog from "./DialogBranchesLog.jsx";
 export default function SectionBranches() {
 	const updateConfig = useApp((ctx) => ctx.updateConfig);
 	const configurableRowData = useApp((ctx) => ctx.configurableRowData);
+	const selectedBranchesData = useApp((ctx) => ctx.selectedBranchesData);
 	const selectedBranches = useApp((ctx) => ctx.selectedBranches);
 	const setSelectedBranches = useApp((ctx) => ctx.setSelectedBranches);
 	const setAppMode = useApp((ctx) => ctx.setAppMode);
@@ -28,7 +29,7 @@ export default function SectionBranches() {
 	const [isRowDialogOpen, setIsRowDialogOpen] = useState(false);
 	const fireRowDialogAction = useCallback(() => {
 		updateConfig((currentConfig) => {
-			const newBranches = configurableRowData.filter((branch) => !selectedBranches[branch.id]);
+			const newBranches = configurableRowData.filter((branch) => !selectedBranches[branch["SVN Branch"]]);
 			return { ...currentConfig, branches: newBranches };
 		});
 	}, [updateConfig, configurableRowData, selectedBranches]);
@@ -71,14 +72,14 @@ export default function SectionBranches() {
 
 	const refreshSelectedBranches = useCallback(() => {
 		configurableRowData
-			.filter((branchRow) => selectedBranches[branchRow.id])
+			.filter((branchRow) => selectedBranches[branchRow["SVN Branch"]])
 			.forEach((branchRow) => {
 				emitInfoSingle(branchRow.id, branchRow["SVN Branch"], branchRow["Branch Version"], branchRow["Branch Folder"]);
 			});
 	}, [configurableRowData, selectedBranches]);
 
 	const updateSelectedBranches = useCallback(() => {
-		const selectedBranchRows = configurableRowData.filter((branchRow) => selectedBranches[branchRow.id]);
+		const selectedBranchRows = selectedBranchesData;
 
 		RaisePromisedClientNotification({
 			title: "Updating Selected Branches",
@@ -100,7 +101,7 @@ export default function SectionBranches() {
 			errorMessage: (id) => `Failed to update branch ${id}`,
 			loadingMessage: (current, total) => `Updating ${current} of ${total} branches`,
 		}).catch(console.error);
-	}, [RaisePromisedClientNotification, configurableRowData, selectedBranches, emitUpdateSingle, emitInfoSingle]);
+	}, [RaisePromisedClientNotification, selectedBranchesData, emitUpdateSingle, emitInfoSingle]);
 
 	const commitSelectedBranches = useCallback(() => {
 		setAppMode((current) => (current == "commit" ? "branches" : "commit"));
@@ -200,8 +201,7 @@ export default function SectionBranches() {
                 onClear={() => setSelectedBranches({})}
             />
 
-			<DialogRowDeletion isDialogOpen={isRowDialogOpen} closeDialog={() => setIsRowDialogOpen(false)} fireDialogAction={fireRowDialogAction} />
-
+			<DialogRowDeletion selectedCount={selectionMetrics.selectedBranchesCount} isDialogOpen={isRowDialogOpen} closeDialog={() => setIsRowDialogOpen(false)} fireDialogAction={fireRowDialogAction} />
 			<DialogBranchesLog />
 		</Box>
 	);

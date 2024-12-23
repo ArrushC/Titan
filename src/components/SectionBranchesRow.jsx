@@ -193,9 +193,6 @@ const SectionBranchesRow = memo(
 				</Table.Cell>
 			</Table.Row>
 		);
-	},
-	(prevProps, nextProps) => {
-		return prevProps.isSelected === nextProps.isSelected && prevProps.branchRow.id === nextProps.branchRow.id;
 	}
 );
 

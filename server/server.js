@@ -19,9 +19,7 @@ const __dirname = path.dirname(__filename);
 const packageJsonPath = path.join(__dirname, "../package.json");
 const packageJson = JSON.parse(fs.readFileSync(packageJsonPath, "utf-8"));
 
-const latestVersion = packageJson.version;
-const configFilePath = packageJson.configFilePath;
-const targetsFilePath = packageJson.targetsFilePath;
+const { version: latestVersion, configFilePath, targetsFilePath, svnLogsCacheFilePath } = packageJson;
 
 const isDev = process.env.NODE_ENV === "development";
 const port = process.env.PORT || 4000;
@@ -46,7 +44,20 @@ const instanceData = {
 	lastConnectionErrorTime: 0,
 	CONNECTION_ERROR_DEBOUNCE_MS: 5000,
 	subversionLogsCache: {},
+	branchWatchers: {},
 };
+
+try {
+	fs.access(svnLogsCacheFilePath, fs.constants.F_OK, async (accessErr) => {
+		if (!accessErr) {
+			const data = await fsPromises.readFile(svnLogsCacheFilePath, "utf8");
+			instanceData.subversionLogsCache = JSON.parse(data);
+			logger.info("Loaded SVN logs cache file successfully.");
+		}
+	});
+} catch (err) {
+	logger.error("Error reading SVN logs cache file:", err);
+}
 
 // Use compression middleware
 app.use(compression());
@@ -140,6 +151,15 @@ async function writeTargetsFile(targets = []) {
 		await fsPromises.writeFile(targetsFilePath, targets.join("\n"));
 	} catch (err) {
 		logger.error("Error writing targets file:", err);
+	}
+}
+
+async function saveSvnLogsCache() {
+	try {
+		await fsPromises.mkdir(path.dirname(svnLogsCacheFilePath), { recursive: true });
+		await fsPromises.writeFile(svnLogsCacheFilePath, JSON.stringify(instanceData.subversionLogsCache, null, 4));
+	} catch (err) {
+		logger.error("Error writing SVN logs cache file:", err);
 	}
 }
 
@@ -457,6 +477,8 @@ async function fetchConfig(socket) {
 				key: "TRELLO_API_KEY",
 				token: "TRELLO_TOKEN",
 			},
+			ignoredUnknownPaths: [],
+			ignoredModifiedPaths: [],
 		};
 		try {
 			await fsPromises.writeFile(configFilePath, JSON.stringify(defaultConfig, null, 4));
@@ -658,43 +680,65 @@ io.on("connection", (socket) => {
 				const results = await executeSvnCommand(task);
 				const result = results[0]?.result;
 
+				let filesToTrack = [];
 				let filesToCommit = [];
 				let filesToUpdate = [];
+
+				const processBatch = async (batch) => {
+					return Promise.all(
+						batch.map(async (entry) => {
+							const path = String(entry.$.path);
+							try {
+								const stats = await fsPromises.stat(path);
+								return { entry, path, lastModified: stats.mtime.toLocaleString() };
+							} catch (error) {
+								console.error(`Error retrieving stats for ${path}:`, error.message);
+								return { entry, path, lastModified: null };
+							}
+						})
+					);
+				};
 
 				// If there are updates to the branch then these result values should not be null or undefined.
 				if (result && result.target && result.target.entry) {
 					const entries = Array.isArray(result.target.entry) ? result.target.entry : [result.target.entry];
 					const pathFilter = `${branchPath}/`.replaceAll("/", "\\");
 
-					entries.forEach((entry) => {
+					const batchedResults = [];
+					for (let i = 0; i < entries.length; i += 20) {
+						const batch = entries.slice(i, i + 20);
+						const batchResults = await processBatch(batch);
+						batchedResults.push(...batchResults);
+					}
+
+					batchedResults.forEach(({ entry, path, lastModified }) => {
 						const wcStatus = entry["wc-status"]?.$?.item;
-						const reposStatus = entry["repos-status"]?.$?.item;
-						const path = String(entry.$.path);
+						const reposStatus = entry["repos-status"]?.$?.item || null;
 						const pathDisplay = path.replace(pathFilter, "");
 
 						const emitData = {
-							path: path,
-							pathDisplay: pathDisplay,
-							wcStatus: wcStatus,
-							reposStatus: reposStatus || null,
+							path,
+							pathDisplay,
+							wcStatus,
+							reposStatus,
+							lastModified,
 						};
 
 						if (wcStatus && !["normal", "none"].includes(wcStatus)) {
 							if (reposStatus && !["normal", "none"].includes(reposStatus)) {
 								filesToUpdate.push(emitData);
-							} else {
+							} else if (wcStatus === "unversioned" || wcStatus === "missing") {
+								filesToTrack.push(emitData);
+							} else if (wcStatus !== "external") {
 								filesToCommit.push(emitData);
 							}
 						}
 					});
 				}
 
-				// logger.debug(`For Branch: ${branchPath}`);
-				// logger.debug(`Files to Commit: ${JSON.stringify(filesToCommit, null, 2)}`);
-				// logger.debug(`Files to Update: ${JSON.stringify(filesToUpdate, null, 2)}`);
-
 				emitBranchStatus(socket, data.selectedBranch.id, {
 					branch: branchPath,
+					filesToTrack,
 					filesToCommit,
 					filesToUpdate,
 				});
@@ -718,7 +762,7 @@ io.on("connection", (socket) => {
 			let files = [];
 
 			for (const file of data.filesToProcess) {
-				const isPathDirectory = await isDirectory(file["Full Path"]);
+				const isPathDirectory = await isDirectory(file.path);
 				if (isPathDirectory) directoryPaths.push(file);
 				else files.push(file);
 			}
@@ -730,7 +774,7 @@ io.on("connection", (socket) => {
 						params: [`--targets ${targetsFilePath}`],
 					},
 					preopCallback: async () => {
-						await writeTargetsFile(files.map((f) => f["Full Path"]));
+						await writeTargetsFile(files.map((f) => f.path));
 					},
 					postopCallback: async (err, result) => {
 						if (err) {
@@ -739,10 +783,15 @@ io.on("connection", (socket) => {
 						} else {
 							logger.info(`Successfully reverted files`);
 							emitMessage(socket, `Successfully reverted files`, "success");
-							for (const file of files.filter((f) => f["Local Status"] == "unversioned")) {
-								await deleteFileOrDirectory(file["Full Path"]);
+							for (const file of files.filter((f) => f.status == "unversioned")) {
+								await deleteFileOrDirectory(file.path);
 							}
-							socket.emit("branch-refresh-unseen");
+							socket.emit("branch-paths-update", {
+								paths: files.map((f) => ({
+									...f,
+									action: "revert",
+								})),
+							});
 						}
 					},
 				};
@@ -757,7 +806,7 @@ io.on("connection", (socket) => {
 						params: [`--targets ${targetsFilePath}`],
 					},
 					preopCallback: async () => {
-						await writeTargetsFile(directoryPaths.map((d) => d["Full Path"]));
+						await writeTargetsFile(directoryPaths.map((d) => d.path));
 					},
 					postopCallback: async (err, result) => {
 						if (err) {
@@ -766,10 +815,15 @@ io.on("connection", (socket) => {
 						} else {
 							logger.info(`Successfully reverted directories`);
 							emitMessage(socket, `Successfully reverted directories`, "success");
-							for (const dir of directoryPaths.filter((d) => d["Local Status"] == "unversioned")) {
-								await deleteFileOrDirectory(dir["Full Path"]);
+							for (const dir of directoryPaths.filter((d) => d.status == "unversioned")) {
+								await deleteFileOrDirectory(dir.path);
 							}
-							socket.emit("branch-refresh-unseen");
+							socket.emit("branch-paths-update", {
+								paths: directoryPaths.map((d) => ({
+									...d,
+									action: "revert",
+								})),
+							});
 						}
 					},
 				};
@@ -996,8 +1050,9 @@ io.on("connection", (socket) => {
 							return reject(err);
 						}
 
+						const repositoryUrl = infoResult?.entry?.url;
 						const repositoryRoot = infoResult?.entry?.repository?.root;
-						resolve({ branch, repositoryRoot });
+						resolve({ branch, repositoryUrl, repositoryRoot });
 					});
 				});
 			});
@@ -1007,15 +1062,17 @@ io.on("connection", (socket) => {
 
 				// Now run `log` for each branch, using the repositoryRoot data we just collected.
 				const logTasks = branchesWithRoot.map((branchData) => {
-					const { branch, repositoryRoot } = branchData;
+					const { branch, repositoryUrl, repositoryRoot } = branchData;
 					const svnBranchPath = branch["SVN Branch"];
 
 					// Check cache and define startRevision as before
 					const cachedLogs = instanceData.subversionLogsCache[svnBranchPath] || [];
 					let startRevision = 1;
 					if (cachedLogs && cachedLogs.length > 0) {
+						const isDifferentRemote = !cachedLogs[0].repositoryUrl || cachedLogs[0].repositoryUrl !== repositoryUrl;
 						const lastKnownRevision = parseInt(cachedLogs[0].revision, 10);
-						startRevision = Number.isNaN(lastKnownRevision) ? 1 : lastKnownRevision + 1;
+						startRevision = Number.isNaN(lastKnownRevision) || isDifferentRemote ? 1 : lastKnownRevision + 1;
+						if (isDifferentRemote) instanceData.subversionLogsCache[svnBranchPath] = [];
 					}
 
 					return new Promise((resolve, reject) => {
@@ -1048,7 +1105,8 @@ io.on("connection", (socket) => {
 									message: entry.msg,
 									date: new Date(entry.date).toLocaleString("en-GB"),
 									filesChanged,
-									repositoryRoot: repositoryRoot, // Include the repository root here
+									repositoryRoot: repositoryRoot,
+									repositoryUrl: repositoryUrl,
 								};
 							});
 
@@ -1056,7 +1114,7 @@ io.on("connection", (socket) => {
 
 							if (fetchedLogs.length > 0) {
 								const combinedLogs = [...fetchedLogs, ...cachedLogs];
-								const uniqueLogs = _.uniqBy(combinedLogs, 'revision');
+								const uniqueLogs = _.uniqBy(combinedLogs, "revision");
 								uniqueLogs.sort((a, b) => parseInt(b.revision, 10) - parseInt(a.revision, 10));
 								instanceData.subversionLogsCache[svnBranchPath] = uniqueLogs;
 							}
@@ -1069,12 +1127,24 @@ io.on("connection", (socket) => {
 
 				// Execute all log tasks in parallel
 				await Promise.all(logTasks);
+				await saveSvnLogsCache();
 			} catch (err) {
 				logger.error("Error fetching SVN logs with repository root:", err);
 				if (!isSVNConnectionError(socket, err)) emitMessage(socket, "Error fetching SVN logs with repository root", "error");
 			}
 
 			debugTask("svn-logs-selected", data, true);
+		});
+
+		socket.on("svn-logs-flush", async (data) => {
+			debugTask("svn-logs-flush", data, false);
+
+			instanceData.subversionLogsCache = {};
+			await saveSvnLogsCache();
+
+			emitMessage(socket, "Successfully cleared SVN logs cache", "success");
+
+			debugTask("svn-logs-flush", data, true);
 		});
 
 		socket.on("trello-search-names-card", async (data, callback) => {

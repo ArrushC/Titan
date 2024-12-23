@@ -1,6 +1,6 @@
 import { Input } from "@chakra-ui/react";
 import { Field } from "./ui/field.jsx";
-import React, { useEffect } from "react";
+import React from "react";
 import { useCommit } from "../ContextCommit.jsx";
 import { NumberInputField, NumberInputRoot } from "./ui/number-input.jsx";
 

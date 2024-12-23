@@ -11,6 +11,7 @@
 	"configFilePath": "C:/Titan/Titan.config.json",
 	"targetsFilePath": "C:/Titan/Titan.targets.txt",
 	"logFilePath": "C:/Titan/Titan.app.log",
+	"svnLogsCacheFilePath": "C:/Titan/Titan.svnLogsCache.json",
 	"scripts": {
 		"start": "npm run server:start",
 		"dev": "cross-env EDGE_CHROMIUM=1 NODE_ENV=development vite",
@@ -23,10 +24,12 @@
 		"electron:start": "electron .",
 		"electron:dev": "cross-env NODE_ENV=development electron .",
 		"electron:build:win": "electron-builder --win",
+		"electron:build:win:nsis": "electron-builder --win nsis",
+		"electron:build:win:portable": "electron-builder --win portable",
 		"electron:build:mac": "electron-builder --mac",
 		"electron:build:linux": "electron-builder --linux",
-		"build:win": "vite build && electron-builder --win",
-		"publish:win": "electron-builder --win --publish always",
+		"build:win": "vite build && electron-builder --win nsis",
+		"publish:win": "electron-builder --win --publish always nsis",
 		"build:mac": "vite build && electron-builder --mac",
 		"publish:mac": "electron-builder --mac --publish always",
 		"build:linux": "vite build && electron-builder --linux",
@@ -84,15 +87,20 @@
 			"icons/**/*",
 			"public/**/*",
 			"server/**/*",
+			"dist-electron/**/*",
 			"electron/**/*",
 			"splash.html",
-			"shutdown.html"
+			"shutdown.html",
+			"package.json"
 		],
 		"directories": {
 			"output": "release"
 		},
 		"win": {
-			"target": "nsis",
+			"target": [
+				"nsis",
+				"portable"
+			],
 			"icon": "icons/Titan.ico"
 		},
 		"mac": {

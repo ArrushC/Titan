@@ -1,4 +1,4 @@
-import { c as createToaster, j as jsxRuntimeExports, P as Portal, T as Toaster$1, a as ToastRoot, S as Spinner, b as ToastIndicator, d as Stack, e as ToastTitle, f as ToastDescription, g as ToastActionTrigger, h as ToastCloseTrigger, r as reactExports, l as lookup, i as TooltipRoot, k as TooltipTrigger, m as TooltipPositioner, n as TooltipContent, o as TooltipArrow, p as TooltipArrowTip, I as IconButton, C as ClientOnly, q as Skeleton, z, F as FaSun, s as FaMoon, J, H as HStack, t as Flex, u as Heading, L as LuFileCog, M as MdBrowserUpdated, v as IoReload, w as CheckboxRoot, x as CheckboxHiddenInput, y as CheckboxControl, A as CheckboxIndicator, B as CheckboxLabel, D as LuX, E as ActionBarPositioner, G as ActionBarContent$1, K as ActionBarCloseTrigger, N as ActionBarRoot$1, O as ActionBarSelectionTrigger$1, Q as ActionBarSeparator$1, R as DialogBackdrop$1, U as DialogPositioner, V as DialogContent$1, W as DialogCloseTrigger$1, X as DialogRoot$1, Y as DialogFooter$1, Z as DialogHeader$1, _ as DialogBody$1, $ as DialogTitle$1, a0 as DialogActionTrigger$1, a1 as Button$1, a2 as TbAsterisk, a3 as TbLetterZ, a4 as TbLetterY, a5 as TbLetterX, a6 as TbLetterW, a7 as TbLetterV, a8 as TbLetterU, a9 as TbLetterT, aa as TbLetterS, ab as TbLetterR, ac as TbLetterQ, ad as TbLetterP, ae as TbLetterO, af as TbLetterN, ag as TbLetterM, ah as TbLetterL, ai as TbLetterK, aj as TbLetterJ, ak as TbLetterI, al as TbLetterH, am as TbLetterG, an as TbLetterF, ao as TbLetterE, ap as TbLetterD, aq as TbLetterC, ar as TbLetterB, as as TbLetterA, at as Input, au as keyframes, av as chroma, aw as Text, ax as TableRow, ay as TableCell, az as FaFolderOpen, aA as Box, aB as MdAutoFixHigh, aC as TableRoot, aD as TableColumnGroup, aE as TableColumn, aF as TableHeader, aG as TableColumnHeader, aH as TableBody, aI as TableFooter, aJ as IoMdAdd, aK as MdUpdate, aL as Kbd, aM as IoMdClose, aN as React, aO as Em, aP as AccordionItemTrigger$1, aQ as AccordionItemIndicator, aR as FaChevronDown, aS as AccordionItemContent$1, aT as AccordionItemBody, aU as AccordionRoot$1, aV as AccordionItem$1, aW as FieldRoot, aX as FieldLabel, aY as FieldRequiredIndicator, aZ as FieldHelperText, a_ as FieldErrorText, a$ as NumberInputRoot$1, b0 as NumberInputControl, b1 as NumberInputIncrementTrigger, b2 as NumberInputDecrementTrigger, b3 as NumberInputInput, b4 as Textarea, b5 as BiMessageDetail, b6 as IoWarning, b7 as FiEdit, b8 as FiHelpCircle, b9 as CollapsibleRoot, ba as CollapsibleContent, bb as Code, bc as AbsoluteCenter, bd as Span, be as createRecipeContext, bf as createContext, bg as PaginationRoot$1, bh as PaginationEllipsis$1, bi as HiMiniEllipsisHorizontal, bj as usePaginationContext, bk as PaginationItem$1, bl as HiChevronLeft, bm as PaginationPrevTrigger$1, bn as HiChevronRight, bo as PaginationNextTrigger$1, bp as PaginationContext, bq as useDisclosure, br as chakra, bs as Image, bt as VscChromeMinimize, bu as FaRegSquare, bv as ChakraProvider, bw as defaultSystem, bx as ReactDOM } from "./vendor.js";
+import { c as createToaster, j as jsxRuntimeExports, P as Portal, T as Toaster$1, a as ToastRoot, S as Spinner, b as ToastIndicator, d as Stack, e as ToastTitle, f as ToastDescription, g as ToastActionTrigger, h as ToastCloseTrigger, i as createContext, u as useContextSelector, r as reactExports, l as lookup, k as reactDomExports, m as TooltipRoot, n as TooltipTrigger, o as TooltipPositioner, p as TooltipContent, q as TooltipArrow, s as TooltipArrowTip, I as IconButton, C as ClientOnly, t as Skeleton, z, F as FaSun, v as FaMoon, J, B as Button$1, A as AbsoluteCenter, w as Span, L as LuX, x as PopoverPositioner, y as PopoverContent$1, D as PopoverArrow$1, E as PopoverArrowTip, G as PopoverCloseTrigger, H as PopoverTitle$1, K as PopoverRoot$1, M as PopoverBody$1, N as PopoverTrigger$1, O as HStack, Q as Flex, R as Heading, U as LuFileCog, V as LiaToiletSolid, W as MdBrowserUpdated, X as IoReload, Y as CheckboxRoot, Z as CheckboxHiddenInput, _ as CheckboxControl, $ as CheckboxIndicator, a0 as CheckboxLabel, a1 as DialogBackdrop$1, a2 as DialogPositioner, a3 as DialogContent$1, a4 as DialogCloseTrigger$1, a5 as DialogRoot$1, a6 as DialogFooter$1, a7 as DialogHeader$1, a8 as DialogBody$1, a9 as DialogTitle$1, aa as DialogActionTrigger$1, ab as TbAsterisk, ac as TbLetterZ, ad as TbLetterY, ae as TbLetterX, af as TbLetterW, ag as TbLetterV, ah as TbLetterU, ai as TbLetterT, aj as TbLetterS, ak as TbLetterR, al as TbLetterQ, am as TbLetterP, an as TbLetterO, ao as TbLetterN, ap as TbLetterM, aq as TbLetterL, ar as TbLetterK, as as TbLetterJ, at as TbLetterI, au as TbLetterH, av as TbLetterG, aw as TbLetterF, ax as TbLetterE, ay as TbLetterD, az as TbLetterC, aA as TbLetterB, aB as TbLetterA, aC as Input, aD as keyframes, aE as chroma, aF as Text, aG as TableRow, aH as TableCell, aI as FaFolderOpen, aJ as MdAutoFixHigh, aK as ActionBarPositioner, aL as ActionBarContent$1, aM as ActionBarCloseTrigger, aN as ActionBarRoot$1, aO as ActionBarSelectionTrigger$1, aP as ActionBarSeparator$1, aQ as Kbd, aR as IoMdClose, aS as Group, aT as InputElement, aU as React, aV as FaChevronDown, aW as FaChevronRight, aX as Box, aY as TableRoot, aZ as TableColumnGroup, a_ as TableColumn, a$ as TableHeader, b0 as TableColumnHeader, b1 as TableBody, b2 as VscDiffSingle, b3 as SiSubversion, b4 as LuSearch, b5 as TableFooter, b6 as IoMdAdd, b7 as MdUpdate, b8 as AccordionItemTrigger$1, b9 as AccordionItemIndicator, ba as AccordionItemContent$1, bb as AccordionItemBody, bc as AccordionRoot$1, bd as AccordionItem$1, be as FieldRoot, bf as FieldLabel, bg as FieldRequiredIndicator, bh as FieldHelperText, bi as FieldErrorText, bj as NumberInputRoot$1, bk as NumberInputControl, bl as NumberInputIncrementTrigger, bm as NumberInputDecrementTrigger, bn as NumberInputInput, bo as chakra, bp as index, bq as FaTrello, br as MdKeyboardReturn, bs as TableScrollArea, bt as Link, bu as LuExternalLink, bv as FaChevronUp, bw as Code, bx as BiMessageDetail, by as IoWarning, bz as FiHelpCircle, bA as FiEdit, bB as CollapsibleRoot, bC as CollapsibleContent, bD as useDisclosure, bE as Image, bF as VscChromeMinimize, bG as FaRegSquare, bH as ChakraProvider, bI as defaultSystem, bJ as ReactDOM } from "./vendor.js";
 import { l as lodashExports } from "./lodash.js";
 /* empty css                  */
 (function polyfill() {
@@ -86,53 +86,60 @@ const Toaster = () => {
     _optionalChain([toast, "access", (_) => _.meta, "optionalAccess", (_2) => _2.closable]) && /* @__PURE__ */ jsxRuntimeExports.jsx(ToastCloseTrigger, {})
   ] }) }) });
 };
-const initialState$1 = {
+const initialState$2 = {
+  appClosing: false,
+  setAppClosing: (_) => {
+  },
   socket: null,
   config: null,
-  updateConfig: () => {
+  updateConfig: (_) => {
   },
-  emitSocketEvent: () => {
+  emitSocketEvent: (_) => {
   },
   configurableRowData: [],
+  selectedBranchesData: [],
+  selectedBranchPaths: /* @__PURE__ */ new Set(),
   selectedBranches: {},
-  setSelectedBranches: () => {
+  setSelectedBranches: (_) => {
   },
-  logData: [],
-  setLogData: () => {
+  svnLogs: {},
+  setSvnLogs: (_) => {
   },
+  logsData: [],
   appMode: "app",
-  setAppMode: () => {
+  setAppMode: (_) => {
   }
 };
-const ContextApp = reactExports.createContext(initialState$1);
-const useApp = () => {
-  const context = reactExports.useContext(ContextApp);
-  if (!context) throw new Error("useApp must be used within an AppProvider");
+const ContextApp = createContext(initialState$2);
+const useApp = (selector) => {
+  const context = useContextSelector(ContextApp, selector);
   return context;
 };
 const AppProvider = ({ children }) => {
+  const [appClosing, setAppClosing] = reactExports.useState(false);
   const [socket, setSocket] = reactExports.useState(null);
   const [config, setConfig] = reactExports.useState({});
   const [selectedBranches, setSelectedBranches] = reactExports.useState({});
-  const [logData, setLogData] = reactExports.useState([]);
+  const [svnLogs, setSvnLogs] = reactExports.useState({});
   const [appMode, setAppMode] = reactExports.useState("app");
+  const _handleTitanConfigEvent = reactExports.useCallback((response) => {
+    if (!response) {
+      toaster.create(createToastConfig("Couldn't load data from the server", "error", 0));
+      return;
+    }
+    setConfig(response.config);
+  }, []);
   reactExports.useEffect(() => {
     const newSocket = lookup(URL_SOCKET_CLIENT);
     setSocket(newSocket);
     const onConnect = () => {
-      newSocket.emit("titan-config-get", (response) => {
-        if (!response) {
-          toaster.create(createToastConfig("Couldn't load data from the server", "error", 0));
-          return;
-        }
-        setConfig(response.config);
-      });
+      newSocket.emit("titan-config-get", null, _handleTitanConfigEvent);
     };
     const onDisconnect = () => {
-      toaster.create(createToastConfig("Server Has Been Disconnected", "warning", 0));
+      toaster.create(createToastConfig("Server Disconnected", "warning", 0));
     };
     const onReconnect = () => {
-      toaster.create(createToastConfig("Server Has Been Reconnected", "success", 2e3));
+      toaster.create(createToastConfig("Server Reconnected", "success", 2e3));
     };
     const onNotification = (data) => {
       toaster.create(createToastConfig(data.description, data.type, data.duration));
@@ -149,14 +156,17 @@ const AppProvider = ({ children }) => {
       newSocket.disconnect();
     };
   }, []);
-  const updateConfig = reactExports.useCallback((updateFunction) => {
-    setConfig((currentConfig) => {
-      const newConfig = updateFunction(currentConfig);
-      if (lodashExports.isEqual(currentConfig, newConfig)) return currentConfig;
-      socket == null ? void 0 : socket.emit("titan-config-set", newConfig);
-      return newConfig;
-    });
-  }, [socket]);
+  const updateConfig = reactExports.useCallback(
+    (updateFunction) => {
+      setConfig((currentConfig) => {
+        const newConfig = updateFunction(currentConfig);
+        if (lodashExports.isEqual(currentConfig, newConfig)) return currentConfig;
+        socket == null ? void 0 : socket.emit("titan-config-set", newConfig);
+        return newConfig;
+      });
+    },
+    [socket]
+  );
   const emitSocketEvent = reactExports.useCallback(
     (eventName, data) => {
       if (!socket.connected) {
@@ -167,27 +177,84 @@ const AppProvider = ({ children }) => {
     },
     [socket]
   );
-  const configurableRowData = reactExports.useMemo(() => (config == null ? void 0 : config.branches) || [], [config == null ? void 0 : config.branches]);
+  const handleBranchSelection = reactExports.useCallback((branchPath, isSelected) => {
+    reactDomExports.flushSync(() => {
+      setSelectedBranches((prev) => {
+        const newState = { ...prev };
+        if (isSelected) newState[branchPath] = true;
+        else delete newState[branchPath];
+        return newState;
+      });
+    });
+  }, []);
+  const handleBulkSelection = reactExports.useCallback((branchPaths, isSelected) => {
+    reactDomExports.flushSync(() => {
+      setSelectedBranches((prev) => {
+        const newState = { ...prev };
+        branchPaths.forEach((path) => {
+          if (isSelected) newState[path] = true;
+          else delete newState[path];
+        });
+        return newState;
+      });
+    });
+  }, []);
+  const configurableRowData = reactExports.useMemo(() => (config == null ? void 0 : config.branches) || [], [config]);
+  const selectedBranchesData = reactExports.useMemo(() => configurableRowData.filter((branchRow) => selectedBranches[branchRow["SVN Branch"]]), [configurableRowData, selectedBranches]);
+  const selectedBranchPaths = reactExports.useMemo(() => new Set(Object.keys(selectedBranches)), [selectedBranches]);
+  reactExports.useEffect(() => {
+    if ((configurableRowData == null ? void 0 : configurableRowData.length) < 1 || Object.keys(selectedBranches).length < 1) return;
+    console.debug("Emitting svn-logs-selected event in DialogBranchesLog component in background");
+    socket == null ? void 0 : socket.emit("svn-logs-selected", { selectedBranches: selectedBranchesData });
+  }, [selectedBranches, configurableRowData, selectedBranchesData, socket]);
+  reactExports.useEffect(() => {
+    const socketCallback = (data) => {
+      console.debug("Received svn-log-result from socket in DialogBranchesLog component in background");
+      setSvnLogs((prevData) => {
+        const newData = {};
+        Object.entries(prevData).forEach(([branch, logs]) => {
+          if (selectedBranches[branch]) {
+            newData[branch] = logs;
+          }
+        });
+        newData[data["SVN Branch"]] = data.logs;
+        return newData;
+      });
+    };
+    socket == null ? void 0 : socket.on("svn-log-result", socketCallback);
+    return () => socket == null ? void 0 : socket.off("svn-log-result", socketCallback);
+  }, [socket, selectedBranches]);
+  const logsData = reactExports.useMemo(() => {
+    const allLogs = Object.values(svnLogs || {}).flat();
+    return allLogs.filter((log) => !!log.revision).sort((a, b) => parseInt(b.revision, 10) - parseInt(a.revision, 10));
+  }, [svnLogs]);
   const value = reactExports.useMemo(
     () => ({
+      appClosing,
+      setAppClosing,
       socket,
       config,
       updateConfig,
       emitSocketEvent,
       configurableRowData,
+      selectedBranchesData,
+      selectedBranchPaths,
       selectedBranches,
       setSelectedBranches,
-      logData,
-      setLogData,
+      svnLogs,
+      setSvnLogs,
+      logsData,
       appMode,
-      setAppMode
+      setAppMode,
+      handleBranchSelection,
+      handleBulkSelection
     }),
-    [socket, config, updateConfig, emitSocketEvent, configurableRowData, selectedBranches, logData, appMode]
+    [appClosing, socket, config, updateConfig, emitSocketEvent, configurableRowData, selectedBranchesData, selectedBranchPaths, selectedBranches, svnLogs, logsData, appMode, handleBranchSelection, handleBulkSelection]
   );
   return /* @__PURE__ */ jsxRuntimeExports.jsx(ContextApp.Provider, { value, children });
 };
 function useSocketEmits() {
-  const { socket } = useApp();
+  const socket = useApp((ctx) => ctx.socket);
   const emitOpenConfig = reactExports.useCallback(() => {
     socket == null ? void 0 : socket.emit("titan-config-open", {});
   }, [socket]);
@@ -198,8 +265,14 @@ function useSocketEmits() {
     [socket]
   );
   const emitInfoSingle = reactExports.useCallback(
-    (branchId, svnBranch, branchVersion, branchFolder, callback) => {
-      socket == null ? void 0 : socket.emit("svn-info-single", { id: branchId, branch: svnBranch, version: branchVersion, folder: branchFolder }, callback);
+    (branchId, svnBranch, branchVersion, branchFolder) => {
+      socket == null ? void 0 : socket.emit("svn-info-single", { id: branchId, branch: svnBranch, version: branchVersion, folder: branchFolder });
+    },
+    [socket]
+  );
+  const emitStatusSingle = reactExports.useCallback(
+    (selectedBranch) => {
+      socket == null ? void 0 : socket.emit("svn-status-single", { selectedBranch });
     },
     [socket]
   );
@@ -209,6 +282,9 @@ function useSocketEmits() {
     },
     [socket]
   );
+  const emitFlushSvnLogs = reactExports.useCallback(() => {
+    socket == null ? void 0 : socket.emit("svn-logs-flush", {});
+  }, [socket]);
   const emitFilesRevert = reactExports.useCallback(
     (filesToProcess) => {
       socket == null ? void 0 : socket.emit("svn-files-revert", { filesToProcess });
@@ -221,15 +297,9 @@ function useSocketEmits() {
     },
     [socket]
   );
-  const emitLogsSelected = reactExports.useCallback(
-    (selectedBranches) => {
-      socket == null ? void 0 : socket.emit("svn-logs-selected", { selectedBranches });
-    },
-    [socket]
-  );
   const emitTrelloCardNamesSearch = reactExports.useCallback(
-    (key, token, query, limit = null) => {
-      socket == null ? void 0 : socket.emit("trello-search-names-card", { key, token, query, limit });
+    (key, token, query, limit = null, callback = null) => {
+      socket == null ? void 0 : socket.emit("trello-search-names-card", { key, token, query, limit }, callback);
     },
     [socket]
   );
@@ -243,10 +313,11 @@ function useSocketEmits() {
     emitOpenConfig,
     emitUpdateSingle,
     emitInfoSingle,
+    emitStatusSingle,
     emitCommitPayload,
+    emitFlushSvnLogs,
     emitFilesRevert,
     emitFilesAddRemove,
-    emitLogsSelected,
     emitTrelloCardNamesSearch,
     emitTrelloCardUpdate
   };
@@ -297,24 +368,24 @@ function useNotifications() {
           description: loadingMessage(0, totalItems),
           type: "loading"
         });
-        const processItem = async (index) => {
-          if (index >= totalItems) {
+        const processItem = async (index2) => {
+          if (index2 >= totalItems) {
             markToastSuccess();
             resolve(processedCount);
             return;
           }
           try {
-            await onProgress(index, {
+            await onProgress(index2, {
               onSuccess: () => {
                 processedCount++;
                 updateToastProgress(processedCount);
               },
               onError: (error) => {
-                markToastError(error.itemId || index);
+                markToastError(error.itemId || index2);
                 throw error;
               }
             });
-            processItem(index + 1);
+            processItem(index2 + 1);
           } catch (error) {
             reject(error);
           }
@@ -353,7 +424,7 @@ function ButtonIconTooltip(props) {
   const handleClick = reactExports.useCallback(() => {
     if (onClick) onClick();
   }, [onClick]);
-  const iconButton = /* @__PURE__ */ jsxRuntimeExports.jsx(IconButton, { "aria-label": label, size, onClick: handleClick, colorPalette, variant, disabled, children: icon });
+  const iconButton = /* @__PURE__ */ jsxRuntimeExports.jsx(IconButton, { "aria-label": label || "", size, onClick: handleClick, colorPalette, variant, disabled, children: icon });
   return label && placement ? /* @__PURE__ */ jsxRuntimeExports.jsx(Tooltip, { content: label, showArrow: true, positioning: { placement }, children: iconButton }) : iconButton;
 }
 function ColorModeProvider(props) {
@@ -369,6 +440,10 @@ function useColorMode() {
     setColorMode: setTheme,
     toggleColorMode
   };
+}
+function useColorModeValue(light, dark) {
+  const { colorMode } = useColorMode();
+  return colorMode === "light" ? light : dark;
 }
 function ColorModeIcon() {
   const { colorMode } = useColorMode();
@@ -396,10 +471,46 @@ const ColorModeButton = reactExports.forwardRef(function ColorModeButton2(props,
     }
   ) }) });
 });
+const Button = reactExports.forwardRef(function Button2(props, ref) {
+  const { loading, disabled, loadingText, children, ...rest } = props;
+  return /* @__PURE__ */ jsxRuntimeExports.jsx(Button$1, { focusRing: "none", focusVisibleRing: "none", disabled: loading || disabled, ref, ...rest, children: loading && !loadingText ? /* @__PURE__ */ jsxRuntimeExports.jsxs(jsxRuntimeExports.Fragment, { children: [
+    /* @__PURE__ */ jsxRuntimeExports.jsx(AbsoluteCenter, { display: "inline-flex", children: /* @__PURE__ */ jsxRuntimeExports.jsx(Spinner, { size: "inherit", color: "inherit" }) }),
+    /* @__PURE__ */ jsxRuntimeExports.jsx(Span, { opacity: 0, children })
+  ] }) : loading && loadingText ? /* @__PURE__ */ jsxRuntimeExports.jsxs(jsxRuntimeExports.Fragment, { children: [
+    /* @__PURE__ */ jsxRuntimeExports.jsx(Spinner, { size: "inherit", color: "inherit" }),
+    loadingText
+  ] }) : children });
+});
+function _nullishCoalesce(lhs, rhsFn) {
+  if (lhs != null) {
+    return lhs;
+  } else {
+    return rhsFn();
+  }
+}
+const CloseButton = reactExports.forwardRef(function CloseButton2(props, ref) {
+  return /* @__PURE__ */ jsxRuntimeExports.jsx(IconButton, { variant: "ghost", "aria-label": "Close", ref, ...props, children: _nullishCoalesce(props.children, () => /* @__PURE__ */ jsxRuntimeExports.jsx(LuX, {})) });
+});
+const PopoverContent = reactExports.forwardRef(function PopoverContent2(props, ref) {
+  const { portalled = true, portalRef, ...rest } = props;
+  return /* @__PURE__ */ jsxRuntimeExports.jsx(Portal, { disabled: !portalled, container: portalRef, children: /* @__PURE__ */ jsxRuntimeExports.jsx(PopoverPositioner, { children: /* @__PURE__ */ jsxRuntimeExports.jsx(PopoverContent$1, { ref, ...rest }) }) });
+});
+const PopoverArrow = reactExports.forwardRef(function PopoverArrow2(props, ref) {
+  return /* @__PURE__ */ jsxRuntimeExports.jsx(PopoverArrow$1, { ...props, ref, children: /* @__PURE__ */ jsxRuntimeExports.jsx(PopoverArrowTip, {}) });
+});
+reactExports.forwardRef(function PopoverCloseTrigger2(props, ref) {
+  return /* @__PURE__ */ jsxRuntimeExports.jsx(PopoverCloseTrigger, { position: "absolute", top: "1", insetEnd: "1", ...props, asChild: true, ref, children: /* @__PURE__ */ jsxRuntimeExports.jsx(CloseButton, { size: "sm" }) });
+});
+const PopoverTitle = PopoverTitle$1;
+const PopoverRoot = PopoverRoot$1;
+const PopoverBody = PopoverBody$1;
+const PopoverTrigger = PopoverTrigger$1;
 function Header() {
-  const { emitOpenConfig } = useSocketEmits();
+  const setAppClosing = useApp((ctx) => ctx.setAppClosing);
+  const { emitOpenConfig, emitFlushSvnLogs } = useSocketEmits();
   const { RaiseClientNotificaiton } = useNotifications();
   const [username, setUsername] = reactExports.useState("User");
+  const [reloadPopover, setReloadPopover] = reactExports.useState(false);
   reactExports.useEffect(() => {
     if (window.electron) {
       window.electron.fetchUsername().then((username2) => {
@@ -407,7 +518,12 @@ function Header() {
       });
     }
   }, []);
-  const handleReload = reactExports.useCallback(() => {
+  const handleReload = reactExports.useCallback((isAppRestart = false) => {
+    if (isAppRestart) {
+      window.electron.restartApp();
+      setAppClosing(true);
+      return;
+    }
     window.location.reload();
   }, []);
   const handleCheckForUpdates = reactExports.useCallback(() => {
@@ -422,6 +538,9 @@ function Header() {
   const handleOpenConfig = reactExports.useCallback(() => {
     emitOpenConfig();
   }, [emitOpenConfig]);
+  const handleFlushSvnLogs = reactExports.useCallback(() => {
+    emitFlushSvnLogs();
+  }, [emitFlushSvnLogs]);
   return /* @__PURE__ */ jsxRuntimeExports.jsxs(HStack, { wrap: "wrap", my: 5, gapY: 5, justify: "space-between", children: [
     /* @__PURE__ */ jsxRuntimeExports.jsxs(Flex, { align: "flex-start", alignItems: "center", className: "notMono", children: [
       /* @__PURE__ */ jsxRuntimeExports.jsxs(Heading, { as: "h1", size: "4xl", fontWeight: 700, lineClamp: 1, className: "animation-fadein-forward", userSelect: "none", children: [
@@ -434,8 +553,18 @@ function Header() {
     /* @__PURE__ */ jsxRuntimeExports.jsxs(Flex, { align: "flex-start", alignItems: "center", columnGap: 2, children: [
       /* @__PURE__ */ jsxRuntimeExports.jsx(ColorModeButton, {}),
       /* @__PURE__ */ jsxRuntimeExports.jsx(ButtonIconTooltip, { icon: /* @__PURE__ */ jsxRuntimeExports.jsx(LuFileCog, {}), onClick: handleOpenConfig, colorPalette: "yellow", variant: "subtle", label: "Open Config File", placement: "bottom-start", size: "md" }),
+      /* @__PURE__ */ jsxRuntimeExports.jsx(ButtonIconTooltip, { icon: /* @__PURE__ */ jsxRuntimeExports.jsx(LiaToiletSolid, {}), onClick: handleFlushSvnLogs, colorPalette: "yellow", variant: "subtle", label: "Flush SVN Logs", placement: "bottom-start", size: "md" }),
       /* @__PURE__ */ jsxRuntimeExports.jsx(ButtonElectron, { icon: /* @__PURE__ */ jsxRuntimeExports.jsx(MdBrowserUpdated, {}), onClick: handleCheckForUpdates, colorPalette: "yellow", variant: "subtle", label: "Check For Updates", size: "md" }),
-      /* @__PURE__ */ jsxRuntimeExports.jsx(ButtonIconTooltip, { icon: /* @__PURE__ */ jsxRuntimeExports.jsx(IoReload, {}), onClick: handleReload, colorPalette: "yellow", variant: "subtle", label: "Reload", placement: "bottom-start", size: "md" })
+      /* @__PURE__ */ jsxRuntimeExports.jsxs(PopoverRoot, { open: window.electron && reloadPopover, onOpenChange: (e) => setReloadPopover(e.open), children: [
+        /* @__PURE__ */ jsxRuntimeExports.jsx(PopoverTrigger, { as: "div", children: /* @__PURE__ */ jsxRuntimeExports.jsx(ButtonIconTooltip, { icon: /* @__PURE__ */ jsxRuntimeExports.jsx(IoReload, {}), onClick: () => setReloadPopover((prev) => !prev), colorPalette: "yellow", label: "Reload", variant: "subtle", size: "md" }) }),
+        /* @__PURE__ */ jsxRuntimeExports.jsxs(PopoverContent, { children: [
+          /* @__PURE__ */ jsxRuntimeExports.jsx(PopoverArrow, {}),
+          /* @__PURE__ */ jsxRuntimeExports.jsx(PopoverBody, { children: /* @__PURE__ */ jsxRuntimeExports.jsxs(HStack, { gap: 8, children: [
+            /* @__PURE__ */ jsxRuntimeExports.jsx(Button, { colorPalette: "yellow", variant: "subtle", onClick: (e) => handleReload(false), children: "Refresh" }),
+            /* @__PURE__ */ jsxRuntimeExports.jsx(Button, { colorPalette: "yellow", variant: "subtle", onClick: (e) => handleReload(true), children: "Restart" })
+          ] }) })
+        ] })
+      ] })
     ] })
   ] });
 }
@@ -447,26 +576,6 @@ const Checkbox = reactExports.forwardRef(function Checkbox2(props, ref) {
     children != null && /* @__PURE__ */ jsxRuntimeExports.jsx(CheckboxLabel, { children })
   ] });
 });
-function _nullishCoalesce(lhs, rhsFn) {
-  if (lhs != null) {
-    return lhs;
-  } else {
-    return rhsFn();
-  }
-}
-const CloseButton = reactExports.forwardRef(function CloseButton2(props, ref) {
-  return /* @__PURE__ */ jsxRuntimeExports.jsx(IconButton, { variant: "ghost", "aria-label": "Close", ref, ...props, children: _nullishCoalesce(props.children, () => /* @__PURE__ */ jsxRuntimeExports.jsx(LuX, {})) });
-});
-const ActionBarContent = reactExports.forwardRef(function ActionBarContent2(props, ref) {
-  const { children, portalled = true, portalRef, ...rest } = props;
-  return /* @__PURE__ */ jsxRuntimeExports.jsx(Portal, { disabled: !portalled, container: portalRef, children: /* @__PURE__ */ jsxRuntimeExports.jsx(ActionBarPositioner, { children: /* @__PURE__ */ jsxRuntimeExports.jsx(ActionBarContent$1, { ref, ...rest, asChild: false, children }) }) });
-});
-reactExports.forwardRef(function ActionBarCloseTrigger2(props, ref) {
-  return /* @__PURE__ */ jsxRuntimeExports.jsx(ActionBarCloseTrigger, { ...props, asChild: true, ref, children: /* @__PURE__ */ jsxRuntimeExports.jsx(CloseButton, { size: "sm" }) });
-});
-const ActionBarRoot = ActionBarRoot$1;
-const ActionBarSelectionTrigger = ActionBarSelectionTrigger$1;
-const ActionBarSeparator = ActionBarSeparator$1;
 const DialogContent = reactExports.forwardRef(function DialogContent2(props, ref) {
   const { children, portalled = true, portalRef, backdrop = true, ...rest } = props;
   return /* @__PURE__ */ jsxRuntimeExports.jsxs(Portal, { disabled: !portalled, container: portalRef, children: [
@@ -484,7 +593,7 @@ const DialogBody = DialogBody$1;
 const DialogBackdrop = DialogBackdrop$1;
 const DialogTitle = DialogTitle$1;
 const DialogActionTrigger = DialogActionTrigger$1;
-function DialogRowDeletion({ isDialogOpen, closeDialog, fireDialogAction }) {
+function DialogRowDeletion({ selectedCount, isDialogOpen, closeDialog, fireDialogAction }) {
   const deleteButtonRef = reactExports.useRef(null);
   const processDialogAction = reactExports.useCallback(() => {
     fireDialogAction();
@@ -493,8 +602,14 @@ function DialogRowDeletion({ isDialogOpen, closeDialog, fireDialogAction }) {
   return /* @__PURE__ */ jsxRuntimeExports.jsxs(DialogRoot, { role: "alertdialog", open: isDialogOpen, onOpenChange: closeDialog, closeOnEscape: true, initialFocusEl: () => deleteButtonRef.current, children: [
     /* @__PURE__ */ jsxRuntimeExports.jsx(DialogBackdrop, {}),
     /* @__PURE__ */ jsxRuntimeExports.jsxs(DialogContent, { children: [
-      /* @__PURE__ */ jsxRuntimeExports.jsx(DialogHeader, { fontSize: "lg", fontWeight: "bold", children: /* @__PURE__ */ jsxRuntimeExports.jsx(DialogTitle, { children: "Delete Selected Rows" }) }),
-      /* @__PURE__ */ jsxRuntimeExports.jsx(DialogBody, { children: "Are you sure you want to delete the selected rows? This action cannot be undone." }),
+      /* @__PURE__ */ jsxRuntimeExports.jsx(DialogHeader, { fontSize: "lg", fontWeight: "bold", children: /* @__PURE__ */ jsxRuntimeExports.jsx(DialogTitle, { children: "Delete Selected Branches" }) }),
+      /* @__PURE__ */ jsxRuntimeExports.jsxs(DialogBody, { children: [
+        "Are you sure you want to delete ",
+        selectedCount,
+        " branch",
+        selectedCount == "1" ? "" : "es",
+        "? This action cannot be undone."
+      ] }),
       /* @__PURE__ */ jsxRuntimeExports.jsxs(DialogFooter, { children: [
         /* @__PURE__ */ jsxRuntimeExports.jsx(DialogActionTrigger, { asChild: true, children: /* @__PURE__ */ jsxRuntimeExports.jsx(Button$1, { children: "Cancel" }) }),
         /* @__PURE__ */ jsxRuntimeExports.jsx(DialogCloseTrigger, {}),
@@ -504,7 +619,7 @@ function DialogRowDeletion({ isDialogOpen, closeDialog, fireDialogAction }) {
   ] });
 }
 function ButtonCustomScripts(props) {
-  const { onClick, colorPalette, label, size } = props;
+  const { onClick, colorPalette, label, size, disabled = false } = props;
   const handleClick = reactExports.useCallback(() => {
     if (onClick) onClick();
   }, [onClick]);
@@ -567,10 +682,11 @@ function ButtonCustomScripts(props) {
         return /* @__PURE__ */ jsxRuntimeExports.jsx(TbAsterisk, {});
     }
   }, [label]);
-  return /* @__PURE__ */ jsxRuntimeExports.jsx(Tooltip, { content: window.electron ? label : "Feature must be used in desktop application", showArrow: true, children: /* @__PURE__ */ jsxRuntimeExports.jsx(IconButton, { "aria-label": label, size, onClick: handleClick, colorPalette, variant: "subtle", disabled: !window.electron, children: icon }) });
+  return /* @__PURE__ */ jsxRuntimeExports.jsx(Tooltip, { content: window.electron ? label : "Feature must be used in desktop application", showArrow: true, disabled: !window.electron || disabled, children: /* @__PURE__ */ jsxRuntimeExports.jsx(IconButton, { "aria-label": label, size, onClick: handleClick, colorPalette, variant: "subtle", disabled: !window.electron || disabled, children: icon }) });
 }
 function EditableBranchesRow({ branchId, dataColumn, dataValue, handleDataChange }) {
-  const { configurableRowData, updateConfig } = useApp();
+  const configurableRowData = useApp((ctx) => ctx.configurableRowData);
+  const updateConfig = useApp((ctx) => ctx.updateConfig);
   const [cellData, setCellData] = reactExports.useState(dataValue);
   const debouncedUpdate = reactExports.useMemo(
     () => lodashExports.debounce((value) => {
@@ -600,7 +716,7 @@ function EditableBranchesRow({ branchId, dataColumn, dataValue, handleDataChange
     }
   );
 }
-const initialState = {
+const initialState$1 = {
   branchInfos: {},
   setBranchInfos: (_) => {
   },
@@ -618,20 +734,25 @@ const initialState = {
   setCustomScripts: (_) => {
   }
 };
-const ContextBranches = reactExports.createContext(initialState);
-const useBranches = () => {
-  const context = reactExports.useContext(ContextBranches);
-  if (!context) throw new Error("useApp must be used within a BranchesProvider");
+const ContextBranches = createContext(initialState$1);
+const useBranches = (selector) => {
+  const context = useContextSelector(ContextBranches, selector);
   return context;
 };
 const BranchesProvider = ({ children }) => {
-  const { configurableRowData, socket, config, updateConfig } = useApp();
-  const [branchInfos, setBranchInfos] = reactExports.useState({});
-  const branchTableGridRef = reactExports.useRef(null);
-  const [selectedBranches, setSelectedBranches] = reactExports.useState({});
+  const configurableRowData = useApp((ctx) => ctx.configurableRowData);
+  const selectedBranches = useApp((ctx) => ctx.selectedBranches);
+  const setSelectedBranches = useApp((ctx) => ctx.setSelectedBranches);
   const [isDialogSBLogOpen, setIsDialogSBLogOpen] = reactExports.useState(false);
-  const [showSelectedBranchesLog, setShowSelectedBranchesLog] = reactExports.useState(false);
   const [customScripts, setCustomScripts] = reactExports.useState([]);
+  const selectionMetrics = reactExports.useMemo(() => {
+    const selectedCount = Object.keys(selectedBranches).length;
+    return {
+      selectedBranchesCount: selectedCount,
+      indeterminate: selectedCount > 0 && selectedCount < configurableRowData.length,
+      hasSelection: selectedCount > 0
+    };
+  }, [selectedBranches, configurableRowData]);
   reactExports.useEffect(() => {
     if (!window.electron) return;
     window.electron.fetchCustomScripts().then((data) => {
@@ -642,214 +763,400 @@ const BranchesProvider = ({ children }) => {
       toaster.create(createToastConfig(data.error, "error", 0));
     });
   }, [configurableRowData]);
-  const memoizedProps = reactExports.useMemo(
-    () => ({
-      branchInfos,
-      setBranchInfos,
-      branchTableGridRef,
-      selectedBranches,
-      setSelectedBranches,
-      isDialogSBLogOpen,
-      setIsDialogSBLogOpen,
-      showSelectedBranchesLog,
-      setShowSelectedBranchesLog,
-      customScripts,
-      setCustomScripts
-    }),
-    [
-      socket,
-      config,
-      updateConfig,
-      configurableRowData,
-      branchInfos,
-      selectedBranches,
-      isDialogSBLogOpen,
-      showSelectedBranchesLog,
-      customScripts
-    ]
-  );
-  return /* @__PURE__ */ jsxRuntimeExports.jsx(ContextBranches.Provider, { value: memoizedProps, children });
-};
-const SectionBranchesRow = reactExports.memo(({ branchRow }) => {
-  const { socket, config, configurableRowData, updateConfig } = useApp();
-  const { selectedBranches, setSelectedBranches, customScripts } = useBranches();
-  const { emitInfoSingle } = useSocketEmits();
-  const branchId = branchRow == null ? void 0 : branchRow.id;
-  const branchFolder = branchRow == null ? void 0 : branchRow["Branch Folder"];
-  const branchVersion = branchRow == null ? void 0 : branchRow["Branch Version"];
-  const branchPath = branchRow == null ? void 0 : branchRow["SVN Branch"];
-  const [branchInfo, setBranchInfo] = reactExports.useState((branchRow == null ? void 0 : branchRow["Branch Info"]) || "Refreshing...");
-  const gradientAnimation = keyframes`
-		0% { background-position: 0% 50%; }
-		50% { background-position: 100% 50%; }
-		100% { background-position: 0% 50%; }
-	`;
-  const gradientStyle = reactExports.useMemo(() => {
-    let gradientFrom = "";
-    let gradientTo = "";
-    let animation = "";
-    let revisionCount = 0;
-    if (branchInfo.toLowerCase().includes("🤬")) {
-      gradientFrom = "#800080";
-      gradientTo = "#FF00FF";
-      animation = `${gradientAnimation} 0.5s linear infinite`;
-    } else if (branchInfo.trim().toLowerCase() !== "latest") {
-      const regex = /-([0-9]+) Revisions{0,1}/;
-      const match = branchInfo.match(regex);
-      if (match) {
-        revisionCount = parseInt(match[1], 10);
-        gradientFrom = "#FFFF00";
-        if (revisionCount >= 4) {
-          gradientFrom = "#FFA500";
-        }
-        const maxRevisions = 10;
-        const colorScale = chroma.scale([revisionCount >= 4 ? "orange" : "yellow", "red"]).domain([0, maxRevisions]);
-        gradientTo = colorScale(Math.min(revisionCount, maxRevisions)).hex();
-        const duration = `${Math.max(1, maxRevisions - revisionCount)}s`;
-        animation = `${gradientAnimation} ${duration} linear infinite`;
-      }
-    }
-    return {
-      backgroundImage: `linear-gradient(to right, ${gradientFrom}, ${gradientTo})`,
-      backgroundSize: "200% 200%",
-      backgroundPosition: "0% 50%",
-      animation,
-      color: revisionCount == 0 || revisionCount > 10 ? "white" : "black"
-    };
-  }, [branchInfo, gradientAnimation]);
-  const rowStyle = reactExports.useMemo(() => {
-    const color = config == null ? void 0 : config.branchFolderColours[branchFolder];
-    return {
-      backgroundColor: color ? `${color}20` : "transparent"
-    };
-  }, [branchFolder, config == null ? void 0 : config.branchFolderColours]);
-  const handleSelectRow = reactExports.useCallback(
-    (checked) => {
-      setSelectedBranches((prev) => {
-        const newState = { ...prev };
-        if (checked) {
-          newState[branchId] = true;
-        } else {
-          delete newState[branchId];
-        }
-        return newState;
-      });
-    },
-    [setSelectedBranches]
-  );
-  const handleSelectFolder = reactExports.useCallback(async () => {
-    const path = await window.electron.selectFolder();
-    if (path) updateConfig((currentConfig) => ({ ...currentConfig, branches: configurableRowData.map((row) => ({ ...row, "SVN Branch": row.id === branchId ? path : row["SVN Branch"] })) }));
-  }, [configurableRowData, updateConfig]);
-  const handleDataChange = reactExports.useCallback((branchId2, dataColumn, newValue) => {
-    updateConfig((currentConfig) => ({
-      ...currentConfig,
-      branches: currentConfig.branches.map((branch) => {
-        if (branch.id === branchId2) {
-          return { ...branch, [dataColumn]: newValue };
-        }
-        return branch;
-      })
-    }));
-  }, [updateConfig]);
-  const refreshRow = reactExports.useCallback(() => {
-    emitInfoSingle(branchId, branchPath, branchVersion, branchFolder, (response) => {
-      if (response.id != branchId) return;
-      setBranchInfo(response.info);
-    });
-  }, [emitInfoSingle, branchId, branchPath, branchVersion, branchFolder]);
-  const resolveConflicts = reactExports.useCallback(() => {
-    window.electron.openSvnResolve({ fullPath: branchPath }).then((result) => {
-      refreshRow();
-    });
-  }, [configurableRowData, refreshRow]);
-  const executeCustomScript = reactExports.useCallback((scriptType, scriptPath, branchData) => {
-    window.electron.runCustomScript({ scriptType, scriptPath, branchData }).then((result) => {
-      console.log("Custom Script Result: ", JSON.stringify(result, null, 4));
-    });
-  }, []);
   reactExports.useEffect(() => {
-    if (!branchPath) return;
-    refreshRow();
-    const interval = setInterval(() => {
-      refreshRow();
-    }, 6e4 * 2);
-    return () => clearInterval(interval);
-  }, [branchPath]);
-  reactExports.useEffect(() => {
-    const socketCallback = (data) => {
-      if (data.id != branchId) return;
-      setBranchInfo(data.info);
-    };
-    socket == null ? void 0 : socket.on("branch-info-single", socketCallback);
-    return () => socket == null ? void 0 : socket.off("branch-info-single", socketCallback);
-  }, [socket]);
-  const renderedBranchInfo = reactExports.useMemo(() => {
-    if (branchInfo === "Latest" || branchInfo === "Refreshing...") {
-      return /* @__PURE__ */ jsxRuntimeExports.jsx(Text, { as: "span", children: branchInfo });
-    }
-    const regex = /(-\d+)( Revisions{0,1}.*)/;
-    const match = branchInfo.match(regex);
-    if (match) {
-      const [_, number, text] = match;
-      return /* @__PURE__ */ jsxRuntimeExports.jsxs(Text, { as: "span", fontWeight: "normal", children: [
-        /* @__PURE__ */ jsxRuntimeExports.jsx(Text, { as: "span", fontWeight: "bold", fontSize: 18, me: 1, children: number }),
-        text
-      ] });
-    }
-    return /* @__PURE__ */ jsxRuntimeExports.jsx(Text, { as: "span", children: branchInfo });
-  }, [branchInfo]);
-  return /* @__PURE__ */ jsxRuntimeExports.jsxs(TableRow, { bgColor: rowStyle.backgroundColor, children: [
-    /* @__PURE__ */ jsxRuntimeExports.jsx(TableCell, { display: "flex", alignItems: "center", children: /* @__PURE__ */ jsxRuntimeExports.jsx(Checkbox, { top: "2", "aria-label": "Select row", variant: "subtle", colorPalette: "yellow", checked: !!selectedBranches[branchId], onCheckedChange: (e) => handleSelectRow(e.checked) }) }),
-    /* @__PURE__ */ jsxRuntimeExports.jsx(TableCell, { children: /* @__PURE__ */ jsxRuntimeExports.jsx(EditableBranchesRow, { branchId, dataColumn: "Branch Folder", dataValue: branchFolder, handleDataChange }) }),
-    /* @__PURE__ */ jsxRuntimeExports.jsx(TableCell, { children: /* @__PURE__ */ jsxRuntimeExports.jsx(EditableBranchesRow, { branchId, dataColumn: "Branch Version", dataValue: branchVersion, handleDataChange }) }),
-    /* @__PURE__ */ jsxRuntimeExports.jsx(TableCell, { children: /* @__PURE__ */ jsxRuntimeExports.jsxs(Flex, { gapX: 3, alignItems: "center", onDoubleClick: () => handleSelectFolder(), children: [
-      /* @__PURE__ */ jsxRuntimeExports.jsx(Tooltip, { content: window.electron ? "Select folder" : "Feature must be used in desktop application", showArrow: true, children: /* @__PURE__ */ jsxRuntimeExports.jsx(IconButton, { colorPalette: "yellow", variant: "subtle", size: "xs", onClick: () => handleSelectFolder(), disabled: !window.electron, children: /* @__PURE__ */ jsxRuntimeExports.jsx(FaFolderOpen, {}) }) }),
-      /* @__PURE__ */ jsxRuntimeExports.jsx(Text, { children: branchPath })
-    ] }) }),
-    /* @__PURE__ */ jsxRuntimeExports.jsx(TableCell, { children: /* @__PURE__ */ jsxRuntimeExports.jsx(Box, { ...gradientStyle, bgColor: "green.focusRing", rounded: "xl", textAlign: "center", py: "6px", px: 2, children: renderedBranchInfo }) }),
-    /* @__PURE__ */ jsxRuntimeExports.jsx(TableCell, { children: /* @__PURE__ */ jsxRuntimeExports.jsxs(Flex, { columnGap: 1, children: [
-      branchInfo.toLowerCase().includes("🤬") && /* @__PURE__ */ jsxRuntimeExports.jsx(ButtonElectron, { icon: /* @__PURE__ */ jsxRuntimeExports.jsx(MdAutoFixHigh, {}), onClick: () => resolveConflicts(), colorPalette: "yellow", variant: "subtle", label: "Resolve Conflicts", size: "xs" }),
-      customScripts.map((script, i) => /* @__PURE__ */ jsxRuntimeExports.jsx(ButtonCustomScripts, { onClick: () => executeCustomScript(script.type, script.path, branchRow), colorPalette: "yellow", label: script.fileName, size: "xs" }, i))
-    ] }) })
-  ] });
-});
-SectionBranchesRow.displayName = "SectionBranchesRow";
-function SectionBranches() {
-  const { updateConfig, configurableRowData, selectedBranches, setSelectedBranches, setIsDialogSBLogOpen, setIsCommitMode } = useApp();
-  const { RaisePromisedClientNotification } = useNotifications();
-  const { emitInfoSingle, emitUpdateSingle } = useSocketEmits();
-  const [selectionMetrics, setSelectionMetrics] = reactExports.useState({
-    selectedBranchesCount: 0,
-    indeterminate: false,
-    hasSelection: false
-  });
-  reactExports.useEffect(() => {
-    const validBranchIds = new Set(configurableRowData.map((branch) => branch.id));
-    const selectedBranchIds = Object.keys(selectedBranches).filter((id) => selectedBranches[id]);
-    const hasInvalidSelections = selectedBranchIds.some((id) => !validBranchIds.has(id));
+    const validBranchPaths = new Set(configurableRowData.map((branch) => branch["SVN Branch"]));
+    const selectedBranchPaths = Object.keys(selectedBranches).filter((path) => selectedBranches[path]);
+    const hasInvalidSelections = selectedBranchPaths.some((path) => !validBranchPaths.has(path));
     if (hasInvalidSelections) {
-      const validSelectedBranches = Object.entries(selectedBranches).reduce((acc, [id, isSelected]) => {
-        if (isSelected && validBranchIds.has(id)) {
-          acc[id] = true;
+      const validSelectedBranches = Object.entries(selectedBranches).reduce((acc, [path, isSelected]) => {
+        if (isSelected && validBranchPaths.has(path)) {
+          acc[path] = true;
         }
         return acc;
       }, {});
       setSelectedBranches(validSelectedBranches);
     }
   }, [configurableRowData, selectedBranches, setSelectedBranches]);
-  reactExports.useEffect(() => {
-    const selectedCount = Object.keys(selectedBranches).filter((key) => selectedBranches[key]).length;
-    setSelectionMetrics({
-      selectedBranchesCount: selectedCount,
-      indeterminate: selectedCount > 0 && selectedCount < configurableRowData.length,
-      hasSelection: selectedCount > 0
+  const value = reactExports.useMemo(
+    () => ({
+      isDialogSBLogOpen,
+      setIsDialogSBLogOpen,
+      customScripts,
+      setCustomScripts,
+      selectionMetrics
+    }),
+    [isDialogSBLogOpen, customScripts, selectionMetrics]
+  );
+  return /* @__PURE__ */ jsxRuntimeExports.jsx(ContextBranches.Provider, { value, children });
+};
+const SectionBranchesRow = reactExports.memo(
+  ({ branchRow, isSelected }) => {
+    const socket = useApp((ctx) => ctx.socket);
+    const config = useApp((ctx) => ctx.config);
+    const configurableRowData = useApp((ctx) => ctx.configurableRowData);
+    const handleBranchSelection = useApp((ctx) => ctx.handleBranchSelection);
+    const updateConfig = useApp((ctx) => ctx.updateConfig);
+    const customScripts = useBranches((ctx) => ctx.customScripts);
+    const { emitInfoSingle } = useSocketEmits();
+    const branchId = branchRow == null ? void 0 : branchRow.id;
+    const branchFolder = branchRow == null ? void 0 : branchRow["Branch Folder"];
+    const branchVersion = branchRow == null ? void 0 : branchRow["Branch Version"];
+    const branchPath = branchRow == null ? void 0 : branchRow["SVN Branch"];
+    const [branchInfo, setBranchInfo] = reactExports.useState((branchRow == null ? void 0 : branchRow["Branch Info"]) || "Refreshing...");
+    const themedBgColor = (config == null ? void 0 : config.branchFolderColours[branchFolder]) || "transparent";
+    const gradientAnimation = keyframes`
+			0% { background-position: 0% 50%; }
+			50% { background-position: 100% 50%; }
+			100% { background-position: 0% 50%; }
+		`;
+    const gradientStyle = reactExports.useMemo(() => {
+      let gradientFrom = "";
+      let gradientTo = "";
+      let animation = "";
+      let revisionCount = 0;
+      if (branchInfo.toLowerCase().includes("🤬") || branchInfo == "Not Found" || branchInfo == "Connection Error") {
+        gradientFrom = "#800080";
+        gradientTo = "#FF00FF";
+        animation = `${gradientAnimation} 0.5s linear infinite`;
+      } else if (branchInfo.trim().toLowerCase() !== "latest") {
+        const regex = /-([0-9]+) Revisions{0,1}/;
+        const match = branchInfo.match(regex);
+        if (match) {
+          revisionCount = parseInt(match[1], 10);
+          gradientFrom = "#FFFF00";
+          if (revisionCount >= 4) {
+            gradientFrom = "#FFA500";
+          }
+          const maxRevisions = 10;
+          const colorScale = chroma.scale([revisionCount >= 4 ? "orange" : "yellow", "red"]).domain([0, maxRevisions]);
+          gradientTo = colorScale(Math.min(revisionCount, maxRevisions)).hex();
+          const duration = `${Math.max(1, maxRevisions - revisionCount)}s`;
+          animation = `${gradientAnimation} ${duration} linear infinite`;
+        }
+      }
+      return {
+        backgroundImage: `linear-gradient(to right, ${gradientFrom}, ${gradientTo})`,
+        backgroundSize: "200% 200%",
+        backgroundPosition: "0% 50%",
+        animation,
+        color: revisionCount == 0 || revisionCount > 10 ? "white" : "black"
+      };
+    }, [branchInfo, gradientAnimation]);
+    const handleSelectFolder = reactExports.useCallback(async () => {
+      const path = await window.electron.selectFolder();
+      if (path) updateConfig((currentConfig) => ({ ...currentConfig, branches: configurableRowData.map((row) => ({ ...row, "SVN Branch": row.id === branchId ? path : row["SVN Branch"] })) }));
+    }, [configurableRowData, updateConfig]);
+    const handleDataChange = reactExports.useCallback(
+      (branchId2, dataColumn, newValue) => {
+        updateConfig((currentConfig) => ({
+          ...currentConfig,
+          branches: currentConfig.branches.map((branch) => {
+            if (branch.id === branchId2) {
+              return { ...branch, [dataColumn]: newValue };
+            }
+            return branch;
+          })
+        }));
+      },
+      [updateConfig]
+    );
+    const refreshRow = reactExports.useCallback(() => {
+      emitInfoSingle(branchId, branchPath, branchVersion, branchFolder);
+    }, [emitInfoSingle, branchId, branchPath, branchVersion, branchFolder]);
+    const resolveConflicts = reactExports.useCallback(() => {
+      window.electron.openSvnResolve({ fullPath: branchPath }).then((result) => {
+        refreshRow();
+      });
+    }, [configurableRowData, refreshRow]);
+    const executeCustomScript = reactExports.useCallback((scriptType, scriptPath, branchData) => {
+      window.electron.runCustomScript({ scriptType, scriptPath, branchData }).then((result) => {
+        console.log("Custom Script Result: ", JSON.stringify(result, null, 4));
+      });
+    }, []);
+    reactExports.useEffect(() => {
+      if (!branchPath) return;
+      refreshRow();
+      const interval = setInterval(() => {
+        refreshRow();
+      }, 6e4 * 2);
+      return () => clearInterval(interval);
+    }, [branchPath]);
+    reactExports.useEffect(() => {
+      const socketCallback = (data) => {
+        if (data.id != branchId) return;
+        setBranchInfo(data.info);
+      };
+      socket == null ? void 0 : socket.on("branch-info-single", socketCallback);
+      return () => socket == null ? void 0 : socket.off("branch-info-single", socketCallback);
+    }, [socket]);
+    const renderedBranchInfo = reactExports.useMemo(() => {
+      if (branchInfo === "Latest" || branchInfo === "Refreshing...") {
+        return /* @__PURE__ */ jsxRuntimeExports.jsx(Text, { as: "span", children: branchInfo });
+      }
+      const regex = /(-\d+)( Revisions{0,1}.*)/;
+      const match = branchInfo.match(regex);
+      if (match) {
+        const [_, number, text] = match;
+        return /* @__PURE__ */ jsxRuntimeExports.jsxs(Text, { as: "span", fontWeight: "normal", children: [
+          /* @__PURE__ */ jsxRuntimeExports.jsx(Text, { as: "span", fontWeight: "bold", fontSize: 18, me: 1, children: number }),
+          text
+        ] });
+      }
+      return /* @__PURE__ */ jsxRuntimeExports.jsx(Text, { as: "span", children: branchInfo });
+    }, [branchInfo]);
+    return /* @__PURE__ */ jsxRuntimeExports.jsxs(TableRow, { _light: { bgColor: themedBgColor == "transparent" ? "transparent" : `${themedBgColor}20` }, _dark: { bgColor: themedBgColor == "transparent" ? "transparent" : `${themedBgColor}80` }, children: [
+      /* @__PURE__ */ jsxRuntimeExports.jsx(TableCell, { display: "flex", alignItems: "center", children: /* @__PURE__ */ jsxRuntimeExports.jsx(Checkbox, { top: "2", "aria-label": "Select row", variant: "subtle", colorPalette: "yellow", checked: isSelected, onCheckedChange: (e) => handleBranchSelection(branchPath, e.checked) }) }),
+      /* @__PURE__ */ jsxRuntimeExports.jsx(TableCell, { children: /* @__PURE__ */ jsxRuntimeExports.jsx(EditableBranchesRow, { branchId, dataColumn: "Branch Folder", dataValue: branchFolder, handleDataChange }) }),
+      /* @__PURE__ */ jsxRuntimeExports.jsx(TableCell, { children: /* @__PURE__ */ jsxRuntimeExports.jsx(EditableBranchesRow, { branchId, dataColumn: "Branch Version", dataValue: branchVersion, handleDataChange }) }),
+      /* @__PURE__ */ jsxRuntimeExports.jsx(TableCell, { children: /* @__PURE__ */ jsxRuntimeExports.jsxs(Flex, { gapX: 3, alignItems: "center", onDoubleClick: () => handleSelectFolder(), children: [
+        /* @__PURE__ */ jsxRuntimeExports.jsx(Tooltip, { content: window.electron ? "Select folder" : "Feature must be used in desktop application", showArrow: true, children: /* @__PURE__ */ jsxRuntimeExports.jsx(IconButton, { colorPalette: "yellow", variant: "subtle", size: "xs", onClick: () => handleSelectFolder(), disabled: !window.electron, children: /* @__PURE__ */ jsxRuntimeExports.jsx(FaFolderOpen, {}) }) }),
+        /* @__PURE__ */ jsxRuntimeExports.jsx(Text, { children: branchPath })
+      ] }) }),
+      /* @__PURE__ */ jsxRuntimeExports.jsx(TableCell, { ...gradientStyle, bgColor: "green.focusRing", textAlign: "center", children: renderedBranchInfo }),
+      /* @__PURE__ */ jsxRuntimeExports.jsx(TableCell, { children: /* @__PURE__ */ jsxRuntimeExports.jsxs(Flex, { columnGap: 1, children: [
+        branchInfo.toLowerCase().includes("🤬") && /* @__PURE__ */ jsxRuntimeExports.jsx(ButtonElectron, { icon: /* @__PURE__ */ jsxRuntimeExports.jsx(MdAutoFixHigh, {}), onClick: () => resolveConflicts(), colorPalette: "yellow", variant: "subtle", label: "Resolve Conflicts", size: "xs" }),
+        customScripts.map((script, i) => /* @__PURE__ */ jsxRuntimeExports.jsx(ButtonCustomScripts, { onClick: () => executeCustomScript(script.type, script.path, branchRow), colorPalette: "yellow", label: script.fileName, size: "xs", disabled: branchInfo === "Not Found" }, i))
+      ] }) })
+    ] });
+  }
+);
+SectionBranchesRow.displayName = "SectionBranchesRow";
+const ActionBarContent = reactExports.forwardRef(function ActionBarContent2(props, ref) {
+  const { children, portalled = true, portalRef, ...rest } = props;
+  return /* @__PURE__ */ jsxRuntimeExports.jsx(Portal, { disabled: !portalled, container: portalRef, children: /* @__PURE__ */ jsxRuntimeExports.jsx(ActionBarPositioner, { children: /* @__PURE__ */ jsxRuntimeExports.jsx(ActionBarContent$1, { ref, ...rest, asChild: false, children }) }) });
+});
+reactExports.forwardRef(function ActionBarCloseTrigger2(props, ref) {
+  return /* @__PURE__ */ jsxRuntimeExports.jsx(ActionBarCloseTrigger, { ...props, asChild: true, ref, children: /* @__PURE__ */ jsxRuntimeExports.jsx(CloseButton, { size: "sm" }) });
+});
+const ActionBarRoot = ActionBarRoot$1;
+const ActionBarSelectionTrigger = ActionBarSelectionTrigger$1;
+const ActionBarSeparator = ActionBarSeparator$1;
+const ActionBarSelection = reactExports.memo(({ selectedCount, onDelete, onRefresh, onUpdate, onCommit, onLogs, onClear }) => {
+  if (selectedCount === 0) return null;
+  return /* @__PURE__ */ jsxRuntimeExports.jsx(ActionBarRoot, { open: true, closeOnEscape: false, children: /* @__PURE__ */ jsxRuntimeExports.jsxs(ActionBarContent, { colorPalette: "yellow", children: [
+    /* @__PURE__ */ jsxRuntimeExports.jsxs(ActionBarSelectionTrigger, { children: [
+      selectedCount,
+      " Selected"
+    ] }),
+    /* @__PURE__ */ jsxRuntimeExports.jsx(ActionBarSeparator, {}),
+    /* @__PURE__ */ jsxRuntimeExports.jsxs(HStack, { wrap: "wrap", children: [
+      /* @__PURE__ */ jsxRuntimeExports.jsxs(Button$1, { variant: "subtle", size: "sm", onClick: onDelete, children: [
+        "Delete ",
+        /* @__PURE__ */ jsxRuntimeExports.jsx(Kbd, { variant: "subtle", wordSpacing: 0, children: "Alt+Del" })
+      ] }),
+      /* @__PURE__ */ jsxRuntimeExports.jsxs(Button$1, { variant: "subtle", size: "sm", onClick: onRefresh, children: [
+        "Refresh ",
+        /* @__PURE__ */ jsxRuntimeExports.jsx(Kbd, { variant: "subtle", wordSpacing: 0, children: "Alt+R" })
+      ] }),
+      /* @__PURE__ */ jsxRuntimeExports.jsxs(Button$1, { variant: "subtle", size: "sm", onClick: onUpdate, children: [
+        "Update ",
+        /* @__PURE__ */ jsxRuntimeExports.jsx(Kbd, { variant: "subtle", wordSpacing: 0, children: "Alt+U" })
+      ] }),
+      /* @__PURE__ */ jsxRuntimeExports.jsxs(Button$1, { variant: "subtle", size: "sm", onClick: onCommit, children: [
+        "Commit ",
+        /* @__PURE__ */ jsxRuntimeExports.jsx(Kbd, { variant: "subtle", wordSpacing: 0, children: "Alt+C" })
+      ] }),
+      /* @__PURE__ */ jsxRuntimeExports.jsxs(Button$1, { variant: "subtle", size: "sm", onClick: onLogs, children: [
+        "Logs ",
+        /* @__PURE__ */ jsxRuntimeExports.jsx(Kbd, { variant: "subtle", wordSpacing: 0, children: "Alt+L" })
+      ] })
+    ] }),
+    /* @__PURE__ */ jsxRuntimeExports.jsx(ActionBarSeparator, {}),
+    /* @__PURE__ */ jsxRuntimeExports.jsx(IconButton, { variant: "ghost", size: "sm", onClick: onClear, disabled: !window.electron, children: /* @__PURE__ */ jsxRuntimeExports.jsx(IoMdClose, {}) })
+  ] }) });
+});
+ActionBarSelection.displayName = "SelectionActionBar";
+const InputGroup = reactExports.forwardRef(function InputGroup2(props, ref) {
+  const { startElement, startElementProps, endElement, endElementProps, children, startOffset = "6px", endOffset = "6px", ...rest } = props;
+  return /* @__PURE__ */ jsxRuntimeExports.jsxs(Group, { ref, ...rest, children: [
+    startElement && /* @__PURE__ */ jsxRuntimeExports.jsx(InputElement, { pointerEvents: "none", ...startElementProps, children: startElement }),
+    reactExports.cloneElement(children, {
+      ...startElement && {
+        ps: `calc(var(--input-height) - ${startOffset})`
+      },
+      ...endElement && { pe: `calc(var(--input-height) - ${endOffset})` },
+      ...children.props
+    }),
+    endElement && /* @__PURE__ */ jsxRuntimeExports.jsx(InputElement, { placement: "end", ...endElementProps, children: endElement })
+  ] });
+});
+const ROW_HEIGHT$1 = 40;
+const OVERSCAN$1 = 10;
+const getPathActionolour$1 = (action) => {
+  switch (action) {
+    case "A":
+      return "green.500";
+    case "M":
+      return "cyan.500";
+    case "D":
+      return "red.500";
+    default:
+      return "gray";
+  }
+};
+const LogRow$1 = React.memo(function LogRow2({ entry, isExpanded, onToggleExpand }) {
+  return /* @__PURE__ */ jsxRuntimeExports.jsxs(React.Fragment, { children: [
+    /* @__PURE__ */ jsxRuntimeExports.jsxs(TableRow, { height: `${ROW_HEIGHT$1}px`, _light: { bgColor: "yellow.fg", color: "white" }, _dark: { bgColor: "yellow.800" }, children: [
+      /* @__PURE__ */ jsxRuntimeExports.jsx(TableCell, { children: /* @__PURE__ */ jsxRuntimeExports.jsx(IconButton, { "aria-label": "Expand/Collapse", size: "2xs", onClick: () => onToggleExpand(entry.revision), variant: "subtle", children: isExpanded ? /* @__PURE__ */ jsxRuntimeExports.jsx(FaChevronDown, {}) : /* @__PURE__ */ jsxRuntimeExports.jsx(FaChevronRight, {}) }) }),
+      /* @__PURE__ */ jsxRuntimeExports.jsx(TableCell, { fontWeight: 900, children: entry.revision }),
+      /* @__PURE__ */ jsxRuntimeExports.jsx(TableCell, { children: entry.date }),
+      /* @__PURE__ */ jsxRuntimeExports.jsx(TableCell, { children: entry.author }),
+      /* @__PURE__ */ jsxRuntimeExports.jsx(
+        TableCell,
+        {
+          style: {
+            whiteSpace: "nowrap",
+            overflow: "hidden",
+            textOverflow: "ellipsis",
+            maxWidth: "500px"
+          },
+          children: entry.message
+        }
+      )
+    ] }),
+    isExpanded && entry.filesChanged && entry.filesChanged.length > 0 && /* @__PURE__ */ jsxRuntimeExports.jsx(TableRow, { bgColor: "gray.subtle", height: `${ROW_HEIGHT$1}px`, children: /* @__PURE__ */ jsxRuntimeExports.jsx(TableCell, { colSpan: 5, children: /* @__PURE__ */ jsxRuntimeExports.jsxs(Box, { p: 3, children: [
+      /* @__PURE__ */ jsxRuntimeExports.jsxs(Flex, { alignItems: "center", mb: 5, gap: 3, p: 2, children: [
+        "Commit Message: ",
+        /* @__PURE__ */ jsxRuntimeExports.jsx(Text, { color: "yellow.fg", children: entry.message })
+      ] }),
+      /* @__PURE__ */ jsxRuntimeExports.jsxs(TableRoot, { variant: "simple", size: "sm", children: [
+        /* @__PURE__ */ jsxRuntimeExports.jsxs(TableColumnGroup, { children: [
+          /* @__PURE__ */ jsxRuntimeExports.jsx(TableColumn, { width: "10%" }),
+          /* @__PURE__ */ jsxRuntimeExports.jsx(TableColumn, { width: "" }),
+          /* @__PURE__ */ jsxRuntimeExports.jsx(TableColumn, { width: "10%" })
+        ] }),
+        /* @__PURE__ */ jsxRuntimeExports.jsx(TableHeader, { children: /* @__PURE__ */ jsxRuntimeExports.jsxs(TableRow, { children: [
+          /* @__PURE__ */ jsxRuntimeExports.jsx(TableColumnHeader, { children: "Action" }),
+          /* @__PURE__ */ jsxRuntimeExports.jsx(TableColumnHeader, { children: "Path" }),
+          /* @__PURE__ */ jsxRuntimeExports.jsx(TableColumnHeader, {})
+        ] }) }),
+        /* @__PURE__ */ jsxRuntimeExports.jsx(TableBody, { children: entry.filesChanged.map((file, idx) => /* @__PURE__ */ jsxRuntimeExports.jsxs(TableRow, { height: `${ROW_HEIGHT$1}px`, color: getPathActionolour$1(file.action.toUpperCase()), children: [
+          /* @__PURE__ */ jsxRuntimeExports.jsx(TableCell, { children: file.action.toUpperCase() }),
+          /* @__PURE__ */ jsxRuntimeExports.jsxs(TableCell, { children: [
+            file.path,
+            " (",
+            file.kind === "dir" ? "Directory" : "File",
+            ")"
+          ] }),
+          /* @__PURE__ */ jsxRuntimeExports.jsx(TableCell, { children: /* @__PURE__ */ jsxRuntimeExports.jsx(IconButton, { variant: "subtle", size: "xs", disabled: !window.electron, "aria-label": "Diff", onClick: () => window.electron.openSvnDiff({ fullPath: `${entry.repositoryRoot}${file.path}`, revision: entry.revision }), children: /* @__PURE__ */ jsxRuntimeExports.jsx(VscDiffSingle, {}) }) })
+        ] }, `${entry.revision}-file-${idx}`)) })
+      ] })
+    ] }) }) })
+  ] });
+});
+function DialogBranchesLog() {
+  const logsData = useApp((ctx) => ctx.logsData);
+  const isDialogSBLogOpen = useBranches((ctx) => ctx.isDialogSBLogOpen);
+  const setIsDialogSBLogOpen = useBranches((ctx) => ctx.setIsDialogSBLogOpen);
+  const [expandedRows, setExpandedRows] = reactExports.useState(() => /* @__PURE__ */ new Set());
+  const [searchTerm, setSearchTerm] = reactExports.useState("");
+  const closeDialog = reactExports.useCallback(() => {
+    setIsDialogSBLogOpen(false);
+  }, [setIsDialogSBLogOpen]);
+  const toggleExpand = reactExports.useCallback((revision) => {
+    setExpandedRows((prev) => {
+      const newSet = new Set(prev);
+      if (newSet.has(revision)) {
+        newSet.delete(revision);
+      } else {
+        newSet.add(revision);
+      }
+      return newSet;
     });
-  }, [selectedBranches, configurableRowData]);
+  }, []);
+  const filteredData = reactExports.useMemo(() => {
+    if (!searchTerm) return logsData;
+    const lowerSearch = searchTerm.toLowerCase();
+    return logsData.filter((entry) => {
+      const mainFields = [entry.revision, entry.date, entry.author, entry.message, entry.branchFolder, entry.branchVersion];
+      const mainMatch = mainFields.some((field) => field == null ? void 0 : field.toString().toLowerCase().includes(lowerSearch));
+      const filesMatch = entry.filesChanged && entry.filesChanged.some((file) => [file.action, file.path, file.kind].some((field) => field == null ? void 0 : field.toString().toLowerCase().includes(lowerSearch)));
+      return mainMatch || filesMatch;
+    });
+  }, [logsData, searchTerm]);
+  const containerRef = reactExports.useRef(null);
+  const [containerHeight, setContainerHeight] = reactExports.useState(0);
+  const [scrollTop, setScrollTop] = reactExports.useState(0);
+  reactExports.useEffect(() => {
+    const measure = () => {
+      if (containerRef.current) {
+        setContainerHeight(containerRef.current.clientHeight);
+      }
+    };
+    measure();
+    window.addEventListener("resize", measure);
+    return () => window.removeEventListener("resize", measure);
+  }, []);
+  const onScroll = reactExports.useCallback(() => {
+    if (containerRef.current) {
+      setScrollTop(containerRef.current.scrollTop);
+    }
+  }, []);
+  const totalRows = filteredData.length;
+  const visibleCount = Math.ceil(containerHeight / ROW_HEIGHT$1) + OVERSCAN$1 * 2;
+  const startIndex = Math.max(0, Math.floor(scrollTop / ROW_HEIGHT$1) - OVERSCAN$1);
+  const endIndex = Math.min(totalRows, startIndex + visibleCount);
+  const offsetY = startIndex * ROW_HEIGHT$1;
+  const visibleRows = filteredData.slice(startIndex, endIndex);
+  return /* @__PURE__ */ jsxRuntimeExports.jsxs(DialogRoot, { role: "dialog", size: "cover", placement: "center", open: isDialogSBLogOpen, onOpenChange: closeDialog, closeOnEscape: false, initialFocusEl: void 0, children: [
+    /* @__PURE__ */ jsxRuntimeExports.jsx(DialogBackdrop, {}),
+    /* @__PURE__ */ jsxRuntimeExports.jsxs(DialogContent, { children: [
+      /* @__PURE__ */ jsxRuntimeExports.jsx(DialogHeader, { fontSize: "lg", fontWeight: "bold", children: /* @__PURE__ */ jsxRuntimeExports.jsxs(DialogTitle, { display: "flex", alignItems: "center", gap: 4, children: [
+        /* @__PURE__ */ jsxRuntimeExports.jsx(SiSubversion, { size: "32px" }),
+        "Selected Branches: SVN Logs (All Time)"
+      ] }) }),
+      /* @__PURE__ */ jsxRuntimeExports.jsxs(DialogBody, { children: [
+        /* @__PURE__ */ jsxRuntimeExports.jsx(HStack, { gap: "6", mb: 4, width: "full", colorPalette: "yellow", children: /* @__PURE__ */ jsxRuntimeExports.jsx(InputGroup, { flex: "1", startElement: /* @__PURE__ */ jsxRuntimeExports.jsx(LuSearch, {}), startElementProps: { color: "colorPalette.fg" }, children: /* @__PURE__ */ jsxRuntimeExports.jsx(Input, { placeholder: "Quick search...", variant: "flushed", borderColor: "colorPalette.fg", value: searchTerm, onChange: (e) => setSearchTerm(e.target.value) }) }) }),
+        /* @__PURE__ */ jsxRuntimeExports.jsxs(TableRoot, { size: "sm", variant: "outline", colorPalette: "yellow", children: [
+          /* @__PURE__ */ jsxRuntimeExports.jsxs(TableColumnGroup, { children: [
+            /* @__PURE__ */ jsxRuntimeExports.jsx(TableColumn, { width: "5%" }),
+            /* @__PURE__ */ jsxRuntimeExports.jsx(TableColumn, { width: "10%" }),
+            /* @__PURE__ */ jsxRuntimeExports.jsx(TableColumn, { width: "15%" }),
+            /* @__PURE__ */ jsxRuntimeExports.jsx(TableColumn, { width: "10%" }),
+            /* @__PURE__ */ jsxRuntimeExports.jsx(TableColumn, { width: "60%" })
+          ] }),
+          /* @__PURE__ */ jsxRuntimeExports.jsx(TableHeader, { children: /* @__PURE__ */ jsxRuntimeExports.jsxs(TableRow, { height: `${ROW_HEIGHT$1}px`, bgColor: "colorPalette.400", children: [
+            /* @__PURE__ */ jsxRuntimeExports.jsx(TableColumnHeader, { color: "black", fontWeight: 900 }),
+            /* @__PURE__ */ jsxRuntimeExports.jsx(TableColumnHeader, { color: "black", fontWeight: 900, children: "Revision" }),
+            /* @__PURE__ */ jsxRuntimeExports.jsx(TableColumnHeader, { color: "black", fontWeight: 900, children: "Date" }),
+            /* @__PURE__ */ jsxRuntimeExports.jsx(TableColumnHeader, { color: "black", fontWeight: 900, children: "Author" }),
+            /* @__PURE__ */ jsxRuntimeExports.jsx(TableColumnHeader, { color: "black", fontWeight: 900, ms: 0, children: "Message" })
+          ] }) })
+        ] }),
+        /* @__PURE__ */ jsxRuntimeExports.jsx(Box, { ref: containerRef, overflowY: "auto", maxH: "lg", colorPalette: "yellow", onScroll, position: "relative", children: /* @__PURE__ */ jsxRuntimeExports.jsx(Box, { position: "relative", height: `lg`, children: /* @__PURE__ */ jsxRuntimeExports.jsx(Box, { position: "absolute", width: "100%", top: `${offsetY}px`, children: /* @__PURE__ */ jsxRuntimeExports.jsxs(TableRoot, { size: "sm", variant: "outline", children: [
+          /* @__PURE__ */ jsxRuntimeExports.jsxs(TableColumnGroup, { children: [
+            /* @__PURE__ */ jsxRuntimeExports.jsx(TableColumn, { width: "5%" }),
+            /* @__PURE__ */ jsxRuntimeExports.jsx(TableColumn, { width: "10%" }),
+            /* @__PURE__ */ jsxRuntimeExports.jsx(TableColumn, { width: "15%" }),
+            /* @__PURE__ */ jsxRuntimeExports.jsx(TableColumn, { width: "10%" }),
+            /* @__PURE__ */ jsxRuntimeExports.jsx(TableColumn, { width: "60%" })
+          ] }),
+          /* @__PURE__ */ jsxRuntimeExports.jsx(TableBody, { children: visibleRows.map((entry) => /* @__PURE__ */ jsxRuntimeExports.jsx(LogRow$1, { entry, isExpanded: expandedRows.has(entry.revision), onToggleExpand: toggleExpand }, `${entry.branchFolder}-${entry.branchVersion}-${entry.revision}`)) })
+        ] }) }) }) })
+      ] }),
+      /* @__PURE__ */ jsxRuntimeExports.jsxs(DialogFooter, { children: [
+        /* @__PURE__ */ jsxRuntimeExports.jsx(DialogActionTrigger, { asChild: true, children: /* @__PURE__ */ jsxRuntimeExports.jsx(Button, { children: "Cancel" }) }),
+        /* @__PURE__ */ jsxRuntimeExports.jsx(DialogCloseTrigger, {})
+      ] })
+    ] })
+  ] });
+}
+function SectionBranches() {
+  const updateConfig = useApp((ctx) => ctx.updateConfig);
+  const configurableRowData = useApp((ctx) => ctx.configurableRowData);
+  const selectedBranchesData = useApp((ctx) => ctx.selectedBranchesData);
+  const selectedBranches = useApp((ctx) => ctx.selectedBranches);
+  const setSelectedBranches = useApp((ctx) => ctx.setSelectedBranches);
+  const setAppMode = useApp((ctx) => ctx.setAppMode);
+  const handleBulkSelection = useBranches((ctx) => ctx.handleBulkSelection);
+  const setIsDialogSBLogOpen = useBranches((ctx) => ctx.setIsDialogSBLogOpen);
+  const selectionMetrics = useBranches((ctx) => ctx.selectionMetrics);
+  const { RaisePromisedClientNotification } = useNotifications();
+  const { emitInfoSingle, emitUpdateSingle } = useSocketEmits();
   const [isRowDialogOpen, setIsRowDialogOpen] = reactExports.useState(false);
   const fireRowDialogAction = reactExports.useCallback(() => {
     updateConfig((currentConfig) => {
-      const newBranches = configurableRowData.filter((branch) => !selectedBranches[branch.id]);
+      const newBranches = configurableRowData.filter((branch) => !selectedBranches[branch["SVN Branch"]]);
       return { ...currentConfig, branches: newBranches };
     });
   }, [updateConfig, configurableRowData, selectedBranches]);
@@ -857,13 +1164,13 @@ function SectionBranches() {
     RaisePromisedClientNotification({
       title: "Updating Branches",
       totalItems: configurableRowData.length,
-      onProgress: async (index, { onSuccess }) => {
-        const branchRow = configurableRowData[index];
+      onProgress: async (index2, { onSuccess }) => {
+        const branchRow = configurableRowData[index2];
         await new Promise((resolveUpdate) => {
           emitUpdateSingle(branchRow.id, branchRow["SVN Branch"], branchRow["Branch Version"], branchRow["Branch Folder"], (response) => {
             if (response.success) {
               onSuccess();
-              emitInfoSingle(branchRow.id, branchRow["SVN Branch"], branchRow["Branch Version"], branchRow["Branch Folder"], null);
+              emitInfoSingle(branchRow.id, branchRow["SVN Branch"], branchRow["Branch Version"], branchRow["Branch Folder"]);
             }
             resolveUpdate();
           });
@@ -887,22 +1194,22 @@ function SectionBranches() {
     });
   }, [updateConfig, configurableRowData]);
   const refreshSelectedBranches = reactExports.useCallback(() => {
-    configurableRowData.filter((branchRow) => selectedBranches[branchRow.id]).forEach((branchRow) => {
-      emitInfoSingle(branchRow.id, branchRow["SVN Branch"], branchRow["Branch Version"], branchRow["Branch Folder"], null);
+    configurableRowData.filter((branchRow) => selectedBranches[branchRow["SVN Branch"]]).forEach((branchRow) => {
+      emitInfoSingle(branchRow.id, branchRow["SVN Branch"], branchRow["Branch Version"], branchRow["Branch Folder"]);
     });
   }, [configurableRowData, selectedBranches]);
   const updateSelectedBranches = reactExports.useCallback(() => {
-    const selectedBranchRows = configurableRowData.filter((branchRow) => selectedBranches[branchRow.id]);
+    const selectedBranchRows = selectedBranchesData;
     RaisePromisedClientNotification({
       title: "Updating Selected Branches",
       totalItems: selectedBranchRows.length,
-      onProgress: async (index, { onSuccess }) => {
-        const branchRow = selectedBranchRows[index];
+      onProgress: async (index2, { onSuccess }) => {
+        const branchRow = selectedBranchRows[index2];
         await new Promise((resolveUpdate) => {
           emitUpdateSingle(branchRow.id, branchRow["SVN Branch"], branchRow["Branch Version"], branchRow["Branch Folder"], (response) => {
             if (response.success) {
               onSuccess();
-              emitInfoSingle(branchRow.id, branchRow["SVN Branch"], branchRow["Branch Version"], branchRow["Branch Folder"], null);
+              emitInfoSingle(branchRow.id, branchRow["SVN Branch"], branchRow["Branch Version"], branchRow["Branch Folder"]);
             }
             resolveUpdate();
           });
@@ -912,19 +1219,20 @@ function SectionBranches() {
       errorMessage: (id) => `Failed to update branch ${id}`,
       loadingMessage: (current, total) => `Updating ${current} of ${total} branches`
     }).catch(console.error);
-  }, [RaisePromisedClientNotification, configurableRowData, selectedBranches, emitUpdateSingle, emitInfoSingle]);
+  }, [RaisePromisedClientNotification, selectedBranchesData, emitUpdateSingle, emitInfoSingle]);
   const commitSelectedBranches = reactExports.useCallback(() => {
-    setIsCommitMode((current) => !current);
-  }, [setIsCommitMode]);
+    setAppMode((current) => current == "commit" ? "branches" : "commit");
+  }, [setAppMode]);
   const logsSelectedBranches = reactExports.useCallback(() => {
-    setIsDialogSBLogOpen(true);
+    setIsDialogSBLogOpen((prev) => !prev);
   }, [setIsDialogSBLogOpen]);
   reactExports.useEffect(() => {
     if (!selectionMetrics.hasSelection) return;
     const handleKeyDown = (event) => {
+      if (!event.altKey) return;
       if (event.key === "Delete") {
         setIsRowDialogOpen(true);
-      } else if (event.key === "r" && event.altKey) {
+      } else if (event.key === "r") {
         refreshSelectedBranches();
       } else if (event.key === "u") {
         updateSelectedBranches();
@@ -938,19 +1246,11 @@ function SectionBranches() {
     return () => {
       window.removeEventListener("keydown", handleKeyDown);
     };
-  }, [selectionMetrics.hasSelection, setIsRowDialogOpen, refreshSelectedBranches, updateSelectedBranches]);
+  }, [selectionMetrics.hasSelection, refreshSelectedBranches, updateSelectedBranches]);
   const selectAllBranches = reactExports.useCallback(
     (checked) => {
-      console.log("Select All: ", checked);
-      if (checked) {
-        const newSelection = configurableRowData.reduce((acc, branch) => {
-          acc[branch.id] = true;
-          return acc;
-        }, {});
-        setSelectedBranches(newSelection);
-      } else {
-        setSelectedBranches({});
-      }
+      const paths = configurableRowData.map((row) => row["SVN Branch"]);
+      handleBulkSelection(paths, checked);
     },
     [configurableRowData, setSelectedBranches]
   );
@@ -979,348 +1279,26 @@ function SectionBranches() {
         /* @__PURE__ */ jsxRuntimeExports.jsx(TableColumnHeader, { children: "Branch Info" }),
         /* @__PURE__ */ jsxRuntimeExports.jsx(TableColumnHeader, { children: "Custom Scripts" })
       ] }) }),
-      /* @__PURE__ */ jsxRuntimeExports.jsx(TableBody, { children: configurableRowData && configurableRowData.length > 0 ? configurableRowData.map((branchRow) => /* @__PURE__ */ jsxRuntimeExports.jsx(SectionBranchesRow, { branchRow }, branchRow.id)) : null }),
+      /* @__PURE__ */ jsxRuntimeExports.jsx(TableBody, { children: configurableRowData.map((branchRow) => /* @__PURE__ */ jsxRuntimeExports.jsx(SectionBranchesRow, { branchRow, isSelected: !!selectedBranches[branchRow["SVN Branch"]] }, branchRow.id)) }),
       /* @__PURE__ */ jsxRuntimeExports.jsx(TableFooter, { children: /* @__PURE__ */ jsxRuntimeExports.jsx(TableRow, { children: /* @__PURE__ */ jsxRuntimeExports.jsx(TableCell, { colSpan: 6, children: /* @__PURE__ */ jsxRuntimeExports.jsx(Flex, { justifyContent: "start", p: 2, children: /* @__PURE__ */ jsxRuntimeExports.jsxs(Flex, { gapX: 2, children: [
         /* @__PURE__ */ jsxRuntimeExports.jsx(ButtonIconTooltip, { icon: /* @__PURE__ */ jsxRuntimeExports.jsx(IoMdAdd, {}), colorPalette: "yellow", variant: "subtle", label: "Add Row", placement: "bottom-end", onClick: addRow }),
         /* @__PURE__ */ jsxRuntimeExports.jsx(ButtonIconTooltip, { icon: /* @__PURE__ */ jsxRuntimeExports.jsx(MdUpdate, {}), colorPalette: "yellow", variant: "subtle", label: "Update All", placement: "bottom-end", onClick: updateAll, disabled: configurableRowData.length < 1 })
       ] }) }) }) }) })
     ] }),
-    /* @__PURE__ */ jsxRuntimeExports.jsx(ActionBarRoot, { open: selectionMetrics.hasSelection, closeOnEscape: false, children: /* @__PURE__ */ jsxRuntimeExports.jsxs(ActionBarContent, { children: [
-      /* @__PURE__ */ jsxRuntimeExports.jsxs(ActionBarSelectionTrigger, { children: [
-        selectionMetrics.selectedBranchesCount,
-        " Selected"
-      ] }),
-      /* @__PURE__ */ jsxRuntimeExports.jsx(ActionBarSeparator, {}),
-      /* @__PURE__ */ jsxRuntimeExports.jsxs(HStack, { wrap: "wrap", children: [
-        /* @__PURE__ */ jsxRuntimeExports.jsxs(Button$1, { variant: "outline", size: "sm", onClick: () => setIsRowDialogOpen(true), children: [
-          "Delete ",
-          /* @__PURE__ */ jsxRuntimeExports.jsx(Kbd, { wordSpacing: 0, children: "Del" })
-        ] }),
-        /* @__PURE__ */ jsxRuntimeExports.jsxs(Button$1, { variant: "outline", size: "sm", onClick: () => refreshSelectedBranches(), children: [
-          "Refresh ",
-          /* @__PURE__ */ jsxRuntimeExports.jsx(Kbd, { wordSpacing: 0, children: "Alt + R" })
-        ] }),
-        /* @__PURE__ */ jsxRuntimeExports.jsxs(Button$1, { variant: "outline", size: "sm", onClick: () => updateSelectedBranches(), children: [
-          "Update ",
-          /* @__PURE__ */ jsxRuntimeExports.jsx(Kbd, { wordSpacing: 0, children: "U" })
-        ] }),
-        /* @__PURE__ */ jsxRuntimeExports.jsxs(Button$1, { variant: "outline", size: "sm", onClick: () => commitSelectedBranches(), children: [
-          "Commit ",
-          /* @__PURE__ */ jsxRuntimeExports.jsx(Kbd, { wordSpacing: 0, children: "C" })
-        ] }),
-        /* @__PURE__ */ jsxRuntimeExports.jsxs(Button$1, { variant: "outline", size: "sm", onClick: () => logsSelectedBranches(), children: [
-          "Logs ",
-          /* @__PURE__ */ jsxRuntimeExports.jsx(Kbd, { wordSpacing: 0, children: "L" })
-        ] })
-      ] }),
-      /* @__PURE__ */ jsxRuntimeExports.jsx(ActionBarSeparator, {}),
-      /* @__PURE__ */ jsxRuntimeExports.jsx(IconButton, { variant: "ghost", size: "sm", onClick: () => setSelectedBranches({}), disabled: !window.electron, children: /* @__PURE__ */ jsxRuntimeExports.jsx(IoMdClose, {}) })
-    ] }) }),
-    /* @__PURE__ */ jsxRuntimeExports.jsx(DialogRowDeletion, { isDialogOpen: isRowDialogOpen, closeDialog: () => setIsRowDialogOpen(false), fireDialogAction: fireRowDialogAction })
-  ] });
-}
-function branchString(branchFolder, branchVersion, branch) {
-  return `${branchFolder == "" ? "Uncategorised" : branchFolder} ${branchVersion == "" ? "Unversioned" : branchVersion} ${String(branch).split("\\").at(-1)}`;
-}
-const ContextCommit = reactExports.createContext({
-  socket: null,
-  toaster: null,
-  config: null,
-  updateConfig: (_) => {
-  },
-  configurableRowData: [],
-  setConfigurableRowData: (_) => {
-  },
-  branchInfos: {},
-  setBranchInfos: (_) => {
-  },
-  branchTableGridRef: null,
-  selectedBranches: {},
-  setSelectedBranches: (_) => {
-  },
-  isDialogSBLogOpen: false,
-  setIsDialogSBLogOpen: (_) => {
-  },
-  showSelectedBranchesLog: false,
-  setShowSelectedBranchesLog: (_) => {
-  },
-  customScripts: [],
-  setCustomScripts: (_) => {
-  },
-  isCommitMode: false,
-  setIsCommitMode: (_) => {
-  },
-  selectedBranchStatuses: [],
-  setSelectedBranchStatuses: (_) => {
-  },
-  localChangesGridRef: null,
-  untrackedChangesGridRef: null,
-  showCommitView: false,
-  setShowCommitView: (_) => {
-  },
-  sourceBranch: null,
-  setSourceBranch: (_) => {
-  },
-  branchOptions: [],
-  issueNumber: {},
-  setIssueNumber: (_) => {
-  },
-  commitMessage: "",
-  setCommitMessage: (_) => {
-  },
-  selectedLocalChanges: [],
-  setSelectedLocalChanges: (_) => {
-  },
-  selectedUntrackedChanges: [],
-  setSelectedUntrackedChanges: (_) => {
-  },
-  socketPayload: null,
-  setSocketPayload: (_) => {
-  },
-  postCommitData: {},
-  setPostCommitData: (_) => {
-  },
-  logData: [],
-  setLogData: (_) => {
-  }
-});
-const useCommit = () => {
-  return reactExports.useContext(ContextCommit);
-};
-const CommitProvider = ({ children }) => {
-  const [config, setConfig] = reactExports.useState(null);
-  const [socket, setSocket] = reactExports.useState(null);
-  reactExports.useEffect(() => {
-    const newSocket = lookup(URL_SOCKET_CLIENT);
-    setSocket(newSocket);
-    newSocket.on("connect", () => {
-      newSocket.emit("titan-config-get", "fetch");
-      newSocket.once("titan-config-get", (data) => {
-        setConfig(data);
-        if (!data) toaster.create(createToastConfig("Couldn't load data from the server", "error", 0));
-      });
-    });
-    newSocket.on("notification", (data) => {
-      toaster.create(createToastConfig(data.description, data.type, data.duration));
-    });
-    newSocket.on("disconnect", () => {
-      toaster.create(createToastConfig("Server Has Been Disconnected", "warning", 0));
-    });
-    newSocket.on("reconnect", () => {
-      toaster.create(createToastConfig("Server Has Been Reconnected", "success", 2e3));
-    });
-    return () => {
-      newSocket.disconnect();
-    };
-  }, []);
-  const saveConfig = reactExports.useCallback(
-    (configToSave) => {
-      if (configToSave === null || configToSave === void 0) return;
-      console.debug("Saving config:", configToSave);
-      socket == null ? void 0 : socket.emit("titan-config-set", configToSave);
-    },
-    [socket]
-  );
-  const updateConfig = reactExports.useCallback(
-    (updateFunction) => {
-      setConfig((currentConfig) => {
-        const newConfig = updateFunction(currentConfig);
-        if (lodashExports.isEqual(currentConfig, newConfig)) return currentConfig;
-        saveConfig(newConfig);
-        return newConfig;
-      });
-    },
-    [setConfig, saveConfig]
-  );
-  const [configurableRowData, setConfigurableRowData] = reactExports.useState([]);
-  const [branchInfos, setBranchInfos] = reactExports.useState({});
-  const branchTableGridRef = reactExports.useRef(null);
-  const [selectedBranches, setSelectedBranches] = reactExports.useState({});
-  const [isDialogSBLogOpen, setIsDialogSBLogOpen] = reactExports.useState(false);
-  const [showSelectedBranchesLog, setShowSelectedBranchesLog] = reactExports.useState(false);
-  const [customScripts, setCustomScripts] = reactExports.useState([]);
-  const [isCommitMode, setIsCommitMode] = reactExports.useState(false);
-  const [selectedBranchStatuses, setSelectedBranchStatuses] = reactExports.useState([]);
-  const localChangesGridRef = reactExports.useRef(null);
-  const untrackedChangesGridRef = reactExports.useRef(null);
-  const [showCommitView, setShowCommitView] = reactExports.useState(false);
-  const [sourceBranch, setSourceBranch] = reactExports.useState(null);
-  const branchOptions = reactExports.useMemo(() => {
-    let isFolderOnlySource = config && config.commitOptions && config.commitOptions.useFolderOnlySource;
-    let filteredBranches = configurableRowData.filter((row) => row["Branch Folder"] && row["Branch Version"] && row["SVN Branch"] && row["Branch Folder"] !== "" && row["Branch Version"] !== "" && row["SVN Branch"] !== "");
-    if (isFolderOnlySource) {
-      filteredBranches = filteredBranches.reduce((acc, row) => {
-        if (!acc.some((item) => item["Branch Folder"] === row["Branch Folder"])) {
-          acc.push(row);
-        }
-        return acc;
-      }, []);
-    }
-    return filteredBranches.map((row) => ({
-      value: row.id,
-      label: isFolderOnlySource ? row["Branch Folder"] : branchString(row["Branch Folder"], row["Branch Version"], row["SVN Branch"])
-    }));
-  }, [config, selectedBranches, configurableRowData]);
-  const [issueNumber, setIssueNumber] = reactExports.useState({});
-  const [commitMessage, setCommitMessage] = reactExports.useState("");
-  const [selectedLocalChanges, setSelectedLocalChanges] = reactExports.useState([]);
-  const [selectedUntrackedChanges, setSelectedUntrackedChanges] = reactExports.useState([]);
-  const [socketPayload, setSocketPayload] = reactExports.useState(null);
-  const [postCommitData, setPostCommitData] = reactExports.useState({});
-  const [logData, setLogData] = React.useState([]);
-  reactExports.useEffect(() => {
-    setConfigurableRowData((currentData) => {
-      if (config && config.branches && !lodashExports.isEqual(config.branches, currentData)) return config.branches;
-      return currentData;
-    });
-  }, [config]);
-  reactExports.useEffect(() => {
-    setSelectedBranchStatuses([]);
-    setShowCommitView(false);
-  }, [configurableRowData]);
-  reactExports.useEffect(() => {
-    if (!window.electron) return;
-    window.electron.fetchCustomScripts().then((data) => {
-      if (data.success) {
-        setCustomScripts(data.scripts);
-        return;
+    /* @__PURE__ */ jsxRuntimeExports.jsx(
+      ActionBarSelection,
+      {
+        selectedCount: selectionMetrics.selectedBranchesCount,
+        onDelete: () => setIsRowDialogOpen(true),
+        onRefresh: refreshSelectedBranches,
+        onUpdate: updateSelectedBranches,
+        onCommit: commitSelectedBranches,
+        onLogs: logsSelectedBranches,
+        onClear: () => setSelectedBranches({})
       }
-      toaster.create(createToastConfig(data.error, "error", 0));
-    });
-  }, [configurableRowData]);
-  reactExports.useEffect(() => {
-    if (!isCommitMode || !showCommitView) return;
-    const hookTimeoutCallback = setTimeout(() => {
-      var _a;
-      (_a = document.getElementById("sectionCommit")) == null ? void 0 : _a.scrollIntoView({ behavior: "smooth", block: "start", inline: "nearest" });
-    }, 100);
-    return () => clearTimeout(hookTimeoutCallback);
-  }, [isCommitMode, showCommitView]);
-  reactExports.useEffect(() => {
-    const socketCallback = () => {
-      setShowCommitView(false);
-    };
-    socket == null ? void 0 : socket.on("branch-refresh-unseen", socketCallback);
-    return () => socket == null ? void 0 : socket.off("branch-refresh-unseen", socketCallback);
-  }, [socket]);
-  reactExports.useEffect(() => {
-    const socketCallback = (data) => {
-      setSelectedBranchStatuses((prev) => [...prev, data]);
-    };
-    socket == null ? void 0 : socket.on("branch-status-single", socketCallback);
-    return () => socket == null ? void 0 : socket.off("branch-status-single", socketCallback);
-  }, [socket]);
-  reactExports.useEffect(() => {
-    setLogData([]);
-  }, [selectedBranches]);
-  return /* @__PURE__ */ jsxRuntimeExports.jsx(
-    ContextCommit.Provider,
-    {
-      value: {
-        socket,
-        toaster,
-        config,
-        updateConfig,
-        configurableRowData,
-        setConfigurableRowData,
-        branchInfos,
-        setBranchInfos,
-        branchTableGridRef,
-        selectedBranches,
-        setSelectedBranches,
-        isDialogSBLogOpen,
-        setIsDialogSBLogOpen,
-        showSelectedBranchesLog,
-        setShowSelectedBranchesLog,
-        customScripts,
-        setCustomScripts,
-        isCommitMode,
-        setIsCommitMode,
-        selectedBranchStatuses,
-        setSelectedBranchStatuses,
-        localChangesGridRef,
-        untrackedChangesGridRef,
-        showCommitView,
-        setShowCommitView,
-        sourceBranch,
-        setSourceBranch,
-        branchOptions,
-        issueNumber,
-        setIssueNumber,
-        commitMessage,
-        setCommitMessage,
-        selectedLocalChanges,
-        setSelectedLocalChanges,
-        selectedUntrackedChanges,
-        setSelectedUntrackedChanges,
-        socketPayload,
-        setSocketPayload,
-        postCommitData,
-        setPostCommitData,
-        logData,
-        setLogData
-      },
-      children
-    }
-  );
-};
-function OptionsCommit() {
-  const { config, updateConfig } = useApp();
-  const { setSourceBranch, setIssueNumber } = useCommit();
-  const [commitOptions, setCommitOptions] = reactExports.useState({});
-  const handleOptionChange = reactExports.useCallback(
-    (optionName, checked) => {
-      setCommitOptions((currentOptions) => ({
-        ...currentOptions,
-        [optionName]: checked
-      }));
-    },
-    [setCommitOptions]
-  );
-  reactExports.useEffect(() => {
-    if (!config || lodashExports.isEmpty(config)) return;
-    if (!config.commitOptions) {
-      updateConfig((currentConfig) => ({
-        ...currentConfig,
-        commitOptions: {
-          useFolderOnlySource: false,
-          useIssuePerFolder: false
-        }
-      }));
-    } else {
-      setCommitOptions(config.commitOptions);
-    }
-  }, [config]);
-  reactExports.useEffect(() => {
-    if (lodashExports.isEmpty(commitOptions)) return;
-    updateConfig((currentConfig) => {
-      if (!lodashExports.isEqual(currentConfig.commitOptions, commitOptions)) {
-        return {
-          ...currentConfig,
-          commitOptions
-        };
-      }
-      return currentConfig;
-    });
-  }, [commitOptions]);
-  reactExports.useEffect(() => {
-    setSourceBranch(null);
-  }, [commitOptions == null ? void 0 : commitOptions.useFolderOnlySource, setSourceBranch]);
-  reactExports.useEffect(() => {
-    setIssueNumber({});
-  }, [commitOptions == null ? void 0 : commitOptions.useIssuePerFolder, setIssueNumber]);
-  return /* @__PURE__ */ jsxRuntimeExports.jsxs(Box, { colorPalette: "yellow", bgColor: "colorPalette.subtle", rounded: "md", p: 4, children: [
-    /* @__PURE__ */ jsxRuntimeExports.jsx(Heading, { as: "h6", size: "sm", fontWeight: 700, mb: 3, children: "Commit Options" }),
-    /* @__PURE__ */ jsxRuntimeExports.jsxs(Flex, { direction: "column", gap: 4, mt: 2, children: [
-      /* @__PURE__ */ jsxRuntimeExports.jsxs(Checkbox, { variant: "subtle", checked: commitOptions.useFolderOnlySource, onCheckedChange: (e) => handleOptionChange("useFolderOnlySource", e.checked), children: [
-        "Use Folder Only Source Branch? ",
-        /* @__PURE__ */ jsxRuntimeExports.jsx(Em, { color: "colorPalette.fg", children: " - Removes extra branch details from source branch" })
-      ] }),
-      /* @__PURE__ */ jsxRuntimeExports.jsxs(Checkbox, { variant: "subtle", checked: commitOptions.useIssuePerFolder, onCheckedChange: (e) => handleOptionChange("useIssuePerFolder", e.checked), children: [
-        "Use 1 Issue Per Folder? ",
-        /* @__PURE__ */ jsxRuntimeExports.jsx(Em, { color: "colorPalette.fg", children: " - Allows users to input issue number for each branch folder" })
-      ] })
-    ] })
+    ),
+    /* @__PURE__ */ jsxRuntimeExports.jsx(DialogRowDeletion, { selectedCount: selectionMetrics.selectedBranchesCount, isDialogOpen: isRowDialogOpen, closeDialog: () => setIsRowDialogOpen(false), fireDialogAction: fireRowDialogAction }),
+    /* @__PURE__ */ jsxRuntimeExports.jsx(DialogBranchesLog, {})
   ] });
 }
 const AccordionItemTrigger = reactExports.forwardRef(function AccordionItemTrigger2(props, ref) {
@@ -1359,69 +1337,877 @@ const NumberInputRoot = reactExports.forwardRef(function NumberInput(props, ref)
   ] });
 });
 const NumberInputField = NumberInputInput;
-function useCommitOptions() {
-  const { config } = useApp();
-  return config && config.commitOptions ? config.commitOptions : null;
-}
 function FieldIssueNumber({ branchFolder }) {
-  const { setIssueNumber } = useApp();
-  const commitOptions = useCommitOptions();
-  const [fieldIssueNumber, setFieldIssueNumber] = reactExports.useState("");
-  const handleIssueNumChange = reactExports.useCallback(
-    (e) => {
-      setFieldIssueNumber(e.value);
-    },
-    [branchFolder, setIssueNumber]
-  );
-  const isFieldDisabled = !branchFolder;
-  const isFieldRequired = !branchFolder || !(commitOptions == null ? void 0 : commitOptions.useIssuePerFolder);
-  reactExports.useEffect(() => {
-    if (!branchFolder) return;
+  const issueNumber = useCommit((ctx) => ctx.issueNumber);
+  const setIssueNumber = useCommit((ctx) => ctx.setIssueNumber);
+  const handleIssueNumberChange = reactExports.useCallback((value) => {
     setIssueNumber((currIssueNumber) => ({
       ...currIssueNumber,
-      [branchFolder]: fieldIssueNumber
+      [branchFolder]: value
     }));
+  }, [branchFolder]);
+  reactExports.useEffect(() => {
+    if (branchFolder) {
+      setIssueNumber((currIssueNumber) => ({
+        ...currIssueNumber,
+        [branchFolder]: ""
+      }));
+    }
     return () => {
       setIssueNumber((currIssueNumber) => {
         const { [branchFolder]: _, ...rest } = currIssueNumber;
         return rest;
       });
     };
-  }, [branchFolder, fieldIssueNumber, setIssueNumber]);
-  console.log("FieldIssueNumber rendered");
-  return /* @__PURE__ */ jsxRuntimeExports.jsx(Field, { orientation: "horizontal", label: `Issue Number (${branchFolder})`, labelFlex: "0.4", required: isFieldRequired, disabled: isFieldDisabled, children: /* @__PURE__ */ jsxRuntimeExports.jsx(NumberInputRoot, { variant: "flushed", min: "0", ms: 4, flex: "0.95", size: "sm", value: fieldIssueNumber, onValueChange: handleIssueNumChange, children: /* @__PURE__ */ jsxRuntimeExports.jsx(NumberInputField, { placeholder: "The issue that your changes are linked to", borderColor: "colorPalette.fg" }) }) });
+  }, [branchFolder]);
+  return /* @__PURE__ */ jsxRuntimeExports.jsx(Field, { orientation: "horizontal", label: `Issue Number (${branchFolder})`, labelFlex: "0.3", required: true, children: /* @__PURE__ */ jsxRuntimeExports.jsx(NumberInputRoot, { variant: "flushed", min: "0", ms: 4, flex: "0.95", size: "sm", value: issueNumber[branchFolder], onValueChange: (e) => handleIssueNumberChange(e.value), children: /* @__PURE__ */ jsxRuntimeExports.jsx(NumberInputField, { placeholder: `The issue that your ${branchFolder} changes belongs to`, borderColor: "colorPalette.fg" }) }) });
 }
-const SourceBranchField = reactExports.memo(() => /* @__PURE__ */ jsxRuntimeExports.jsx(Field, { orientation: "horizontal", label: "Source branch", labelFlex: "0.4", children: /* @__PURE__ */ jsxRuntimeExports.jsx(Input, { placeholder: "Where your changes came from", ms: 4, flex: "0.95", size: "sm", variant: "flushed", borderColor: "colorPalette.fg" }) }));
-const CommitMessageField = reactExports.memo(() => /* @__PURE__ */ jsxRuntimeExports.jsx(Field, { orientation: "vertical", label: "Commit Message", required: true, children: /* @__PURE__ */ jsxRuntimeExports.jsx(Textarea, { placeholder: "Main body of the commit message", variant: "outline", size: "sm", rows: 8, borderColor: "colorPalette.fg" }) }));
-function SubSectionCommitDetails() {
-  const { selectedBranches, configurableRowData } = useApp();
-  const selectedFolders = reactExports.useMemo(
-    () => configurableRowData.filter((branchRow) => selectedBranches[branchRow.id]).map((branchRow) => branchRow["Branch Folder"]),
-    [configurableRowData, selectedBranches]
+const FieldIssueNumber$1 = reactExports.memo(FieldIssueNumber);
+function FieldSourceBranch() {
+  const sourceBranch = useCommit((ctx) => ctx.sourceBranch);
+  const setSourceBranch = useCommit((ctx) => ctx.setSourceBranch);
+  const sourceIssueNumber = useCommit((ctx) => ctx.sourceIssueNumber);
+  const setSourceIssueNumber = useCommit((ctx) => ctx.setSourceIssueNumber);
+  return /* @__PURE__ */ jsxRuntimeExports.jsxs(jsxRuntimeExports.Fragment, { children: [
+    /* @__PURE__ */ jsxRuntimeExports.jsx(Field, { orientation: "horizontal", label: "Source branch", labelFlex: "0.3", children: /* @__PURE__ */ jsxRuntimeExports.jsx(Input, { placeholder: "The branch where your changes originated from", ms: 4, flex: "0.95", size: "sm", variant: "flushed", borderColor: "colorPalette.fg", value: sourceBranch, onChange: (e) => setSourceBranch(e.target.value) }) }),
+    sourceBranch.trim() !== "" ? /* @__PURE__ */ jsxRuntimeExports.jsx(Field, { orientation: "horizontal", label: `Source Issue Number`, labelFlex: "0.3", children: /* @__PURE__ */ jsxRuntimeExports.jsx(NumberInputRoot, { variant: "flushed", min: "0", ms: 4, flex: "0.95", size: "sm", value: sourceIssueNumber, onValueChange: (e) => setSourceIssueNumber(e.value), children: /* @__PURE__ */ jsxRuntimeExports.jsx(NumberInputField, { placeholder: `The issue that your source branch changes belongs to`, borderColor: "colorPalette.fg" }) }) }) : null
+  ] });
+}
+const ChakraAutoResize = chakra(index);
+function FieldCommitMessage() {
+  const commitMessage = useCommit((ctx) => ctx.commitMessage);
+  const setCommitMessage = useCommit((ctx) => ctx.setCommitMessage);
+  return /* @__PURE__ */ jsxRuntimeExports.jsx(Field, { orientation: "vertical", label: "Commit Message", required: true, children: /* @__PURE__ */ jsxRuntimeExports.jsx(
+    ChakraAutoResize,
+    {
+      placeholder: "Main body of the commit message",
+      variant: "outline",
+      size: "sm",
+      width: "100%",
+      rows: 8,
+      borderColor: "colorPalette.fg",
+      value: commitMessage,
+      onChange: (e) => setCommitMessage(e.target.value),
+      resize: "none",
+      minH: "initial",
+      overflow: "hidden",
+      borderWidth: "1px",
+      px: 2.5,
+      py: 2,
+      lineHeight: "1.25rem",
+      focusRingColor: "colorPalette.focusRing",
+      _hover: { borderColor: "colorPalette.focusRing", outlineColor: "colorPalette.focusRing" },
+      className: "chakra-textarea",
+      rounded: "sm"
+    }
+  ) });
+}
+function useTrelloIntegration() {
+  const config = useApp((ctx) => ctx.config);
+  const { emitTrelloCardNamesSearch, emitTrelloCardUpdate } = useSocketEmits();
+  const configTrelloIntegration = config == null ? void 0 : config.trelloIntegration;
+  const key = (configTrelloIntegration == null ? void 0 : configTrelloIntegration.key) || null;
+  const token = (configTrelloIntegration == null ? void 0 : configTrelloIntegration.token) || null;
+  const isTrelloIntegrationSupported = key && token && key.trim() !== "" && token.trim() !== "" && key.toUpperCase() !== "TRELLO_API_KEY" && token.toUpperCase !== "TRELLO_TOKEN";
+  return {
+    key,
+    token,
+    isTrelloIntegrationSupported,
+    emitTrelloCardNamesSearch,
+    emitTrelloCardUpdate
+  };
+}
+const shineAnimation$2 = keyframes`
+	from { background-position: 200% center; }
+	to { background-position: -200% center; }
+`;
+function DialogLookupTrello({ fireDialogAction }) {
+  const isLookupTrelloOn = useCommit((ctx) => ctx.isLookupTrelloOn);
+  const setIsLookupTrelloOn = useCommit((ctx) => ctx.setIsLookupTrelloOn);
+  const { key, token, emitTrelloCardNamesSearch } = useTrelloIntegration();
+  const textColor = useColorModeValue("black", "white");
+  const [trelloQuery, setTrelloQuery] = reactExports.useState("");
+  const [fetchedCards, setFetchedCards] = reactExports.useState([]);
+  const [loading, setLoading] = reactExports.useState(false);
+  const [searchPerformed, setSearchPerformed] = reactExports.useState(false);
+  const [sortConfig, setSortConfig] = reactExports.useState({ column: null, direction: null });
+  const processDialogAction = reactExports.useCallback(
+    (card) => {
+      fireDialogAction(card);
+      setIsLookupTrelloOn(false);
+    },
+    [fireDialogAction, setIsLookupTrelloOn]
   );
-  console.log("SubSectionCommitDetails");
-  console.warn("Maybe create two separate contexts, one for branches and one for commits, and create a universal context for the app");
+  const handleSearch = reactExports.useCallback(() => {
+    if (!trelloQuery.trim()) return;
+    setSearchPerformed(true);
+    setLoading(true);
+    emitTrelloCardNamesSearch(key, token, trelloQuery, null, (response) => {
+      setFetchedCards(response.cards || []);
+      setLoading(false);
+      setSortConfig({ column: null, direction: null });
+    });
+  }, [trelloQuery, key, token, emitTrelloCardNamesSearch]);
+  const handleKeyPress = reactExports.useCallback(
+    (event) => {
+      if (event.key === "Enter") {
+        handleSearch();
+      }
+    },
+    [handleSearch]
+  );
   reactExports.useEffect(() => {
-    console.log("SubSectionCommitDetails rendered");
+    if (trelloQuery.trim().length === 0) {
+      setFetchedCards([]);
+    }
+  }, [trelloQuery]);
+  const sortedCards = reactExports.useMemo(() => {
+    if (!sortConfig.column || !sortConfig.direction) {
+      return fetchedCards;
+    }
+    let sorted = [...fetchedCards];
+    if (sortConfig.column === "name") {
+      sorted.sort((a, b) => a.name.localeCompare(b.name));
+    } else if (sortConfig.column === "lastActivityDate") {
+      sorted.sort((a, b) => new Date(a.lastActivityDate) - new Date(b.lastActivityDate));
+    }
+    if (sortConfig.direction === "desc") {
+      sorted.reverse();
+    }
+    return sorted;
+  }, [fetchedCards, sortConfig]);
+  const toggleSort = (column) => {
+    setSortConfig((prev) => {
+      if (prev.column !== column) {
+        return { column, direction: "asc" };
+      } else {
+        if (prev.direction === "asc") return { column, direction: "desc" };
+        if (prev.direction === "desc") return { column: null, direction: null };
+        return { column, direction: "asc" };
+      }
+    });
+  };
+  const renderSortIcon = (column) => {
+    if (sortConfig.column !== column) return null;
+    return sortConfig.direction === "asc" ? /* @__PURE__ */ jsxRuntimeExports.jsx(FaChevronUp, {}) : /* @__PURE__ */ jsxRuntimeExports.jsx(FaChevronDown, {});
+  };
+  return /* @__PURE__ */ jsxRuntimeExports.jsxs(DialogRoot, { role: "dialog", size: "cover", open: isLookupTrelloOn, onOpenChange: () => setIsLookupTrelloOn(false), closeOnEscape: true, initialFocusEl: null, children: [
+    /* @__PURE__ */ jsxRuntimeExports.jsx(DialogBackdrop, {}),
+    /* @__PURE__ */ jsxRuntimeExports.jsxs(DialogContent, { children: [
+      /* @__PURE__ */ jsxRuntimeExports.jsx(DialogHeader, { fontSize: "lg", fontWeight: "bold", children: /* @__PURE__ */ jsxRuntimeExports.jsxs(DialogTitle, { display: "flex", alignItems: "center", gap: 4, children: [
+        /* @__PURE__ */ jsxRuntimeExports.jsx(FaTrello, { size: "32px" }),
+        "Lookup Trello Card"
+      ] }) }),
+      /* @__PURE__ */ jsxRuntimeExports.jsxs(DialogBody, { children: [
+        /* @__PURE__ */ jsxRuntimeExports.jsx(Box, { mb: 6, children: /* @__PURE__ */ jsxRuntimeExports.jsxs(HStack, { gap: "6", width: "full", colorPalette: "yellow", onKeyDown: handleKeyPress, children: [
+          /* @__PURE__ */ jsxRuntimeExports.jsx(InputGroup, { flex: "1", startElement: /* @__PURE__ */ jsxRuntimeExports.jsx(LuSearch, {}), startElementProps: { color: "colorPalette.fg" }, children: /* @__PURE__ */ jsxRuntimeExports.jsx(Input, { placeholder: "Type a card title and press Enter", variant: "flushed", borderColor: "colorPalette.fg", value: trelloQuery, onChange: (e) => setTrelloQuery(e.target.value) }) }),
+          /* @__PURE__ */ jsxRuntimeExports.jsxs(Button$1, { onClick: handleSearch, isDisabled: !trelloQuery.trim(), children: [
+            "Search",
+            /* @__PURE__ */ jsxRuntimeExports.jsx(Kbd, { variant: "subtle", children: /* @__PURE__ */ jsxRuntimeExports.jsx(MdKeyboardReturn, {}) })
+          ] })
+        ] }) }),
+        loading && /* @__PURE__ */ jsxRuntimeExports.jsxs(HStack, { justifyContent: "center", alignItems: "center", py: 4, children: [
+          /* @__PURE__ */ jsxRuntimeExports.jsx(Spinner, { size: "lg", color: "yellow.fg", borderWidth: "4px" }),
+          /* @__PURE__ */ jsxRuntimeExports.jsx(Text, { ml: 2, children: "Searching..." })
+        ] }),
+        !loading && !searchPerformed && fetchedCards.length === 0 && /* @__PURE__ */ jsxRuntimeExports.jsx(Text, { textAlign: "center", fontSize: "md", color: "gray.500", py: 4, children: 'Enter a card title above and press Enter or click "Search".' }),
+        searchPerformed && !loading && sortedCards.length === 0 && /* @__PURE__ */ jsxRuntimeExports.jsx(Text, { textAlign: "center", fontSize: "lg", color: "whiteAlpha", py: 4, children: "No results found. Try a different query." }),
+        !loading && sortedCards.length > 0 && /* @__PURE__ */ jsxRuntimeExports.jsxs(jsxRuntimeExports.Fragment, { children: [
+          /* @__PURE__ */ jsxRuntimeExports.jsx(Text, { fontSize: "sm", mb: 2, fontWeight: 900, bgGradient: "to-r", gradientFrom: textColor, gradientVia: "yellow.500", gradientTo: textColor, backgroundSize: "200% auto", bgClip: "text", animation: `${shineAnimation$2} 7s ease-in infinite`, children: "Double-click a card to select it." }),
+          /* @__PURE__ */ jsxRuntimeExports.jsx(TableScrollArea, { borderWidth: "1px", maxH: "60vh", children: /* @__PURE__ */ jsxRuntimeExports.jsxs(TableRoot, { size: "sm", variant: "outline", stickyHeader: true, showColumnBorder: true, interactive: true, children: [
+            /* @__PURE__ */ jsxRuntimeExports.jsxs(TableColumnGroup, { children: [
+              /* @__PURE__ */ jsxRuntimeExports.jsx(TableColumn, { width: "" }),
+              /* @__PURE__ */ jsxRuntimeExports.jsx(TableColumn, { width: "30%" })
+            ] }),
+            /* @__PURE__ */ jsxRuntimeExports.jsx(TableHeader, { children: /* @__PURE__ */ jsxRuntimeExports.jsxs(TableRow, { bgColor: "yellow.400", children: [
+              /* @__PURE__ */ jsxRuntimeExports.jsx(TableColumnHeader, { onClick: () => toggleSort("name"), children: /* @__PURE__ */ jsxRuntimeExports.jsxs(HStack, { children: [
+                /* @__PURE__ */ jsxRuntimeExports.jsx(chakra.span, { color: "black", fontWeight: 900, me: 1, children: "Card Title" }),
+                renderSortIcon("name")
+              ] }) }),
+              /* @__PURE__ */ jsxRuntimeExports.jsx(TableColumnHeader, { onClick: () => toggleSort("lastActivityDate"), children: /* @__PURE__ */ jsxRuntimeExports.jsxs(HStack, { children: [
+                /* @__PURE__ */ jsxRuntimeExports.jsx(chakra.span, { color: "black", fontWeight: 900, me: 1, children: "Last Activity" }),
+                renderSortIcon("lastActivityDate")
+              ] }) })
+            ] }) }),
+            /* @__PURE__ */ jsxRuntimeExports.jsx(TableBody, { children: sortedCards.map((card) => /* @__PURE__ */ jsxRuntimeExports.jsxs(TableRow, { onDoubleClick: () => processDialogAction(card), children: [
+              /* @__PURE__ */ jsxRuntimeExports.jsx(TableCell, { children: /* @__PURE__ */ jsxRuntimeExports.jsxs(Link, { onClick: () => window.open(card.url), display: "flex", alignItems: "center", width: "fit-content", children: [
+                card.name,
+                /* @__PURE__ */ jsxRuntimeExports.jsx(chakra.span, { color: "yellow.fg", fontSize: "16px", children: /* @__PURE__ */ jsxRuntimeExports.jsx(LuExternalLink, {}) })
+              ] }) }),
+              /* @__PURE__ */ jsxRuntimeExports.jsx(TableCell, { children: card.lastActivityDate })
+            ] }, card.id)) }),
+            /* @__PURE__ */ jsxRuntimeExports.jsx(TableFooter, { children: /* @__PURE__ */ jsxRuntimeExports.jsx(TableRow, { bgColor: "yellow.400", children: /* @__PURE__ */ jsxRuntimeExports.jsxs(TableCell, { colSpan: 2, fontWeight: 900, children: [
+              sortedCards.length,
+              " ",
+              sortedCards.length === 1 ? "card" : "cards",
+              " found from Trello"
+            ] }) }) })
+          ] }) })
+        ] })
+      ] }),
+      /* @__PURE__ */ jsxRuntimeExports.jsxs(DialogFooter, { children: [
+        /* @__PURE__ */ jsxRuntimeExports.jsx(DialogActionTrigger, { asChild: true, children: /* @__PURE__ */ jsxRuntimeExports.jsx(Button$1, { children: "Cancel" }) }),
+        /* @__PURE__ */ jsxRuntimeExports.jsx(DialogCloseTrigger, {})
+      ] })
+    ] })
+  ] });
+}
+const shineAnimation$1 = keyframes`
+	from { background-position: 200% center; }
+	to { background-position: -200% center; }
+`;
+const ROW_HEIGHT = 40;
+const OVERSCAN = 10;
+const getPathActionolour = (action) => {
+  switch (action) {
+    case "A":
+      return "green.500";
+    case "M":
+      return "cyan.500";
+    case "D":
+      return "red.500";
+    default:
+      return "gray";
+  }
+};
+const LogRow = React.memo(function LogRow22({ entry, isExpanded, onToggleExpand, processDialogAction }) {
+  return /* @__PURE__ */ jsxRuntimeExports.jsxs(React.Fragment, { children: [
+    /* @__PURE__ */ jsxRuntimeExports.jsxs(TableRow, { height: `${ROW_HEIGHT}px`, _light: { bgColor: "yellow.fg", color: "white" }, _dark: { bgColor: "yellow.800" }, onDoubleClick: () => processDialogAction(entry), children: [
+      /* @__PURE__ */ jsxRuntimeExports.jsx(TableCell, { children: /* @__PURE__ */ jsxRuntimeExports.jsx(IconButton, { "aria-label": "Expand/Collapse", size: "2xs", onClick: () => onToggleExpand(entry.revision), variant: "subtle", children: isExpanded ? /* @__PURE__ */ jsxRuntimeExports.jsx(FaChevronDown, {}) : /* @__PURE__ */ jsxRuntimeExports.jsx(FaChevronRight, {}) }) }),
+      /* @__PURE__ */ jsxRuntimeExports.jsx(TableCell, { fontWeight: 900, children: entry.revision }),
+      /* @__PURE__ */ jsxRuntimeExports.jsx(TableCell, { children: entry.date }),
+      /* @__PURE__ */ jsxRuntimeExports.jsx(TableCell, { children: entry.author }),
+      /* @__PURE__ */ jsxRuntimeExports.jsx(
+        TableCell,
+        {
+          style: {
+            whiteSpace: "nowrap",
+            overflow: "hidden",
+            textOverflow: "ellipsis",
+            maxWidth: "500px"
+          },
+          children: entry.message
+        }
+      )
+    ] }),
+    isExpanded && entry.filesChanged && entry.filesChanged.length > 0 && /* @__PURE__ */ jsxRuntimeExports.jsx(TableRow, { bgColor: "gray.subtle", height: `${ROW_HEIGHT}px`, onDoubleClick: () => processDialogAction(entry), children: /* @__PURE__ */ jsxRuntimeExports.jsx(TableCell, { colSpan: 5, children: /* @__PURE__ */ jsxRuntimeExports.jsxs(Box, { p: 3, children: [
+      /* @__PURE__ */ jsxRuntimeExports.jsxs(Flex, { alignItems: "center", mb: 5, gap: 3, p: 2, children: [
+        "Commit Message: ",
+        /* @__PURE__ */ jsxRuntimeExports.jsx(Text, { color: "yellow.fg", children: entry.message })
+      ] }),
+      /* @__PURE__ */ jsxRuntimeExports.jsxs(TableRoot, { variant: "simple", size: "sm", children: [
+        /* @__PURE__ */ jsxRuntimeExports.jsxs(TableColumnGroup, { children: [
+          /* @__PURE__ */ jsxRuntimeExports.jsx(TableColumn, { width: "10%" }),
+          /* @__PURE__ */ jsxRuntimeExports.jsx(TableColumn, { width: "" }),
+          /* @__PURE__ */ jsxRuntimeExports.jsx(TableColumn, { width: "10%" })
+        ] }),
+        /* @__PURE__ */ jsxRuntimeExports.jsx(TableHeader, { children: /* @__PURE__ */ jsxRuntimeExports.jsxs(TableRow, { children: [
+          /* @__PURE__ */ jsxRuntimeExports.jsx(TableColumnHeader, { children: "Action" }),
+          /* @__PURE__ */ jsxRuntimeExports.jsx(TableColumnHeader, { children: "Path" }),
+          /* @__PURE__ */ jsxRuntimeExports.jsx(TableColumnHeader, {})
+        ] }) }),
+        /* @__PURE__ */ jsxRuntimeExports.jsx(TableBody, { children: entry.filesChanged.map((file, idx) => /* @__PURE__ */ jsxRuntimeExports.jsxs(TableRow, { height: `${ROW_HEIGHT}px`, color: getPathActionolour(file.action.toUpperCase()), children: [
+          /* @__PURE__ */ jsxRuntimeExports.jsx(TableCell, { children: file.action.toUpperCase() }),
+          /* @__PURE__ */ jsxRuntimeExports.jsxs(TableCell, { children: [
+            file.path,
+            " (",
+            file.kind === "dir" ? "Directory" : "File",
+            ")"
+          ] }),
+          /* @__PURE__ */ jsxRuntimeExports.jsx(TableCell, { children: /* @__PURE__ */ jsxRuntimeExports.jsx(IconButton, { variant: "subtle", size: "xs", disabled: !window.electron, "aria-label": "Diff", onClick: () => window.electron.openSvnDiff({ fullPath: `${entry.repositoryRoot}${file.path}`, revision: entry.revision }), children: /* @__PURE__ */ jsxRuntimeExports.jsx(VscDiffSingle, {}) }) })
+        ] }, `${entry.revision}-file-${idx}`)) })
+      ] })
+    ] }) }) })
+  ] });
+});
+function DialogLookupSVNLogs({ fireDialogAction }) {
+  const logsData = useApp((ctx) => ctx.logsData);
+  const isLookupSLogsOn = useCommit((ctx) => ctx.isLookupSLogsOn);
+  const setIsLookupSLogsOn = useCommit((ctx) => ctx.setIsLookupSLogsOn);
+  const textColor = useColorModeValue("black", "white");
+  const [expandedRows, setExpandedRows] = reactExports.useState(() => /* @__PURE__ */ new Set());
+  const [searchTerm, setSearchTerm] = reactExports.useState("");
+  const closeDialog = reactExports.useCallback(() => {
+    setIsLookupSLogsOn(false);
+  }, [setIsLookupSLogsOn]);
+  const processDialogAction = reactExports.useCallback(
+    (entry) => {
+      fireDialogAction(entry);
+      setIsLookupSLogsOn(false);
+    },
+    [fireDialogAction, setIsLookupSLogsOn]
+  );
+  const toggleExpand = reactExports.useCallback((revision) => {
+    setExpandedRows((prev) => {
+      const newSet = new Set(prev);
+      if (newSet.has(revision)) {
+        newSet.delete(revision);
+      } else {
+        newSet.add(revision);
+      }
+      return newSet;
+    });
   }, []);
-  return /* @__PURE__ */ jsxRuntimeExports.jsx(Flex, { ms: 9, children: /* @__PURE__ */ jsxRuntimeExports.jsxs(Stack, { gap: "6", maxW: "5xl", css: { "--field-label-width": "96px" }, flex: 1, children: [
-    selectedFolders.map((branchFolder, i) => /* @__PURE__ */ jsxRuntimeExports.jsx(FieldIssueNumber, { branchFolder }, i)),
-    /* @__PURE__ */ jsxRuntimeExports.jsx(SourceBranchField, {}),
-    /* @__PURE__ */ jsxRuntimeExports.jsx(CommitMessageField, {})
-  ] }) });
+  const filteredData = reactExports.useMemo(() => {
+    if (!searchTerm) return logsData;
+    const lowerSearch = searchTerm.toLowerCase();
+    return logsData.filter((entry) => {
+      const mainFields = [entry.revision, entry.date, entry.author, entry.message, entry.branchFolder, entry.branchVersion];
+      const mainMatch = mainFields.some((field) => field == null ? void 0 : field.toString().toLowerCase().includes(lowerSearch));
+      const filesMatch = entry.filesChanged && entry.filesChanged.some((file) => [file.action, file.path, file.kind].some((field) => field == null ? void 0 : field.toString().toLowerCase().includes(lowerSearch)));
+      return mainMatch || filesMatch;
+    });
+  }, [logsData, searchTerm]);
+  const containerRef = reactExports.useRef(null);
+  const [containerHeight, setContainerHeight] = reactExports.useState(0);
+  const [scrollTop, setScrollTop] = reactExports.useState(0);
+  reactExports.useEffect(() => {
+    const measure = () => {
+      if (containerRef.current) {
+        setContainerHeight(containerRef.current.clientHeight);
+      }
+    };
+    measure();
+    window.addEventListener("resize", measure);
+    return () => window.removeEventListener("resize", measure);
+  }, []);
+  const onScroll = reactExports.useCallback(() => {
+    if (containerRef.current) {
+      setScrollTop(containerRef.current.scrollTop);
+    }
+  }, []);
+  const totalRows = filteredData.length;
+  const visibleCount = Math.ceil(containerHeight / ROW_HEIGHT) + OVERSCAN * 2;
+  const startIndex = Math.max(0, Math.floor(scrollTop / ROW_HEIGHT) - OVERSCAN);
+  const endIndex = Math.min(totalRows, startIndex + visibleCount);
+  const offsetY = startIndex * ROW_HEIGHT;
+  const visibleRows = filteredData.slice(startIndex, endIndex);
+  return /* @__PURE__ */ jsxRuntimeExports.jsxs(DialogRoot, { role: "dialog", size: "cover", placement: "center", open: isLookupSLogsOn, onOpenChange: closeDialog, closeOnEscape: false, initialFocusEl: void 0, children: [
+    /* @__PURE__ */ jsxRuntimeExports.jsx(DialogBackdrop, {}),
+    /* @__PURE__ */ jsxRuntimeExports.jsxs(DialogContent, { children: [
+      /* @__PURE__ */ jsxRuntimeExports.jsx(DialogHeader, { fontSize: "lg", fontWeight: "bold", children: /* @__PURE__ */ jsxRuntimeExports.jsxs(DialogTitle, { display: "flex", alignItems: "center", gap: 4, children: [
+        /* @__PURE__ */ jsxRuntimeExports.jsx(SiSubversion, { size: "32px" }),
+        "Lookup SVN Logs"
+      ] }) }),
+      /* @__PURE__ */ jsxRuntimeExports.jsxs(DialogBody, { children: [
+        /* @__PURE__ */ jsxRuntimeExports.jsx(HStack, { gap: "6", mb: 4, width: "full", colorPalette: "yellow", children: /* @__PURE__ */ jsxRuntimeExports.jsx(InputGroup, { flex: "1", startElement: /* @__PURE__ */ jsxRuntimeExports.jsx(LuSearch, {}), startElementProps: { color: "colorPalette.fg" }, children: /* @__PURE__ */ jsxRuntimeExports.jsx(Input, { placeholder: "Quick search...", variant: "flushed", borderColor: "colorPalette.fg", value: searchTerm, onChange: (e) => setSearchTerm(e.target.value) }) }) }),
+        /* @__PURE__ */ jsxRuntimeExports.jsx(Text, { fontSize: "sm", mb: 2, fontWeight: 900, bgGradient: "to-r", gradientFrom: textColor, gradientVia: "yellow.500", gradientTo: textColor, backgroundSize: "200% auto", bgClip: "text", animation: `${shineAnimation$1} 7s ease-in infinite`, children: "Double-click a SVN revision row to select it." }),
+        /* @__PURE__ */ jsxRuntimeExports.jsxs(TableRoot, { size: "sm", variant: "outline", colorPalette: "yellow", children: [
+          /* @__PURE__ */ jsxRuntimeExports.jsxs(TableColumnGroup, { children: [
+            /* @__PURE__ */ jsxRuntimeExports.jsx(TableColumn, { width: "5%" }),
+            /* @__PURE__ */ jsxRuntimeExports.jsx(TableColumn, { width: "10%" }),
+            /* @__PURE__ */ jsxRuntimeExports.jsx(TableColumn, { width: "15%" }),
+            /* @__PURE__ */ jsxRuntimeExports.jsx(TableColumn, { width: "10%" }),
+            /* @__PURE__ */ jsxRuntimeExports.jsx(TableColumn, { width: "60%" })
+          ] }),
+          /* @__PURE__ */ jsxRuntimeExports.jsx(TableHeader, { children: /* @__PURE__ */ jsxRuntimeExports.jsxs(TableRow, { height: `${ROW_HEIGHT}px`, bgColor: "colorPalette.400", children: [
+            /* @__PURE__ */ jsxRuntimeExports.jsx(TableColumnHeader, { color: "black", fontWeight: 900 }),
+            /* @__PURE__ */ jsxRuntimeExports.jsx(TableColumnHeader, { color: "black", fontWeight: 900, children: "Revision" }),
+            /* @__PURE__ */ jsxRuntimeExports.jsx(TableColumnHeader, { color: "black", fontWeight: 900, children: "Date" }),
+            /* @__PURE__ */ jsxRuntimeExports.jsx(TableColumnHeader, { color: "black", fontWeight: 900, children: "Author" }),
+            /* @__PURE__ */ jsxRuntimeExports.jsx(TableColumnHeader, { color: "black", fontWeight: 900, ms: 0, children: "Message" })
+          ] }) })
+        ] }),
+        /* @__PURE__ */ jsxRuntimeExports.jsx(Box, { ref: containerRef, overflowY: "auto", maxH: "md", colorPalette: "yellow", onScroll, position: "relative", children: /* @__PURE__ */ jsxRuntimeExports.jsx(Box, { position: "relative", height: `${totalRows * ROW_HEIGHT}px`, children: /* @__PURE__ */ jsxRuntimeExports.jsx(Box, { position: "absolute", width: "100%", top: `${offsetY}px`, children: /* @__PURE__ */ jsxRuntimeExports.jsxs(TableRoot, { size: "sm", variant: "outline", children: [
+          /* @__PURE__ */ jsxRuntimeExports.jsxs(TableColumnGroup, { children: [
+            /* @__PURE__ */ jsxRuntimeExports.jsx(TableColumn, { width: "5%" }),
+            /* @__PURE__ */ jsxRuntimeExports.jsx(TableColumn, { width: "10%" }),
+            /* @__PURE__ */ jsxRuntimeExports.jsx(TableColumn, { width: "15%" }),
+            /* @__PURE__ */ jsxRuntimeExports.jsx(TableColumn, { width: "10%" }),
+            /* @__PURE__ */ jsxRuntimeExports.jsx(TableColumn, { width: "60%" })
+          ] }),
+          /* @__PURE__ */ jsxRuntimeExports.jsx(TableBody, { children: visibleRows.map((entry) => /* @__PURE__ */ jsxRuntimeExports.jsx(LogRow, { entry, isExpanded: expandedRows.has(entry.revision), onToggleExpand: toggleExpand, processDialogAction }, `${entry.branchFolder}-${entry.branchVersion}-${entry.revision}`)) })
+        ] }) }) }) })
+      ] }),
+      /* @__PURE__ */ jsxRuntimeExports.jsxs(DialogFooter, { children: [
+        /* @__PURE__ */ jsxRuntimeExports.jsx(DialogActionTrigger, { asChild: true, children: /* @__PURE__ */ jsxRuntimeExports.jsx(Button, { children: "Cancel" }) }),
+        /* @__PURE__ */ jsxRuntimeExports.jsx(DialogCloseTrigger, {})
+      ] })
+    ] })
+  ] });
+}
+const shineAnimation = keyframes`
+    from { background-position: 200% center; }
+    to { background-position: -200% center; }
+`;
+const FieldLookup = reactExports.memo(() => {
+  const setIsLookupTrelloOn = useCommit((ctx) => ctx.setIsLookupTrelloOn);
+  const setIsLookupSLogsOn = useCommit((ctx) => ctx.setIsLookupSLogsOn);
+  const { isTrelloIntegrationSupported } = useTrelloIntegration();
+  const textColor = useColorModeValue("black", "white");
+  const [trelloPopover, setTrelloPopover] = reactExports.useState(false);
+  const handleSelectedSvnRevision = reactExports.useCallback((entry) => {
+    console.log("Selected SVN Revision", entry);
+  }, []);
+  const handleSelectedTrelloCard = reactExports.useCallback((card) => {
+    console.log("Selected Trello Card", card);
+  }, []);
+  return /* @__PURE__ */ jsxRuntimeExports.jsxs(Box, { colorPalette: "yellow", children: [
+    /* @__PURE__ */ jsxRuntimeExports.jsx(Box, { children: /* @__PURE__ */ jsxRuntimeExports.jsx(Text, { fontWeight: 900, bgGradient: "to-r", gradientFrom: textColor, gradientVia: "colorPalette.500", gradientTo: textColor, backgroundSize: "200% auto", bgClip: "text", animation: `${shineAnimation} 7s ease-in infinite`, children: "You can lookup and automatically fill in the following commit details using the options below:" }) }),
+    /* @__PURE__ */ jsxRuntimeExports.jsx(Box, { my: 4 }),
+    /* @__PURE__ */ jsxRuntimeExports.jsxs(Flex, { gapX: 2, children: [
+      /* @__PURE__ */ jsxRuntimeExports.jsxs(Button, { variant: "subtle", onClick: () => setIsLookupSLogsOn(true), children: [
+        /* @__PURE__ */ jsxRuntimeExports.jsx(SiSubversion, {}),
+        "Use SVN Logs"
+      ] }),
+      /* @__PURE__ */ jsxRuntimeExports.jsxs(PopoverRoot, { open: !isTrelloIntegrationSupported && trelloPopover, onOpenChange: (e) => setTrelloPopover(e.open), children: [
+        /* @__PURE__ */ jsxRuntimeExports.jsx(PopoverTrigger, { asChild: true, children: /* @__PURE__ */ jsxRuntimeExports.jsxs(Button, { variant: "subtle", onClick: () => setIsLookupTrelloOn(isTrelloIntegrationSupported), children: [
+          /* @__PURE__ */ jsxRuntimeExports.jsx(FaTrello, {}),
+          "Use Trello"
+        ] }) }),
+        /* @__PURE__ */ jsxRuntimeExports.jsxs(PopoverContent, { children: [
+          /* @__PURE__ */ jsxRuntimeExports.jsx(PopoverArrow, {}),
+          /* @__PURE__ */ jsxRuntimeExports.jsxs(PopoverBody, { children: [
+            /* @__PURE__ */ jsxRuntimeExports.jsxs(PopoverTitle, { fontWeight: 900, color: "yellow.500", display: "flex", alignItems: "center", gapX: 2, children: [
+              /* @__PURE__ */ jsxRuntimeExports.jsx(FaTrello, {}),
+              " Trello Integration Not Set Up"
+            ] }),
+            /* @__PURE__ */ jsxRuntimeExports.jsx(Text, { my: 4, children: "It seems you haven't set up the Trello integration yet. To use this feature, link your Trello account by following the guide below." }),
+            /* @__PURE__ */ jsxRuntimeExports.jsx(Button, { colorPalette: "yellow", variant: "outline", onClick: (e) => window.open("https://help.merge.dev/en/articles/8757597-trello-how-do-i-link-my-account"), children: "Setup Guide" })
+          ] })
+        ] })
+      ] })
+    ] }),
+    /* @__PURE__ */ jsxRuntimeExports.jsx(DialogLookupSVNLogs, { fireDialogAction: handleSelectedSvnRevision }),
+    /* @__PURE__ */ jsxRuntimeExports.jsx(DialogLookupTrello, { fireDialogAction: handleSelectedTrelloCard })
+  ] });
+});
+function SubSectionCommitDetails() {
+  const selectedBranchesData = useApp((ctx) => ctx.selectedBranchesData);
+  const sourceBranch = useCommit((ctx) => ctx.sourceBranch);
+  const sourceIssueNumber = useCommit((ctx) => ctx.sourceIssueNumber);
+  const commitMessage = useCommit((ctx) => ctx.commitMessage);
+  const selectedFolders = reactExports.useMemo(() => {
+    return Array.from(selectedBranchesData.reduce((acc, branchRow) => acc.add(branchRow["Branch Folder"]), /* @__PURE__ */ new Set()));
+  }, [selectedBranchesData]);
+  return /* @__PURE__ */ jsxRuntimeExports.jsxs(Flex, { ms: 9, flexDirection: "column", children: [
+    /* @__PURE__ */ jsxRuntimeExports.jsxs(Stack, { gap: "6", maxW: "8xl", css: { "--field-label-width": "96px" }, flex: 1, children: [
+      /* @__PURE__ */ jsxRuntimeExports.jsx(FieldLookup, {}),
+      selectedFolders.map((branchFolder, i) => /* @__PURE__ */ jsxRuntimeExports.jsx(FieldIssueNumber$1, { branchFolder }, branchFolder)),
+      /* @__PURE__ */ jsxRuntimeExports.jsx(FieldSourceBranch, {}),
+      /* @__PURE__ */ jsxRuntimeExports.jsx(FieldCommitMessage, {})
+    ] }),
+    /* @__PURE__ */ jsxRuntimeExports.jsxs(Text, { mt: 6, children: [
+      "Your final commit message:",
+      " ",
+      /* @__PURE__ */ jsxRuntimeExports.jsxs(Code, { children: [
+        "Issue XYZ",
+        sourceBranch.trim() !== "" ? ` (${sourceBranch.trim()}${sourceIssueNumber !== "" ? " #" + String(sourceIssueNumber) : ""})` : "",
+        ":",
+        " ",
+        commitMessage.trim() == "" ? "Enter commit message above" : commitMessage.trim().replace(/\s*\n+\s*/g, "; ").replace(/[;\s]+$/, "").trim()
+      ] })
+    ] })
+  ] });
 }
 function SubSectionConflictingChanges() {
-  return /* @__PURE__ */ jsxRuntimeExports.jsx(Flex, { ms: 9, children: "You don't have any files to update!" });
+  const conflictingChanges = useCommit((ctx) => ctx.conflictingChanges);
+  return /* @__PURE__ */ jsxRuntimeExports.jsx(Box, { ms: 9, children: JSON.stringify(conflictingChanges, null, 4) });
+}
+function ButtonDiff({ fullPath, branchFolder, branchVersion, onDiffResult }) {
+  const handleDiff = reactExports.useCallback(async () => {
+    try {
+      const result = await window.electron.openTortoiseSVNDiff({
+        fullPath,
+        branchFolder,
+        branchVersion
+      });
+      onDiffResult(result);
+    } catch (error) {
+      onDiffResult({ success: false, error: error.message });
+    }
+  }, [fullPath, branchFolder, branchVersion, onDiffResult]);
+  return /* @__PURE__ */ jsxRuntimeExports.jsx(IconButton, { "aria-label": "Diff", size: "xs", onClick: handleDiff, colorPalette: "yellow", children: /* @__PURE__ */ jsxRuntimeExports.jsx(VscDiffSingle, {}) });
+}
+function DialogModifiedChangesRevert({ selectedCount, isDialogOpen, closeDialog, fireDialogAction }) {
+  const deleteButtonRef = reactExports.useRef(null);
+  const processDialogAction = reactExports.useCallback(() => {
+    fireDialogAction();
+    closeDialog();
+  }, [fireDialogAction, closeDialog]);
+  return /* @__PURE__ */ jsxRuntimeExports.jsxs(DialogRoot, { role: "alertdialog", open: isDialogOpen, onOpenChange: closeDialog, closeOnEscape: true, initialFocusEl: () => deleteButtonRef.current, children: [
+    /* @__PURE__ */ jsxRuntimeExports.jsx(DialogBackdrop, {}),
+    /* @__PURE__ */ jsxRuntimeExports.jsxs(DialogContent, { children: [
+      /* @__PURE__ */ jsxRuntimeExports.jsx(DialogHeader, { fontSize: "lg", fontWeight: "bold", children: /* @__PURE__ */ jsxRuntimeExports.jsx(DialogTitle, { children: "Revert Selected Paths" }) }),
+      /* @__PURE__ */ jsxRuntimeExports.jsxs(DialogBody, { children: [
+        "Are you sure you want to revert ",
+        selectedCount,
+        " path",
+        selectedCount == "1" ? "" : "s",
+        "? This action cannot be undone."
+      ] }),
+      /* @__PURE__ */ jsxRuntimeExports.jsxs(DialogFooter, { children: [
+        /* @__PURE__ */ jsxRuntimeExports.jsx(DialogActionTrigger, { asChild: true, children: /* @__PURE__ */ jsxRuntimeExports.jsx(Button$1, { children: "Cancel" }) }),
+        /* @__PURE__ */ jsxRuntimeExports.jsx(DialogCloseTrigger, {}),
+        /* @__PURE__ */ jsxRuntimeExports.jsx(Button$1, { ref: deleteButtonRef, colorPalette: "red", onClick: processDialogAction, ml: 3, children: "Revert" })
+      ] })
+    ] })
+  ] });
+}
+function sortByStack(rows, sortStack) {
+  return [...rows].sort((a, b) => {
+    for (const sortItem of sortStack) {
+      let aVal, bVal;
+      switch (sortItem.column) {
+        case "branch":
+          aVal = a.branchString.toLowerCase();
+          bVal = b.branchString.toLowerCase();
+          break;
+        case "path":
+          aVal = a.file.pathDisplay.toLowerCase();
+          bVal = b.file.pathDisplay.toLowerCase();
+          break;
+        case "lastModified":
+          aVal = new Date(a.file.lastModified).getTime();
+          bVal = new Date(b.file.lastModified).getTime();
+          break;
+        case "status":
+          aVal = a.file.wcStatus.toLowerCase();
+          bVal = b.file.wcStatus.toLowerCase();
+          break;
+        default:
+          aVal = 0;
+          bVal = 0;
+      }
+      if (aVal < bVal) return sortItem.direction === "asc" ? -1 : 1;
+      if (aVal > bVal) return sortItem.direction === "asc" ? 1 : -1;
+    }
+    return 0;
+  });
+}
+function getSortIndicator(columnKey, sortStack) {
+  const itemIndex = sortStack.findIndex((s) => s.column === columnKey);
+  if (itemIndex === -1) return null;
+  return sortStack[itemIndex].direction === "asc" ? "↑" : "↓";
 }
 function SubSectionModifiedChanges() {
-  return /* @__PURE__ */ jsxRuntimeExports.jsx(Flex, { ms: 9, children: "You don't have any files to update!" });
+  const { emitFilesRevert } = useSocketEmits();
+  const { RaiseClientNotificaiton } = useNotifications();
+  const modifiedChanges = useCommit((ctx) => ctx.modifiedChanges);
+  const selectedModifiedChanges = useCommit((ctx) => ctx.selectedModifiedChanges);
+  const setSelectedModifiedChanges = useCommit((ctx) => ctx.setSelectedModifiedChanges);
+  const [searchTerm, setSearchTerm] = reactExports.useState("");
+  const [isRevertDialogOpen, setIsRevertDialogOpen] = reactExports.useState(false);
+  const [sortStack, setSortStack] = reactExports.useState([
+    { column: "status", direction: "asc" },
+    { column: "lastModified", direction: "desc" }
+  ]);
+  const getStatusColor = reactExports.useCallback((status) => {
+    switch (status) {
+      case "modified":
+        return "cyan.500";
+      case "deleted":
+        return "red.500";
+      case "added":
+        return "green.500";
+      default:
+        return "purple.600";
+    }
+  }, []);
+  const handleSort = reactExports.useCallback((columnKey) => {
+    setSortStack((prev) => {
+      const existingIndex = prev.findIndex((s) => s.column === columnKey);
+      if (existingIndex === -1) {
+        return [{ column: columnKey, direction: "asc" }, ...prev];
+      }
+      const updatedSort = { ...prev[existingIndex] };
+      updatedSort.direction = updatedSort.direction === "asc" ? "desc" : "asc";
+      const newStack = [...prev];
+      newStack.splice(existingIndex, 1);
+      newStack.unshift(updatedSort);
+      return newStack;
+    });
+  }, []);
+  const handlePathSelection = reactExports.useCallback(
+    (path, pathStatus, checked) => {
+      setSelectedModifiedChanges((currentSelection) => {
+        if (checked) return { ...currentSelection, [path]: pathStatus };
+        const { [path]: _, ...newSelection } = currentSelection;
+        return newSelection;
+      });
+    },
+    [setSelectedModifiedChanges]
+  );
+  const handleDiffResult = reactExports.useCallback(
+    (result) => {
+      if (result.success) RaiseClientNotificaiton("TortoiseSVN diff opened successfully", "success", 3e3);
+      else RaiseClientNotificaiton(`Error opening TortoiseSVN diff: ${JSON.stringify(result.error, null, 4)}`, "error", 0);
+    },
+    [RaiseClientNotificaiton]
+  );
+  const filteredModifiedChanges = reactExports.useMemo(() => {
+    if (!searchTerm) return modifiedChanges;
+    const lowerSearch = searchTerm.toLowerCase();
+    const filtered = {};
+    Object.keys(modifiedChanges).forEach((branchPath) => {
+      const branchData = modifiedChanges[branchPath];
+      const { branchString: branchString2, filesToCommit, "Branch Folder": branchFolder, "Branch Version": branchVersion } = branchData;
+      const filteredFiles = filesToCommit.filter((file) => {
+        const fieldsToCheck = [branchString2, branchFolder, branchVersion, branchPath, file.pathDisplay, file.wcStatus, file.lastModified];
+        return fieldsToCheck.some((field) => field == null ? void 0 : field.toString().toLowerCase().includes(lowerSearch));
+      });
+      if (filteredFiles.length > 0) {
+        filtered[branchPath] = {
+          ...branchData,
+          filesToCommit: filteredFiles
+        };
+      }
+    });
+    return filtered;
+  }, [modifiedChanges, searchTerm]);
+  const allFilteredRows = reactExports.useMemo(() => {
+    const rows = [];
+    Object.keys(filteredModifiedChanges).forEach((branchPath) => {
+      const { branchString: branchString2, branchFolder, branchVersion, filesToCommit } = filteredModifiedChanges[branchPath];
+      filesToCommit.forEach((file) => {
+        rows.push({
+          branchPath,
+          branchString: branchString2,
+          branchFolder,
+          branchVersion,
+          file
+        });
+      });
+    });
+    return rows;
+  }, [filteredModifiedChanges]);
+  const sortedRows = reactExports.useMemo(() => {
+    return sortByStack(allFilteredRows, sortStack);
+  }, [allFilteredRows, sortStack]);
+  const allFilteredPaths = reactExports.useMemo(() => {
+    return sortedRows.map((row) => row.file.path);
+  }, [sortedRows]);
+  const { allSelected, someSelected } = reactExports.useMemo(() => {
+    if (allFilteredPaths.length === 0) {
+      return { allSelected: false, someSelected: false };
+    }
+    const selectedCount = allFilteredPaths.filter((p) => selectedModifiedChanges[p]).length;
+    return {
+      allSelected: selectedCount === allFilteredPaths.length,
+      someSelected: selectedCount > 0 && selectedCount < allFilteredPaths.length
+    };
+  }, [allFilteredPaths, selectedModifiedChanges]);
+  const handleHeaderCheckboxChange = reactExports.useCallback(
+    (checked) => {
+      if (checked) {
+        setSelectedModifiedChanges((currentSelection) => {
+          const newSelection = { ...currentSelection };
+          for (const path of allFilteredPaths) {
+            newSelection[path] = true;
+          }
+          return newSelection;
+        });
+      } else {
+        setSelectedModifiedChanges((currentSelection) => {
+          const newSelection = { ...currentSelection };
+          for (const path of allFilteredPaths) {
+            delete newSelection[path];
+          }
+          return newSelection;
+        });
+      }
+    },
+    [allFilteredPaths, setSelectedModifiedChanges]
+  );
+  const handleRevertFileViewFiles = reactExports.useCallback(() => {
+    console.debug("Reverting selected files: ", selectedModifiedChanges);
+    const filesToRevert = Object.entries(selectedModifiedChanges).map(([path, status]) => ({
+      path,
+      status
+    }));
+    emitFilesRevert(filesToRevert);
+    setSelectedModifiedChanges({});
+  }, [selectedModifiedChanges, setSelectedModifiedChanges]);
+  return /* @__PURE__ */ jsxRuntimeExports.jsxs(Box, { ms: 9, children: [
+    /* @__PURE__ */ jsxRuntimeExports.jsx(HStack, { gap: "6", mb: 4, width: "full", colorPalette: "yellow", children: /* @__PURE__ */ jsxRuntimeExports.jsx(InputGroup, { flex: "1", startElement: /* @__PURE__ */ jsxRuntimeExports.jsx(LuSearch, {}), startElementProps: { color: "colorPalette.fg" }, children: /* @__PURE__ */ jsxRuntimeExports.jsx(Input, { placeholder: "Quick search...", variant: "flushed", borderColor: "colorPalette.fg", value: searchTerm, onChange: (e) => setSearchTerm(e.target.value) }) }) }),
+    /* @__PURE__ */ jsxRuntimeExports.jsx(TableScrollArea, { borderWidth: "1px", maxH: "xl", children: /* @__PURE__ */ jsxRuntimeExports.jsxs(TableRoot, { size: "sm", variant: "outline", colorPalette: "yellow", children: [
+      /* @__PURE__ */ jsxRuntimeExports.jsx(TableHeader, { children: /* @__PURE__ */ jsxRuntimeExports.jsxs(TableRow, { bgColor: "colorPalette.400", children: [
+        /* @__PURE__ */ jsxRuntimeExports.jsx(TableColumnHeader, { children: /* @__PURE__ */ jsxRuntimeExports.jsx(Checkbox, { "aria-label": "Select Filtered", variant: "subtle", colorPalette: "yellow", checked: someSelected && !allSelected ? "indeterminate" : allSelected, onCheckedChange: (e) => handleHeaderCheckboxChange(e.checked) }) }),
+        /* @__PURE__ */ jsxRuntimeExports.jsxs(TableColumnHeader, { color: "black", fontWeight: 900, cursor: "pointer", onClick: () => handleSort("branch"), children: [
+          "Branch ",
+          getSortIndicator("branch", sortStack)
+        ] }),
+        /* @__PURE__ */ jsxRuntimeExports.jsxs(TableColumnHeader, { color: "black", fontWeight: 900, cursor: "pointer", onClick: () => handleSort("path"), children: [
+          "Path ",
+          getSortIndicator("path", sortStack)
+        ] }),
+        /* @__PURE__ */ jsxRuntimeExports.jsxs(TableColumnHeader, { color: "black", fontWeight: 900, cursor: "pointer", onClick: () => handleSort("lastModified"), children: [
+          "Last Modified ",
+          getSortIndicator("lastModified", sortStack)
+        ] }),
+        /* @__PURE__ */ jsxRuntimeExports.jsxs(TableColumnHeader, { color: "black", fontWeight: 900, cursor: "pointer", onClick: () => handleSort("status"), children: [
+          "Status ",
+          getSortIndicator("status", sortStack)
+        ] }),
+        /* @__PURE__ */ jsxRuntimeExports.jsx(TableColumnHeader, {})
+      ] }) }),
+      /* @__PURE__ */ jsxRuntimeExports.jsx(TableBody, { children: Object.keys(sortedRows).length == 0 ? /* @__PURE__ */ jsxRuntimeExports.jsx(TableRow, { children: /* @__PURE__ */ jsxRuntimeExports.jsx(TableCell, { colSpan: 6, textAlign: "center", children: "No results found" }) }) : sortedRows.map((row) => {
+        const { branchPath, branchString: branchString2, branchFolder, branchVersion, file } = row;
+        return /* @__PURE__ */ jsxRuntimeExports.jsxs(TableRow, { children: [
+          /* @__PURE__ */ jsxRuntimeExports.jsx(TableCell, { children: /* @__PURE__ */ jsxRuntimeExports.jsx(Checkbox, { "aria-label": "Select path", variant: "subtle", colorPalette: "yellow", checked: !!selectedModifiedChanges[file.path], onCheckedChange: (e) => handlePathSelection(file.path, file.wcStatus, e.checked) }) }),
+          /* @__PURE__ */ jsxRuntimeExports.jsx(TableCell, { color: getStatusColor(file.wcStatus), children: branchString2 }),
+          /* @__PURE__ */ jsxRuntimeExports.jsx(TableCell, { color: getStatusColor(file.wcStatus), children: `${branchPath.split("\\").at(-1)}\\${file.pathDisplay}` }),
+          /* @__PURE__ */ jsxRuntimeExports.jsx(TableCell, { color: getStatusColor(file.wcStatus), children: file.lastModified }),
+          /* @__PURE__ */ jsxRuntimeExports.jsx(TableCell, { color: getStatusColor(file.wcStatus), children: file.wcStatus }),
+          /* @__PURE__ */ jsxRuntimeExports.jsx(TableCell, { children: /* @__PURE__ */ jsxRuntimeExports.jsx(ButtonDiff, { fullPath: file.path, branchFolder, branchVersion, onDiffResult: handleDiffResult }) })
+        ] }, file.path);
+      }) })
+    ] }) }),
+    /* @__PURE__ */ jsxRuntimeExports.jsxs(Flex, { gap: "6", mt: 4, justifyContent: "space-between", alignItems: "center", colorPalette: "yellow", children: [
+      /* @__PURE__ */ jsxRuntimeExports.jsxs(Flex, { gap: 2, children: [
+        "Selected paths:",
+        " ",
+        /* @__PURE__ */ jsxRuntimeExports.jsx(Box, { bgColor: "yellow.subtle", color: "yellow.fg", rounded: "md", px: 3, children: Object.keys(selectedModifiedChanges).length })
+      ] }),
+      /* @__PURE__ */ jsxRuntimeExports.jsx(Box, { children: /* @__PURE__ */ jsxRuntimeExports.jsx(Button, { onClick: () => setIsRevertDialogOpen(true), colorPalette: "red", disabled: Object.keys(selectedModifiedChanges).length < 1, children: "Revert Selected" }) })
+    ] }),
+    /* @__PURE__ */ jsxRuntimeExports.jsx(DialogModifiedChangesRevert, { selectedCount: Object.keys(selectedModifiedChanges).length, isDialogOpen: isRevertDialogOpen, closeDialog: () => setIsRevertDialogOpen(false), fireDialogAction: handleRevertFileViewFiles })
+  ] });
 }
 function SubSectionUnknownChanges() {
-  return /* @__PURE__ */ jsxRuntimeExports.jsx(Flex, { ms: 9, children: "You don't have any files to update!" });
+  const unknownChanges = useCommit((ctx) => ctx.unknownChanges);
+  return /* @__PURE__ */ jsxRuntimeExports.jsx(Box, { ms: 9, children: Object.keys(unknownChanges) });
 }
-function SectionCommit() {
-  const { selectedBranches, isCommitMode } = useApp();
-  const selectedBranchesCount = Object.keys(selectedBranches).length;
+function branchString(branchFolder, branchVersion, branch) {
+  return `${branchFolder == "" ? "Uncategorised" : branchFolder} ${branchVersion == "" ? "Unversioned" : branchVersion} ${String(branch).split("\\").at(-1)}`;
+}
+const initialState = {
+  isLookupSLogsOn: false,
+  setIsLookupSLogsOn: (_) => {
+  },
+  isLookupTrelloOn: false,
+  setIsLookupTrelloOn: (_) => {
+  },
+  sourceBranch: "",
+  setSourceBranch: (_) => {
+  },
+  sourceIssueNumber: "",
+  setSourceIssueNumber: (_) => {
+  },
+  issueNumber: {},
+  setIssueNumber: (_) => {
+  },
+  commitMessage: "",
+  setCommitMessage: (_) => {
+  },
+  conflictingChanges: {},
+  unknownChanges: {},
+  modifiedChanges: {},
+  selectedUnknownChanges: {},
+  setSelectedUnknownChanges: (_) => {
+  },
+  selectedModifiedChanges: {},
+  setSelectedModifiedChanges: (_) => {
+  },
+  isCommitMode: false,
+  selectedBranchesCount: 0,
+  accordionSection: [],
+  commitStage: [],
+  setCommitStage: (_) => {
+  }
+};
+const ContextCommit = createContext(initialState);
+const useCommit = (selector) => {
+  const context = useContextSelector(ContextCommit, selector);
+  return context;
+};
+const CommitProvider = ({ children }) => {
+  const socket = useApp((ctx) => ctx.socket);
+  const configurableRowData = useApp((ctx) => ctx.configurableRowData);
+  const selectedBranches = useApp((ctx) => ctx.selectedBranches);
+  const selectedBrachesData = useApp((ctx) => ctx.selectedBranchesData);
+  const selectedBranchPaths = useApp((ctx) => ctx.selectedBranchPaths);
+  const appMode = useApp((ctx) => ctx.appMode);
+  const isCommitMode = reactExports.useMemo(() => appMode === "commit", [appMode]);
+  const { emitStatusSingle } = useSocketEmits();
+  const selectedBranchesCount = reactExports.useMemo(() => Object.keys(selectedBranches).length, [selectedBranches]);
+  const [isLookupSLogsOn, setIsLookupSLogsOn] = reactExports.useState(false);
+  const [isLookupTrelloOn, setIsLookupTrelloOn] = reactExports.useState(false);
+  const [sourceBranch, setSourceBranch] = reactExports.useState("");
+  const [sourceIssueNumber, setSourceIssueNumber] = reactExports.useState("");
+  const [issueNumber, setIssueNumber] = reactExports.useState({});
+  const [commitMessage, setCommitMessage] = reactExports.useState("");
+  const [conflictingChanges, setConflictingChanges] = reactExports.useState({});
+  const [unknownChanges, setUnknownChanges] = reactExports.useState({});
+  const [modifiedChanges, setModifiedChanges] = reactExports.useState({});
+  const [selectedUnknownChanges, setSelectedUnknownChanges] = reactExports.useState({});
+  const [selectedModifiedChanges, setSelectedModifiedChanges] = reactExports.useState({});
+  const [commitStage, setCommitStage] = reactExports.useState(["commitDetails"]);
+  const accordionSections = reactExports.useMemo(
+    () => [
+      {
+        value: "commitDetails",
+        icon: BiMessageDetail,
+        title: "Commit Details",
+        description: "Enter issue, branch and message details",
+        component: SubSectionCommitDetails
+      },
+      {
+        value: "conflictingChanges",
+        icon: IoWarning,
+        title: "Conflicting Changes",
+        description: "Modified changes that will conflict with the remote version",
+        component: SubSectionConflictingChanges
+      },
+      {
+        value: "unknownChanges",
+        icon: FiHelpCircle,
+        title: "Unknown Changes",
+        description: "Added and deleted files currently not tracked by SVN",
+        component: SubSectionUnknownChanges
+      },
+      {
+        value: "modifiedChanges",
+        icon: FiEdit,
+        title: "Modified Changes",
+        description: "Files and directories listed for committing",
+        component: SubSectionModifiedChanges
+      }
+    ],
+    []
+  );
+  const accordionSection = reactExports.useMemo(
+    () => accordionSections.map((accSection, i) => /* @__PURE__ */ jsxRuntimeExports.jsxs(AccordionItem, { value: accSection.value, children: [
+      /* @__PURE__ */ jsxRuntimeExports.jsxs(AccordionItemTrigger, { children: [
+        /* @__PURE__ */ jsxRuntimeExports.jsx(Flex, { fontSize: "lg", color: "colorPalette.fg", children: /* @__PURE__ */ jsxRuntimeExports.jsx(accSection.icon, {}) }),
+        /* @__PURE__ */ jsxRuntimeExports.jsxs(Stack, { gap: "1", children: [
+          /* @__PURE__ */ jsxRuntimeExports.jsx(Text, { children: accSection.title }),
+          /* @__PURE__ */ jsxRuntimeExports.jsx(Text, { fontSize: "xs", color: "fg.muted", children: accSection.description })
+        ] })
+      ] }),
+      /* @__PURE__ */ jsxRuntimeExports.jsx(AccordionItemContent, { children: /* @__PURE__ */ jsxRuntimeExports.jsx(accSection.component, {}) })
+    ] }, i)),
+    [accordionSections]
+  );
+  const value = reactExports.useMemo(
+    () => ({
+      isLookupSLogsOn,
+      setIsLookupSLogsOn,
+      isLookupTrelloOn,
+      setIsLookupTrelloOn,
+      sourceBranch,
+      setSourceBranch,
+      sourceIssueNumber,
+      setSourceIssueNumber,
+      issueNumber,
+      setIssueNumber,
+      commitMessage,
+      setCommitMessage,
+      conflictingChanges,
+      unknownChanges,
+      modifiedChanges,
+      selectedUnknownChanges,
+      setSelectedUnknownChanges,
+      selectedModifiedChanges,
+      setSelectedModifiedChanges,
+      isCommitMode,
+      selectedBranchesCount,
+      accordionSection,
+      commitStage,
+      setCommitStage
+    }),
+    [isLookupSLogsOn, isLookupTrelloOn, sourceBranch, sourceIssueNumber, issueNumber, commitMessage, conflictingChanges, unknownChanges, modifiedChanges, selectedUnknownChanges, selectedModifiedChanges, isCommitMode, selectedBranchesCount, accordionSection, commitStage]
+  );
   reactExports.useEffect(() => {
     if (!isCommitMode) return;
     setTimeout(() => {
@@ -1429,49 +2215,96 @@ function SectionCommit() {
       return (_a = document.getElementById("sectionCommit")) == null ? void 0 : _a.scrollIntoView({ behavior: "smooth", block: "start", inline: "nearest" });
     }, 400);
   }, [isCommitMode]);
-  const [commitStage, setCommitStage] = reactExports.useState(["commitDetails"]);
-  const accordionSections = reactExports.useMemo(() => [
-    {
-      value: "commitDetails",
-      icon: BiMessageDetail,
-      title: "Commit Details",
-      description: "Enter issue, branch and message details",
-      component: SubSectionCommitDetails
-    },
-    {
-      value: "conflictingChanges",
-      icon: IoWarning,
-      title: "Conflicting Changes",
-      description: "Modified changes that will conflict with the remote version",
-      component: SubSectionConflictingChanges
-    },
-    {
-      value: "modifiedChanges",
-      icon: FiEdit,
-      title: "Modified Changes",
-      description: "Files and directories listed for committing",
-      component: SubSectionModifiedChanges
-    },
-    {
-      value: "unknownChanges",
-      icon: FiHelpCircle,
-      title: "Unknown Changes",
-      description: "Added and deleted files currently not tracked by SVN",
-      component: SubSectionUnknownChanges
-    }
-  ], []);
-  const accordionSection = reactExports.useMemo(() => accordionSections.map((accSection, i) => /* @__PURE__ */ jsxRuntimeExports.jsxs(AccordionItem, { value: accSection.value, children: [
-    /* @__PURE__ */ jsxRuntimeExports.jsxs(AccordionItemTrigger, { children: [
-      /* @__PURE__ */ jsxRuntimeExports.jsx(Flex, { fontSize: "lg", color: "colorPalette.fg", children: /* @__PURE__ */ jsxRuntimeExports.jsx(accSection.icon, {}) }),
-      /* @__PURE__ */ jsxRuntimeExports.jsxs(Stack, { gap: "1", children: [
-        /* @__PURE__ */ jsxRuntimeExports.jsx(Text, { children: accSection.title }),
-        /* @__PURE__ */ jsxRuntimeExports.jsx(Text, { fontSize: "xs", color: "fg.muted", children: accSection.description })
-      ] })
-    ] }),
-    /* @__PURE__ */ jsxRuntimeExports.jsx(AccordionItemContent, { children: /* @__PURE__ */ jsxRuntimeExports.jsx(accSection.component, {}) })
-  ] }, i)), [accordionSections]);
-  console.log("SectionCommit");
-  return /* @__PURE__ */ jsxRuntimeExports.jsx(CollapsibleRoot, { open: isCommitMode, children: /* @__PURE__ */ jsxRuntimeExports.jsx(CollapsibleContent, { children: /* @__PURE__ */ jsxRuntimeExports.jsxs(Box, { id: "sectionCommit", mb: 40, children: [
+  reactExports.useEffect(() => {
+    if (!isCommitMode) return;
+    selectedBrachesData.forEach((branchRow) => {
+      console.log("Emitting status single for branch", branchRow["SVN Branch"]);
+      emitStatusSingle(branchRow);
+    });
+  }, [isCommitMode, selectedBrachesData]);
+  reactExports.useEffect(() => {
+    if (!isCommitMode || selectedBranchesCount < 1) return;
+    const socketCallback = (data) => {
+      console.log("Received status single from socket in ContextCommit component in background", data);
+      const branchId = data.id;
+      const { branch: branchPath, filesToUpdate, filesToTrack, filesToCommit } = data.status;
+      const matchedSelectedRow = configurableRowData.find((branchRow) => branchRow.id === branchId);
+      const matchedBranchString = branchString(matchedSelectedRow["Branch Folder"], matchedSelectedRow["Branch Version"], matchedSelectedRow["SVN Branch"]);
+      setConflictingChanges((prevData) => {
+        const newData = {};
+        Object.entries(prevData).forEach(([branchPath2, branchData]) => {
+          if (selectedBranchPaths.has(branchPath2)) {
+            newData[branchPath2] = branchData;
+          }
+        });
+        if ((filesToUpdate == null ? void 0 : filesToUpdate.length) > 0)
+          newData[branchPath] = {
+            branchString: matchedBranchString,
+            "Branch Folder": matchedSelectedRow["Branch Folder"],
+            "Branch Version": matchedSelectedRow["Branch Version"],
+            "SVN Branch": branchPath,
+            filesToUpdate
+          };
+        else delete newData[branchPath];
+        return newData;
+      });
+      setUnknownChanges((prevData) => {
+        const newData = {};
+        Object.entries(prevData).forEach(([branchPath2, branchData]) => {
+          if (selectedBranchPaths.has(branchPath2)) {
+            newData[branchPath2] = branchData;
+          }
+        });
+        if ((filesToTrack == null ? void 0 : filesToTrack.length) > 0)
+          newData[branchPath] = {
+            branchString: matchedBranchString,
+            "Branch Folder": matchedSelectedRow["Branch Folder"],
+            "Branch Version": matchedSelectedRow["Branch Version"],
+            "SVN Branch": branchPath,
+            filesToTrack
+          };
+        else delete newData[branchPath];
+        return newData;
+      });
+      setModifiedChanges((prevData) => {
+        const newData = {};
+        Object.entries(prevData).forEach(([branchPath2, branchData]) => {
+          if (selectedBranchPaths.has(branchPath2)) {
+            newData[branchPath2] = branchData;
+          }
+        });
+        if ((filesToCommit == null ? void 0 : filesToCommit.length) > 0)
+          newData[branchPath] = {
+            branchString: matchedBranchString,
+            "Branch Folder": matchedSelectedRow["Branch Folder"],
+            "Branch Version": matchedSelectedRow["Branch Version"],
+            "SVN Branch": branchPath,
+            filesToCommit
+          };
+        else delete newData[branchPath];
+        return newData;
+      });
+    };
+    socket == null ? void 0 : socket.on("branch-status-single", socketCallback);
+    return () => socket == null ? void 0 : socket.off("branch-status-single", socketCallback);
+  }, [socket, isCommitMode, selectedBranchesCount, configurableRowData, selectedBranchPaths]);
+  reactExports.useEffect(() => {
+    if (!isCommitMode || selectedBranchesCount < 1) return;
+    const socketCallback = (data) => {
+      console.log("Received branch-paths-update from socket in ContextCommit component in background", data);
+    };
+    socket == null ? void 0 : socket.on("branch-paths-update", socketCallback);
+    return () => socket == null ? void 0 : socket.off("branch-paths-update", socketCallback);
+  }, [socket, isCommitMode, selectedBranchesCount]);
+  return /* @__PURE__ */ jsxRuntimeExports.jsx(ContextCommit.Provider, { value, children });
+};
+function SectionCommit() {
+  const isCommitMode = useCommit((ctx) => ctx.isCommitMode);
+  const selectedBranchesCount = useCommit((ctx) => ctx.selectedBranchesCount);
+  const commitStage = useCommit((ctx) => ctx.commitStage);
+  const accordionSection = useCommit((ctx) => ctx.accordionSection);
+  const setCommitStage = useCommit((ctx) => ctx.setCommitStage);
+  return /* @__PURE__ */ jsxRuntimeExports.jsx(CollapsibleRoot, { open: isCommitMode && selectedBranchesCount > 0, children: /* @__PURE__ */ jsxRuntimeExports.jsx(CollapsibleContent, { children: /* @__PURE__ */ jsxRuntimeExports.jsxs(Box, { id: "sectionCommit", mb: 40, children: [
     /* @__PURE__ */ jsxRuntimeExports.jsxs(Heading, { as: "h2", size: "2xl", lineClamp: 1, mb: 4, className: "animation-pulse", lineHeight: "1.4", children: [
       "Committing to ",
       selectedBranchesCount,
@@ -1479,146 +2312,8 @@ function SectionCommit() {
       selectedBranchesCount > 1 ? "es" : "",
       ":"
     ] }),
-    /* @__PURE__ */ jsxRuntimeExports.jsx(OptionsCommit, {}),
-    /* @__PURE__ */ jsxRuntimeExports.jsxs(Box, { my: 6, fontSize: "sm", children: [
-      /* @__PURE__ */ jsxRuntimeExports.jsx(AccordionRoot, { size: "sm", variant: "enclosed", colorPalette: "yellow", value: commitStage, collapsible: true, multiple: true, onValueChange: (e) => setCommitStage(e.value), lazyMount: true, children: accordionSection }),
-      /* @__PURE__ */ jsxRuntimeExports.jsxs(Text, { mt: 6, children: [
-        "Your final commit message: ",
-        /* @__PURE__ */ jsxRuntimeExports.jsx(Code, { children: "Issue XXXX (YYY): ZZZZ" })
-      ] })
-    ] })
+    /* @__PURE__ */ jsxRuntimeExports.jsx(Box, { my: 6, fontSize: "sm", children: /* @__PURE__ */ jsxRuntimeExports.jsx(AccordionRoot, { size: "sm", variant: "enclosed", colorPalette: "yellow", value: commitStage, collapsible: true, multiple: true, onValueChange: (e) => setCommitStage(e.value), lazyMount: false, children: accordionSection }) })
   ] }) }) });
-}
-const Button = reactExports.forwardRef(function Button2(props, ref) {
-  const { loading, disabled, loadingText, children, ...rest } = props;
-  return /* @__PURE__ */ jsxRuntimeExports.jsx(Button$1, { focusRing: "none", focusVisibleRing: "none", disabled: loading || disabled, ref, ...rest, children: loading && !loadingText ? /* @__PURE__ */ jsxRuntimeExports.jsxs(jsxRuntimeExports.Fragment, { children: [
-    /* @__PURE__ */ jsxRuntimeExports.jsx(AbsoluteCenter, { display: "inline-flex", children: /* @__PURE__ */ jsxRuntimeExports.jsx(Spinner, { size: "inherit", color: "inherit" }) }),
-    /* @__PURE__ */ jsxRuntimeExports.jsx(Span, { opacity: 0, children })
-  ] }) : loading && loadingText ? /* @__PURE__ */ jsxRuntimeExports.jsxs(jsxRuntimeExports.Fragment, { children: [
-    /* @__PURE__ */ jsxRuntimeExports.jsx(Spinner, { size: "inherit", color: "inherit" }),
-    loadingText
-  ] }) : children });
-});
-const { withContext } = createRecipeContext({ key: "button" });
-const LinkButton = withContext("a");
-const [RootPropsProvider, useRootProps] = createContext({
-  name: "RootPropsProvider"
-});
-const variantMap = {
-  outline: { default: "ghost", ellipsis: "plain", current: "outline" },
-  solid: { default: "outline", ellipsis: "outline", current: "solid" },
-  subtle: { default: "ghost", ellipsis: "plain", current: "subtle" }
-};
-const PaginationRoot = reactExports.forwardRef(function PaginationRoot2(props, ref) {
-  const { size = "sm", variant = "outline", getHref, ...rest } = props;
-  return /* @__PURE__ */ jsxRuntimeExports.jsx(RootPropsProvider, { value: { size, variantMap: variantMap[variant], getHref }, children: /* @__PURE__ */ jsxRuntimeExports.jsx(PaginationRoot$1, { ref, type: getHref ? "link" : "button", ...rest }) });
-});
-const PaginationEllipsis = reactExports.forwardRef(function PaginationEllipsis2(props, ref) {
-  const { size, variantMap: variantMap2 } = useRootProps();
-  return /* @__PURE__ */ jsxRuntimeExports.jsx(PaginationEllipsis$1, { ref, ...props, asChild: true, children: /* @__PURE__ */ jsxRuntimeExports.jsx(Button$1, { as: "span", variant: variantMap2.ellipsis, size, children: /* @__PURE__ */ jsxRuntimeExports.jsx(HiMiniEllipsisHorizontal, {}) }) });
-});
-const PaginationItem = reactExports.forwardRef(function PaginationItem2(props, ref) {
-  const { page } = usePaginationContext();
-  const { size, variantMap: variantMap2, getHref } = useRootProps();
-  const current = page === props.value;
-  const variant = current ? variantMap2.current : variantMap2.default;
-  if (getHref) {
-    return /* @__PURE__ */ jsxRuntimeExports.jsx(LinkButton, { href: getHref(props.value), variant, size, children: props.value });
-  }
-  return /* @__PURE__ */ jsxRuntimeExports.jsx(PaginationItem$1, { ref, ...props, asChild: true, children: /* @__PURE__ */ jsxRuntimeExports.jsx(Button$1, { variant, size, children: props.value }) });
-});
-const PaginationPrevTrigger = reactExports.forwardRef(function PaginationPrevTrigger2(props, ref) {
-  const { size, variantMap: variantMap2, getHref } = useRootProps();
-  const { previousPage } = usePaginationContext();
-  if (getHref) {
-    return /* @__PURE__ */ jsxRuntimeExports.jsx(LinkButton, { href: previousPage != null ? getHref(previousPage) : void 0, variant: variantMap2.default, size, children: /* @__PURE__ */ jsxRuntimeExports.jsx(HiChevronLeft, {}) });
-  }
-  return /* @__PURE__ */ jsxRuntimeExports.jsx(PaginationPrevTrigger$1, { ref, asChild: true, ...props, children: /* @__PURE__ */ jsxRuntimeExports.jsx(IconButton, { variant: variantMap2.default, size, children: /* @__PURE__ */ jsxRuntimeExports.jsx(HiChevronLeft, {}) }) });
-});
-const PaginationNextTrigger = reactExports.forwardRef(function PaginationNextTrigger2(props, ref) {
-  const { size, variantMap: variantMap2, getHref } = useRootProps();
-  const { nextPage } = usePaginationContext();
-  if (getHref) {
-    return /* @__PURE__ */ jsxRuntimeExports.jsx(LinkButton, { href: nextPage != null ? getHref(nextPage) : void 0, variant: variantMap2.default, size, children: /* @__PURE__ */ jsxRuntimeExports.jsx(HiChevronRight, {}) });
-  }
-  return /* @__PURE__ */ jsxRuntimeExports.jsx(PaginationNextTrigger$1, { ref, asChild: true, ...props, children: /* @__PURE__ */ jsxRuntimeExports.jsx(IconButton, { variant: variantMap2.default, size, children: /* @__PURE__ */ jsxRuntimeExports.jsx(HiChevronRight, {}) }) });
-});
-const PaginationItems = (props) => {
-  return /* @__PURE__ */ jsxRuntimeExports.jsx(PaginationContext, { children: ({ pages }) => pages.map((page, index) => {
-    return page.type === "ellipsis" ? /* @__PURE__ */ jsxRuntimeExports.jsx(PaginationEllipsis, { index, ...props }, index) : /* @__PURE__ */ jsxRuntimeExports.jsx(PaginationItem, { type: "page", value: page.value, ...props }, index);
-  }) });
-};
-reactExports.forwardRef(function PaginationPageText2(props, ref) {
-  const { format = "compact", ...rest } = props;
-  const { page, totalPages, pageRange, count } = usePaginationContext();
-  const content = reactExports.useMemo(() => {
-    if (format === "short") return `${page} / ${totalPages}`;
-    if (format === "compact") return `${page} of ${totalPages}`;
-    return `${pageRange.start + 1} - ${pageRange.end} of ${count}`;
-  }, [format, page, totalPages, pageRange, count]);
-  return /* @__PURE__ */ jsxRuntimeExports.jsx(Text, { fontWeight: "medium", ref, ...rest, children: content });
-});
-function DialogBranchesLog() {
-  const { socket, configurableRowData, selectedBranches, isDialogSBLogOpen, setIsDialogSBLogOpen } = useApp();
-  const { emitLogsSelected } = useSocketEmits();
-  const [svnLogs, setSvnLogs] = reactExports.useState([]);
-  const closeDialog = reactExports.useCallback(() => {
-    setIsDialogSBLogOpen(false);
-  }, [isDialogSBLogOpen]);
-  reactExports.useEffect(() => {
-    if ((configurableRowData == null ? void 0 : configurableRowData.length) < 1 || (selectedBranches == null ? void 0 : selectedBranches.length) < 1) return;
-    setSvnLogs([]);
-    emitLogsSelected(configurableRowData.filter((branchRow) => selectedBranches[branchRow.id]));
-  }, [selectedBranches, configurableRowData]);
-  reactExports.useEffect(() => {
-    const socketCallback = (data) => {
-      console.debug("Received svn-log-result from socket in DialogBranchesLog component in background");
-      setSvnLogs((prevData) => [...prevData, ...data.logs]);
-    };
-    socket == null ? void 0 : socket.on("svn-log-result", socketCallback);
-    return () => socket == null ? void 0 : socket.off("svn-log-result", socketCallback);
-  }, [socket]);
-  return /* @__PURE__ */ jsxRuntimeExports.jsxs(DialogRoot, { role: "dialog", size: "full", placement: "center", open: isDialogSBLogOpen, onOpenChange: closeDialog, closeOnEscape: true, initialFocusEl: void 0, children: [
-    /* @__PURE__ */ jsxRuntimeExports.jsx(DialogBackdrop, {}),
-    /* @__PURE__ */ jsxRuntimeExports.jsxs(DialogContent, { children: [
-      /* @__PURE__ */ jsxRuntimeExports.jsx(DialogHeader, { fontSize: "lg", fontWeight: "bold", children: /* @__PURE__ */ jsxRuntimeExports.jsx(DialogTitle, { children: "Selected Branches: SVN Logs (All Time)" }) }),
-      /* @__PURE__ */ jsxRuntimeExports.jsxs(DialogBody, { children: [
-        /* @__PURE__ */ jsxRuntimeExports.jsxs(TableRoot, { size: "sm", variant: "outline", transition: "backgrounds", children: [
-          /* @__PURE__ */ jsxRuntimeExports.jsxs(TableColumnGroup, { children: [
-            /* @__PURE__ */ jsxRuntimeExports.jsx(TableColumn, { width: "1%" }),
-            /* @__PURE__ */ jsxRuntimeExports.jsx(TableColumn, { width: "15%" }),
-            /* @__PURE__ */ jsxRuntimeExports.jsx(TableColumn, { width: "15%" }),
-            /* @__PURE__ */ jsxRuntimeExports.jsx(TableColumn, { width: "15%" }),
-            /* @__PURE__ */ jsxRuntimeExports.jsx(TableColumn, { width: "15%" })
-          ] }),
-          /* @__PURE__ */ jsxRuntimeExports.jsx(TableHeader, { children: /* @__PURE__ */ jsxRuntimeExports.jsxs(TableRow, { children: [
-            /* @__PURE__ */ jsxRuntimeExports.jsx(TableColumnHeader, { children: "Revision" }),
-            /* @__PURE__ */ jsxRuntimeExports.jsx(TableColumnHeader, { children: "Date" }),
-            /* @__PURE__ */ jsxRuntimeExports.jsx(TableColumnHeader, { children: "Branch" }),
-            /* @__PURE__ */ jsxRuntimeExports.jsx(TableColumnHeader, { children: "Author" }),
-            /* @__PURE__ */ jsxRuntimeExports.jsx(TableColumnHeader, { children: "Message" })
-          ] }) }),
-          /* @__PURE__ */ jsxRuntimeExports.jsx(TableBody, { children: svnLogs.length > 0 ? svnLogs.map((logRevision) => /* @__PURE__ */ jsxRuntimeExports.jsxs(TableRow, { children: [
-            /* @__PURE__ */ jsxRuntimeExports.jsx(TableCell, { children: logRevision.revision }),
-            /* @__PURE__ */ jsxRuntimeExports.jsx(TableCell, { children: logRevision.date }),
-            /* @__PURE__ */ jsxRuntimeExports.jsx(TableCell, { children: `${logRevision.branchFolder} ${logRevision.branchVersion}` }),
-            /* @__PURE__ */ jsxRuntimeExports.jsx(TableCell, { children: logRevision.author }),
-            /* @__PURE__ */ jsxRuntimeExports.jsx(TableCell, { children: logRevision.message })
-          ] }, logRevision.revision)) : null })
-        ] }),
-        /* @__PURE__ */ jsxRuntimeExports.jsx(PaginationRoot, { count: svnLogs.length, pageSize: 5, page: 1, children: /* @__PURE__ */ jsxRuntimeExports.jsxs(HStack, { wrap: "wrap", children: [
-          /* @__PURE__ */ jsxRuntimeExports.jsx(PaginationPrevTrigger, {}),
-          /* @__PURE__ */ jsxRuntimeExports.jsx(PaginationItems, {}),
-          /* @__PURE__ */ jsxRuntimeExports.jsx(PaginationNextTrigger, {})
-        ] }) })
-      ] }),
-      /* @__PURE__ */ jsxRuntimeExports.jsxs(DialogFooter, { children: [
-        /* @__PURE__ */ jsxRuntimeExports.jsx(DialogActionTrigger, { asChild: true, children: /* @__PURE__ */ jsxRuntimeExports.jsx(Button, { children: "Cancel" }) }),
-        /* @__PURE__ */ jsxRuntimeExports.jsx(DialogCloseTrigger, {}),
-        /* @__PURE__ */ jsxRuntimeExports.jsx(Button, { colorPalette: "yellow", children: "Idk" })
-      ] })
-    ] })
-  ] });
 }
 function AlertUpdateTitan() {
   const { toast, RaiseClientNotificaiton } = useNotifications();
@@ -1691,6 +2386,7 @@ function AlertUpdateTitan() {
 const Logo = "" + new URL("Titan.png", import.meta.url).href;
 function HeaderApp() {
   if (!window.electron) return /* @__PURE__ */ jsxRuntimeExports.jsx(jsxRuntimeExports.Fragment, {});
+  const setAppClosing = useApp((ctx) => ctx.setAppClosing);
   const [appVersion, setAppVersion] = reactExports.useState("");
   reactExports.useEffect(() => {
     window.electron.getAppVersion().then((version) => {
@@ -1705,8 +2401,9 @@ function HeaderApp() {
   }, []);
   const handleCloseWindow = reactExports.useCallback(() => {
     window.electron.closeWindow();
+    setAppClosing(true);
   }, []);
-  return /* @__PURE__ */ jsxRuntimeExports.jsx(chakra.header, { w: "100%", position: "fixed", bgGradient: "to-r", gradientFrom: "yellow.500", gradientTo: "yellow.400", className: "titanHead notMono", zIndex: 9999999, top: 0, overflow: "none", children: /* @__PURE__ */ jsxRuntimeExports.jsxs(Flex, { justifyContent: "space-between", alignItems: "center", p: 0, position: "static", children: [
+  return /* @__PURE__ */ jsxRuntimeExports.jsx(chakra.header, { w: "100%", position: "fixed", bgColor: "yellow.400", className: "titanHead notMono", zIndex: 9999999, top: 0, overflow: "none", children: /* @__PURE__ */ jsxRuntimeExports.jsxs(Flex, { justifyContent: "space-between", alignItems: "center", p: 0, position: "static", children: [
     /* @__PURE__ */ jsxRuntimeExports.jsxs(Flex, { alignItems: "center", gapX: 1, ms: 1, children: [
       /* @__PURE__ */ jsxRuntimeExports.jsx(Image, { src: Logo, alt: "Titan Logo", boxSize: "20px", borderRadius: "full", userSelect: "none" }),
       /* @__PURE__ */ jsxRuntimeExports.jsxs(Heading, { as: "h6", size: "sm", fontWeight: 700, lineClamp: 1, p: 1, className: "animation-fadein-left-forward", userSelect: "none", color: "black", children: [
@@ -1782,6 +2479,7 @@ function HeaderApp() {
   ] }) });
 }
 function App() {
+  const appClosing = useApp((ctx) => ctx.appClosing);
   const { RaiseClientNotificaiton } = useNotifications();
   reactExports.useEffect(() => {
     if (window.electron) {
@@ -1799,14 +2497,20 @@ function App() {
   return /* @__PURE__ */ jsxRuntimeExports.jsxs(Box, { className: "titanContainer", h: "calc(100vh)", children: [
     /* @__PURE__ */ jsxRuntimeExports.jsx(Toaster, {}),
     /* @__PURE__ */ jsxRuntimeExports.jsx(HeaderApp, {}),
-    /* @__PURE__ */ jsxRuntimeExports.jsxs(Box, { p: 10, overflowY: "auto", className: "titanBody", children: [
+    !appClosing ? /* @__PURE__ */ jsxRuntimeExports.jsxs(Box, { p: 10, overflowY: "auto", className: "titanBody", children: [
       /* @__PURE__ */ jsxRuntimeExports.jsx(Header, {}),
       /* @__PURE__ */ jsxRuntimeExports.jsx(AlertUpdateTitan, {}),
       /* @__PURE__ */ jsxRuntimeExports.jsxs(Flex, { rowGap: 8, flexDirection: "column", children: [
         /* @__PURE__ */ jsxRuntimeExports.jsx(Box, { children: /* @__PURE__ */ jsxRuntimeExports.jsx(BranchesProvider, { children: /* @__PURE__ */ jsxRuntimeExports.jsx(SectionBranches, {}) }) }),
         /* @__PURE__ */ jsxRuntimeExports.jsx(Box, { children: /* @__PURE__ */ jsxRuntimeExports.jsx(CommitProvider, { children: /* @__PURE__ */ jsxRuntimeExports.jsx(SectionCommit, {}) }) })
-      ] }),
-      /* @__PURE__ */ jsxRuntimeExports.jsx(DialogBranchesLog, {})
+      ] })
+    ] }) : /* @__PURE__ */ jsxRuntimeExports.jsxs(Flex, { alignItems: "center", justifyContent: "center", className: "titanBody", h: "100%", flexDirection: "column", gap: 60, children: [
+      /* @__PURE__ */ jsxRuntimeExports.jsx(Image, { src: Logo, alt: "Titan Logo", boxSize: "256px", borderRadius: "full", userSelect: "none", boxShadowColor: "yellow.fg", boxShadow: "0px 0px 256px 24px var(--shadow-color)", filter: "auto", brightness: "110%", saturate: "120%" }),
+      /* @__PURE__ */ jsxRuntimeExports.jsxs(Heading, { as: "h1", size: "4xl", className: "animation-pulse", lineHeight: "1.4", fontWeight: 900, color: "yellow.fg", textAlign: "center", children: [
+        "App is closing...",
+        /* @__PURE__ */ jsxRuntimeExports.jsx("br", {}),
+        "Please wait."
+      ] })
     ] })
   ] });
 }

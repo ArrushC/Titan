@@ -8,14 +8,13 @@ import { FieldLookup } from "./FieldLookup.jsx";
 import { useCommit } from "../ContextCommit.jsx";
 
 export default function SubSectionCommitDetails() {
-	const selectedBranches = useApp((ctx) => ctx.selectedBranches);
-	const configurableRowData = useApp((ctx) => ctx.configurableRowData);
+	const selectedBranchesData = useApp((ctx) => ctx.selectedBranchesData);
 	const sourceBranch = useCommit((ctx) => ctx.sourceBranch);
 	const sourceIssueNumber = useCommit((ctx) => ctx.sourceIssueNumber);
 	const commitMessage = useCommit((ctx) => ctx.commitMessage);
 	const selectedFolders = useMemo(() => {
-		return Array.from(configurableRowData.filter((branchRow) => selectedBranches[branchRow["SVN Branch"]]).reduce((acc, branchRow) => acc.add(branchRow["Branch Folder"]), new Set()));
-	}, [configurableRowData, selectedBranches]);
+		return Array.from(selectedBranchesData.reduce((acc, branchRow) => acc.add(branchRow["Branch Folder"]), new Set()));
+	}, [selectedBranchesData]);
 
 	return (
 		<Flex ms={9} flexDirection={"column"}>
@@ -31,7 +30,7 @@ export default function SubSectionCommitDetails() {
 			<Text mt={6}>
 				Your final commit message:{" "}
 				<Code>
-					Issue XXXX{sourceBranch.trim() !== "" ? ` (${sourceBranch.trim()}${sourceIssueNumber !== "" ? " #" + String(sourceIssueNumber) : ""})` : ""}:{" "}
+					Issue XYZ{sourceBranch.trim() !== "" ? ` (${sourceBranch.trim()}${sourceIssueNumber !== "" ? " #" + String(sourceIssueNumber) : ""})` : ""}:{" "}
 					{commitMessage.trim() == ""
 						? "Enter commit message above"
 						: commitMessage

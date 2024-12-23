@@ -37,7 +37,6 @@ app.commandLine.appendSwitch("js-flags", "--max-old-space-size=4096");
 app.commandLine.appendSwitch("enable-features", "V8CodeCache");
 
 let mainWindow;
-let splashWindow;
 let serverProcess;
 let isQuitting = false;
 let updateDownloaded = false;
@@ -62,11 +61,7 @@ function createWindow() {
 		},
 	});
 
-	if (process.env.VITE_DEV_SERVER_URL) {
-		mainWindow.loadURL(process.env.VITE_DEV_SERVER_URL);
-	} else {
-		mainWindow.loadURL(connectionURL);
-	}
+	mainWindow.loadFile(path.join(__dirname, "../splash.html"));
 
 	// Set CSP headers
 	session.defaultSession.webRequest.onHeadersReceived((details, callback) => {
@@ -109,7 +104,6 @@ function createWindow() {
 
 	// Show window when it's ready to avoid flickering
 	mainWindow.once("ready-to-show", () => {
-		splashWindow.destroy();
 		mainWindow.show();
 		mainWindow.focus();
 	});
@@ -128,40 +122,19 @@ function createWindow() {
 	});
 }
 
-function createSplashWindow() {
-	splashWindow = new BrowserWindow({
-		width: 400,
-		height: 400,
-		frame: false,
-		transparent: true,
-		alwaysOnTop: true,
-		skipTaskbar: true,
-		resizable: false,
-		webPreferences: {
-			nodeIntegration: true,
-			contextIsolation: false,
-		},
-	});
-
-	splashWindow.loadFile(path.join(__dirname, "../splash.html"));
-
-	// Center the splash window on the primary display
-	const primaryDisplay = screen.getPrimaryDisplay();
-	const { width, height } = primaryDisplay.workAreaSize;
-	splashWindow.setPosition(Math.round(width / 2 - 200), Math.round(height / 2 - 150));
-
-	splashWindow.setSkipTaskbar(true);
-	splashWindow.removeMenu();
-}
-
 function startServer() {
 	serverProcess = fork(path.join(__dirname, "../server/server.js"), [], {
 		env: { ...process.env, ELECTRON_RUN_AS_NODE: "1" },
+		stdio: ["pipe", "pipe", "pipe", "ipc"],
 	});
 
 	serverProcess.on("message", (message) => {
 		if (message === "server-ready") {
-			createWindow();
+			if (process.env.VITE_DEV_SERVER_URL) {
+				mainWindow.loadURL(process.env.VITE_DEV_SERVER_URL);
+			} else {
+				mainWindow.loadFile(path.join(__dirname, "../dist/index.html"));
+			}
 		}
 	});
 
@@ -268,7 +241,7 @@ if (!gotTheLock) {
 	});
 
 	app.on("ready", async () => {
-		createSplashWindow();
+		createWindow();
 		startServer();
 		setupMemoryMonitoring();
 		checkForUpdates();
@@ -517,7 +490,7 @@ ipcMain.handle("open-svn-resolve", async (event, data) => {
 
 ipcMain.handle("open-svn-diff", async (event, data) => {
 	const { fullPath, revision } = data;
-	const command = `TortoiseProc.exe /command:diff /path:"${fullPath}" /startrev:${Number(revision)-1} /endrev:${revision}`;
+	const command = `TortoiseProc.exe /command:diff /path:"${fullPath}" /startrev:${Number(revision) - 1} /endrev:${revision}`;
 
 	return new Promise((resolve, reject) => {
 		exec(command, (error, stdout, stderr) => {
@@ -608,8 +581,6 @@ ipcMain.handle("app-restart", () => {
 	app.relaunch();
 	app.quit();
 });
-
-
 
 // Cleanup any remaining listeners
 app.on("will-quit", () => {

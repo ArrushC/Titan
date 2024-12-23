@@ -2,21 +2,19 @@ import { IconButton } from "@chakra-ui/react";
 import React, { useCallback } from "react";
 import { VscDiffSingle } from "react-icons/vsc";
 
-export default function ButtonDiff(props) {
-	const { data, onDiffResult } = props;
-
+export default function ButtonDiff({ fullPath, branchFolder, branchVersion, onDiffResult }) {
 	const handleDiff = useCallback(async () => {
 		try {
 			const result = await window.electron.openTortoiseSVNDiff({
-				fullPath: data["Full Path"],
-				branchFolder: data["Branch Folder"],
-				branchVersion: data["Branch Version"],
+				fullPath,
+				branchFolder,
+				branchVersion,
 			});
 			onDiffResult(result);
 		} catch (error) {
 			onDiffResult({ success: false, error: error.message });
 		}
-	}, [data, onDiffResult]);
+	}, [fullPath, branchFolder, branchVersion, onDiffResult]);
 
-	return <IconButton aria-label="Diff" size="sm" icon={<VscDiffSingle />} onClick={handleDiff} colorPalette="yellow" />;
+	return <IconButton aria-label="Diff" size="xs" onClick={handleDiff} colorPalette="yellow"><VscDiffSingle /></IconButton>;
 }

@@ -202,8 +202,8 @@ export default function DialogBranchesLog() {
 						</Table.Header>
 					</Table.Root>
 
-					<Box ref={containerRef} overflowY="auto" maxH={"md"} colorPalette={"yellow"} onScroll={onScroll} position="relative">
-						<Box position="relative" height={`${totalRows * ROW_HEIGHT}px`}>
+					<Box ref={containerRef} overflowY="auto" maxH={"xl"} colorPalette={"yellow"} onScroll={onScroll} position="relative">
+						<Box position="relative" height={`xl`}>
 							<Box position="absolute" width="100%" top={`${offsetY}px`}>
 								<Table.Root size="sm" variant="outline">
 									<Table.ColumnGroup>

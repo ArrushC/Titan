@@ -12,7 +12,7 @@ export default function SectionCommit() {
 	const setCommitStage = useCommit((ctx) => ctx.setCommitStage);
 
 	return (
-		<Collapsible.Root open={isCommitMode}>
+		<Collapsible.Root open={isCommitMode && selectedBranchesCount > 0}>
 			<Collapsible.Content>
 				<Box id="sectionCommit" mb={40}>
 					<Heading as={"h2"} size={"2xl"} lineClamp={1} mb={4} className="animation-pulse" lineHeight={"1.4"}>

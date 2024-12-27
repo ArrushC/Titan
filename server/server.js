@@ -958,14 +958,14 @@ io.on("connection", (socket) => {
 
 							let action = "normal";
 
-							if (emitData.wcStatus === "unversioned" || emitData.wcStatus === "missing") {
+							if (!["normal", "none"].includes(emitData.wcStatus) && !["normal", "none"].includes(emitData.reposStatus)) {
+								action = "conflict";
+							} else if (emitData.wcStatus === "unversioned" || emitData.wcStatus === "missing") {
 								action = "untrack";
 							} else if (emitData.wcStatus === "added") {
 								action = "add";
 							} else if (emitData.wcStatus === "deleted") {
 								action = "delete";
-							} else if (!["normal", "none"].includes(emitData.wcStatus) && !["normal", "none"].includes(emitData.reposStatus)) {
-								action = "conflict";
 							} else if (emitData.wcStatus === "modified") {
 								action = "modify";
 							}

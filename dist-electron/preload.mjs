@@ -1,10 +1,9 @@
 "use strict";
 const { contextBridge, ipcRenderer } = require("electron");
 contextBridge.exposeInMainWorld("electron", {
-  fetchUsername: () => ipcRenderer.invoke("fetch-username"),
   getAppVersion: () => ipcRenderer.invoke("app-version"),
   openTortoiseSVNDiff: (data) => ipcRenderer.invoke("open-tortoisesvn-diff", data),
-  selectFolder: () => ipcRenderer.invoke("select-folder"),
+  selectFolder: (data) => ipcRenderer.invoke("select-folder", data),
   fetchCustomScripts: () => ipcRenderer.invoke("fetch-custom-scripts"),
   openSvnResolve: (data) => ipcRenderer.invoke("open-svn-resolve", data),
   openSvnDiff: (data) => ipcRenderer.invoke("open-svn-diff", data),

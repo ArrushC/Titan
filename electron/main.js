@@ -404,17 +404,6 @@ process.on("uncaughtException", (error) => {
 app.commandLine.appendSwitch("disable-renderer-backgrounding");
 
 // IPC communication
-ipcMain.handle("fetch-username", async () => {
-	const userInfo = os.userInfo();
-	const fullName = userInfo.username; // os.userInfo().username gets the system username
-
-	// Assuming the username is formatted as "FirstName.LastName"
-	// This may need adjusting the parsing logic based on actual system username format
-	const [firstName, lastName] = fullName.split(".");
-
-	return { firstName, lastName };
-});
-
 ipcMain.handle("app-version", () => app.getVersion());
 
 ipcMain.handle("open-tortoisesvn-diff", async (event, data) => {
@@ -508,8 +497,9 @@ ipcMain.handle("open-svn-diff", async (event, data) => {
 	});
 });
 
-ipcMain.handle("select-folder", async () => {
+ipcMain.handle("select-folder", async (event, data) => {
 	const result = await dialog.showOpenDialog(mainWindow, {
+		defaultPath: data?.defaultPath || os.homedir(),
 		properties: ["openDirectory"],
 	});
 

@@ -25762,12 +25762,6 @@ process.on("uncaughtException", (error2) => {
   }
 });
 app.commandLine.appendSwitch("disable-renderer-backgrounding");
-ipcMain.handle("fetch-username", async () => {
-  const userInfo = require$$0$2.userInfo();
-  const fullName = userInfo.username;
-  const [firstName, lastName] = fullName.split(".");
-  return { firstName, lastName };
-});
 ipcMain.handle("app-version", () => app.getVersion());
 ipcMain.handle("open-tortoisesvn-diff", async (event, data) => {
   const { fullPath, branchFolder, branchVersion } = data;
@@ -25847,8 +25841,9 @@ ipcMain.handle("open-svn-diff", async (event, data) => {
     });
   });
 });
-ipcMain.handle("select-folder", async () => {
+ipcMain.handle("select-folder", async (event, data) => {
   const result = await dialog.showOpenDialog(mainWindow, {
+    defaultPath: (data == null ? void 0 : data.defaultPath) || require$$0$2.homedir(),
     properties: ["openDirectory"]
   });
   return result.canceled ? null : result.filePaths[0];

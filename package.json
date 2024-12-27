@@ -5,7 +5,7 @@
 	"version": "1.4.9",
 	"type": "module",
 	"main": "dist-electron/main.js",
-	"description": "A desktop application for streamlining your workflow in Revision Control Systems (RCS) like Subversion (SVN).",
+	"description": "Titan",
 	"author": "ArrushC",
 	"configFolderPath": "C:/Titan",
 	"configFilePath": "C:/Titan/Titan.config.json",

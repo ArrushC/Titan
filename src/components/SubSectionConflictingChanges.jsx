@@ -109,7 +109,7 @@ export default function SubSectionConflictingChanges() {
 	const handlePathSelection = useCallback(
 		(file, checked) => {
 			setSelectedConflictingChanges((currentSelection) => {
-				if (checked) return { ...currentSelection, [file.path]: file.wcStatus };
+				if (checked) return { ...currentSelection, [file.path]: file };
 				const { [file.path]: _, ...newSelection } = currentSelection;
 				return newSelection;
 			});

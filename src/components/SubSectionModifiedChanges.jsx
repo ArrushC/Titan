@@ -109,7 +109,7 @@ export default function SubSectionModifiedChanges() {
 	const handlePathSelection = useCallback(
 		(file, checked) => {
 			setSelectedModifiedChanges((currentSelection) => {
-				if (checked) return { ...currentSelection, [file.path]: file.wcStatus };
+				if (checked) return { ...currentSelection, [file.path]: file };
 				const { [file.path]: _, ...newSelection } = currentSelection;
 				return newSelection;
 			});

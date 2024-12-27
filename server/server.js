@@ -710,7 +710,7 @@ io.on("connection", (socket) => {
 							reposStatus,
 							lastModified,
 							branchPath,
-							type
+							type,
 						};
 
 						if (wcStatus && !["normal", "none"].includes(wcStatus)) {
@@ -742,7 +742,7 @@ io.on("connection", (socket) => {
 		socket.on("svn-files-revert", async (data) => {
 			debugTask("svn-files-revert", data, false);
 
-			if (!data.filesToProcess ||Object.keys(data.filesToProcess).length === 0) {
+			if (!data.filesToProcess || Object.keys(data.filesToProcess).length === 0) {
 				emitMessage(socket, "No files to undo", "error");
 				return;
 			}
@@ -856,7 +856,7 @@ io.on("connection", (socket) => {
 							logger.info(`Successfully added all unversioned paths`);
 							emitMessage(socket, `Successfully added all unversioned paths`, "success");
 							const directoryPaths = unversionedPaths.filter((file) => file.type !== "file");
-							if (directoryPaths.length > 0) socket.emit("branch-paths-update", { paths: directoryPaths.map((file) => ({ ...file, action: "add" })) });
+							if (directoryPaths.length > 0) socket.emit("branch-paths-update", { paths: directoryPaths.map((file) => ({ ...file, action: "add", wcStatus: "added" })) });
 						}
 					},
 				};
@@ -876,7 +876,7 @@ io.on("connection", (socket) => {
 							} else {
 								logger.info(`Successfully set SVN properties for all unversioned files`);
 								emitMessage(socket, `SVN properties for all unversioned files have been set. Please check that you have added SVN comments to ensure that your SVN client can automatically update them`, "warning", 10_000);
-								socket.emit("branch-paths-update", { paths: files.map((file) => ({ ...file, action: "add" })) });
+								socket.emit("branch-paths-update", { paths: files.map((file) => ({ ...file, action: "add", wcStatus: "added" })) });
 							}
 						},
 					};
@@ -900,7 +900,7 @@ io.on("connection", (socket) => {
 						} else {
 							logger.info(`Successfully deleted all missing files`);
 							emitMessage(socket, `Successfully deleted all missing files`, "success");
-							socket.emit("branch-paths-update", { paths: missingPaths.map((file) => ({ ...file, action: "delete" })) });
+							socket.emit("branch-paths-update", { paths: missingPaths.map((file) => ({ ...file, action: "delete", wcStatus: "deleted" })) });
 						}
 					},
 				};
@@ -913,19 +913,117 @@ io.on("connection", (socket) => {
 		socket.on("watcher-branches-update", async (data) => {
 			debugTask("watcher-branches-update", data, false);
 
-			/*
-			data: {
-				"selectedBranchPaths": [
-					"C:\\SVN\\trunk\\Websites\\Fin"
-				]
+			const { selectedBranchPaths } = data;
+			const currentBranches = Object.keys(instanceData.branchWatchers);
+			const newSelections = selectedBranchPaths || [];
+
+			// 1. Unwatch branches no longer selected
+			for (const oldBranchPath of currentBranches) {
+				if (!newSelections.includes(oldBranchPath)) {
+					logger.info(`Stopping watcher for branch: ${oldBranchPath}`);
+					await instanceData.branchWatchers[oldBranchPath].close();
+					delete instanceData.branchWatchers[oldBranchPath];
+				}
 			}
 
-			Goal:
-			- For every branch in selectedBranches that doesn't exist in branchWatchers, create a new watcher and start watching.
-			- For every branch in branchWatchers that doesn't exist in selectedBranches, simply pause the watcher.
-			*/
+			const handleFsEvent = (branchPath, type, filePath, stats) => {
+				const task = {
+					command: "status",
+					args: [filePath],
+					options: { quiet: false, params: ["--show-updates"] },
+				};
 
-			const { selectedBranchPaths } = data;
+				executeSvnCommand(task)
+					.then((results) => {
+						const result = results[0]?.result;
+
+						logger.info("Result:" + JSON.stringify(result, null, 4));
+
+						if (result && result.target && result.target.entry) {
+							const entry = result.target.entry;
+							const wcStatus = entry["wc-status"]?.$?.item;
+							const reposStatus = entry["repos-status"]?.$?.item || null;
+							const pathDisplay = filePath.replace(`${branchPath}/`.replaceAll("/", "\\"), "");
+							const lastModified = stats.mtime.toLocaleString();
+
+							const emitData = {
+								path: filePath,
+								pathDisplay,
+								wcStatus,
+								reposStatus,
+								lastModified,
+								branchPath,
+								type,
+							};
+
+							let action = "normal";
+
+							if (emitData.wcStatus === "unversioned" || emitData.wcStatus === "missing") {
+								action = "untrack";
+							} else if (emitData.wcStatus === "added") {
+								action = "add";
+							} else if (emitData.wcStatus === "deleted") {
+								action = "delete";
+							} else if (!["normal", "none"].includes(emitData.wcStatus) && !["normal", "none"].includes(emitData.reposStatus)) {
+								action = "conflict";
+							} else if (emitData.wcStatus === "modified") {
+								action = "modify";
+							}
+
+							socket.emit("branch-paths-update", { paths: [{
+								...emitData,
+								action
+							}] });
+						}
+					})
+					.catch((err) => {
+						logger.error("Error checking SVN status:", err);
+						if (!isSVNConnectionError(socket, err)) emitMessage(socket, `Error checking SVN status for branch ${branchPath}`, "error");
+					});
+			};
+
+			// 2. Create watchers for newly selected branches
+			for (const branchPath of newSelections) {
+				if (instanceData.branchWatchers[branchPath]) continue;
+
+				logger.info(`Creating watcher for branch: ${branchPath}`);
+				const watcher = chokidar.watch(branchPath, {
+					ignored: /(^|[\/\\])\../,
+					persistent: true,
+					ignoreInitial: true,
+					usePolling: false,
+				});
+
+				watcher
+					.on("add", (filePath, stats) => {
+						logger.info(`File added: ${filePath}`);
+						handleFsEvent(branchPath, "file", filePath, stats);
+					})
+					.on("change", (filePath, stats) => {
+						logger.info(`File changed: ${filePath}`);
+						handleFsEvent(branchPath, "file", filePath, stats);
+					})
+					.on("unlink", (filePath, stats) => {
+						logger.info(`File removed: ${filePath}`);
+						handleFsEvent(branchPath, "file", filePath, stats);
+					})
+					.on("addDir", (dirPath, stats) => {
+						logger.info(`Directory added: ${dirPath}`);
+						handleFsEvent(branchPath, "directory", dirPath, stats);
+					})
+					.on("unlinkDir", (dirPath, stats) => {
+						logger.info(`Directory removed: ${dirPath}`);
+						handleFsEvent(branchPath, "directory", dirPath, stats);
+					})
+					.on("error", (error) => {
+						logger.error(`Watcher error on branch ${branchPath}: ${error}`);
+					})
+					.on("ready", () => {
+						logger.info(`Watcher ready: now monitoring ${branchPath}`);
+					});
+
+				instanceData.branchWatchers[branchPath] = watcher;
+			}
 
 			debugTask("watcher-branches-update", data, true);
 		});

@@ -281,11 +281,133 @@ export const CommitProvider = ({ children }) => {
 		if (!isCommitMode || selectedBranchesCount < 1) return;
 		const socketCallback = (data) => {
 			console.log("Received branch-paths-update from socket in ContextCommit component in background", data);
+			const { paths } = data;
+
+			// We must remove the action as we append paths to the appropriate tables
+			// When we allocate paths to a table, their wcStatus property should be amended to reflect the new status
+
+			setConflictingChanges((prevData) => {
+				const newData = {};
+				Object.entries(prevData).forEach(([branchPath, branchData]) => {
+					if (selectedBranchPaths.has(branchPath)) {
+						newData[branchPath] = branchData;
+					}
+				});
+
+				for (const branchPath of Object.keys(newData)) {
+					let newFilesToUpdate = newData[branchPath].filesToUpdate;
+
+					// Filter out current paths that are in the new paths and the new paths having a revert action.
+					newFilesToUpdate = newFilesToUpdate.filter((f) => {
+						const path = paths.find((p) => p.path === f.path);
+						return !path || !["revert", "resolve"].includes(path.action);
+					});
+
+					// Add new paths to the current array if they have conflict action and are not already in the array.
+					for (const path of paths) {
+						if (path.action === "conflict") {
+							const index = newFilesToUpdate.findIndex((f) => f.path === path.path);
+							if (index === -1) {
+								const { action, ...rest } = path;
+								newFilesToUpdate.push({
+									...rest
+								});
+							}
+						}
+					}
+
+					newData[branchPath] = {
+						...newData[branchPath],
+						filesToUpdate: newFilesToUpdate,
+					};
+				}
+
+				return newData;
+			});
+
+			setUnknownChanges((prevData) => {
+				const newData = {};
+				Object.entries(prevData).forEach(([branchPath, branchData]) => {
+					if (selectedBranchPaths.has(branchPath)) {
+						newData[branchPath] = branchData;
+					}
+				});
+
+				for (const branchPath of Object.keys(newData)) {
+					let newFilesToTrack = newData[branchPath].filesToTrack;
+
+					// Filter out current paths that are in the new paths and the new paths having an action that is either add or delete. It should also omit reverted paths that have a wcStatus of unversioned or missing.
+					newFilesToTrack = newFilesToTrack.filter((f) => {
+						const path = paths.find((p) => p.path === f.path);
+						return !path || !["add", "delete"].includes(path.action) || !(path.action === "revert" && ["unversioned", "missing"].includes(path.wcStatus));
+					});
+
+					// Add new paths to the current array if they have unversioned or missing wcStatus or they have a revert action and are not already in the array.
+					for (const path of paths) {
+						if (["added", "deleted"].includes(path.wcStatus) && path.action === "revert") {
+							const index = newFilesToTrack.findIndex((f) => f.path === path.path);
+							if (index === -1) {
+								const { action, ...rest } = path;
+								newFilesToTrack.push({
+									...rest,
+									wcStatus: path.wcStatus === "added" ? "unversioned" : "missing",
+								});
+							}
+						}
+					}
+
+					newData[branchPath] = {
+						...newData[branchPath],
+						filesToTrack: newFilesToTrack,
+					};
+				}
+
+				return newData;
+			});
+
+			setModifiedChanges((prevData) => {
+				const newData = {};
+				Object.entries(prevData).forEach(([branchPath, branchData]) => {
+					if (selectedBranchPaths.has(branchPath)) {
+						newData[branchPath] = branchData;
+					}
+				});
+
+				for (const branchPath of Object.keys(newData)) {
+					let newFilesToCommit = newData[branchPath].filesToCommit;
+
+					// Filter out current paths that are in the new paths and the new paths having a revert or commit action.
+					newFilesToCommit = newFilesToCommit.filter((f) => {
+						const path = paths.find((p) => p.path === f.path);
+						return !path || !["commit"].includes(path.action) || !(path.action === "revert" && ["added", "deleted"].includes(path.wcStatus));
+					});
+
+					// Add new paths to the current array if they have add, modified or delete action and are not already in the array.
+					for (const path of paths) {
+						if (["add", "delete", "modify"].includes(path.action)) {
+							const index = newFilesToCommit.findIndex((f) => f.path === path.path);
+							if (index === -1) {
+								const {action, ...rest} = path;
+								newFilesToCommit.push({
+									...rest,
+								});
+							}
+						}
+					}
+
+					newData[branchPath] = {
+						...newData[branchPath],
+						filesToCommit: newFilesToCommit,
+					};
+				}
+
+				return newData;
+			});
 		};
 
 		socket?.on("branch-paths-update", socketCallback);
 		return () => socket?.off("branch-paths-update", socketCallback);
-	}, [socket, isCommitMode, selectedBranchesCount]);
+	}, [socket, isCommitMode, selectedBranchesCount, configurableRowData, selectedBranchPaths]);
 
 	return <ContextCommit.Provider value={value}>{children}</ContextCommit.Provider>;
 };

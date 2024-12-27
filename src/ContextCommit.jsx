@@ -278,6 +278,7 @@ export const CommitProvider = ({ children }) => {
 	}, [socket, isCommitMode, selectedBranchesCount, configurableRowData, selectedBranchPaths]);
 
 	useEffect(() => {
+		console.debug("branch paths update logic has been re-rendered");
 		if (!isCommitMode || selectedBranchesCount < 1) return;
 		const socketCallback = (data) => {
 			console.log("Received branch-paths-update from socket in ContextCommit component in background", data);
@@ -290,115 +291,172 @@ export const CommitProvider = ({ children }) => {
 			const revertedPaths = paths.filter((path) => path.action === "revert");
 			const modifiedPaths = paths.filter((path) => path.action === "modify");
 			const conflictingPaths = paths.filter((path) => path.action === "conflict");
-			const committedPaths = paths.filter((path) => path.action === "commit"); // TODO: Not used, but maybe useful in the future -- show committed paths in a new history tab?
-			const normalPaths = paths.filter((path) => path.action === "normal"); // TOOD: Not used, might be removed
+			// (commit, normal not currently used but included for reference)
+			// const committedPaths = paths.filter((p) => p.action === "commit");
+			// const normalPaths = paths.filter((p) => p.action === "normal");
 
 			// When adding paths, we must remove the action
 
+			// ---------- Conflicting Changes ----------
 			setConflictingChanges((prevData) => {
 				const newData = {};
-				Object.entries(prevData).forEach(([branchPath, branchData]) => {
+
+				// Copy over only branches that remain selected, also give them new sub-objects
+				for (const [branchPath, branchData] of Object.entries(prevData)) {
 					if (selectedBranchPaths.has(branchPath)) {
-						newData[branchPath] = branchData;
+						newData[branchPath] = {
+							...branchData,
+							filesToUpdate: [...branchData.filesToUpdate],
+						};
 					}
-				});
+				}
 
+				// For each selected branch, ensure we at least have an entry
+				for (const path of conflictingPaths) {
+					const { branchPath } = path;
+					if (!selectedBranchPaths.has(branchPath)) continue;
+					if (!newData[branchPath]) {
+						newData[branchPath] = {
+							branchString: path.branchString || "",
+							"Branch Folder": path["Branch Folder"] || "",
+							"Branch Version": path["Branch Version"] || "",
+							"SVN Branch": branchPath,
+							filesToUpdate: [],
+						};
+					}
+				}
+
+				// Now filter or push new items
 				for (const branchPath of Object.keys(newData)) {
-					let newFilesToUpdate = newData[branchPath].filesToUpdate;
+					let { filesToUpdate } = newData[branchPath];
 
-					newFilesToUpdate = newFilesToUpdate.filter((f) => {
-						const path = paths.find((p) => p.path === f.path);
-						return !path || ["conflict"].includes(path.action);
+					// Remove paths that changed to anything else but conflict
+					filesToUpdate = filesToUpdate.filter((f) => {
+						const updated = paths.find((p) => p.path === f.path);
+						return !updated || updated.action === "conflict";
 					});
 
-					// Add new paths to the current array if they have conflict action and are not already in the array.
+					// Add newly conflicting paths, if they're not in the array yet
 					for (const path of conflictingPaths) {
-						const index = newFilesToUpdate.findIndex((f) => f.path === path.path);
-						if (index === -1) {
+						if (path.branchPath !== branchPath) continue;
+						const idx = filesToUpdate.findIndex((f) => f.path === path.path);
+						if (idx === -1) {
+							// strip the `action` key but keep everything else
 							const { action, ...rest } = path;
-							newFilesToUpdate.push({
-								...rest
-							});
+							filesToUpdate.push({ ...rest });
 						}
 					}
 
-					newData[branchPath] = {
-						...newData[branchPath],
-						filesToUpdate: newFilesToUpdate,
-					};
+					newData[branchPath].filesToUpdate = filesToUpdate;
 				}
 
 				return newData;
 			});
 
+			// ---------- Unknown Changes (Added/Deleted) ----------
 			setUnknownChanges((prevData) => {
 				const newData = {};
-				Object.entries(prevData).forEach(([branchPath, branchData]) => {
+
+				// Copy over only branches that remain selected
+				for (const [branchPath, branchData] of Object.entries(prevData)) {
 					if (selectedBranchPaths.has(branchPath)) {
-						newData[branchPath] = branchData;
+						newData[branchPath] = {
+							...branchData,
+							filesToTrack: [...branchData.filesToTrack],
+						};
 					}
-				});
+				}
 
+				// Ensure a record for newly referenced branches
+				for (const path of [...untrackedPaths, ...revertedPaths]) {
+					const { branchPath } = path;
+					if (!selectedBranchPaths.has(branchPath)) continue;
+					if (!newData[branchPath]) {
+						newData[branchPath] = {
+							branchString: path.branchString || "",
+							"Branch Folder": path["Branch Folder"] || "",
+							"Branch Version": path["Branch Version"] || "",
+							"SVN Branch": branchPath,
+							filesToTrack: [],
+						};
+					}
+				}
+
+				// Filter or push items
 				for (const branchPath of Object.keys(newData)) {
-					let newFilesToTrack = newData[branchPath].filesToTrack;
+					let { filesToTrack } = newData[branchPath];
 
-					newFilesToTrack = newFilesToTrack.filter((f) => {
-						const path = paths.find((p) => p.path === f.path);
-						return !path || ["untrack"].includes(path.action);
+					// Remove any that switched action away from untrack
+					filesToTrack = filesToTrack.filter((f) => {
+						const updated = paths.find((p) => p.path === f.path);
+						return !updated || updated.action === "untrack";
 					});
 
-					// Add new paths to the current array if they have untrack action or revert action with wcStatus unversioned or missing and are not already in the array.
+					// Paths with untrack or (revert + unversioned/missing) get appended
 					for (const path of [...untrackedPaths, ...revertedPaths.filter((p) => ["unversioned", "missing"].includes(p.wcStatus))]) {
-						const index = newFilesToTrack.findIndex((f) => f.path === path.path);
-						if (index === -1) {
+						if (path.branchPath !== branchPath) continue;
+						const idx = filesToTrack.findIndex((f) => f.path === path.path);
+						if (idx === -1) {
 							const { action, ...rest } = path;
-							newFilesToTrack.push({
-								...rest,
-							});
+							filesToTrack.push({ ...rest });
 						}
 					}
 
-					newData[branchPath] = {
-						...newData[branchPath],
-						filesToTrack: newFilesToTrack,
-					};
+					newData[branchPath].filesToTrack = filesToTrack;
 				}
 
 				return newData;
 			});
 
+			// ---------- Modified Changes ----------
 			setModifiedChanges((prevData) => {
 				const newData = {};
-				Object.entries(prevData).forEach(([branchPath, branchData]) => {
+
+				// Copy over only branches that remain selected
+				for (const [branchPath, branchData] of Object.entries(prevData)) {
 					if (selectedBranchPaths.has(branchPath)) {
-						newData[branchPath] = branchData;
+						newData[branchPath] = {
+							...branchData,
+							filesToCommit: [...branchData.filesToCommit],
+						};
 					}
-				});
+				}
 
+				// Ensure a record for newly referenced branches
+				for (const path of [...addedPaths, ...deletedPaths, ...modifiedPaths]) {
+					const { branchPath } = path;
+					if (!selectedBranchPaths.has(branchPath)) continue;
+					if (!newData[branchPath]) {
+						newData[branchPath] = {
+							branchString: path.branchString || "",
+							"Branch Folder": path["Branch Folder"] || "",
+							"Branch Version": path["Branch Version"] || "",
+							"SVN Branch": branchPath,
+							filesToCommit: [],
+						};
+					}
+				}
+
+				// Filter out items that changed to revert or commit
 				for (const branchPath of Object.keys(newData)) {
-					let newFilesToCommit = newData[branchPath].filesToCommit;
-
-					// Filter out current paths that are in the new paths and the new paths having a revert or commit action.
-					newFilesToCommit = newFilesToCommit.filter((f) => {
-						const path = paths.find((p) => p.path === f.path);
-						return !path || ["add", "delete", "modify"].includes(path.action);
+					let { filesToCommit } = newData[branchPath];
+					filesToCommit = filesToCommit.filter((f) => {
+						const updated = paths.find((p) => p.path === f.path);
+						// Keep them only if their action is one of add, delete, or modify
+						return !updated || ["add", "delete", "modify"].includes(updated.action);
 					});
 
-					// Add new paths to the current array if they have add, delete or modify action and are not already in the array.
+					// Add newly added/deleted/modified paths
 					for (const path of [...addedPaths, ...deletedPaths, ...modifiedPaths]) {
-						const index = newFilesToCommit.findIndex((f) => f.path === path.path);
-						if (index === -1) {
-							const {action, ...rest} = path;
-							newFilesToCommit.push({
-								...rest,
-							});
+						if (path.branchPath !== branchPath) continue;
+						const idx = filesToCommit.findIndex((f) => f.path === path.path);
+						if (idx === -1) {
+							const { action, ...rest } = path;
+							filesToCommit.push({ ...rest });
 						}
 					}
 
-					newData[branchPath] = {
-						...newData[branchPath],
-						filesToCommit: newFilesToCommit,
-					};
+					newData[branchPath].filesToCommit = filesToCommit;
 				}
 
 				return newData;

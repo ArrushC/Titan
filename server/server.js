@@ -334,45 +334,6 @@ function executeSvnCommand(commands) {
 	);
 }
 
-function executeSvnCommandParallel(commands) {
-	if (!Array.isArray(commands)) {
-		commands = [commands];
-	}
-
-	// Dont return promise, just execute the commands in parallel
-	commands.forEach((cmd) => {
-		const args = Array.isArray(cmd.args) ? cmd.args : [cmd.args];
-		const options = cmd.options || {};
-
-		args.push(options);
-
-		const opCallback = (err, result) => {
-			if (err) {
-				logger.error(`Error executing SVN operation ${cmd.command} with args ${JSON.stringify(args, null, 2)}:`);
-				logger.error(JSON.stringify(err, null, 2));
-			}
-			cmd.postopCallback(err, result);
-		};
-
-		// Check whether to execute a utility command or a regular SVN command
-		if (cmd.isUtilityCmd) {
-			// Handle utility commands
-			if (typeof svnUltimate.util[cmd.command] !== "function") {
-				logger.error(`Invalid SVN utility command: ${cmd.command}`);
-				return;
-			}
-			svnUltimate.util[cmd.command](...args, opCallback);
-		} else {
-			// Handle regular SVN commands
-			if (typeof svnUltimate.commands[cmd.command] !== "function") {
-				logger.error(`Invalid SVN command: ${cmd.command}`);
-				return;
-			}
-			svnUltimate.commands[cmd.command](...args, opCallback);
-		}
-	});
-}
-
 const svnQueueSerial = async.queue(async (task) => {
 	debugTask("svnQueueSerial", task, false);
 	const { command, args, postopCallback, preopCallback } = task;
@@ -743,7 +704,7 @@ io.on("connection", (socket) => {
 			debugTask("svn-files-revert", data, false);
 
 			if (!data.filesToProcess || Object.keys(data.filesToProcess).length === 0) {
-				emitMessage(socket, "No files to undo", "error");
+				emitMessage(socket, "No files to revert", "error");
 				return;
 			}
 
@@ -756,7 +717,7 @@ io.on("connection", (socket) => {
 				const isPathDirectory = path.type === "directory";
 				if (isPathDirectory) directoryPaths.push(path);
 				else files.push(path);
-			}
+				}
 
 			if (files.length > 0) {
 				const task = {
@@ -812,7 +773,7 @@ io.on("connection", (socket) => {
 							}
 							socket.emit("branch-paths-update", {
 								paths: directoryPaths.map((d) => ({
-									...d,
+										...d,
 									wcStatus: d.wcStatus == "added" ? "unversioned" : d.wcStatus == "deleted" ? "missing" : d.wcStatus,
 									action: ["unversioned", "missing"].includes(d.wcStatus) ? "normal" : "revert",
 								})),
@@ -843,7 +804,7 @@ io.on("connection", (socket) => {
 				let files = unversionedPaths.filter((file) => file.type === "file");
 
 				let task = {
-					command: "add",
+						command: "add",
 					options: {
 						params: [`--targets ${targetsFilePath}`],
 					},
@@ -915,7 +876,7 @@ io.on("connection", (socket) => {
 		socket.on("watcher-branches-update", async (data) => {
 			debugTask("watcher-branches-update", data, false);
 
-			const { selectedBranchPaths } = data;
+			const { selectedBranchPaths, ignoredUnknownPaths, ignoredChangedPaths } = data;
 			const currentBranches = Object.keys(instanceData.branchWatchers);
 			const newSelections = selectedBranchPaths || [];
 
@@ -947,7 +908,7 @@ io.on("connection", (socket) => {
 						const wcStatus = entry?.["wc-status"]?.$?.item || null;
 						const reposStatus = entry?.["repos-status"]?.$?.item || null;
 						const pathDisplay = filePath.replace(`${branchPath}/`.replaceAll("/", "\\"), "");
-						const lastModified = stats?.mtime ? stats.mtime.toLocaleString() : (new Date()).toLocaleString();
+						const lastModified = stats?.mtime ? stats.mtime.toLocaleString() : new Date().toLocaleString();
 
 						const emitData = {
 							path: filePath,
@@ -975,10 +936,14 @@ io.on("connection", (socket) => {
 
 						logger.info(`Emitting branch-paths-update for ${filePath} with action ${action}`);
 
-						socket.emit("branch-paths-update", { paths: [{
-							...emitData,
-							action
-						}] });
+						socket.emit("branch-paths-update", {
+							paths: [
+								{
+									...emitData,
+									action,
+								},
+							],
+						});
 					})
 					.catch((err) => {
 						logger.error("Error checking SVN status:" + err);
@@ -992,7 +957,7 @@ io.on("connection", (socket) => {
 
 				logger.info(`Creating watcher for branch: ${branchPath}`);
 				const watcher = chokidar.watch(branchPath, {
-					ignored: /(^|[\/\\])\../,
+					ignored: [/(^|[\/\\])\../, ...ignoredUnknownPaths.map((path) => new RegExp(path)), ...ignoredChangedPaths.map((path) => new RegExp(path))],
 					persistent: true,
 					ignoreInitial: true,
 					usePolling: false,
@@ -1013,10 +978,12 @@ io.on("connection", (socket) => {
 					})
 					.on("addDir", (dirPath, stats) => {
 						logger.info(`Directory added: ${dirPath}`);
+						watcher.add(dirPath);
 						handleFsEvent(branchPath, "directory", dirPath, stats);
 					})
 					.on("unlinkDir", (dirPath, stats) => {
 						logger.info(`Directory removed: ${dirPath}`);
+						watcher.unwatch(dirPath);
 						handleFsEvent(branchPath, "directory", dirPath, stats);
 					})
 					.on("error", (error) => {
@@ -1244,7 +1211,7 @@ io.on("connection", (socket) => {
 				await Promise.all(logTasks);
 				await saveSvnLogsCache();
 			} catch (err) {
-				logger.error("Error fetching SVN logs with repository root:" +  err);
+				logger.error("Error fetching SVN logs with repository root:" + err);
 				if (!isSVNConnectionError(socket, err)) emitMessage(socket, "Error fetching SVN logs with repository root", "error");
 			}
 

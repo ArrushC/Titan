@@ -27,8 +27,8 @@ function sortByStack(rows, sortStack) {
 					bVal = b.file.pathDisplay.toLowerCase();
 					break;
 				case "remote":
-					aVal = a.file.reposStatus.toLowerCase();
-					bVal = b.file.reposStatus.toLowerCase();
+					aVal = a.file.reposStatus?.toLowerCase();
+					bVal = b.file.reposStatus?.toLowerCase();
 					break;
 				case "status":
 					// If you need a custom ordering of statuses, adapt accordingly.

@@ -57,7 +57,7 @@ try {
 		}
 	});
 } catch (err) {
-	logger.error("Error reading SVN logs cache file:", err);
+	logger.error("Error reading SVN logs cache file:" + err);
 }
 
 // Use compression middleware
@@ -127,7 +127,7 @@ async function deleteFileOrDirectory(pathToDelete) {
 			logger.error("Path is not a file or directory.");
 		}
 	} catch (err) {
-		logger.error("Error deleting file/directory:", err);
+		logger.error("Error deleting file/directory:" + err);
 	}
 }
 
@@ -136,7 +136,7 @@ async function writeTargetsFile(targets = []) {
 		await fsPromises.mkdir(path.dirname(targetsFilePath), { recursive: true });
 		await fsPromises.writeFile(targetsFilePath, targets.join("\n"));
 	} catch (err) {
-		logger.error("Error writing targets file:", err);
+		logger.error("Error writing targets file:" + err);
 	}
 }
 
@@ -145,7 +145,7 @@ async function saveSvnLogsCache() {
 		await fsPromises.mkdir(path.dirname(svnLogsCacheFilePath), { recursive: true });
 		await fsPromises.writeFile(svnLogsCacheFilePath, JSON.stringify(instanceData.subversionLogsCache, null, 4));
 	} catch (err) {
-		logger.error("Error writing SVN logs cache file:", err);
+		logger.error("Error writing SVN logs cache file:" + err);
 	}
 }
 
@@ -220,7 +220,7 @@ async function getTrelloCardNames(key, token, query, limit) {
 		logger.debug(`Retrieved ${cards.length} cards`);
 		return cards;
 	} catch (error) {
-		logger.error("Error fetching data from Trello:", error);
+		logger.error("Error fetching data from Trello:" + error);
 		throw error;
 	}
 }
@@ -383,7 +383,7 @@ const svnQueueSerial = async.queue(async (task) => {
 		logger.debug(`SVN command ${command} output:\n` + typeof result === "string" ? result : JSON.stringify(result, null, 4));
 		if (postopCallback) await postopCallback(null, result);
 	} catch (err) {
-		logger.error(`Error executing SVN command ${command} with args ${args}:`, err);
+		logger.error(`Error executing SVN command ${command} with args ${args}:` + err);
 		if (postopCallback) await postopCallback(err);
 	}
 
@@ -471,7 +471,7 @@ async function fetchConfig(socket) {
 			emitMessage(socket, "Config file created with default content", "success");
 			config = defaultConfig; // Assign the default config
 		} catch (writeErr) {
-			logger.error("Error writing default config file:", writeErr);
+			logger.error("Error writing default config file:" + writeErr);
 			emitMessage(socket, "Error creating default config file", "error");
 			throw writeErr; // Propagate error to be caught in the caller
 		}
@@ -487,7 +487,7 @@ async function fetchConfig(socket) {
 			emitMessage(socket, `Successfully updated Titan to v${latestVersion}!`, "success");
 		}
 	} catch (err) {
-		logger.error("Error reading or parsing config file:", err);
+		logger.error("Error reading or parsing config file:" + err);
 		emitMessage(socket, "Error reading config file", "error");
 		throw err; // Propagate error to be caught in the caller
 	}
@@ -542,7 +542,7 @@ io.on("connection", (socket) => {
 					// Notepad++ exists, open with it
 					exec(`start "" "${notepadPlusPlusPath}" "${configFilePath}"`, (err) => {
 						if (err) {
-							logger.error("Failed to open config file with Notepad++:", err);
+							logger.error("Failed to open config file with Notepad++:" + err);
 							emitMessage(socket, "Failed to open config file with Notepad++", "error");
 						} else {
 							logger.info("Config file opened successfully with Notepad++");
@@ -553,7 +553,7 @@ io.on("connection", (socket) => {
 					// Fallback to the default application
 					exec(`start "" "${configFilePath}"`, (err) => {
 						if (err) {
-							logger.error("Failed to open config file:", err);
+							logger.error("Failed to open config file:" + err);
 							emitMessage(socket, "Failed to open config file", "error");
 						} else {
 							logger.info("Config file opened successfully with the default app");
@@ -732,7 +732,7 @@ io.on("connection", (socket) => {
 					filesToUpdate,
 				});
 			} catch (err) {
-				logger.error("Error checking SVN status:", err);
+				logger.error("Error checking SVN status:" + err);
 				if (!isSVNConnectionError(socket, err)) emitMessage(socket, `Error checking SVN status for branch ${branchPath}`, "error");
 			}
 
@@ -780,7 +780,8 @@ io.on("connection", (socket) => {
 							socket.emit("branch-paths-update", {
 								paths: files.map((f) => ({
 									...f,
-									action: "revert",
+									wcStatus: f.wcStatus == "added" ? "unversioned" : f.wcStatus == "deleted" ? "missing" : f.wcStatus,
+									action: ["unversioned", "missing"].includes(f.wcStatus) ? "normal" : "revert",
 								})),
 							});
 						}
@@ -812,7 +813,8 @@ io.on("connection", (socket) => {
 							socket.emit("branch-paths-update", {
 								paths: directoryPaths.map((d) => ({
 									...d,
-									action: "revert",
+									wcStatus: d.wcStatus == "added" ? "unversioned" : d.wcStatus == "deleted" ? "missing" : d.wcStatus,
+									action: ["unversioned", "missing"].includes(d.wcStatus) ? "normal" : "revert",
 								})),
 							});
 						}
@@ -933,51 +935,53 @@ io.on("connection", (socket) => {
 					options: { quiet: false, params: ["--show-updates"] },
 				};
 
+				logger.debug(`Checking SVN status for ${filePath}`);
+
 				executeSvnCommand(task)
 					.then((results) => {
 						const result = results[0]?.result;
 
 						logger.info("Result:" + JSON.stringify(result, null, 4));
 
-						if (result && result.target && result.target.entry) {
-							const entry = result.target.entry;
-							const wcStatus = entry["wc-status"]?.$?.item;
-							const reposStatus = entry["repos-status"]?.$?.item || null;
-							const pathDisplay = filePath.replace(`${branchPath}/`.replaceAll("/", "\\"), "");
-							const lastModified = stats.mtime.toLocaleString();
+						const entry = result?.target?.entry;
+						const wcStatus = entry?.["wc-status"]?.$?.item || null;
+						const reposStatus = entry?.["repos-status"]?.$?.item || null;
+						const pathDisplay = filePath.replace(`${branchPath}/`.replaceAll("/", "\\"), "");
+						const lastModified = stats?.mtime ? stats.mtime.toLocaleString() : (new Date()).toLocaleString();
 
-							const emitData = {
-								path: filePath,
-								pathDisplay,
-								wcStatus,
-								reposStatus,
-								lastModified,
-								branchPath,
-								type,
-							};
+						const emitData = {
+							path: filePath,
+							pathDisplay,
+							wcStatus,
+							reposStatus,
+							lastModified,
+							branchPath,
+							type,
+						};
 
-							let action = "normal";
+						let action = "normal";
 
-							if (!["normal", "none"].includes(emitData.wcStatus) && !["normal", "none"].includes(emitData.reposStatus)) {
-								action = "conflict";
-							} else if (emitData.wcStatus === "unversioned" || emitData.wcStatus === "missing") {
-								action = "untrack";
-							} else if (emitData.wcStatus === "added") {
-								action = "add";
-							} else if (emitData.wcStatus === "deleted") {
-								action = "delete";
-							} else if (emitData.wcStatus === "modified") {
-								action = "modify";
-							}
-
-							socket.emit("branch-paths-update", { paths: [{
-								...emitData,
-								action
-							}] });
+						if (emitData.wcStatus && emitData.reposStatus && !["normal", "none"].includes(emitData.wcStatus) && !["normal", "none"].includes(emitData.reposStatus)) {
+							action = "conflict";
+						} else if (emitData.wcStatus === "unversioned" || emitData.wcStatus === "missing") {
+							action = "untrack";
+						} else if (emitData.wcStatus === "added") {
+							action = "add";
+						} else if (emitData.wcStatus === "deleted") {
+							action = "delete";
+						} else if (emitData.wcStatus === "modified") {
+							action = "modify";
 						}
+
+						logger.info(`Emitting branch-paths-update for ${filePath} with action ${action}`);
+
+						socket.emit("branch-paths-update", { paths: [{
+							...emitData,
+							action
+						}] });
 					})
 					.catch((err) => {
-						logger.error("Error checking SVN status:", err);
+						logger.error("Error checking SVN status:" + err);
 						if (!isSVNConnectionError(socket, err)) emitMessage(socket, `Error checking SVN status for branch ${branchPath}`, "error");
 					});
 			};
@@ -1088,7 +1092,7 @@ io.on("connection", (socket) => {
 								logger.debug(`Commit Message: ${commitMessage}`);
 								logger.debug(`Prefixed Commit Message: ${prefixedCommitMessage}`);
 								logger.debug(`Files to Commit: ${JSON.stringify(files, null, 2)}`);
-								logger.error(`Failed to commit files in ${svnBranch}:`, err);
+								logger.error(`Failed to commit files in ${svnBranch}:` + err);
 								emitMessage(socket, `Failed to commit files in ${branchString(branchFolder, branchVersion, svnBranch)}`, "error");
 
 								const liveResponse = {
@@ -1152,7 +1156,7 @@ io.on("connection", (socket) => {
 					const svnBranchPath = branch["SVN Branch"];
 					svnUltimate.commands.info(svnBranchPath, (err, infoResult) => {
 						if (err) {
-							logger.error(`Failed to fetch info for branch ${svnBranchPath}:`, err);
+							logger.error(`Failed to fetch info for branch ${svnBranchPath}:` + err);
 							if (!isSVNConnectionError(socket, err)) emitMessage(socket, `Failed to fetch info for branch ${svnBranchPath}`, "error");
 							return reject(err);
 						}
@@ -1185,7 +1189,11 @@ io.on("connection", (socket) => {
 					return new Promise((resolve, reject) => {
 						svnUltimate.commands.log(svnBranchPath, { revision: `${startRevision}:HEAD`, params: ["--stop-on-copy", "--verbose"] }, (err, logResult) => {
 							if (err) {
-								logger.error(`Failed to fetch logs for branch ${svnBranchPath}:`, err);
+								if (err.message.includes("E160006")) {
+									logger.info(`No new logs for branch ${svnBranchPath}`);
+									return resolve();
+								}
+								logger.error(`Failed to fetch logs for branch ${svnBranchPath}:` + err);
 								if (!isSVNConnectionError(socket, err)) emitMessage(socket, `Failed to fetch logs for branch ${svnBranchPath}`, "error");
 								return reject(err);
 							}
@@ -1236,7 +1244,7 @@ io.on("connection", (socket) => {
 				await Promise.all(logTasks);
 				await saveSvnLogsCache();
 			} catch (err) {
-				logger.error("Error fetching SVN logs with repository root:", err);
+				logger.error("Error fetching SVN logs with repository root:" +  err);
 				if (!isSVNConnectionError(socket, err)) emitMessage(socket, "Error fetching SVN logs with repository root", "error");
 			}
 
@@ -1274,7 +1282,7 @@ io.on("connection", (socket) => {
 				if (callback) callback({ cards });
 				else socket.emit("trello-result-search-names-card", cards);
 			} catch (err) {
-				logger.error("Error fetching Trello card names:", JSON.stringify(err, null, 2));
+				logger.error("Error fetching Trello card names:" + JSON.stringify(err, null, 2));
 				emitMessage(socket, "Error fetching Trello card names", "error");
 			}
 

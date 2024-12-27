@@ -283,8 +283,17 @@ export const CommitProvider = ({ children }) => {
 			console.log("Received branch-paths-update from socket in ContextCommit component in background", data);
 			const { paths } = data;
 
-			// We must remove the action as we append paths to the appropriate tables
-			// When we allocate paths to a table, their wcStatus property should be amended to reflect the new status
+			// List of actions: add, delete, untrack, revert, modify, conflict, commit, normal
+			const addedPaths = paths.filter((path) => path.action === "add");
+			const deletedPaths = paths.filter((path) => path.action === "delete");
+			const untrackedPaths = paths.filter((path) => path.action === "untrack");
+			const revertedPaths = paths.filter((path) => path.action === "revert");
+			const modifiedPaths = paths.filter((path) => path.action === "modify");
+			const conflictingPaths = paths.filter((path) => path.action === "conflict");
+			const committedPaths = paths.filter((path) => path.action === "commit"); // TODO: Not used, but maybe useful in the future -- show committed paths in a new history tab?
+			const normalPaths = paths.filter((path) => path.action === "normal"); // TOOD: Not used, might be removed
+
+			// When adding paths, we must remove the action
 
 			setConflictingChanges((prevData) => {
 				const newData = {};
@@ -297,22 +306,19 @@ export const CommitProvider = ({ children }) => {
 				for (const branchPath of Object.keys(newData)) {
 					let newFilesToUpdate = newData[branchPath].filesToUpdate;
 
-					// Filter out current paths that are in the new paths and the new paths having a revert action.
 					newFilesToUpdate = newFilesToUpdate.filter((f) => {
 						const path = paths.find((p) => p.path === f.path);
-						return !path || !["revert", "resolve"].includes(path.action);
+						return !path || ["conflict"].includes(path.action);
 					});
 
 					// Add new paths to the current array if they have conflict action and are not already in the array.
-					for (const path of paths) {
-						if (path.action === "conflict") {
-							const index = newFilesToUpdate.findIndex((f) => f.path === path.path);
-							if (index === -1) {
-								const { action, ...rest } = path;
-								newFilesToUpdate.push({
-									...rest
-								});
-							}
+					for (const path of conflictingPaths) {
+						const index = newFilesToUpdate.findIndex((f) => f.path === path.path);
+						if (index === -1) {
+							const { action, ...rest } = path;
+							newFilesToUpdate.push({
+								...rest
+							});
 						}
 					}
 
@@ -336,23 +342,19 @@ export const CommitProvider = ({ children }) => {
 				for (const branchPath of Object.keys(newData)) {
 					let newFilesToTrack = newData[branchPath].filesToTrack;
 
-					// Filter out current paths that are in the new paths and the new paths having an action that is either add or delete. It should also omit reverted paths that have a wcStatus of unversioned or missing.
 					newFilesToTrack = newFilesToTrack.filter((f) => {
 						const path = paths.find((p) => p.path === f.path);
-						return !path || !["add", "delete"].includes(path.action) || !(path.action === "revert" && ["unversioned", "missing"].includes(path.wcStatus));
+						return !path || ["untrack"].includes(path.action);
 					});
 
-					// Add new paths to the current array if they have unversioned or missing wcStatus or they have a revert action and are not already in the array.
-					for (const path of paths) {
-						if (["added", "deleted"].includes(path.wcStatus) && path.action === "revert") {
-							const index = newFilesToTrack.findIndex((f) => f.path === path.path);
-							if (index === -1) {
-								const { action, ...rest } = path;
-								newFilesToTrack.push({
-									...rest,
-									wcStatus: path.wcStatus === "added" ? "unversioned" : "missing",
-								});
-							}
+					// Add new paths to the current array if they have untrack action or revert action with wcStatus unversioned or missing and are not already in the array.
+					for (const path of [...untrackedPaths, ...revertedPaths.filter((p) => ["unversioned", "missing"].includes(p.wcStatus))]) {
+						const index = newFilesToTrack.findIndex((f) => f.path === path.path);
+						if (index === -1) {
+							const { action, ...rest } = path;
+							newFilesToTrack.push({
+								...rest,
+							});
 						}
 					}
 
@@ -379,19 +381,17 @@ export const CommitProvider = ({ children }) => {
 					// Filter out current paths that are in the new paths and the new paths having a revert or commit action.
 					newFilesToCommit = newFilesToCommit.filter((f) => {
 						const path = paths.find((p) => p.path === f.path);
-						return !path || !["commit"].includes(path.action) || !(path.action === "revert" && ["added", "deleted"].includes(path.wcStatus));
+						return !path || ["add", "delete", "modify"].includes(path.action);
 					});
 
-					// Add new paths to the current array if they have add, modified or delete action and are not already in the array.
-					for (const path of paths) {
-						if (["add", "delete", "modify"].includes(path.action)) {
-							const index = newFilesToCommit.findIndex((f) => f.path === path.path);
-							if (index === -1) {
-								const {action, ...rest} = path;
-								newFilesToCommit.push({
-									...rest,
-								});
-							}
+					// Add new paths to the current array if they have add, delete or modify action and are not already in the array.
+					for (const path of [...addedPaths, ...deletedPaths, ...modifiedPaths]) {
+						const index = newFilesToCommit.findIndex((f) => f.path === path.path);
+						if (index === -1) {
+							const {action, ...rest} = path;
+							newFilesToCommit.push({
+								...rest,
+							});
 						}
 					}
 

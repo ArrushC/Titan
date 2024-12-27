@@ -147,10 +147,6 @@ export default function SectionBranches() {
 
 	return (
 		<Box>
-			<Heading as={"h2"} size={"2xl"} lineClamp={1} mb={4} lineHeight={"1.4"}>
-				You have {configurableRowData.length} branch{configurableRowData.length > 1 ? "es" : ""}:
-			</Heading>
-
 			<Table.Root size={"sm"} variant={"outline"} transition={"backgrounds"}>
 				<Table.ColumnGroup>
 					<Table.Column width="1%" />

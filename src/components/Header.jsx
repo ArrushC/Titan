@@ -14,20 +14,11 @@ import { useApp } from "../ContextApp.jsx";
 import { LiaToiletSolid } from "react-icons/lia";
 
 export default function Header() {
+	const configurableRowData = useApp((ctx) => ctx.configurableRowData);
 	const setAppClosing = useApp((ctx) => ctx.setAppClosing);
 	const { emitOpenConfig, emitFlushSvnLogs } = useSocketEmits();
 	const { RaiseClientNotificaiton } = useNotifications();
-
-	const [username, setUsername] = useState("User");
 	const [reloadPopover, setReloadPopover] = useState(false);
-
-	useEffect(() => {
-		if (window.electron) {
-			window.electron.fetchUsername().then((username) => {
-				setUsername(username.firstName);
-			});
-		}
-	}, []);
 
 	const handleReload = useCallback((isAppRestart = false) => {
 		if (isAppRestart) {
@@ -60,11 +51,8 @@ export default function Header() {
 	return (
 		<HStack wrap="wrap" my={5} gapY={5} justify={"space-between"}>
 			<Flex align={"flex-start"} alignItems="center" className="notMono">
-				<Heading as={"h1"} size={"4xl"} fontWeight={700} lineClamp={1} className={"animation-fadein-forward"} userSelect={"none"}>
-					Hello, {username}!
-				</Heading>
-				<Heading as={"h1"} size={"4xl"} lineClamp={1} ms={3} p={2} className={"animation-handwave"} userSelect={"none"}>
-					👋
+				<Heading as={"h2"} size={"2xl"} lineClamp={1} lineHeight={"1.4"} className="animation-fadein-forward" userSelect={"none"}>
+					You have {configurableRowData.length} branch{configurableRowData.length > 1 ? "es" : ""}:
 				</Heading>
 			</Flex>
 			<Flex align={"flex-start"} alignItems={"center"} columnGap={2}>

@@ -298,10 +298,10 @@ export default function SubSectionUnknownChanges() {
 				</Flex>
 				<HStack gap={3}>
 					<Button onClick={() => setIsRevertDialogOpen(true)} colorPalette={"red"} disabled={Object.keys(selectedUnknownChanges).length < 1}>
-						Revert Selected
+						Revert
 					</Button>
 					<Button onClick={() => handleTrackFiles()} colorPalette={"green"} disabled={Object.keys(selectedUnknownChanges).length < 1}>
-						Add/Delete Selected
+						Add/Delete
 					</Button>
 				</HStack>
 			</Flex>

@@ -20,7 +20,7 @@ const __dirname = path.dirname(__filename);
 const packageJsonPath = path.join(__dirname, "../package.json");
 const packageJson = JSON.parse(fs.readFileSync(packageJsonPath, "utf-8"));
 
-const { version: latestVersion, configFilePath, targetsFilePath, svnLogsCacheFilePath } = packageJson;
+const { version: latestVersion, configFilePath, targetsFilePath, svnLogsCacheFilePath, commitLiveResponsesFilePath } = packageJson;
 
 const isDev = process.env.NODE_ENV === "development";
 const port = process.env.PORT || 4000;
@@ -58,6 +58,18 @@ try {
 	});
 } catch (err) {
 	logger.error("Error reading SVN logs cache file:" + err);
+}
+
+try {
+	fs.access(commitLiveResponsesFilePath, fs.constants.F_OK, async (accessErr) => {
+		if (!accessErr) {
+			const data = await fsPromises.readFile(commitLiveResponsesFilePath, "utf8");
+			instanceData.commitLiveResponses = JSON.parse(data);
+			logger.info("Loaded commit live responses file successfully.");
+		}
+	});
+} catch (err) {
+	logger.error("Error reading commit live responses file:" + err);
 }
 
 // Use compression middleware
@@ -113,21 +125,57 @@ function branchPathFolder(branch) {
 /************************************
  * File System Utilities
  ************************************/
-async function deleteFileOrDirectory(pathToDelete) {
-	try {
-		const stats = await fsPromises.lstat(pathToDelete);
+/**
+ * Recursively retrieve all descendant files and directories under a given directory.
+ * Returns an array of absolute paths for all nested files and subfolders.
+ */
+async function getAllChildrenRecursively(rootPath) {
+	const results = [];
+	const queue = [rootPath];
 
-		if (stats.isFile()) {
-			await fsPromises.unlink(pathToDelete);
-			logger.debug("File deleted successfully!");
-		} else if (stats.isDirectory()) {
-			await fsPromises.rmdir(pathToDelete, { recursive: true });
-			logger.debug("Directory deleted successfully!");
-		} else {
-			logger.error("Path is not a file or directory.");
+	while (queue.length > 0) {
+		const currentPath = queue.shift(); // Dequeue (FIFO)
+
+		try {
+			// Check if currentPath is actually a directory
+			const stats = await fsPromises.lstat(currentPath);
+
+			// Push every encountered path (file or directory) to results
+			results.push(currentPath);
+
+			if (stats.isDirectory()) {
+				// Read contents of the directory
+				const entries = await fsPromises.readdir(currentPath, { withFileTypes: true });
+
+				// Add each child to the queue for later processing
+				for (const entry of entries) {
+					const childPath = path.join(currentPath, entry.name);
+					queue.push(childPath);
+				}
+			}
+		} catch (err) {
+			// For example, ENOENT (no such file), EPERM (no permission), etc.
+			console.error(`Error accessing "${currentPath}": ${err.message}`);
 		}
+	}
+
+	return results;
+}
+
+/**
+ * Recursively deletes a folder (with all children) or a single file.
+ */
+async function deletePathRecursively(targetPath) {
+	try {
+		const stats = await fsPromises.lstat(targetPath);
+		if (stats.isDirectory()) {
+			await fsPromises.rm(targetPath, { recursive: true, force: true });
+		} else {
+			await fsPromises.unlink(targetPath);
+		}
+		logger.debug(`Local path removed: ${targetPath}`);
 	} catch (err) {
-		logger.error("Error deleting file/directory:" + err);
+		logger.error(`Error removing local path ${targetPath}: ${err}`);
 	}
 }
 
@@ -146,6 +194,15 @@ async function saveSvnLogsCache() {
 		await fsPromises.writeFile(svnLogsCacheFilePath, JSON.stringify(instanceData.subversionLogsCache, null, 4));
 	} catch (err) {
 		logger.error("Error writing SVN logs cache file:" + err);
+	}
+}
+
+async function saveCommitLiveResponses() {
+	try {
+		await fsPromises.mkdir(path.dirname(commitLiveResponsesFilePath), { recursive: true });
+		await fsPromises.writeFile(commitLiveResponsesFilePath, JSON.stringify(instanceData.commitLiveResponses, null, 4));
+	} catch (err) {
+		logger.error("Error writing commit live responses file:" + err);
 	}
 }
 
@@ -638,7 +695,7 @@ io.on("connection", (socket) => {
 							try {
 								const stats = await fsPromises.stat(path);
 								const isDirectory = stats.isDirectory();
-								return { entry, path, lastModified: stats.mtime.toLocaleString(), type: isDirectory ? "directory" : "file" };
+								return { entry, path, lastModified: stats?.mtime?.toLocaleString() || new Date().toLocaleString(), type: isDirectory ? "directory" : "file" };
 							} catch (error) {
 								console.error(`Error retrieving stats for ${path}:`, error.message);
 								return { entry, path, lastModified: null, type: "unknown" };
@@ -710,40 +767,131 @@ io.on("connection", (socket) => {
 
 			const { filesToProcess } = data;
 
-			let directoryPaths = [];
-			let files = [];
+			const unversionedDirs = [];
+			let unversionedFiles = [];
+			const versionedDirs = [];
+			let versionedFiles = [];
 
-			for (const path of Object.values(filesToProcess)) {
-				const isPathDirectory = path.type === "directory";
-				if (isPathDirectory) directoryPaths.push(path);
-				else files.push(path);
+			for (const fileObj of Object.values(filesToProcess)) {
+				const { wcStatus, path: fullPath, type } = fileObj;
+				if (wcStatus === "unversioned") {
+					if (type === "file") unversionedFiles.push(fileObj);
+					else unversionedDirs.push(fileObj);
+				} else {
+					// If it's not unversioned, we consider it "versioned" (could be modified, added, missing, etc.).
+					if (type === "file") versionedFiles.push(fileObj);
+					else versionedDirs.push(fileObj);
 				}
+			}
 
-			if (files.length > 0) {
+			unversionedFiles = unversionedFiles.filter((file) => !unversionedDirs.some((dir) => file.path.startsWith(dir.path)));
+			versionedFiles = versionedFiles.filter((file) => !versionedDirs.some((dir) => file.path.startsWith(dir.path)));
+
+			// 1) Handle UNVERSIONED files
+			if (unversionedFiles.length > 0) {
+				logger.info("Reverting unversioned files -> removing them from filesystem only.");
+				for (const fileObj of unversionedFiles) {
+					await deletePathRecursively(fileObj.path);
+				}
+				emitMessage(socket, "Removed unversioned files from filesystem", "success");
+
+				// Emit updated statuses: they are effectively “gone,” so we mark them as normal.
+				socket.emit("branch-paths-update", {
+					paths: unversionedFiles.map((fileObj) => ({
+						...fileObj,
+						action: "normal",
+						wcStatus: "normal",
+					})),
+				});
+			}
+
+			// 2) Handle UNVERSIONED directories
+			if (unversionedDirs.length > 0) {
+				logger.info("Reverting unversioned directories -> removing them (and children) from filesystem only.");
+
+				for (const dirObj of unversionedDirs) {
+					const children = await getAllChildrenRecursively(dirObj.path);
+					// Delete everything inside the directory
+					for (const childPath of children) {
+						await deletePathRecursively(childPath);
+					}
+				}
+				emitMessage(socket, "Removed unversioned directories from filesystem", "success");
+
+				// Emit updates for each directory and all children
+				for (const dirObj of unversionedDirs) {
+					const children = await getAllChildrenRecursively(dirObj.path);
+					const updates = children.map((childPath) => ({
+						...dirObj,
+						path: childPath,
+						pathDisplay: childPath.replace(dir.branchPath + path.sep, ""),
+						action: "normal",
+						wcStatus: "normal",
+					}));
+					updates.push({ ...dirObj, action: "normal", wcStatus: "normal" });
+					socket.emit("branch-paths-update", { paths: updates });
+				}
+			}
+
+			// 3) Handle VERSIONED files
+			if (versionedFiles.length > 0) {
 				const task = {
 					command: "revert",
 					options: {
+						// No depth needed because we are only reverting files, not directories
 						params: [`--targets ${targetsFilePath}`],
 					},
 					preopCallback: async () => {
-						await writeTargetsFile(files.map((f) => f.path));
+						await writeTargetsFile(versionedFiles.map((f) => f.path));
 					},
 					postopCallback: async (err, result) => {
 						if (err) {
-							logger.error(`Failed to revert files:` + err);
-							if (!isSVNConnectionError(socket, err)) emitMessage(socket, `Failed to revert files`, "error");
-						} else {
-							logger.info(`Successfully reverted files`);
-							emitMessage(socket, `Successfully reverted files`, "success");
-							for (const file of files.filter((f) => f.wcStatus == "unversioned")) {
-								await deleteFileOrDirectory(file.path);
+							logger.error("Failed to revert versioned files:" + err);
+							if (!isSVNConnectionError(socket, err)) {
+								emitMessage(socket, "Failed to revert versioned files", "error");
 							}
+						} else {
+							logger.info("Successfully reverted versioned files");
+							emitMessage(socket, "Successfully reverted versioned files", "success");
+
+							// If any had wcStatus === "added", then revert typically leaves them unversioned on disk.
+							// We remove them from the filesystem altogether if you want them gone.
+							// If you prefer to keep them physically, remove the `if (f.wcStatus == "added") ...` block below.
+							// for (const fileObj of versionedFiles) {
+							// 	if (fileObj.wcStatus === "added") {
+							// 		await deletePathRecursively(fileObj.path);
+							// 	}
+							// }
+
+							// Finally, emit an update for each file
 							socket.emit("branch-paths-update", {
-								paths: files.map((f) => ({
-									...f,
-									wcStatus: f.wcStatus == "added" ? "unversioned" : f.wcStatus == "deleted" ? "missing" : f.wcStatus,
-									action: ["unversioned", "missing"].includes(f.wcStatus) ? "normal" : "revert",
-								})),
+								paths: versionedFiles.map((f) => {
+									let newStatus = f.wcStatus;
+									let action = "revert";
+
+									if (f.wcStatus === "added") {
+										// After revert, that file is unversioned if it’s still physically there.
+										newStatus = "unversioned";
+										action = "untrack";
+									} else if (f.wcStatus === "deleted") {
+										// After revert, the file is back to normal if it physically exists.
+										newStatus = "normal";
+										action = "normal";
+									} else if (f.wcStatus === "modified" || f.wcStatus === "conflicted") {
+										newStatus = "normal";
+										action = "normal";
+									} else if (f.wcStatus === "missing") {
+										// Revert should restore the file to disk => normal.
+										newStatus = "normal";
+										action = "normal";
+									}
+
+									return {
+										...f,
+										wcStatus: newStatus,
+										action,
+									};
+								}),
 							});
 						}
 					},
@@ -751,7 +899,8 @@ io.on("connection", (socket) => {
 				svnQueueSerial.push(task);
 			}
 
-			if (directoryPaths.length > 0) {
+			// 4) Handle VERSIONED directories
+			if (versionedDirs.length > 0) {
 				const task = {
 					command: "revert",
 					options: {
@@ -759,31 +908,59 @@ io.on("connection", (socket) => {
 						params: [`--targets ${targetsFilePath}`],
 					},
 					preopCallback: async () => {
-						await writeTargetsFile(directoryPaths.map((d) => d.path));
+						await writeTargetsFile(versionedDirs.map((d) => d.path));
 					},
 					postopCallback: async (err, result) => {
 						if (err) {
-							logger.error(`Failed to revert directories:` + err);
-							if (!isSVNConnectionError(socket, err)) emitMessage(socket, `Failed to revert directories`, "error");
-						} else {
-							logger.info(`Successfully reverted directories`);
-							emitMessage(socket, `Successfully reverted directories`, "success");
-							for (const dir of directoryPaths.filter((d) => d.wcStatus == "unversioned")) {
-								await deleteFileOrDirectory(dir.path);
+							logger.error("Failed to revert versioned directories:" + err);
+							if (!isSVNConnectionError(socket, err)) {
+								emitMessage(socket, "Failed to revert versioned directories", "error");
 							}
-							socket.emit("branch-paths-update", {
-								paths: directoryPaths.map((d) => ({
-										...d,
-									wcStatus: d.wcStatus == "added" ? "unversioned" : d.wcStatus == "deleted" ? "missing" : d.wcStatus,
-									action: ["unversioned", "missing"].includes(d.wcStatus) ? "normal" : "revert",
-								})),
-							});
+						} else {
+							logger.info("Successfully reverted versioned directories");
+							emitMessage(socket, "Successfully reverted versioned directories (depth=infinity)", "success");
+
+							// Now we do a BFS/DFS to see if any newly "unversioned" files remain
+							// for those that had been "added." If so, we remove them from disk.
+							// Then we emit final updates for each item we revert or remove.
+							for (const dirObj of versionedDirs) {
+								try {
+									const rootAction = dirObj.wcStatus === "added" ? "untrack" : "normal";
+									const rootWcStatus = dirObj.wcStatus === "added" ? "unversioned" : "normal";
+
+									const children = await getAllChildrenRecursively(dirObj.path);
+									const updates = [];
+
+									// Push the root directory update
+									updates.push({
+										...dirObj,
+										path: dirObj.path,
+										pathDisplay: dirObj.path.replace(dirObj.branchPath + path.sep, ""),
+										action: rootAction,
+										wcStatus: rootWcStatus,
+									});
+
+									for (const childPath of children.filter((p) => p !== dirObj.path)) {
+										updates.push({
+											...dirObj,
+											path: childPath,
+											pathDisplay: childPath.replace(dirObj.branchPath + path.sep, ""),
+											action: "normal",
+											wcStatus: "normal",
+										});
+									}
+
+									socket.emit("branch-paths-update", { paths: updates });
+								} catch (fsErr) {
+									logger.error(`Error scanning children of versioned directory ${dirObj.path} after revert: ` + fsErr);
+									emitMessage(socket, "Error scanning children for versioned directories after revert", "error");
+								}
+							}
 						}
 					},
 				};
 				svnQueueSerial.push(task);
 			}
-
 			debugTask("svn-files-revert", data, true);
 		});
 
@@ -796,78 +973,191 @@ io.on("connection", (socket) => {
 			}
 
 			const { filesToProcess } = data;
-
 			const unversionedPaths = Object.values(filesToProcess).filter((file) => file.wcStatus == "unversioned");
 			const missingPaths = Object.values(filesToProcess).filter((file) => file.wcStatus == "missing");
 
+			// 1) Handle UNVERSIONED paths
 			if (unversionedPaths.length > 0) {
-				let files = unversionedPaths.filter((file) => file.type === "file");
+				const unversionedDirs = unversionedPaths.filter((p) => p.type === "directory");
+				const unversionedFiles = unversionedPaths.filter((p) => p.type === "file" && !unversionedDirs.some((d) => p.path.startsWith(d.path)));
 
-				let task = {
+				// 1a) Add unversioned files
+				if (unversionedFiles.length > 0) {
+					let addFilesTask = {
 						command: "add",
-					options: {
-						params: [`--targets ${targetsFilePath}`],
-					},
-					preopCallback: async () => {
-						await writeTargetsFile(unversionedPaths.map((file) => file.path));
-					},
-					postopCallback: (err, result) => {
-						if (err) {
-							logger.error(`Failed to add all unversioned paths:` + err);
-							if (!isSVNConnectionError(socket, err)) emitMessage(socket, `Failed to add all unversioned paths`, "error");
-						} else {
-							logger.info(`Successfully added all unversioned paths`);
-							emitMessage(socket, `Successfully added all unversioned paths`, "success");
-							const directoryPaths = unversionedPaths.filter((file) => file.type !== "file");
-							if (directoryPaths.length > 0) socket.emit("branch-paths-update", { paths: directoryPaths.map((file) => ({ ...file, action: "add", wcStatus: "added" })) });
-						}
-					},
-				};
-				svnQueueSerial.push(task);
-
-				if (files.length > 0) {
-					let propTask = {
-						command: "propset",
-						args: ["svn:keywords", '"Id Author Date Revision HeadURL"', `--targets ${targetsFilePath}`],
+						options: {
+							params: [`--targets ${targetsFilePath}`],
+						},
 						preopCallback: async () => {
-							await writeTargetsFile(files.map((file) => file.path));
+							await writeTargetsFile(unversionedFiles.map((file) => file.path));
 						},
 						postopCallback: (err, result) => {
 							if (err) {
-								logger.error(`Failed to set SVN properties for all unversioned files:` + err);
-								if (!isSVNConnectionError(socket, err)) emitMessage(socket, `Failed to set SVN properties for all unversioned files`, "error");
+								logger.error("Failed to add unversioned files: " + err);
+								if (!isSVNConnectionError(socket, err)) {
+									emitMessage(socket, "Failed to add unversioned files", "error");
+								}
 							} else {
-								logger.info(`Successfully set SVN properties for all unversioned files`);
-								emitMessage(socket, `SVN properties for all unversioned files have been set. Please check that you have added SVN comments to ensure that your SVN client can automatically update them`, "warning", 10_000);
-								socket.emit("branch-paths-update", { paths: files.map((file) => ({ ...file, action: "add", wcStatus: "added" })) });
+								logger.info("Successfully added unversioned files");
+								emitMessage(socket, "Successfully added unversioned files", "success");
+
+								// After adding the files, apply the propset
+								let propTask = {
+									command: "propset",
+									args: ["svn:keywords", '"Id Author Date Revision HeadURL"', `--targets ${targetsFilePath}`],
+									preopCallback: async () => {
+										// Reuse the same targets file for the set of unversioned files
+										await writeTargetsFile(unversionedFiles.map((file) => file.path));
+									},
+									postopCallback: (err, result) => {
+										if (err) {
+											logger.error("Failed to set SVN properties for unversioned files: " + err);
+											if (!isSVNConnectionError(socket, err)) {
+												emitMessage(socket, "Failed to set SVN properties for unversioned files", "error");
+											}
+										} else {
+											logger.info("Successfully set SVN properties for unversioned files");
+											emitMessage(socket, "SVN properties for unversioned files have been set. Please ensure your SVN comments are present so they update automatically.", "warning", 10000);
+											// Emit paths update for each file
+											socket.emit("branch-paths-update", {
+												paths: unversionedFiles.map((file) => ({
+													...file,
+													action: "add",
+													wcStatus: "added",
+												})),
+											});
+										}
+									},
+								};
+								svnQueueSerial.push(propTask);
 							}
 						},
 					};
-					svnQueueSerial.push(propTask);
+					svnQueueSerial.push(addFilesTask);
+				}
+
+				// 1b) Add unversioned directories
+				if (unversionedDirs.length > 0) {
+					let addDirsTask = {
+						command: "add",
+						options: {
+							depth: "infinity",
+							params: [`--targets ${targetsFilePath}`],
+						},
+						preopCallback: async () => {
+							await writeTargetsFile(unversionedDirs.map((dir) => dir.path));
+						},
+						postopCallback: async (err, result) => {
+							if (err) {
+								logger.error("Failed to add unversioned directories: " + err);
+								if (!isSVNConnectionError(socket, err)) {
+									emitMessage(socket, "Failed to add unversioned directories", "error");
+								}
+							} else {
+								logger.info("Successfully added unversioned directories (depth=infinity)");
+								emitMessage(socket, "Successfully added unversioned directories (depth=infinity)", "success");
+
+								// Now we do a local filesystem walk to discover
+								// all children (files + subdirectories).
+								try {
+									for (const dir of unversionedDirs) {
+										const children = await getAllChildrenRecursively(dir.path);
+
+										const updates = children.map((child) => ({
+											...dir,
+											path: child,
+											pathDisplay: child.replace(dir.branchPath + path.sep, ""),
+											type: fs.lstatSync(child).isDirectory() ? "directory" : "file",
+											action: "add",
+											wcStatus: "added",
+										}));
+
+										socket.emit("branch-paths-update", { paths: updates });
+									}
+								} catch (fsErr) {
+									logger.error("Error scanning children of unversioned directories: " + fsErr);
+									emitMessage(socket, "Error scanning children of unversioned directories", "error");
+								}
+							}
+						},
+					};
+					svnQueueSerial.push(addDirsTask);
 				}
 			}
 
+			// 2) Handle MISSING paths
 			if (missingPaths.length > 0) {
-				let task = {
-					command: "del",
-					options: {
-						params: [`--targets ${targetsFilePath}`],
-					},
-					preopCallback: async () => {
-						await writeTargetsFile(missingPaths.map((file) => file.path));
-					},
-					postopCallback: (err, result) => {
-						if (err) {
-							logger.error(`Failed to delete all missing files:` + err);
-							if (!isSVNConnectionError(socket, err)) emitMessage(socket, `Failed to delete all missing files`, "error");
-						} else {
-							logger.info(`Successfully deleted all missing files`);
-							emitMessage(socket, `Successfully deleted all missing files`, "success");
-							socket.emit("branch-paths-update", { paths: missingPaths.map((file) => ({ ...file, action: "delete", wcStatus: "deleted" })) });
-						}
-					},
-				};
-				svnQueueSerial.push(task);
+				const missingDirs = missingPaths.filter((p) => p.type === "directory");
+				const missingFiles = missingPaths.filter((p) => p.type === "file" && !missingDirs.some((d) => p.path.startsWith(d.path)));
+
+				// 2a) Missing files
+				if (missingFiles.length > 0) {
+					let delFilesTask = {
+						command: "del",
+						options: {
+							params: [`--targets ${targetsFilePath}`],
+						},
+						preopCallback: async () => {
+							await writeTargetsFile(missingFiles.map((file) => file.path));
+						},
+						postopCallback: (err, result) => {
+							if (err) {
+								logger.error("Failed to delete missing files: " + err);
+								if (!isSVNConnectionError(socket, err)) {
+									emitMessage(socket, "Failed to delete missing files", "error");
+								}
+							} else {
+								logger.info("Successfully deleted missing files");
+								emitMessage(socket, "Successfully deleted missing files", "success");
+
+								socket.emit("branch-paths-update", {
+									paths: missingFiles.map((file) => ({
+										...file,
+										action: "delete",
+										wcStatus: "deleted",
+									})),
+								});
+							}
+						},
+					};
+					svnQueueSerial.push(delFilesTask);
+				}
+
+				// 2b) Missing directories (depth=infinity)
+				if (missingDirs.length > 0) {
+					let delDirsTask = {
+						command: "del",
+						options: {
+							depth: "infinity",
+							params: [`--targets ${targetsFilePath}`],
+						},
+						preopCallback: async () => {
+							await writeTargetsFile(missingDirs.map((dir) => dir.path));
+						},
+						postopCallback: (err, result) => {
+							if (err) {
+								logger.error("Failed to delete missing directories: " + err);
+								if (!isSVNConnectionError(socket, err)) {
+									emitMessage(socket, "Failed to delete missing directories", "error");
+								}
+							} else {
+								logger.info("Successfully deleted missing directories (depth=infinity)");
+								emitMessage(socket, "Successfully deleted missing directories (depth=infinity)", "success");
+
+								// Since the directories are missing on disk, there's nothing local to walk.
+								// Just emit the directories themselves.
+								socket.emit("branch-paths-update", {
+									paths: missingDirs.map((dir) => ({
+										...dir,
+										action: "delete",
+										wcStatus: "deleted",
+									})),
+								});
+							}
+						},
+					};
+					svnQueueSerial.push(delDirsTask);
+				}
 			}
 
 			debugTask("svn-files-add-delete", data, true);
@@ -1099,6 +1389,10 @@ io.on("connection", (socket) => {
 
 							io.emit("svn-commit-status-live", liveResponse);
 							instanceData.commitLiveResponses.push(liveResponse);
+						}
+
+						if (instanceData.commitLiveResponses.length === Object.entries(filesByBranch).length) {
+							saveCommitLiveResponses();
 						}
 					},
 				};

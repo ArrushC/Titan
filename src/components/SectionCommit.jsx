@@ -12,7 +12,6 @@ export default function SectionCommit() {
 	const commitStage = useCommit((ctx) => ctx.commitStage);
 	const accordionSection = useCommit((ctx) => ctx.accordionSection);
 	const setCommitStage = useCommit((ctx) => ctx.setCommitStage);
-	const selectedModifiedChanges = useCommit((ctx) => ctx.selectedModifiedChanges);
 
 	return (
 		<Collapsible.Root open={isCommitMode && selectedBranchesCount > 0}>
@@ -29,12 +28,7 @@ export default function SectionCommit() {
 						</AccordionRoot>
 					</Box>
 
-					<Box my={6}>
-						<Button colorPalette={"yellow"} disabled={Object.keys(selectedModifiedChanges).length < 1}>
-							<MdCloudUpload />
-							Commit
-						</Button>
-					</Box>
+					{/* TODO: Insert ProcessCommit component here */}
 				</Box>
 			</Collapsible.Content>
 		</Collapsible.Root>

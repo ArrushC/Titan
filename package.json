@@ -12,6 +12,7 @@
 	"targetsFilePath": "C:/Titan/Titan.targets.txt",
 	"logFilePath": "C:/Titan/Titan.app.log",
 	"svnLogsCacheFilePath": "C:/Titan/Titan.svnLogsCache.json",
+	"commitLiveResponsesFilePath": "C:/Titan/Titan.commitLiveResponses.json",
 	"scripts": {
 		"start": "npm run server:start",
 		"dev": "cross-env EDGE_CHROMIUM=1 NODE_ENV=development vite",

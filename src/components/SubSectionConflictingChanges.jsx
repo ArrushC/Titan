@@ -290,7 +290,7 @@ export default function SubSectionConflictingChanges() {
 				</Flex>
 				<HStack gap={3}>
 					<Button onClick={() => setIsRevertDialogOpen(true)} colorPalette={"red"} disabled={Object.keys(selectedConflictingChanges).length < 1}>
-						Revert Selected
+						Revert
 					</Button>
 				</HStack>
 			</Flex>

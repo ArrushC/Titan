@@ -290,11 +290,15 @@ export default function SubSectionModifiedChanges() {
 						{Object.keys(selectedModifiedChanges).length}
 					</Box>
 				</Flex>
-				<Box>
+				<HStack gap={3}>
 					<Button onClick={() => setIsRevertDialogOpen(true)} colorPalette={"red"} disabled={Object.keys(selectedModifiedChanges).length < 1}>
-						Revert Selected
+						Revert
 					</Button>
-				</Box>
+
+					<Button onClick={() => console.warn("No commit button yet!")}colorPalette={"yellow"} disabled={Object.keys(selectedModifiedChanges).length < 1}>
+						Commit
+					</Button>
+				</HStack>
 			</Flex>
 
 			<DialogModifiedChangesRevert selectedCount={Object.keys(selectedModifiedChanges).length} isDialogOpen={isRevertDialogOpen} closeDialog={() => setIsRevertDialogOpen(false)} fireDialogAction={handleRevertFileViewFiles} />

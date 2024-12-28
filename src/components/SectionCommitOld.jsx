@@ -3,12 +3,7 @@ import React, { useEffect, useMemo, useState } from "react";
 import { useApp } from "../ContextApp.jsx";
 import { branchPathFolder, branchString } from "../utils/CommonConfig";
 import ModalCommit from "./ModalCommit";
-import PanelUpdates from "./PanelUpdates";
-import PanelLocalChanges from "./PanelLocalChanges";
-import PanelUntrackedChanges from "./PanelUntrackedChanges";
-import FormSVNMessage from "./FormSVNMessage";
 import FooterSectionCommit from "./FooterSectionCommit";
-import ModalMessageAutoFill from "./ModalMessageAutoFill";
 import OptionsCommit from "./OptionsCommit";
 
 export default function SectionCommit() {

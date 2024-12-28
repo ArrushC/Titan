@@ -161,8 +161,8 @@ export const AppProvider = ({ children }) => {
 	}, [socket, selectedBranches]);
 
 	useEffect(() => {
-		socket?.emit("watcher-branches-update", { selectedBranchPaths: Array.from(selectedBranchPaths), ignoredUnknownPaths: config?.ignoredUnknownPaths, ignoredChangedPaths: config?.ignoredChangedPaths });
-	}, [socket, config?.ignoredUnknownPaths, config?.ignoredChangedPaths, selectedBranchPaths])
+		socket?.emit("watcher-branches-update", { selectedBranchPaths: Array.from(selectedBranchPaths), ignoredUnknownPaths: config?.ignoredUnknownPaths, ignoredModifiedPaths: config?.ignoredModifiedPaths });
+	}, [socket, config?.ignoredUnknownPaths, config?.ignoredModifiedPaths, selectedBranchPaths])
 
 	const logsData = useMemo(() => {
 		const allLogs = Object.values(svnLogs || {}).flat();

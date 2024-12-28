@@ -52,6 +52,7 @@ export const useCommit = (selector) => {
 };
 
 export const CommitProvider = ({ children }) => {
+	const config = useApp((ctx) => ctx.config);
 	const socket = useApp((ctx) => ctx.socket);
 	const configurableRowData = useApp((ctx) => ctx.configurableRowData);
 	const selectedBranches = useApp((ctx) => ctx.selectedBranches);
@@ -246,7 +247,7 @@ export const CommitProvider = ({ children }) => {
 						"Branch Folder": matchedSelectedRow["Branch Folder"],
 						"Branch Version": matchedSelectedRow["Branch Version"],
 						"SVN Branch": branchPath,
-						filesToTrack,
+						filesToTrack: filesToTrack.filter((f) => !config?.ignoredUnknownPaths.some((p) => new RegExp(p).test(f.path))),
 					};
 				else delete newData[branchPath];
 				return newData;
@@ -266,7 +267,7 @@ export const CommitProvider = ({ children }) => {
 						"Branch Folder": matchedSelectedRow["Branch Folder"],
 						"Branch Version": matchedSelectedRow["Branch Version"],
 						"SVN Branch": branchPath,
-						filesToCommit,
+						filesToCommit: filesToCommit.filter((f) => !config?.ignoredModifiedPaths.some((p) => new RegExp(p).test(f.path))),
 					};
 				else delete newData[branchPath];
 				return newData;
@@ -275,7 +276,7 @@ export const CommitProvider = ({ children }) => {
 
 		socket?.on("branch-status-single", socketCallback);
 		return () => socket?.off("branch-status-single", socketCallback);
-	}, [socket, isCommitMode, selectedBranchesCount, configurableRowData, selectedBranchPaths]);
+	}, [socket, isCommitMode, selectedBranchesCount, configurableRowData, selectedBranchPaths, config?.ignoredUnknownPaths, config?.ignoredModifiedPaths]);
 
 	useEffect(() => {
 		console.debug("branch paths update logic has been re-rendered");

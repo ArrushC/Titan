@@ -1166,7 +1166,7 @@ io.on("connection", (socket) => {
 		socket.on("watcher-branches-update", async (data) => {
 			debugTask("watcher-branches-update", data, false);
 
-			const { selectedBranchPaths, ignoredUnknownPaths, ignoredChangedPaths } = data;
+			const { selectedBranchPaths, ignoredUnknownPaths, ignoredModifiedPaths } = data;
 			const currentBranches = Object.keys(instanceData.branchWatchers);
 			const newSelections = selectedBranchPaths || [];
 
@@ -1247,7 +1247,7 @@ io.on("connection", (socket) => {
 
 				logger.info(`Creating watcher for branch: ${branchPath}`);
 				const watcher = chokidar.watch(branchPath, {
-					ignored: [/(^|[\/\\])\../, ...ignoredUnknownPaths.map((path) => new RegExp(path)), ...ignoredChangedPaths.map((path) => new RegExp(path))],
+					ignored: [/(^|[\/\\])\../, ...ignoredUnknownPaths.map((path) => new RegExp(path)), ...ignoredModifiedPaths.map((path) => new RegExp(path))],
 					persistent: true,
 					ignoreInitial: true,
 					usePolling: false,

@@ -62,8 +62,8 @@ export default function useSocketEmits() {
 	);
 
 	const emitTrelloCardUpdate = useCallback(
-		(key, token, trelloData, commitResponses, commitMessage) => {
-			socket?.emit("trello-update-card", { key, token, trelloData, commitResponses, commitMessage });
+		(trelloData, commitResponses, commitMessage) => {
+			socket?.emit("trello-update-card", { trelloData, commitResponses, commitMessage });
 		},
 		[socket]
 	);

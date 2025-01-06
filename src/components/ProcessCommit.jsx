@@ -15,7 +15,7 @@ import { FaCheck, FaTrello } from "react-icons/fa6";
 export default function ProcessCommit() {
 	const socket = useApp((ctx) => ctx.socket);
 	const commitPayload = useCommit((ctx) => ctx.commitPayload);
-	const { issueNumber, sourceBranch, sourceIssueNumber, commitMessage, selectedModifiedChanges, selectedBranchProps, trelloData } = commitPayload;
+	const { commitMessage, selectedModifiedChanges, selectedBranchProps, trelloData } = commitPayload;
 	const isProcessCommit = useCommit((ctx) => ctx.isProcessCommit);
 	const setIsProcessCommit = useCommit((ctx) => ctx.setIsProcessCommit);
 	const { emitTrelloCardUpdate } = useSocketEmits();
@@ -44,8 +44,7 @@ export default function ProcessCommit() {
 
 	const formatForClipboard = useCallback(() => {
 		// Zero-width spaces to offset line wrapping if "MarkupSupport" is included
-		const zeroWidthSpace = "\u200B".repeat(7);
-		const newline = clipboardOptions.includes("MarkupSupport") ? `\r\n\n${zeroWidthSpace}` : "\r\n";
+		const newline = clipboardOptions.includes("MarkupSupport") ? `\r\n\n${"\u200B".repeat(7)}` : "\r\n";
 
 		// Sort commits if needed. For example, if you want them grouped by branchString or similar:
 		const sortedCommits = [...liveCommits]; // mutate a copy, if you want to apply a custom sort
@@ -106,8 +105,9 @@ export default function ProcessCommit() {
 	}, []);
 
 	const handleUpdateTrelloCard = useCallback(() => {
-		emitTrelloCardUpdate(trelloData.key, trelloData.token, trelloData, revisionsText, finalCommitMessage);
-	}, [trelloData, liveCommits, finalCommitMessage, emitTrelloCardUpdate]);
+		const newline = clipboardOptions.includes("MarkupSupport") ? `\r\n\n${"\u200B".repeat(7)}` : "\r\n";
+		emitTrelloCardUpdate(trelloData, revisionsText.split(newline), finalCommitMessage);
+	}, [trelloData, liveCommits, finalCommitMessage, clipboardOptions, emitTrelloCardUpdate]);
 
 	return (
 		<Box>

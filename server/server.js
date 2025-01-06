@@ -1388,7 +1388,7 @@ io.on("connection", async (socket) => {
 									path: f,
 									branchPath: svnBranch,
 									action: "normal",
-									wcStatus: "normal"
+									wcStatus: "normal",
 								})),
 							});
 						}
@@ -1555,22 +1555,25 @@ io.on("connection", async (socket) => {
 		socket.on("trello-update-card", async (data) => {
 			debugTask("trello-update-card", data, false);
 
-			if (!data.key || data.key === "" || data.key === "TRELLO_API_KEY" || !data.token || data.token === "" || data.token === "TRELLO_TOKEN") {
-				emitMessage(socket, "Trello API key and token are required for this function", "error");
-				return;
-			}
+			const { trelloData, commitResponses, commitMessage = "" } = data;
 
-			if (!data.trelloData || !data.trelloData.id || !data.trelloData.name || !data.trelloData.lastActivityDate || !data.trelloData.url || !data.trelloData.boardId || !data.trelloData.checklistIds || !data.trelloData.checklists) {
+			if (!trelloData || !trelloData.id || !trelloData.name || !trelloData.lastActivityDate || !trelloData.url || !trelloData.boardId || !trelloData.checklistIds || !trelloData.checklists || !trelloData.key || !trelloData.token) {
 				emitMessage(socket, "Trello data is missing required fields", "error");
 				return;
 			}
 
-			if (!data.commitResponses || data.commitResponses.length === 0) {
-				emitMessage(socket, "No commit responses provided", "error");
+			const { key, token } = trelloData;
+
+			if (key === "" || key === "TRELLO_API_KEY" || token === "" || token === "TRELLO_TOKEN") {
+				emitMessage(socket, "Trello API key and token are required for this function", "error");
 				return;
 			}
 
-			const { key, token, trelloData, commitResponses, commitMessage = "" } = data;
+
+			if (!commitResponses || commitResponses.length === 0) {
+				emitMessage(socket, "No commit responses provided", "error");
+				return;
+			}
 
 			const result = await updateTrelloCard(key, token, trelloData, commitResponses, commitMessage);
 			if (result) {

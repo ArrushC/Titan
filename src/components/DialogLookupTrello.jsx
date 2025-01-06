@@ -32,10 +32,14 @@ export default function DialogLookupTrello({ fireDialogAction }) {
 
 	const processDialogAction = useCallback(
 		(card) => {
-			fireDialogAction(card);
+			fireDialogAction({
+				...card,
+				key,
+				token
+			});
 			setIsLookupTrelloOn(false);
 		},
-		[fireDialogAction, setIsLookupTrelloOn]
+		[fireDialogAction, key, token, setIsLookupTrelloOn]
 	);
 
 	const handleSearch = useCallback(() => {

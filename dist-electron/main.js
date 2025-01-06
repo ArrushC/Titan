@@ -25511,7 +25511,7 @@ function createWindow() {
   });
   session.defaultSession.setPermissionRequestHandler((webContents, permission, callback) => {
     const url = webContents.getURL();
-    if (url.startsWith("https://trello.com") || url.includes(".trello.com")) {
+    if (url.startsWith("https://trello.com") || url.includes(".trello.com") || permission === "clipboard-sanitized-write") {
       callback(true);
     } else {
       callback(false);

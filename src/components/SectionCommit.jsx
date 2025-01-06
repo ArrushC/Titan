@@ -2,8 +2,7 @@ import { Box, Collapsible, Heading } from "@chakra-ui/react";
 import React from "react";
 import { AccordionRoot } from "./ui/accordion.jsx";
 import { useCommit } from "../ContextCommit.jsx";
-import { MdCloudUpload } from "react-icons/md";
-import { Button } from "./ui/button.jsx";
+import ProcessCommit from "./ProcessCommit.jsx";
 // import OptionsCommit from "./OptionsCommit.jsx";
 
 export default function SectionCommit() {
@@ -12,6 +11,7 @@ export default function SectionCommit() {
 	const commitStage = useCommit((ctx) => ctx.commitStage);
 	const accordionSection = useCommit((ctx) => ctx.accordionSection);
 	const setCommitStage = useCommit((ctx) => ctx.setCommitStage);
+	const isProcessCommit = useCommit((ctx) => ctx.isProcessCommit);
 
 	return (
 		<Collapsible.Root open={isCommitMode && selectedBranchesCount > 0}>
@@ -28,7 +28,11 @@ export default function SectionCommit() {
 						</AccordionRoot>
 					</Box>
 
-					{/* TODO: Insert ProcessCommit component here */}
+					<Collapsible.Root open={isProcessCommit}>
+						<Collapsible.Content>
+							<ProcessCommit />
+						</Collapsible.Content>
+					</Collapsible.Root>
 				</Box>
 			</Collapsible.Content>
 		</Collapsible.Root>

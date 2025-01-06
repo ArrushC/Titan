@@ -11,7 +11,7 @@ import SubSectionModifiedChanges from "./components/SubSectionModifiedChanges.js
 import { FiEdit, FiHelpCircle } from "react-icons/fi";
 import SubSectionUnknownChanges from "./components/SubSectionUnknownChanges.jsx";
 import useSocketEmits from "./hooks/useSocketEmits.jsx";
-import { branchString } from "./utils/CommonConfig.jsx";
+import { toBranchString } from "./utils/CommonConfig.jsx";
 
 const initialState = {
 	isLookupSLogsOn: false,
@@ -36,12 +36,16 @@ const initialState = {
 	selectedModifiedChanges: {},
 	setSelectedModifiedChanges: (_) => {},
 	trelloData: {},
+	commitPayload: {},
+	setCommitPayload: (_) => {},
 	setTrelloData: (_) => {},
 	isCommitMode: false,
 	selectedBranchesCount: 0,
 	accordionSection: [],
 	commitStage: [],
 	setCommitStage: (_) => {},
+	isProcessCommit: false,
+	setIsProcessCommit: (_) => {},
 };
 
 const ContextCommit = createContext(initialState);
@@ -54,13 +58,16 @@ export const useCommit = (selector) => {
 export const CommitProvider = ({ children }) => {
 	const config = useApp((ctx) => ctx.config);
 	const socket = useApp((ctx) => ctx.socket);
+
 	const configurableRowData = useApp((ctx) => ctx.configurableRowData);
 	const selectedBranches = useApp((ctx) => ctx.selectedBranches);
 	const selectedBrachesData = useApp((ctx) => ctx.selectedBranchesData);
 	const selectedBranchPaths = useApp((ctx) => ctx.selectedBranchPaths);
+
 	const appMode = useApp((ctx) => ctx.appMode);
-	const isCommitMode = useMemo(() => appMode === "commit", [appMode]);
 	const { emitStatusSingle } = useSocketEmits();
+
+	const isCommitMode = useMemo(() => appMode === "commit", [appMode]);
 	const selectedBranchesCount = useMemo(() => Object.keys(selectedBranches).length, [selectedBranches]);
 
 	const [isLookupSLogsOn, setIsLookupSLogsOn] = useState(false);
@@ -79,6 +86,8 @@ export const CommitProvider = ({ children }) => {
 	const [selectedModifiedChanges, setSelectedModifiedChanges] = useState({});
 
 	const [trelloData, setTrelloData] = useState({});
+
+	const [commitPayload, setCommitPayload] = useState({});
 
 	const [commitStage, setCommitStage] = useState(["commitDetails"]);
 	const accordionSections = useMemo(
@@ -138,6 +147,8 @@ export const CommitProvider = ({ children }) => {
 		[accordionSections]
 	);
 
+	const [isProcessCommit, setIsProcessCommit] = useState(false);
+
 	const value = useMemo(
 		() => ({
 			isLookupSLogsOn,
@@ -163,11 +174,15 @@ export const CommitProvider = ({ children }) => {
 			setSelectedModifiedChanges,
 			trelloData,
 			setTrelloData,
+			commitPayload,
+			setCommitPayload,
 			isCommitMode,
 			selectedBranchesCount,
 			accordionSection,
 			commitStage,
 			setCommitStage,
+			isProcessCommit,
+			setIsProcessCommit,
 		}),
 		[
 			isLookupSLogsOn,
@@ -183,10 +198,12 @@ export const CommitProvider = ({ children }) => {
 			selectedUnknownChanges,
 			selectedModifiedChanges,
 			trelloData,
+			commitPayload,
 			isCommitMode,
 			selectedBranchesCount,
 			accordionSection,
 			commitStage,
+			isProcessCommit,
 		]
 	);
 
@@ -211,7 +228,7 @@ export const CommitProvider = ({ children }) => {
 			const { branch: branchPath, filesToUpdate, filesToTrack, filesToCommit } = data.status;
 
 			const matchedSelectedRow = configurableRowData.find((branchRow) => branchRow.id === branchId);
-			const matchedBranchString = branchString(matchedSelectedRow["Branch Folder"], matchedSelectedRow["Branch Version"], matchedSelectedRow["SVN Branch"]);
+			const matchedBranchString = toBranchString(matchedSelectedRow["Branch Folder"], matchedSelectedRow["Branch Version"], matchedSelectedRow["SVN Branch"]);
 
 			setConflictingChanges((prevData) => {
 				const newData = {};

@@ -15,7 +15,8 @@ const initialState = {
 	emitSocketEvent: (_) => {},
 	configurableRowData: [],
 	selectedBranchesData: [],
-	selectedBranchPaths: (new Set()),
+	selectedBranchPaths: new Set(),
+	selectedBranchProps: {},
 	selectedBranches: {},
 	setSelectedBranches: (_) => {},
 	svnLogs: {},
@@ -40,20 +41,12 @@ export const AppProvider = ({ children }) => {
 	const [svnLogs, setSvnLogs] = useState({});
 	const [appMode, setAppMode] = useState("app");
 
-	const _handleTitanConfigEvent = useCallback((response) => {
-		if (!response) {
-			toaster.create(createToastConfig("Couldn't load data from the server", "error", 0));
-			return;
-		}
-		setConfig(response.config);
-	}, []);
-
 	useEffect(() => {
 		const newSocket = socketIOClient(URL_SOCKET_CLIENT);
 		setSocket(newSocket);
 
 		const onConnect = () => {
-			newSocket.emit("titan-config-get", null, _handleTitanConfigEvent);
+			console.debug("=== CONECTED TO SERVER ===");
 		};
 
 		const onDisconnect = () => {
@@ -74,12 +67,22 @@ export const AppProvider = ({ children }) => {
 		newSocket.on("reconnect", onReconnect);
 		newSocket.on("notification", onNotification);
 
+		const onTitanConfigGet = (response) => {
+			if (!response) {
+				toaster.create(createToastConfig("Couldn't load data from the server", "error", 0));
+				return;
+			}
+			setConfig(response.config);
+		};
+		newSocket.once("titan-config-get", onTitanConfigGet);
+
 		// Cleanup on unmount
 		return () => {
 			newSocket.off("connect", onConnect);
 			newSocket.off("disconnect", onDisconnect);
 			newSocket.off("reconnect", onReconnect);
 			newSocket.off("notification", onNotification);
+			newSocket.off("titan-config-get", onTitanConfigGet);
 			newSocket.disconnect();
 		};
 	}, []);
@@ -133,7 +136,11 @@ export const AppProvider = ({ children }) => {
 
 	const configurableRowData = useMemo(() => config?.branches || [], [config]);
 	const selectedBranchesData = useMemo(() => configurableRowData.filter((branchRow) => selectedBranches[branchRow["SVN Branch"]]), [configurableRowData, selectedBranches]);
-	const selectedBranchPaths = useMemo(() => (new Set(Object.keys(selectedBranches))), [selectedBranches]);
+	const selectedBranchPaths = useMemo(() => new Set(Object.keys(selectedBranches)), [selectedBranches]);
+	const selectedBranchProps = useMemo(() => Object.fromEntries(selectedBranchesData.map((branchRow) => [branchRow["SVN Branch"], {
+		folder: branchRow["Branch Folder"],
+		version: branchRow["Branch Version"],
+	}])), [selectedBranchesData]);
 
 	useEffect(() => {
 		if (configurableRowData?.length < 1 || Object.keys(selectedBranches).length < 1) return;
@@ -162,7 +169,7 @@ export const AppProvider = ({ children }) => {
 
 	useEffect(() => {
 		socket?.emit("watcher-branches-update", { selectedBranchPaths: Array.from(selectedBranchPaths), ignoredUnknownPaths: config?.ignoredUnknownPaths, ignoredModifiedPaths: config?.ignoredModifiedPaths });
-	}, [socket, config?.ignoredUnknownPaths, config?.ignoredModifiedPaths, selectedBranchPaths])
+	}, [socket, config?.ignoredUnknownPaths, config?.ignoredModifiedPaths, selectedBranchPaths]);
 
 	const logsData = useMemo(() => {
 		const allLogs = Object.values(svnLogs || {}).flat();
@@ -180,6 +187,7 @@ export const AppProvider = ({ children }) => {
 			configurableRowData,
 			selectedBranchesData,
 			selectedBranchPaths,
+			selectedBranchProps,
 			selectedBranches,
 			setSelectedBranches,
 			svnLogs,
@@ -190,7 +198,7 @@ export const AppProvider = ({ children }) => {
 			handleBranchSelection,
 			handleBulkSelection,
 		}),
-		[appClosing, socket, config, updateConfig, emitSocketEvent, configurableRowData, selectedBranchesData, selectedBranchPaths, selectedBranches, svnLogs, logsData, appMode, handleBranchSelection, handleBulkSelection]
+		[appClosing, socket, config, updateConfig, emitSocketEvent, configurableRowData, selectedBranchesData, selectedBranchPaths, selectedBranchProps, selectedBranches, svnLogs, logsData, appMode, handleBranchSelection, handleBulkSelection]
 	);
 
 	return <ContextApp.Provider value={value}>{children}</ContextApp.Provider>;

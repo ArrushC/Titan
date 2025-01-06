@@ -9,6 +9,7 @@ import { LuSearch } from "react-icons/lu";
 import DialogModifiedChangesRevert from "./DialogModifiedChangesRevert.jsx";
 import { Button } from "./ui/button.jsx";
 import useSocketEmits from "../hooks/useSocketEmits.jsx";
+import ButtonProcessCommit from "./ButtonProcessCommit.jsx";
 
 // Helper function to sort rows based on the current stack.
 // Each step in the stack has the shape { column, direction }.
@@ -294,10 +295,7 @@ export default function SubSectionModifiedChanges() {
 					<Button onClick={() => setIsRevertDialogOpen(true)} colorPalette={"red"} disabled={Object.keys(selectedModifiedChanges).length < 1}>
 						Revert
 					</Button>
-
-					<Button onClick={() => console.warn("No commit button yet!")}colorPalette={"yellow"} disabled={Object.keys(selectedModifiedChanges).length < 1}>
-						Commit
-					</Button>
+					<ButtonProcessCommit />
 				</HStack>
 			</Flex>
 

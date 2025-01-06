@@ -3,7 +3,6 @@ import { createToastConfig } from "../utils/Constants.jsx";
 import { toaster } from "../components/ui/toaster.jsx";
 
 export default function useNotifications() {
-
 	const RaiseClientNotificaiton = useCallback(
 		(description = "", type = "info", duration = 3000, manualToast = null) => {
 			const toastConfig = createToastConfig(description, type, duration);

@@ -41,9 +41,6 @@ const io = new Server(server, {
 
 const instanceData = {
 	commitLiveResponses: [],
-	isConnectionError: false,
-	lastConnectionErrorTime: 0,
-	CONNECTION_ERROR_DEBOUNCE_MS: 5000,
 	subversionLogsCache: {},
 	branchWatchers: {},
 };
@@ -285,12 +282,13 @@ async function getTrelloCardNames(key, token, query, limit) {
 /**
  * Updates the "Commit History" checklist or creates a new one if it doesn't exist, and adds commit responses to it.
  *
- * @param {*} key The Trello API key
- * @param {*} token The Trello token
+ * @param {String} key The Trello API key
+ * @param {String} token The Trello token
  * @param {*} trelloData  The Trello data object containing the card ID, board ID, checklist ID, and commit responses
  * @param {*} commitResponses The commit responses to add to the checklist
+ * @param {String} commitMessage The commit message to add to the card
  */
-async function updateTrelloCard(key, token, trelloData, commitResponses) {
+async function updateTrelloCard(key, token, trelloData, commitResponses, commitMessage) {
 	try {
 		// Check if the "Commit History" checklist exists and if not, create a new one
 		let checklistId = trelloData.checklists.find((checklist) => checklist.name === "Commit History")?.id;
@@ -317,10 +315,29 @@ async function updateTrelloCard(key, token, trelloData, commitResponses) {
 			checklistId = data.id;
 		}
 
+		const url = new URL(`https://api.trello.com/1/checklists/${checklistId}/checkItems`);
+
+		// Add the commit message to the "Commit History" checklist
+		let params = new URLSearchParams({
+			key: key,
+			token: token,
+			name: commitMessage,
+			pos: "bottom",
+		});
+		url.search = params.toString();
+
+		let res = await fetch(url, { method: "POST" });
+
+		if (!res.ok) {
+			throw new Error(`HTTP error! status: ${res.status} - ${res.statusText} - ${await res.text()}`);
+		}
+
+		const data = await res.json();
+		logger.debug(`Added commit message to Trello card: ${data.name}`);
+
 		// Add the commit responses to the "Commit History" checklist
 		for (let responseItem of commitResponses) {
-			const url = new URL(`https://api.trello.com/1/checklists/${checklistId}/checkItems`);
-			const params = new URLSearchParams({
+			params = new URLSearchParams({
 				key: key,
 				token: token,
 				name: responseItem,
@@ -329,7 +346,7 @@ async function updateTrelloCard(key, token, trelloData, commitResponses) {
 
 			url.search = params.toString();
 
-			const res = await fetch(url, { method: "POST" });
+			res = await fetch(url, { method: "POST" });
 
 			if (!res.ok) {
 				throw new Error(`HTTP error! status: ${res.status} - ${res.statusText} - ${await res.text()}`);
@@ -513,7 +530,7 @@ async function fetchConfig(socket) {
 	return config;
 }
 
-io.on("connection", (socket) => {
+io.on("connection", async (socket) => {
 	const origin = socket.handshake.headers.origin || "";
 	const referer = socket.handshake.headers.referer || "";
 	const expectedOrigin = isDev ? `http://localhost:${frontendPort}` : `http://localhost:${port}`;
@@ -523,20 +540,8 @@ io.on("connection", (socket) => {
 	logger.info(`Connected to ${isForeignOrigin ? "foreign" : "titan"} client`);
 	emitMessage(socket, "Connected To Server!", "success", 1500);
 
-	socket.on("titan-config-get", async (data, callback) => {
-		debugTask("titan-config-get", data, false);
-		try {
-			debugTask("titan-config-get", {}, false);
-			const config = await fetchConfig(socket);
-			callback({ config });
-			debugTask("titan-config-get", {}, true);
-		} catch (error) {
-			logger.error("Error in titan-config-get: " + error);
-			emitMessage(socket, "An error occurred while fetching the configuration.", "error");
-			callback({ error: "Failed to fetch configuration." });
-		}
-		debugTask("titan-config-get", data, true);
-	});
+	const config = await fetchConfig(socket);
+	socket.emit("titan-config-get", { config });
 
 	if (!isForeignOrigin) {
 		socket.on("titan-config-set", async (data) => {
@@ -1292,103 +1297,100 @@ io.on("connection", (socket) => {
 		socket.on("svn-commit", async (data) => {
 			debugTask("svn-commit", data, false);
 
-			if (!data.filesToProcess || data.filesToProcess.length === 0) {
-				emitMessage(socket, "No files to commit", "error");
-				return;
-			}
-
 			instanceData.commitLiveResponses = [];
+			const { issueNumber, sourceBranch, sourceIssueNumber, commitMessage, selectedModifiedChanges, selectedBranchProps } = data;
 
-			const { sourceBranch, issueNumber, commitMessage, filesToProcess, commitOptions } = data;
-
-			// Group files by SVN Branch
-			const filesByBranch = filesToProcess.reduce((acc, file) => {
-				const key = file["SVN Branch"];
-				if (!acc[key]) {
-					acc[key] = {
-						branchId: file.branchId,
-						branchFolder: file["Branch Folder"],
-						branchVersion: file["Branch Version"],
+			const filesByBranch = {};
+			for (const [filePath, fileData] of Object.entries(selectedModifiedChanges)) {
+				const branchPath = fileData.branchPath;
+				if (!filesByBranch[branchPath]) {
+					filesByBranch[branchPath] = {
+						branchFolder: selectedBranchProps[branchPath].folder,
+						branchVersion: selectedBranchProps[branchPath].version,
 						files: [],
 					};
 				}
-				acc[key].files.push(file["Full Path"]);
-				return acc;
-			}, {});
+				filesByBranch[branchPath].files.push(filePath);
+			}
 
-			let originalIssueNumber = issueNumber[sourceBranch["Branch Folder"]] || "";
-
-			for (const [svnBranch, branchInfo] of Object.entries(filesByBranch)) {
-				const { branchId, branchFolder, branchVersion, files } = branchInfo;
-
-				let originalMessage = `(${sourceBranch["Branch Folder"]}${originalIssueNumber !== "" ? ` #${originalIssueNumber}` : ""})`;
-				if (branchFolder === sourceBranch["Branch Folder"]) {
-					originalMessage = `(${branchFolder}${commitOptions.useFolderOnlySource ? "" : ` ${sourceBranch["Branch Version"]}`})`;
+			for (const [svnBranch, branchStatus] of Object.entries(filesByBranch)) {
+				const { branchFolder, branchVersion, files } = branchStatus;
+				let originalMessage = "";
+				if (sourceBranch.trim() !== "") {
+					originalMessage = `(${sourceBranch.trim()}${sourceIssueNumber !== "" && branchFolder !== sourceBranch ? ` #${sourceIssueNumber}` : ""})`;
 				}
 
-				let branchIssueNumber = issueNumber[branchFolder] || originalIssueNumber;
-				let prefixedCommitMessage = sanitizeCommitMessage(`Issue ${branchIssueNumber} ${originalMessage}: ${commitMessage}`);
-
-				console.log("Commit message:", prefixedCommitMessage);
+				let branchIssueNumber = issueNumber[branchFolder] || sourceIssueNumber;
+				const finalCommitMessage = `Issue ${branchIssueNumber} ${originalMessage}: ${commitMessage
+					.trim()
+					.replace(/\s*\n+\s*/g, "; ")
+					.replace(/[;\s]+$/, "")
+					.trim()}`;
 
 				const task = {
 					command: "commit",
 					options: {
-						msg: prefixedCommitMessage,
+						msg: finalCommitMessage,
 						params: [`--targets ${targetsFilePath}`],
 					},
 					preopCallback: async () => {
 						await writeTargetsFile(files);
 					},
-					postopCallback: (err, result) => {
+					postopCallback: async (err, result) => {
 						if (err) {
 							if (!isSVNConnectionError(socket, err)) {
 								logger.debug(`Files by Branch: ${JSON.stringify(filesByBranch, null, 2)}`);
 								logger.debug(`SVN Branch: ${svnBranch}`);
 								logger.debug(`Issue Number: ${issueNumber}`);
 								logger.debug(`Commit Message: ${commitMessage}`);
-								logger.debug(`Prefixed Commit Message: ${prefixedCommitMessage}`);
+								logger.debug(`Final Commit Message: ${finalCommitMessage}`);
 								logger.debug(`Files to Commit: ${JSON.stringify(files, null, 2)}`);
 								logger.error(`Failed to commit files in ${svnBranch}:` + err);
 								emitMessage(socket, `Failed to commit files in ${branchString(branchFolder, branchVersion, svnBranch)}`, "error");
 
 								const liveResponse = {
-									branchId: branchId,
-									branchIssueNumber: branchIssueNumber,
-									"Branch Folder": branchFolder,
-									"Branch Version": branchVersion,
-									"SVN Branch": svnBranch,
+									branchIssueNumber,
+									branchFolder,
+									branchVersion,
+									svnBranch,
 									branchPathFolder: branchPathFolder(svnBranch),
 									branchString: branchString(branchFolder, branchVersion, svnBranch),
-									commitMessage: prefixedCommitMessage,
+									commitMessage: finalCommitMessage,
 									revision: null,
 									errorMessage: err.message,
 									bulkCommitLength: Object.entries(filesByBranch).length,
 								};
 
-								io.emit("svn-commit-status-live", liveResponse);
+								io.emit("svn-commit-live", liveResponse);
 								instanceData.commitLiveResponses.push(liveResponse);
 							}
 						} else {
 							logger.info(`Successfully committed files in ${svnBranch}`);
 							emitMessage(socket, `Successfully committed files in ${branchString(branchFolder, branchVersion, svnBranch)}`, "success");
-							logger.debug(`Revision Number: ${extractRevisionNumber(result[0].result)}`);
 
 							const liveResponse = {
-								branchId: branchId,
-								branchIssueNumber: branchIssueNumber,
-								"Branch Folder": branchFolder,
-								"Branch Version": branchVersion,
-								"SVN Branch": svnBranch,
+								branchIssueNumber,
+								branchFolder,
+								branchVersion,
+								svnBranch,
 								branchPathFolder: branchPathFolder(svnBranch),
 								branchString: branchString(branchFolder, branchVersion, svnBranch),
-								commitMessage: prefixedCommitMessage,
+								commitMessage: finalCommitMessage,
 								revision: extractRevisionNumber(result[0].result),
 								bulkCommitLength: Object.entries(filesByBranch).length,
 							};
 
-							io.emit("svn-commit-status-live", liveResponse);
+							io.emit("svn-commit-live", liveResponse);
 							instanceData.commitLiveResponses.push(liveResponse);
+
+							socket.emit("branch-paths-update", {
+								paths: files.map((f) => ({
+									path: f,
+									branchPath: svnBranch,
+									action: "normal",
+									wcStatus: "normal"
+								})),
+							});
 						}
 
 						if (instanceData.commitLiveResponses.length === Object.entries(filesByBranch).length) {
@@ -1568,9 +1570,9 @@ io.on("connection", (socket) => {
 				return;
 			}
 
-			const { key, token, trelloData, commitResponses } = data;
+			const { key, token, trelloData, commitResponses, commitMessage = "" } = data;
 
-			const result = await updateTrelloCard(key, token, trelloData, commitResponses);
+			const result = await updateTrelloCard(key, token, trelloData, commitResponses, commitMessage);
 			if (result) {
 				emitMessage(socket, "Successfully updated Trello card", "success");
 			} else {

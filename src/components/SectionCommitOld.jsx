@@ -3,8 +3,6 @@ import React, { useEffect, useMemo, useState } from "react";
 import { useApp } from "../ContextApp.jsx";
 import { branchPathFolder, branchString } from "../utils/CommonConfig";
 import ModalCommit from "./ModalCommit";
-import FooterSectionCommit from "./FooterSectionCommit";
-import OptionsCommit from "./OptionsCommit";
 
 export default function SectionCommit() {
 	const { setIsCommitMode, selectedBranchStatuses, showCommitView, setShowCommitView, selectedBranches, configurableRowData } = useApp();
@@ -15,22 +13,8 @@ export default function SectionCommit() {
 	const [rowDataUntrackedChanges, setRowDataUntrackedChanges] = useState([]);
 
 	// Modals
-	const { open: isCommitModalOpen, onOpen: openCommitModal, onClose: closeCommitModal } = useDisclosure();
-	const { open: isMessageAutoFillModalOpen, onOpen: openMessageAutoFillModal, onClose: closeMessageAutoFillModal } = useDisclosure();
+	const { open: isCommitModalOpen, onClose: closeCommitModal } = useDisclosure();
 
-	const defaultColDefsCommit = useMemo(
-		() => ({
-			resizable: true,
-			wrapText: true,
-			autoHeight: true,
-			filter: true,
-			suppressMovable: true,
-			editable: false,
-			wrapHeaderText: true,
-			autoHeaderHeight: true,
-		}),
-		[]
-	);
 
 	// Fetch the branch status for each selected branch
 	useEffect(() => {
@@ -88,9 +72,7 @@ export default function SectionCommit() {
 
 	return (
 		<Box>
-			<OptionsCommit />
 			<Box mb={6}>
-				<FormSVNMessage openMessageAutoFillModal={openMessageAutoFillModal} />
 			</Box>
 			<Skeleton isLoaded={showCommitView && hasChanges} startColor="yelow.500" endColor="yellow.500">
 				<Tabs variant={"solid-rounded"} colorPalette="yellow" defaultIndex={hasFileUpdates ? 0 : hasLocalChanges ? 1 : 2} isLazy={false}>
@@ -113,13 +95,10 @@ export default function SectionCommit() {
 					</TabList>
 					<TabPanels>
 						<TabPanel px={0}>
-							<PanelUpdates fileUpdates={fileUpdates} />
 						</TabPanel>
 						<TabPanel px={0}>
-							<PanelLocalChanges rowDataLocalChanges={rowDataLocalChanges} setRowDataLocalChanges={setRowDataLocalChanges} defaultColDefsCommit={defaultColDefsCommit} />
 						</TabPanel>
 						<TabPanel px={0}>
-							<PanelUntrackedChanges rowDataUntrackedChanges={rowDataUntrackedChanges} setRowDataUntrackedChanges={setRowDataUntrackedChanges} defaultColDefsCommit={defaultColDefsCommit} />
 						</TabPanel>
 					</TabPanels>
 				</Tabs>
@@ -134,10 +113,8 @@ export default function SectionCommit() {
 				<></>
 			)}
 			<Box mt={6}>
-				<FooterSectionCommit openCommitModal={openCommitModal} />
 			</Box>
 			<ModalCommit isModalOpen={isCommitModalOpen} closeModal={closeCommitModal} />
-			<ModalMessageAutoFill isModalOpen={isMessageAutoFillModalOpen} closeModal={closeMessageAutoFillModal} />
 		</Box>
 	);
 }

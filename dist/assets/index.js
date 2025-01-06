@@ -1,4 +1,4 @@
-import { c as createToaster, j as jsxRuntimeExports, P as Portal, T as Toaster$1, a as ToastRoot, S as Spinner, b as ToastIndicator, d as Stack, e as ToastTitle, f as ToastDescription, g as ToastActionTrigger, h as ToastCloseTrigger, i as createContext, u as useContextSelector, r as reactExports, l as lookup, k as reactDomExports, m as TooltipRoot, n as TooltipTrigger, o as TooltipPositioner, p as TooltipContent, q as TooltipArrow, s as TooltipArrowTip, I as IconButton, C as ClientOnly, t as Skeleton, z, F as FaSun, v as FaMoon, J, B as Button$1, A as AbsoluteCenter, w as Span, L as LuX, x as PopoverPositioner, y as PopoverContent$1, D as PopoverArrow$1, E as PopoverArrowTip, G as PopoverCloseTrigger, H as PopoverTitle$1, K as PopoverRoot$1, M as PopoverBody$1, N as PopoverTrigger$1, O as HStack, Q as Flex, R as Heading, U as LuFileCog, V as LiaToiletSolid, W as MdBrowserUpdated, X as IoReload, Y as CheckboxRoot, Z as CheckboxHiddenInput, _ as CheckboxControl, $ as CheckboxIndicator, a0 as CheckboxLabel, a1 as DialogBackdrop$1, a2 as DialogPositioner, a3 as DialogContent$1, a4 as DialogCloseTrigger$1, a5 as DialogRoot$1, a6 as DialogFooter$1, a7 as DialogHeader$1, a8 as DialogBody$1, a9 as DialogTitle$1, aa as DialogActionTrigger$1, ab as TbAsterisk, ac as TbLetterZ, ad as TbLetterY, ae as TbLetterX, af as TbLetterW, ag as TbLetterV, ah as TbLetterU, ai as TbLetterT, aj as TbLetterS, ak as TbLetterR, al as TbLetterQ, am as TbLetterP, an as TbLetterO, ao as TbLetterN, ap as TbLetterM, aq as TbLetterL, ar as TbLetterK, as as TbLetterJ, at as TbLetterI, au as TbLetterH, av as TbLetterG, aw as TbLetterF, ax as TbLetterE, ay as TbLetterD, az as TbLetterC, aA as TbLetterB, aB as TbLetterA, aC as Input, aD as keyframes, aE as chroma, aF as Text, aG as TableRow, aH as TableCell, aI as FaFolderOpen, aJ as MdAutoFixHigh, aK as ActionBarPositioner, aL as ActionBarContent$1, aM as ActionBarCloseTrigger, aN as ActionBarRoot$1, aO as ActionBarSelectionTrigger$1, aP as ActionBarSeparator$1, aQ as Kbd, aR as IoMdClose, aS as Group, aT as InputElement, aU as React, aV as FaChevronDown, aW as FaChevronRight, aX as Box, aY as TableRoot, aZ as TableColumnGroup, a_ as TableColumn, a$ as TableHeader, b0 as TableColumnHeader, b1 as TableBody, b2 as VscDiffSingle, b3 as SiSubversion, b4 as LuSearch, b5 as TableFooter, b6 as IoMdAdd, b7 as MdUpdate, b8 as AccordionItemTrigger$1, b9 as AccordionItemIndicator, ba as AccordionItemContent$1, bb as AccordionItemBody, bc as AccordionRoot$1, bd as AccordionItem$1, be as FieldRoot, bf as FieldLabel, bg as FieldRequiredIndicator, bh as FieldHelperText, bi as FieldErrorText, bj as NumberInputRoot$1, bk as NumberInputControl, bl as NumberInputIncrementTrigger, bm as NumberInputDecrementTrigger, bn as NumberInputInput, bo as chakra, bp as index, bq as FaTrello, br as MdKeyboardReturn, bs as TableScrollArea, bt as Link, bu as LuExternalLink, bv as FaChevronUp, bw as Code, bx as BiMessageDetail, by as IoWarning, bz as FiHelpCircle, bA as FiEdit, bB as CollapsibleRoot, bC as CollapsibleContent, bD as useDisclosure, bE as Image, bF as VscChromeMinimize, bG as FaRegSquare, bH as ChakraProvider, bI as defaultSystem, bJ as ReactDOM } from "./vendor.js";
+import { c as createToaster, j as jsxRuntimeExports, P as Portal, T as Toaster$1, a as ToastRoot, S as Spinner, b as ToastIndicator, d as Stack, e as ToastTitle, f as ToastDescription, g as ToastActionTrigger, h as ToastCloseTrigger, i as createContext, u as useContextSelector, r as reactExports, l as lookup, k as reactDomExports, m as TooltipRoot, n as TooltipTrigger, o as TooltipPositioner, p as TooltipContent, q as TooltipArrow, s as TooltipArrowTip, I as IconButton, C as ClientOnly, t as Skeleton, z, F as FaSun, v as FaMoon, J, B as Button$1, A as AbsoluteCenter, w as Span, L as LuX, x as PopoverPositioner, y as PopoverContent$1, D as PopoverArrow$1, E as PopoverArrowTip, G as PopoverCloseTrigger, H as PopoverTitle$1, K as PopoverRoot$1, M as PopoverBody$1, N as PopoverTrigger$1, O as HStack, Q as Flex, R as Heading, U as LuFileCog, V as LiaToiletSolid, W as MdBrowserUpdated, X as IoReload, Y as CheckboxRoot, Z as CheckboxHiddenInput, _ as CheckboxControl, $ as CheckboxIndicator, a0 as CheckboxLabel, a1 as DialogBackdrop$1, a2 as DialogPositioner, a3 as DialogContent$1, a4 as DialogCloseTrigger$1, a5 as DialogRoot$1, a6 as DialogFooter$1, a7 as DialogHeader$1, a8 as DialogBody$1, a9 as DialogTitle$1, aa as DialogActionTrigger$1, ab as TbAsterisk, ac as TbLetterZ, ad as TbLetterY, ae as TbLetterX, af as TbLetterW, ag as TbLetterV, ah as TbLetterU, ai as TbLetterT, aj as TbLetterS, ak as TbLetterR, al as TbLetterQ, am as TbLetterP, an as TbLetterO, ao as TbLetterN, ap as TbLetterM, aq as TbLetterL, ar as TbLetterK, as as TbLetterJ, at as TbLetterI, au as TbLetterH, av as TbLetterG, aw as TbLetterF, ax as TbLetterE, ay as TbLetterD, az as TbLetterC, aA as TbLetterB, aB as TbLetterA, aC as Input, aD as keyframes, aE as chroma, aF as Text, aG as TableRow, aH as TableCell, aI as FaFolderOpen, aJ as MdAutoFixHigh, aK as ActionBarPositioner, aL as ActionBarContent$1, aM as ActionBarCloseTrigger, aN as ActionBarRoot$1, aO as ActionBarSelectionTrigger$1, aP as ActionBarSeparator$1, aQ as Kbd, aR as IoMdClose, aS as Group, aT as InputElement, aU as React, aV as FaChevronDown, aW as FaChevronRight, aX as Box, aY as TableRoot, aZ as TableColumnGroup, a_ as TableColumn, a$ as TableHeader, b0 as TableColumnHeader, b1 as TableBody, b2 as VscDiffSingle, b3 as SiSubversion, b4 as LuSearch, b5 as TableFooter, b6 as IoMdAdd, b7 as MdUpdate, b8 as AccordionItemTrigger$1, b9 as AccordionItemIndicator, ba as AccordionItemContent$1, bb as AccordionItemBody, bc as AccordionRoot$1, bd as AccordionItem$1, be as FieldRoot, bf as FieldLabel, bg as FieldRequiredIndicator, bh as FieldHelperText, bi as FieldErrorText, bj as NumberInputRoot$1, bk as NumberInputControl, bl as NumberInputIncrementTrigger, bm as NumberInputDecrementTrigger, bn as NumberInputInput, bo as chakra, bp as index, bq as FaTrello, br as MdKeyboardReturn, bs as TableScrollArea, bt as Link, bu as LuExternalLink, bv as FaChevronUp, bw as Code, bx as MdError, by as BiMessageDetail, bz as IoWarning, bA as FiHelpCircle, bB as FiEdit, bC as HiOutlineInformationCircle, bD as ProgressTrack, bE as ProgressRange, bF as ProgressLabel$1, bG as ProgressRoot$1, bH as ProgressValueText$1, bI as LuCheck, bJ as LuClipboard, bK as ListRoot, bL as ListItem, bM as ListIndicator, bN as LuCheckCircle, bO as CheckboxGroup, bP as FaCheck, bQ as CollapsibleRoot, bR as CollapsibleContent, bS as useDisclosure, bT as Image, bU as VscChromeMinimize, bV as FaRegSquare, bW as ChakraProvider, bX as defaultSystem, bY as ReactDOM } from "./vendor.js";
 import { l as lodashExports } from "./lodash.js";
 /* empty css                  */
 (function polyfill() {
@@ -99,6 +99,7 @@ const initialState$2 = {
   configurableRowData: [],
   selectedBranchesData: [],
   selectedBranchPaths: /* @__PURE__ */ new Set(),
+  selectedBranchProps: {},
   selectedBranches: {},
   setSelectedBranches: (_) => {
   },
@@ -122,18 +123,11 @@ const AppProvider = ({ children }) => {
   const [selectedBranches, setSelectedBranches] = reactExports.useState({});
   const [svnLogs, setSvnLogs] = reactExports.useState({});
   const [appMode, setAppMode] = reactExports.useState("app");
-  const _handleTitanConfigEvent = reactExports.useCallback((response) => {
-    if (!response) {
-      toaster.create(createToastConfig("Couldn't load data from the server", "error", 0));
-      return;
-    }
-    setConfig(response.config);
-  }, []);
   reactExports.useEffect(() => {
     const newSocket = lookup(URL_SOCKET_CLIENT);
     setSocket(newSocket);
     const onConnect = () => {
-      newSocket.emit("titan-config-get", null, _handleTitanConfigEvent);
+      console.debug("=== CONECTED TO SERVER ===");
     };
     const onDisconnect = () => {
       toaster.create(createToastConfig("Server Disconnected", "warning", 0));
@@ -148,11 +142,20 @@ const AppProvider = ({ children }) => {
     newSocket.on("disconnect", onDisconnect);
     newSocket.on("reconnect", onReconnect);
     newSocket.on("notification", onNotification);
+    const onTitanConfigGet = (response) => {
+      if (!response) {
+        toaster.create(createToastConfig("Couldn't load data from the server", "error", 0));
+        return;
+      }
+      setConfig(response.config);
+    };
+    newSocket.once("titan-config-get", onTitanConfigGet);
     return () => {
       newSocket.off("connect", onConnect);
       newSocket.off("disconnect", onDisconnect);
       newSocket.off("reconnect", onReconnect);
       newSocket.off("notification", onNotification);
+      newSocket.off("titan-config-get", onTitanConfigGet);
       newSocket.disconnect();
     };
   }, []);
@@ -202,6 +205,10 @@ const AppProvider = ({ children }) => {
   const configurableRowData = reactExports.useMemo(() => (config == null ? void 0 : config.branches) || [], [config]);
   const selectedBranchesData = reactExports.useMemo(() => configurableRowData.filter((branchRow) => selectedBranches[branchRow["SVN Branch"]]), [configurableRowData, selectedBranches]);
   const selectedBranchPaths = reactExports.useMemo(() => new Set(Object.keys(selectedBranches)), [selectedBranches]);
+  const selectedBranchProps = reactExports.useMemo(() => Object.fromEntries(selectedBranchesData.map((branchRow) => [branchRow["SVN Branch"], {
+    folder: branchRow["Branch Folder"],
+    version: branchRow["Branch Version"]
+  }])), [selectedBranchesData]);
   reactExports.useEffect(() => {
     if ((configurableRowData == null ? void 0 : configurableRowData.length) < 1 || Object.keys(selectedBranches).length < 1) return;
     console.debug("Emitting svn-logs-selected event in DialogBranchesLog component in background");
@@ -224,6 +231,9 @@ const AppProvider = ({ children }) => {
     socket == null ? void 0 : socket.on("svn-log-result", socketCallback);
     return () => socket == null ? void 0 : socket.off("svn-log-result", socketCallback);
   }, [socket, selectedBranches]);
+  reactExports.useEffect(() => {
+    socket == null ? void 0 : socket.emit("watcher-branches-update", { selectedBranchPaths: Array.from(selectedBranchPaths), ignoredUnknownPaths: config == null ? void 0 : config.ignoredUnknownPaths, ignoredModifiedPaths: config == null ? void 0 : config.ignoredModifiedPaths });
+  }, [socket, config == null ? void 0 : config.ignoredUnknownPaths, config == null ? void 0 : config.ignoredModifiedPaths, selectedBranchPaths]);
   const logsData = reactExports.useMemo(() => {
     const allLogs = Object.values(svnLogs || {}).flat();
     return allLogs.filter((log) => !!log.revision).sort((a, b) => parseInt(b.revision, 10) - parseInt(a.revision, 10));
@@ -239,6 +249,7 @@ const AppProvider = ({ children }) => {
       configurableRowData,
       selectedBranchesData,
       selectedBranchPaths,
+      selectedBranchProps,
       selectedBranches,
       setSelectedBranches,
       svnLogs,
@@ -249,7 +260,7 @@ const AppProvider = ({ children }) => {
       handleBranchSelection,
       handleBulkSelection
     }),
-    [appClosing, socket, config, updateConfig, emitSocketEvent, configurableRowData, selectedBranchesData, selectedBranchPaths, selectedBranches, svnLogs, logsData, appMode, handleBranchSelection, handleBulkSelection]
+    [appClosing, socket, config, updateConfig, emitSocketEvent, configurableRowData, selectedBranchesData, selectedBranchPaths, selectedBranchProps, selectedBranches, svnLogs, logsData, appMode, handleBranchSelection, handleBulkSelection]
   );
   return /* @__PURE__ */ jsxRuntimeExports.jsx(ContextApp.Provider, { value, children });
 };
@@ -291,9 +302,9 @@ function useSocketEmits() {
     },
     [socket]
   );
-  const emitFilesAddRemove = reactExports.useCallback(
+  const emitFilesAddDelete = reactExports.useCallback(
     (filesToProcess) => {
-      socket == null ? void 0 : socket.emit("svn-files-add-remove", { filesToProcess });
+      socket == null ? void 0 : socket.emit("svn-files-add-delete", { filesToProcess });
     },
     [socket]
   );
@@ -304,8 +315,8 @@ function useSocketEmits() {
     [socket]
   );
   const emitTrelloCardUpdate = reactExports.useCallback(
-    (key, token, trelloData, commitResponses) => {
-      socket == null ? void 0 : socket.emit("trello-update-card", { key, token, trelloData, commitResponses });
+    (trelloData, commitResponses, commitMessage) => {
+      socket == null ? void 0 : socket.emit("trello-update-card", { trelloData, commitResponses, commitMessage });
     },
     [socket]
   );
@@ -317,7 +328,7 @@ function useSocketEmits() {
     emitCommitPayload,
     emitFlushSvnLogs,
     emitFilesRevert,
-    emitFilesAddRemove,
+    emitFilesAddDelete,
     emitTrelloCardNamesSearch,
     emitTrelloCardUpdate
   };
@@ -506,18 +517,11 @@ const PopoverRoot = PopoverRoot$1;
 const PopoverBody = PopoverBody$1;
 const PopoverTrigger = PopoverTrigger$1;
 function Header() {
+  const configurableRowData = useApp((ctx) => ctx.configurableRowData);
   const setAppClosing = useApp((ctx) => ctx.setAppClosing);
   const { emitOpenConfig, emitFlushSvnLogs } = useSocketEmits();
   const { RaiseClientNotificaiton } = useNotifications();
-  const [username, setUsername] = reactExports.useState("User");
   const [reloadPopover, setReloadPopover] = reactExports.useState(false);
-  reactExports.useEffect(() => {
-    if (window.electron) {
-      window.electron.fetchUsername().then((username2) => {
-        setUsername(username2.firstName);
-      });
-    }
-  }, []);
   const handleReload = reactExports.useCallback((isAppRestart = false) => {
     if (isAppRestart) {
       window.electron.restartApp();
@@ -542,14 +546,13 @@ function Header() {
     emitFlushSvnLogs();
   }, [emitFlushSvnLogs]);
   return /* @__PURE__ */ jsxRuntimeExports.jsxs(HStack, { wrap: "wrap", my: 5, gapY: 5, justify: "space-between", children: [
-    /* @__PURE__ */ jsxRuntimeExports.jsxs(Flex, { align: "flex-start", alignItems: "center", className: "notMono", children: [
-      /* @__PURE__ */ jsxRuntimeExports.jsxs(Heading, { as: "h1", size: "4xl", fontWeight: 700, lineClamp: 1, className: "animation-fadein-forward", userSelect: "none", children: [
-        "Hello, ",
-        username,
-        "!"
-      ] }),
-      /* @__PURE__ */ jsxRuntimeExports.jsx(Heading, { as: "h1", size: "4xl", lineClamp: 1, ms: 3, p: 2, className: "animation-handwave", userSelect: "none", children: "👋" })
-    ] }),
+    /* @__PURE__ */ jsxRuntimeExports.jsx(Flex, { align: "flex-start", alignItems: "center", className: "notMono", children: /* @__PURE__ */ jsxRuntimeExports.jsxs(Heading, { as: "h2", size: "2xl", lineClamp: 1, lineHeight: "1.4", className: "animation-fadein-forward", userSelect: "none", children: [
+      "You have ",
+      configurableRowData.length,
+      " branch",
+      configurableRowData.length > 1 ? "es" : "",
+      ":"
+    ] }) }),
     /* @__PURE__ */ jsxRuntimeExports.jsxs(Flex, { align: "flex-start", alignItems: "center", columnGap: 2, children: [
       /* @__PURE__ */ jsxRuntimeExports.jsx(ColorModeButton, {}),
       /* @__PURE__ */ jsxRuntimeExports.jsx(ButtonIconTooltip, { icon: /* @__PURE__ */ jsxRuntimeExports.jsx(LuFileCog, {}), onClick: handleOpenConfig, colorPalette: "yellow", variant: "subtle", label: "Open Config File", placement: "bottom-start", size: "md" }),
@@ -712,7 +715,8 @@ function EditableBranchesRow({ branchId, dataColumn, dataValue, handleDataChange
       colorPalette: "yellow",
       variant: "subtle",
       value: cellData,
-      onChange: onEditableChange
+      onChange: onEditableChange,
+      h: 7
     }
   );
 }
@@ -789,137 +793,138 @@ const BranchesProvider = ({ children }) => {
   );
   return /* @__PURE__ */ jsxRuntimeExports.jsx(ContextBranches.Provider, { value, children });
 };
-const SectionBranchesRow = reactExports.memo(
-  ({ branchRow, isSelected }) => {
-    const socket = useApp((ctx) => ctx.socket);
-    const config = useApp((ctx) => ctx.config);
-    const configurableRowData = useApp((ctx) => ctx.configurableRowData);
-    const handleBranchSelection = useApp((ctx) => ctx.handleBranchSelection);
-    const updateConfig = useApp((ctx) => ctx.updateConfig);
-    const customScripts = useBranches((ctx) => ctx.customScripts);
-    const { emitInfoSingle } = useSocketEmits();
-    const branchId = branchRow == null ? void 0 : branchRow.id;
-    const branchFolder = branchRow == null ? void 0 : branchRow["Branch Folder"];
-    const branchVersion = branchRow == null ? void 0 : branchRow["Branch Version"];
-    const branchPath = branchRow == null ? void 0 : branchRow["SVN Branch"];
-    const [branchInfo, setBranchInfo] = reactExports.useState((branchRow == null ? void 0 : branchRow["Branch Info"]) || "Refreshing...");
-    const themedBgColor = (config == null ? void 0 : config.branchFolderColours[branchFolder]) || "transparent";
-    const gradientAnimation = keyframes`
+const SectionBranchesRow = reactExports.memo(({ branchRow, isSelected }) => {
+  const socket = useApp((ctx) => ctx.socket);
+  const config = useApp((ctx) => ctx.config);
+  const configurableRowData = useApp((ctx) => ctx.configurableRowData);
+  const handleBranchSelection = useApp((ctx) => ctx.handleBranchSelection);
+  const updateConfig = useApp((ctx) => ctx.updateConfig);
+  const customScripts = useBranches((ctx) => ctx.customScripts);
+  const { emitInfoSingle } = useSocketEmits();
+  const branchId = branchRow == null ? void 0 : branchRow.id;
+  const branchFolder = branchRow == null ? void 0 : branchRow["Branch Folder"];
+  const branchVersion = branchRow == null ? void 0 : branchRow["Branch Version"];
+  const branchPath = branchRow == null ? void 0 : branchRow["SVN Branch"];
+  const [branchInfo, setBranchInfo] = reactExports.useState((branchRow == null ? void 0 : branchRow["Branch Info"]) || "Refreshing...");
+  const themedBgColor = (config == null ? void 0 : config.branchFolderColours[branchFolder]) || "transparent";
+  const gradientAnimation = keyframes`
 			0% { background-position: 0% 50%; }
 			50% { background-position: 100% 50%; }
 			100% { background-position: 0% 50%; }
 		`;
-    const gradientStyle = reactExports.useMemo(() => {
-      let gradientFrom = "";
-      let gradientTo = "";
-      let animation = "";
-      let revisionCount = 0;
-      if (branchInfo.toLowerCase().includes("🤬") || branchInfo == "Not Found" || branchInfo == "Connection Error") {
-        gradientFrom = "#800080";
-        gradientTo = "#FF00FF";
-        animation = `${gradientAnimation} 0.5s linear infinite`;
-      } else if (branchInfo.trim().toLowerCase() !== "latest") {
-        const regex = /-([0-9]+) Revisions{0,1}/;
-        const match = branchInfo.match(regex);
-        if (match) {
-          revisionCount = parseInt(match[1], 10);
-          gradientFrom = "#FFFF00";
-          if (revisionCount >= 4) {
-            gradientFrom = "#FFA500";
-          }
-          const maxRevisions = 10;
-          const colorScale = chroma.scale([revisionCount >= 4 ? "orange" : "yellow", "red"]).domain([0, maxRevisions]);
-          gradientTo = colorScale(Math.min(revisionCount, maxRevisions)).hex();
-          const duration = `${Math.max(1, maxRevisions - revisionCount)}s`;
-          animation = `${gradientAnimation} ${duration} linear infinite`;
-        }
-      }
-      return {
-        backgroundImage: `linear-gradient(to right, ${gradientFrom}, ${gradientTo})`,
-        backgroundSize: "200% 200%",
-        backgroundPosition: "0% 50%",
-        animation,
-        color: revisionCount == 0 || revisionCount > 10 ? "white" : "black"
-      };
-    }, [branchInfo, gradientAnimation]);
-    const handleSelectFolder = reactExports.useCallback(async () => {
-      const path = await window.electron.selectFolder();
-      if (path) updateConfig((currentConfig) => ({ ...currentConfig, branches: configurableRowData.map((row) => ({ ...row, "SVN Branch": row.id === branchId ? path : row["SVN Branch"] })) }));
-    }, [configurableRowData, updateConfig]);
-    const handleDataChange = reactExports.useCallback(
-      (branchId2, dataColumn, newValue) => {
-        updateConfig((currentConfig) => ({
-          ...currentConfig,
-          branches: currentConfig.branches.map((branch) => {
-            if (branch.id === branchId2) {
-              return { ...branch, [dataColumn]: newValue };
-            }
-            return branch;
-          })
-        }));
-      },
-      [updateConfig]
-    );
-    const refreshRow = reactExports.useCallback(() => {
-      emitInfoSingle(branchId, branchPath, branchVersion, branchFolder);
-    }, [emitInfoSingle, branchId, branchPath, branchVersion, branchFolder]);
-    const resolveConflicts = reactExports.useCallback(() => {
-      window.electron.openSvnResolve({ fullPath: branchPath }).then((result) => {
-        refreshRow();
-      });
-    }, [configurableRowData, refreshRow]);
-    const executeCustomScript = reactExports.useCallback((scriptType, scriptPath, branchData) => {
-      window.electron.runCustomScript({ scriptType, scriptPath, branchData }).then((result) => {
-        console.log("Custom Script Result: ", JSON.stringify(result, null, 4));
-      });
-    }, []);
-    reactExports.useEffect(() => {
-      if (!branchPath) return;
-      refreshRow();
-      const interval = setInterval(() => {
-        refreshRow();
-      }, 6e4 * 2);
-      return () => clearInterval(interval);
-    }, [branchPath]);
-    reactExports.useEffect(() => {
-      const socketCallback = (data) => {
-        if (data.id != branchId) return;
-        setBranchInfo(data.info);
-      };
-      socket == null ? void 0 : socket.on("branch-info-single", socketCallback);
-      return () => socket == null ? void 0 : socket.off("branch-info-single", socketCallback);
-    }, [socket]);
-    const renderedBranchInfo = reactExports.useMemo(() => {
-      if (branchInfo === "Latest" || branchInfo === "Refreshing...") {
-        return /* @__PURE__ */ jsxRuntimeExports.jsx(Text, { as: "span", children: branchInfo });
-      }
-      const regex = /(-\d+)( Revisions{0,1}.*)/;
+  const gradientStyle = reactExports.useMemo(() => {
+    let gradientFrom = "";
+    let gradientTo = "";
+    let animation = "";
+    let revisionCount = 0;
+    if (branchInfo.toLowerCase().includes("🤬") || branchInfo == "Not Found" || branchInfo == "Connection Error") {
+      gradientFrom = "#800080";
+      gradientTo = "#FF00FF";
+      animation = `${gradientAnimation} 0.5s linear infinite`;
+    } else if (branchInfo.trim().toLowerCase() !== "latest") {
+      const regex = /-([0-9]+) Revisions{0,1}/;
       const match = branchInfo.match(regex);
       if (match) {
-        const [_, number, text] = match;
-        return /* @__PURE__ */ jsxRuntimeExports.jsxs(Text, { as: "span", fontWeight: "normal", children: [
-          /* @__PURE__ */ jsxRuntimeExports.jsx(Text, { as: "span", fontWeight: "bold", fontSize: 18, me: 1, children: number }),
-          text
-        ] });
+        revisionCount = parseInt(match[1], 10);
+        gradientFrom = "#FFFF00";
+        if (revisionCount >= 4) {
+          gradientFrom = "#FFA500";
+        }
+        const maxRevisions = 10;
+        const colorScale = chroma.scale([revisionCount >= 4 ? "orange" : "yellow", "red"]).domain([0, maxRevisions]);
+        gradientTo = colorScale(Math.min(revisionCount, maxRevisions)).hex();
+        const duration = `${Math.max(1, maxRevisions - revisionCount)}s`;
+        animation = `${gradientAnimation} ${duration} linear infinite`;
       }
+    }
+    return {
+      backgroundImage: `linear-gradient(to right, ${gradientFrom}, ${gradientTo})`,
+      backgroundSize: "200% 200%",
+      backgroundPosition: "0% 50%",
+      animation,
+      color: revisionCount == 0 || revisionCount > 10 ? "white" : "black"
+    };
+  }, [branchInfo, gradientAnimation]);
+  const handleSelectFolder = reactExports.useCallback(
+    async (defaultPath) => {
+      const path = await window.electron.selectFolder({ defaultPath });
+      if (path) updateConfig((currentConfig) => ({ ...currentConfig, branches: configurableRowData.map((row) => ({ ...row, "SVN Branch": row.id === branchId ? path : row["SVN Branch"] })) }));
+    },
+    [configurableRowData, updateConfig]
+  );
+  const handleDataChange = reactExports.useCallback(
+    (branchId2, dataColumn, newValue) => {
+      updateConfig((currentConfig) => ({
+        ...currentConfig,
+        branches: currentConfig.branches.map((branch) => {
+          if (branch.id === branchId2) {
+            return { ...branch, [dataColumn]: newValue };
+          }
+          return branch;
+        })
+      }));
+    },
+    [updateConfig]
+  );
+  const refreshRow = reactExports.useCallback(() => {
+    emitInfoSingle(branchId, branchPath, branchVersion, branchFolder);
+  }, [emitInfoSingle, branchId, branchPath, branchVersion, branchFolder]);
+  const resolveConflicts = reactExports.useCallback(() => {
+    window.electron.openSvnResolve({ fullPath: branchPath }).then((result) => {
+      refreshRow();
+    });
+  }, [configurableRowData, refreshRow]);
+  const executeCustomScript = reactExports.useCallback((scriptType, scriptPath, branchData) => {
+    window.electron.runCustomScript({ scriptType, scriptPath, branchData }).then((result) => {
+      console.log("Custom Script Result: ", JSON.stringify(result, null, 4));
+    });
+  }, []);
+  reactExports.useEffect(() => {
+    if (!branchPath) return;
+    refreshRow();
+    const interval = setInterval(() => {
+      refreshRow();
+    }, 6e4 * 2);
+    return () => clearInterval(interval);
+  }, [branchPath]);
+  reactExports.useEffect(() => {
+    const socketCallback = (data) => {
+      if (data.id != branchId) return;
+      setBranchInfo(data.info);
+    };
+    socket == null ? void 0 : socket.on("branch-info-single", socketCallback);
+    return () => socket == null ? void 0 : socket.off("branch-info-single", socketCallback);
+  }, [socket]);
+  const renderedBranchInfo = reactExports.useMemo(() => {
+    if (branchInfo === "Latest" || branchInfo === "Refreshing...") {
       return /* @__PURE__ */ jsxRuntimeExports.jsx(Text, { as: "span", children: branchInfo });
-    }, [branchInfo]);
-    return /* @__PURE__ */ jsxRuntimeExports.jsxs(TableRow, { _light: { bgColor: themedBgColor == "transparent" ? "transparent" : `${themedBgColor}20` }, _dark: { bgColor: themedBgColor == "transparent" ? "transparent" : `${themedBgColor}80` }, children: [
-      /* @__PURE__ */ jsxRuntimeExports.jsx(TableCell, { display: "flex", alignItems: "center", children: /* @__PURE__ */ jsxRuntimeExports.jsx(Checkbox, { top: "2", "aria-label": "Select row", variant: "subtle", colorPalette: "yellow", checked: isSelected, onCheckedChange: (e) => handleBranchSelection(branchPath, e.checked) }) }),
-      /* @__PURE__ */ jsxRuntimeExports.jsx(TableCell, { children: /* @__PURE__ */ jsxRuntimeExports.jsx(EditableBranchesRow, { branchId, dataColumn: "Branch Folder", dataValue: branchFolder, handleDataChange }) }),
-      /* @__PURE__ */ jsxRuntimeExports.jsx(TableCell, { children: /* @__PURE__ */ jsxRuntimeExports.jsx(EditableBranchesRow, { branchId, dataColumn: "Branch Version", dataValue: branchVersion, handleDataChange }) }),
-      /* @__PURE__ */ jsxRuntimeExports.jsx(TableCell, { children: /* @__PURE__ */ jsxRuntimeExports.jsxs(Flex, { gapX: 3, alignItems: "center", onDoubleClick: () => handleSelectFolder(), children: [
-        /* @__PURE__ */ jsxRuntimeExports.jsx(Tooltip, { content: window.electron ? "Select folder" : "Feature must be used in desktop application", showArrow: true, children: /* @__PURE__ */ jsxRuntimeExports.jsx(IconButton, { colorPalette: "yellow", variant: "subtle", size: "xs", onClick: () => handleSelectFolder(), disabled: !window.electron, children: /* @__PURE__ */ jsxRuntimeExports.jsx(FaFolderOpen, {}) }) }),
-        /* @__PURE__ */ jsxRuntimeExports.jsx(Text, { children: branchPath })
-      ] }) }),
-      /* @__PURE__ */ jsxRuntimeExports.jsx(TableCell, { ...gradientStyle, bgColor: "green.focusRing", textAlign: "center", children: renderedBranchInfo }),
-      /* @__PURE__ */ jsxRuntimeExports.jsx(TableCell, { children: /* @__PURE__ */ jsxRuntimeExports.jsxs(Flex, { columnGap: 1, children: [
-        branchInfo.toLowerCase().includes("🤬") && /* @__PURE__ */ jsxRuntimeExports.jsx(ButtonElectron, { icon: /* @__PURE__ */ jsxRuntimeExports.jsx(MdAutoFixHigh, {}), onClick: () => resolveConflicts(), colorPalette: "yellow", variant: "subtle", label: "Resolve Conflicts", size: "xs" }),
-        customScripts.map((script, i) => /* @__PURE__ */ jsxRuntimeExports.jsx(ButtonCustomScripts, { onClick: () => executeCustomScript(script.type, script.path, branchRow), colorPalette: "yellow", label: script.fileName, size: "xs", disabled: branchInfo === "Not Found" }, i))
-      ] }) })
-    ] });
-  }
-);
+    }
+    const regex = /(-\d+)( Revisions{0,1}.*)/;
+    const match = branchInfo.match(regex);
+    if (match) {
+      const [_, number, text] = match;
+      return /* @__PURE__ */ jsxRuntimeExports.jsxs(Text, { as: "span", fontWeight: "normal", children: [
+        /* @__PURE__ */ jsxRuntimeExports.jsx(Text, { as: "span", fontWeight: "bold", fontSize: 18, me: 1, children: number }),
+        text
+      ] });
+    }
+    return /* @__PURE__ */ jsxRuntimeExports.jsx(Text, { as: "span", children: branchInfo });
+  }, [branchInfo]);
+  return /* @__PURE__ */ jsxRuntimeExports.jsxs(TableRow, { _light: { bgColor: themedBgColor == "transparent" ? "transparent" : `${themedBgColor}20` }, _dark: { bgColor: themedBgColor == "transparent" ? "transparent" : `${themedBgColor}80` }, children: [
+    /* @__PURE__ */ jsxRuntimeExports.jsx(TableCell, { display: "flex", alignItems: "center", children: /* @__PURE__ */ jsxRuntimeExports.jsx(Checkbox, { top: "2", "aria-label": "Select row", variant: "subtle", colorPalette: "yellow", checked: isSelected, onCheckedChange: (e) => handleBranchSelection(branchPath, e.checked) }) }),
+    /* @__PURE__ */ jsxRuntimeExports.jsx(TableCell, { children: /* @__PURE__ */ jsxRuntimeExports.jsx(EditableBranchesRow, { branchId, dataColumn: "Branch Folder", dataValue: branchFolder, handleDataChange }) }),
+    /* @__PURE__ */ jsxRuntimeExports.jsx(TableCell, { children: /* @__PURE__ */ jsxRuntimeExports.jsx(EditableBranchesRow, { branchId, dataColumn: "Branch Version", dataValue: branchVersion, handleDataChange }) }),
+    /* @__PURE__ */ jsxRuntimeExports.jsx(TableCell, { children: /* @__PURE__ */ jsxRuntimeExports.jsxs(Flex, { gapX: 3, alignItems: "center", onDoubleClick: () => handleSelectFolder(branchPath), children: [
+      /* @__PURE__ */ jsxRuntimeExports.jsx(Tooltip, { content: window.electron ? "Select folder" : "Feature must be used in desktop application", showArrow: true, children: /* @__PURE__ */ jsxRuntimeExports.jsx(IconButton, { colorPalette: "yellow", variant: "subtle", size: "xs", onClick: () => handleSelectFolder(), disabled: !window.electron, children: /* @__PURE__ */ jsxRuntimeExports.jsx(FaFolderOpen, {}) }) }),
+      /* @__PURE__ */ jsxRuntimeExports.jsx(Text, { children: branchPath })
+    ] }) }),
+    /* @__PURE__ */ jsxRuntimeExports.jsx(TableCell, { ...gradientStyle, bgColor: "green.focusRing", textAlign: "center", children: renderedBranchInfo }),
+    /* @__PURE__ */ jsxRuntimeExports.jsx(TableCell, { children: /* @__PURE__ */ jsxRuntimeExports.jsxs(Flex, { columnGap: 1, children: [
+      branchInfo.toLowerCase().includes("🤬") && /* @__PURE__ */ jsxRuntimeExports.jsx(ButtonElectron, { icon: /* @__PURE__ */ jsxRuntimeExports.jsx(MdAutoFixHigh, {}), onClick: () => resolveConflicts(), colorPalette: "yellow", variant: "subtle", label: "Resolve Conflicts", size: "xs" }),
+      customScripts.map((script, i) => /* @__PURE__ */ jsxRuntimeExports.jsx(ButtonCustomScripts, { onClick: () => executeCustomScript(script.type, script.path, branchRow), colorPalette: "yellow", label: script.fileName, size: "xs", disabled: branchInfo === "Not Found" }, i))
+    ] }) })
+  ] });
+});
 SectionBranchesRow.displayName = "SectionBranchesRow";
 const ActionBarContent = reactExports.forwardRef(function ActionBarContent2(props, ref) {
   const { children, portalled = true, portalRef, ...rest } = props;
@@ -1123,7 +1128,7 @@ function DialogBranchesLog() {
             /* @__PURE__ */ jsxRuntimeExports.jsx(TableColumnHeader, { color: "black", fontWeight: 900, ms: 0, children: "Message" })
           ] }) })
         ] }),
-        /* @__PURE__ */ jsxRuntimeExports.jsx(Box, { ref: containerRef, overflowY: "auto", maxH: "lg", colorPalette: "yellow", onScroll, position: "relative", children: /* @__PURE__ */ jsxRuntimeExports.jsx(Box, { position: "relative", height: `lg`, children: /* @__PURE__ */ jsxRuntimeExports.jsx(Box, { position: "absolute", width: "100%", top: `${offsetY}px`, children: /* @__PURE__ */ jsxRuntimeExports.jsxs(TableRoot, { size: "sm", variant: "outline", children: [
+        /* @__PURE__ */ jsxRuntimeExports.jsx(Box, { ref: containerRef, overflowY: "auto", maxH: "xl", colorPalette: "yellow", onScroll, position: "relative", children: /* @__PURE__ */ jsxRuntimeExports.jsx(Box, { position: "relative", height: `xl`, children: /* @__PURE__ */ jsxRuntimeExports.jsx(Box, { position: "absolute", width: "100%", top: `${offsetY}px`, children: /* @__PURE__ */ jsxRuntimeExports.jsxs(TableRoot, { size: "sm", variant: "outline", children: [
           /* @__PURE__ */ jsxRuntimeExports.jsxs(TableColumnGroup, { children: [
             /* @__PURE__ */ jsxRuntimeExports.jsx(TableColumn, { width: "5%" }),
             /* @__PURE__ */ jsxRuntimeExports.jsx(TableColumn, { width: "10%" }),
@@ -1255,13 +1260,6 @@ function SectionBranches() {
     [configurableRowData, setSelectedBranches]
   );
   return /* @__PURE__ */ jsxRuntimeExports.jsxs(Box, { children: [
-    /* @__PURE__ */ jsxRuntimeExports.jsxs(Heading, { as: "h2", size: "2xl", lineClamp: 1, mb: 4, lineHeight: "1.4", children: [
-      "You have ",
-      configurableRowData.length,
-      " branch",
-      configurableRowData.length > 1 ? "es" : "",
-      ":"
-    ] }),
     /* @__PURE__ */ jsxRuntimeExports.jsxs(TableRoot, { size: "sm", variant: "outline", transition: "backgrounds", children: [
       /* @__PURE__ */ jsxRuntimeExports.jsxs(TableColumnGroup, { children: [
         /* @__PURE__ */ jsxRuntimeExports.jsx(TableColumn, { width: "1%" }),
@@ -1433,10 +1431,14 @@ function DialogLookupTrello({ fireDialogAction }) {
   const [sortConfig, setSortConfig] = reactExports.useState({ column: null, direction: null });
   const processDialogAction = reactExports.useCallback(
     (card) => {
-      fireDialogAction(card);
+      fireDialogAction({
+        ...card,
+        key,
+        token
+      });
       setIsLookupTrelloOn(false);
     },
-    [fireDialogAction, setIsLookupTrelloOn]
+    [fireDialogAction, key, token, setIsLookupTrelloOn]
   );
   const handleSearch = reactExports.useCallback(() => {
     if (!trelloQuery.trim()) return;
@@ -1731,6 +1733,9 @@ const shineAnimation = keyframes`
     to { background-position: -200% center; }
 `;
 const FieldLookup = reactExports.memo(() => {
+  const setIssueNumber = useCommit((ctx) => ctx.setIssueNumber);
+  const setCommitMessage = useCommit((ctx) => ctx.setCommitMessage);
+  const setTrelloData = useCommit((ctx) => ctx.setTrelloData);
   const setIsLookupTrelloOn = useCommit((ctx) => ctx.setIsLookupTrelloOn);
   const setIsLookupSLogsOn = useCommit((ctx) => ctx.setIsLookupSLogsOn);
   const { isTrelloIntegrationSupported } = useTrelloIntegration();
@@ -1738,9 +1743,22 @@ const FieldLookup = reactExports.memo(() => {
   const [trelloPopover, setTrelloPopover] = reactExports.useState(false);
   const handleSelectedSvnRevision = reactExports.useCallback((entry) => {
     console.log("Selected SVN Revision", entry);
+    const message = entry.message;
+    const issueNumMatch = message.match(/\s*(Issue)*\s*(\d+)\s*/);
+    const issueNumber = issueNumMatch ? issueNumMatch[2] : null;
+    const formattedMessage = message.replace(/\s*(Issue)*\s*(\d+)?\s*(\([^\)]+\))*\s?:?\s*/, "");
+    if (issueNumber) setIssueNumber((currIssueNumber) => Object.fromEntries(Object.keys(currIssueNumber).map((key) => [key, currIssueNumber[key] || issueNumber])));
+    if (formattedMessage.trim() !== "") setCommitMessage((prevMessage) => prevMessage || formattedMessage);
   }, []);
   const handleSelectedTrelloCard = reactExports.useCallback((card) => {
     console.log("Selected Trello Card", card);
+    const cardName = card.name;
+    const issueNumMatch = cardName.match(/\s*(Issue)*\s*\#*(\d+)\s*/);
+    const issueNumber = issueNumMatch ? issueNumMatch[2] : null;
+    const formattedMessage = cardName.replace(/\s*(Issue)*\s*\#*(\d+)/, "");
+    if (issueNumber) setIssueNumber((currIssueNumber) => Object.fromEntries(Object.keys(currIssueNumber).map((key) => [key, currIssueNumber[key] || issueNumber])));
+    if (formattedMessage.trim() !== "") setCommitMessage((prevMessage) => prevMessage || formattedMessage);
+    setTrelloData(card);
   }, []);
   return /* @__PURE__ */ jsxRuntimeExports.jsxs(Box, { colorPalette: "yellow", children: [
     /* @__PURE__ */ jsxRuntimeExports.jsx(Box, { children: /* @__PURE__ */ jsxRuntimeExports.jsx(Text, { fontWeight: 900, bgGradient: "to-r", gradientFrom: textColor, gradientVia: "colorPalette.500", gradientTo: textColor, backgroundSize: "200% auto", bgClip: "text", animation: `${shineAnimation} 7s ease-in infinite`, children: "You can lookup and automatically fill in the following commit details using the options below:" }) }),
@@ -1773,10 +1791,12 @@ const FieldLookup = reactExports.memo(() => {
   ] });
 });
 function SubSectionCommitDetails() {
+  var _a, _b, _c, _d;
   const selectedBranchesData = useApp((ctx) => ctx.selectedBranchesData);
   const sourceBranch = useCommit((ctx) => ctx.sourceBranch);
   const sourceIssueNumber = useCommit((ctx) => ctx.sourceIssueNumber);
   const commitMessage = useCommit((ctx) => ctx.commitMessage);
+  const trelloData = useCommit((ctx) => ctx.trelloData);
   const selectedFolders = reactExports.useMemo(() => {
     return Array.from(selectedBranchesData.reduce((acc, branchRow) => acc.add(branchRow["Branch Folder"]), /* @__PURE__ */ new Set()));
   }, [selectedBranchesData]);
@@ -1787,22 +1807,33 @@ function SubSectionCommitDetails() {
       /* @__PURE__ */ jsxRuntimeExports.jsx(FieldSourceBranch, {}),
       /* @__PURE__ */ jsxRuntimeExports.jsx(FieldCommitMessage, {})
     ] }),
-    /* @__PURE__ */ jsxRuntimeExports.jsxs(Text, { mt: 6, children: [
-      "Your final commit message:",
-      " ",
-      /* @__PURE__ */ jsxRuntimeExports.jsxs(Code, { children: [
-        "Issue XYZ",
-        sourceBranch.trim() !== "" ? ` (${sourceBranch.trim()}${sourceIssueNumber !== "" ? " #" + String(sourceIssueNumber) : ""})` : "",
-        ":",
+    /* @__PURE__ */ jsxRuntimeExports.jsxs(Flex, { flexDirection: "column", mt: 6, gap: 2, children: [
+      /* @__PURE__ */ jsxRuntimeExports.jsxs(Flex, { gap: 3, children: [
+        "Your final commit message:",
         " ",
-        commitMessage.trim() == "" ? "Enter commit message above" : commitMessage.trim().replace(/\s*\n+\s*/g, "; ").replace(/[;\s]+$/, "").trim()
-      ] })
+        /* @__PURE__ */ jsxRuntimeExports.jsxs(Code, { children: [
+          "Issue XYZ",
+          sourceBranch.trim() !== "" ? ` (${sourceBranch.trim()}${sourceIssueNumber !== "" ? " #" + String(sourceIssueNumber) : ""})` : "",
+          ":",
+          " ",
+          commitMessage.trim() == "" ? "Enter commit message above" : commitMessage.trim().replace(/\s*\n+\s*/g, "; ").replace(/[;\s]+$/, "").trim()
+        ] })
+      ] }),
+      (trelloData == null ? void 0 : trelloData.name) ? /* @__PURE__ */ jsxRuntimeExports.jsxs(Flex, { gap: 3, children: [
+        "Your selected Trello card:",
+        " ",
+        /* @__PURE__ */ jsxRuntimeExports.jsxs(Link, { onClick: () => window.open(trelloData.url), display: "flex", alignItems: "center", width: "fit-content", children: [
+          /* @__PURE__ */ jsxRuntimeExports.jsx(chakra.span, { color: "yellow.fg", fontSize: "16px", children: /* @__PURE__ */ jsxRuntimeExports.jsx(FaTrello, {}) }),
+          trelloData.name
+        ] })
+      ] }) : null,
+      (trelloData == null ? void 0 : trelloData.id) && (!((_a = trelloData.checklistIds) == null ? void 0 : _a.length) || !((_b = trelloData.checklists) == null ? void 0 : _b.length) || !((_c = trelloData.checklists) == null ? void 0 : _c.every((cl) => cl == null ? void 0 : cl.id)) || !((_d = trelloData.checklistIds) == null ? void 0 : _d.every((id) => id))) ? /* @__PURE__ */ jsxRuntimeExports.jsxs(Flex, { color: "red.focusRing", alignItems: "center", gap: 3, children: [
+        /* @__PURE__ */ jsxRuntimeExports.jsx(chakra.span, { color: "yellow.fg", fontSize: "16px", children: /* @__PURE__ */ jsxRuntimeExports.jsx(MdError, {}) }),
+        " ",
+        "Your trello card is missing checklists, please try again."
+      ] }) : null
     ] })
   ] });
-}
-function SubSectionConflictingChanges() {
-  const conflictingChanges = useCommit((ctx) => ctx.conflictingChanges);
-  return /* @__PURE__ */ jsxRuntimeExports.jsx(Box, { ms: 9, children: JSON.stringify(conflictingChanges, null, 4) });
 }
 function ButtonDiff({ fullPath, branchFolder, branchVersion, onDiffResult }) {
   const handleDiff = reactExports.useCallback(async () => {
@@ -1844,6 +1875,489 @@ function DialogModifiedChangesRevert({ selectedCount, isDialogOpen, closeDialog,
     ] })
   ] });
 }
+function sortByStack$2(rows, sortStack) {
+  return [...rows].sort((a, b) => {
+    var _a, _b;
+    for (const sortItem of sortStack) {
+      let aVal, bVal;
+      switch (sortItem.column) {
+        case "branch":
+          aVal = a.branchString.toLowerCase();
+          bVal = b.branchString.toLowerCase();
+          break;
+        case "path":
+          aVal = a.file.pathDisplay.toLowerCase();
+          bVal = b.file.pathDisplay.toLowerCase();
+          break;
+        case "remote":
+          aVal = (_a = a.file.reposStatus) == null ? void 0 : _a.toLowerCase();
+          bVal = (_b = b.file.reposStatus) == null ? void 0 : _b.toLowerCase();
+          break;
+        case "status":
+          aVal = a.file.wcStatus.toLowerCase();
+          bVal = b.file.wcStatus.toLowerCase();
+          break;
+        default:
+          aVal = 0;
+          bVal = 0;
+      }
+      if (aVal < bVal) return sortItem.direction === "asc" ? -1 : 1;
+      if (aVal > bVal) return sortItem.direction === "asc" ? 1 : -1;
+    }
+    return 0;
+  });
+}
+function getSortIndicator$2(columnKey, sortStack) {
+  const itemIndex = sortStack.findIndex((s) => s.column === columnKey);
+  if (itemIndex === -1) return null;
+  return sortStack[itemIndex].direction === "asc" ? "↑" : "↓";
+}
+function SubSectionConflictingChanges() {
+  const { emitFilesRevert } = useSocketEmits();
+  const { RaiseClientNotificaiton } = useNotifications();
+  const conflictingChanges = useCommit((ctx) => ctx.conflictingChanges);
+  const selectedConflictingChanges = useCommit((ctx) => ctx.selectedConflictingChanges);
+  const setSelectedConflictingChanges = useCommit((ctx) => ctx.setSelectedConflictingChanges);
+  const [searchTerm, setSearchTerm] = reactExports.useState("");
+  const [isRevertDialogOpen, setIsRevertDialogOpen] = reactExports.useState(false);
+  const [sortStack, setSortStack] = reactExports.useState([
+    { column: "status", direction: "asc" },
+    { column: "remote", direction: "desc" }
+  ]);
+  const getStatusColor = reactExports.useCallback((status) => {
+    switch (status) {
+      case "modified":
+        return "cyan.500";
+      case "deleted":
+      case "missing":
+        return "red.500";
+      case "added":
+      case "unversioned":
+        return "green.500";
+      default:
+        return "purple.600";
+    }
+  }, []);
+  const handleSort = reactExports.useCallback((columnKey) => {
+    setSortStack((prev) => {
+      const existingIndex = prev.findIndex((s) => s.column === columnKey);
+      if (existingIndex === -1) {
+        return [{ column: columnKey, direction: "asc" }, ...prev];
+      }
+      const updatedSort = { ...prev[existingIndex] };
+      updatedSort.direction = updatedSort.direction === "asc" ? "desc" : "asc";
+      const newStack = [...prev];
+      newStack.splice(existingIndex, 1);
+      newStack.unshift(updatedSort);
+      return newStack;
+    });
+  }, []);
+  const handlePathSelection = reactExports.useCallback(
+    (file, checked) => {
+      setSelectedConflictingChanges((currentSelection) => {
+        if (checked) return { ...currentSelection, [file.path]: file };
+        const { [file.path]: _, ...newSelection } = currentSelection;
+        return newSelection;
+      });
+    },
+    [setSelectedConflictingChanges]
+  );
+  const handleDiffResult = reactExports.useCallback(
+    (result) => {
+      if (result.success) RaiseClientNotificaiton("TortoiseSVN diff opened successfully", "success", 3e3);
+      else RaiseClientNotificaiton(`Error opening TortoiseSVN diff: ${JSON.stringify(result.error, null, 4)}`, "error", 0);
+    },
+    [RaiseClientNotificaiton]
+  );
+  const filteredUnknownChanges = reactExports.useMemo(() => {
+    if (!searchTerm) return conflictingChanges;
+    const lowerSearch = searchTerm.toLowerCase();
+    const filtered = {};
+    Object.keys(conflictingChanges).forEach((branchPath) => {
+      const branchData = conflictingChanges[branchPath];
+      const { branchString, filesToUpdate, "Branch Folder": branchFolder, "Branch Version": branchVersion } = branchData;
+      const filteredFiles = filesToUpdate.filter((file) => {
+        const fieldsToCheck = [branchString, branchFolder, branchVersion, branchPath, file.pathDisplay, file.wcStatus, file.reposStatus];
+        return fieldsToCheck.some((field, i) => field == null ? void 0 : field.toString().toLowerCase().includes(i === 4 ? lowerSearch.replace(/\//g, "\\") : lowerSearch));
+      });
+      if (filteredFiles.length > 0) {
+        filtered[branchPath] = {
+          ...branchData,
+          filesToUpdate: filteredFiles
+        };
+      }
+    });
+    return filtered;
+  }, [conflictingChanges, searchTerm]);
+  const allFilteredRows = reactExports.useMemo(() => {
+    const rows = [];
+    Object.keys(filteredUnknownChanges).forEach((branchPath) => {
+      const { branchString, branchFolder, branchVersion, filesToUpdate } = filteredUnknownChanges[branchPath];
+      filesToUpdate.forEach((file) => {
+        rows.push({
+          branchPath,
+          branchString,
+          branchFolder,
+          branchVersion,
+          file
+        });
+      });
+    });
+    return rows;
+  }, [filteredUnknownChanges]);
+  const sortedRows = reactExports.useMemo(() => {
+    return sortByStack$2(allFilteredRows, sortStack);
+  }, [allFilteredRows, sortStack]);
+  const allFilteredPaths = reactExports.useMemo(() => {
+    return sortedRows.map((row) => row.file.path);
+  }, [sortedRows]);
+  const { allSelected, someSelected } = reactExports.useMemo(() => {
+    if (allFilteredPaths.length === 0) {
+      return { allSelected: false, someSelected: false };
+    }
+    const selectedCount = allFilteredPaths.filter((p) => selectedConflictingChanges[p]).length;
+    return {
+      allSelected: selectedCount === allFilteredPaths.length,
+      someSelected: selectedCount > 0 && selectedCount < allFilteredPaths.length
+    };
+  }, [allFilteredPaths, selectedConflictingChanges]);
+  const handleHeaderCheckboxChange = reactExports.useCallback(
+    (checked) => {
+      if (checked) {
+        setSelectedConflictingChanges((currentSelection) => {
+          const newSelection = { ...currentSelection };
+          for (const path of allFilteredPaths) {
+            newSelection[path] = allFilteredRows.find((p) => p.file.path === path).file;
+          }
+          return newSelection;
+        });
+      } else {
+        setSelectedConflictingChanges((currentSelection) => {
+          const newSelection = { ...currentSelection };
+          for (const path of allFilteredPaths) {
+            delete newSelection[path];
+          }
+          return newSelection;
+        });
+      }
+    },
+    [allFilteredPaths, allFilteredRows, setSelectedConflictingChanges]
+  );
+  const handleRevertFileViewFiles = reactExports.useCallback(() => {
+    console.debug("Reverting selected files: ", selectedConflictingChanges);
+    emitFilesRevert(selectedConflictingChanges);
+    setSelectedConflictingChanges({});
+  }, [selectedConflictingChanges, setSelectedConflictingChanges]);
+  return /* @__PURE__ */ jsxRuntimeExports.jsxs(Box, { ms: 9, children: [
+    /* @__PURE__ */ jsxRuntimeExports.jsx(HStack, { gap: "6", mb: 4, width: "full", colorPalette: "yellow", children: /* @__PURE__ */ jsxRuntimeExports.jsx(InputGroup, { flex: "1", startElement: /* @__PURE__ */ jsxRuntimeExports.jsx(LuSearch, {}), startElementProps: { color: "colorPalette.fg" }, children: /* @__PURE__ */ jsxRuntimeExports.jsx(Input, { placeholder: "Quick search...", variant: "flushed", borderColor: "colorPalette.fg", value: searchTerm, onChange: (e) => setSearchTerm(e.target.value) }) }) }),
+    /* @__PURE__ */ jsxRuntimeExports.jsx(TableScrollArea, { borderWidth: "1px", maxH: "xl", children: /* @__PURE__ */ jsxRuntimeExports.jsxs(TableRoot, { size: "sm", variant: "outline", colorPalette: "yellow", children: [
+      /* @__PURE__ */ jsxRuntimeExports.jsx(TableHeader, { children: /* @__PURE__ */ jsxRuntimeExports.jsxs(TableRow, { bgColor: "colorPalette.400", children: [
+        /* @__PURE__ */ jsxRuntimeExports.jsx(TableColumnHeader, { children: /* @__PURE__ */ jsxRuntimeExports.jsx(Checkbox, { "aria-label": "Select Filtered", variant: "subtle", colorPalette: "yellow", checked: someSelected && !allSelected ? "indeterminate" : allSelected, onCheckedChange: (e) => handleHeaderCheckboxChange(e.checked) }) }),
+        /* @__PURE__ */ jsxRuntimeExports.jsxs(TableColumnHeader, { color: "black", fontWeight: 900, cursor: "pointer", onClick: () => handleSort("branch"), children: [
+          "Branch ",
+          getSortIndicator$2("branch", sortStack)
+        ] }),
+        /* @__PURE__ */ jsxRuntimeExports.jsxs(TableColumnHeader, { color: "black", fontWeight: 900, cursor: "pointer", onClick: () => handleSort("path"), children: [
+          "Path ",
+          getSortIndicator$2("path", sortStack)
+        ] }),
+        /* @__PURE__ */ jsxRuntimeExports.jsxs(TableColumnHeader, { color: "black", fontWeight: 900, cursor: "pointer", onClick: () => handleSort("status"), children: [
+          "Status ",
+          getSortIndicator$2("status", sortStack)
+        ] }),
+        /* @__PURE__ */ jsxRuntimeExports.jsxs(TableColumnHeader, { color: "black", fontWeight: 900, cursor: "pointer", onClick: () => handleSort("remote"), children: [
+          "Remote ",
+          getSortIndicator$2("remote", sortStack)
+        ] }),
+        /* @__PURE__ */ jsxRuntimeExports.jsx(TableColumnHeader, {})
+      ] }) }),
+      /* @__PURE__ */ jsxRuntimeExports.jsx(TableBody, { children: Object.keys(sortedRows).length == 0 ? /* @__PURE__ */ jsxRuntimeExports.jsx(TableRow, { children: /* @__PURE__ */ jsxRuntimeExports.jsx(TableCell, { colSpan: 6, textAlign: "center", children: "No results found" }) }) : sortedRows.map((row) => {
+        const { branchPath, branchString, branchFolder, branchVersion, file } = row;
+        return /* @__PURE__ */ jsxRuntimeExports.jsxs(TableRow, { children: [
+          /* @__PURE__ */ jsxRuntimeExports.jsx(TableCell, { children: /* @__PURE__ */ jsxRuntimeExports.jsx(Checkbox, { "aria-label": "Select path", variant: "subtle", colorPalette: "yellow", checked: !!selectedConflictingChanges[file.path], onCheckedChange: (e) => handlePathSelection(file, e.checked) }) }),
+          /* @__PURE__ */ jsxRuntimeExports.jsx(TableCell, { color: getStatusColor(file.wcStatus), children: branchString }),
+          /* @__PURE__ */ jsxRuntimeExports.jsx(TableCell, { color: getStatusColor(file.wcStatus), children: `${branchPath.split("\\").at(-1)}\\${file.pathDisplay}` }),
+          /* @__PURE__ */ jsxRuntimeExports.jsx(TableCell, { color: getStatusColor(file.wcStatus), children: file.wcStatus }),
+          /* @__PURE__ */ jsxRuntimeExports.jsx(TableCell, { color: getStatusColor(file.reposStatus), children: file.reposStatus }),
+          /* @__PURE__ */ jsxRuntimeExports.jsx(TableCell, { children: /* @__PURE__ */ jsxRuntimeExports.jsx(ButtonDiff, { fullPath: file.path, branchFolder, branchVersion, onDiffResult: handleDiffResult }) })
+        ] }, file.path);
+      }) })
+    ] }) }),
+    /* @__PURE__ */ jsxRuntimeExports.jsxs(Flex, { gap: "6", mt: 4, justifyContent: "space-between", alignItems: "center", colorPalette: "yellow", children: [
+      /* @__PURE__ */ jsxRuntimeExports.jsxs(Flex, { gap: 2, alignItems: "center", children: [
+        "Selected paths:",
+        " ",
+        /* @__PURE__ */ jsxRuntimeExports.jsx(Box, { bgColor: "yellow.subtle", color: "yellow.fg", rounded: "md", px: 3, py: "auto", children: Object.keys(selectedConflictingChanges).length })
+      ] }),
+      /* @__PURE__ */ jsxRuntimeExports.jsx(Flex, { color: "yellow.fg", children: "Revert them or update the branch and resolve potential conflicts" }),
+      /* @__PURE__ */ jsxRuntimeExports.jsx(HStack, { gap: 3, children: /* @__PURE__ */ jsxRuntimeExports.jsx(Button, { onClick: () => setIsRevertDialogOpen(true), colorPalette: "red", disabled: Object.keys(selectedConflictingChanges).length < 1, children: "Revert" }) })
+    ] }),
+    /* @__PURE__ */ jsxRuntimeExports.jsx(DialogModifiedChangesRevert, { selectedCount: Object.keys(selectedConflictingChanges).length, isDialogOpen: isRevertDialogOpen, closeDialog: () => setIsRevertDialogOpen(false), fireDialogAction: handleRevertFileViewFiles })
+  ] });
+}
+function ButtonProcessCommit() {
+  const selectedBranchProps = useApp((ctx) => ctx.selectedBranchProps);
+  const isCommitMode = useCommit((ctx) => ctx.isCommitMode);
+  const issueNumber = useCommit((ctx) => ctx.issueNumber);
+  const sourceBranch = useCommit((ctx) => ctx.sourceBranch);
+  const sourceIssueNumber = useCommit((ctx) => ctx.sourceIssueNumber);
+  const commitMessage = useCommit((ctx) => ctx.commitMessage);
+  const trelloData = useCommit((ctx) => ctx.trelloData);
+  const selectedModifiedChanges = useCommit((ctx) => ctx.selectedModifiedChanges);
+  const isProcessCommit = useCommit((ctx) => ctx.isProcessCommit);
+  const setIsProcessCommit = useCommit((ctx) => ctx.setIsProcessCommit);
+  const setCommitPayload = useCommit((ctx) => ctx.setCommitPayload);
+  const { emitCommitPayload } = useSocketEmits();
+  const { RaiseClientNotificaiton } = useNotifications();
+  const handleProcessCommit = reactExports.useCallback(() => {
+    console.debug("Processing commit for selected files: ", selectedModifiedChanges);
+    const hasFilledIssueNumbers = Object.values(issueNumber).every((issue) => issue && issue !== "");
+    const hasFilledCommitMessage = commitMessage && commitMessage.trim() !== "";
+    if (!hasFilledIssueNumbers || !hasFilledCommitMessage) {
+      const messageString = !hasFilledIssueNumbers && !hasFilledCommitMessage ? "issue number and commit message" : !hasFilledIssueNumbers ? "issue number" : "commit message";
+      RaiseClientNotificaiton(`Please provide the ${messageString} to proceed!`, "error");
+      return;
+    }
+    setIsProcessCommit(true);
+    const commitPayload = {
+      issueNumber,
+      sourceBranch,
+      sourceIssueNumber,
+      commitMessage,
+      selectedModifiedChanges,
+      selectedBranchProps
+    };
+    setCommitPayload({
+      ...commitPayload,
+      trelloData
+    });
+    emitCommitPayload(commitPayload);
+  }, [selectedModifiedChanges, issueNumber, sourceBranch, sourceIssueNumber, commitMessage, selectedBranchProps, RaiseClientNotificaiton]);
+  return /* @__PURE__ */ jsxRuntimeExports.jsx(Button, { onClick: () => handleProcessCommit(), colorPalette: "yellow", disabled: Object.keys(selectedModifiedChanges).length < 1 || isCommitMode && isProcessCommit, children: "Commit" });
+}
+function sortByStack$1(rows, sortStack) {
+  return [...rows].sort((a, b) => {
+    for (const sortItem of sortStack) {
+      let aVal, bVal;
+      switch (sortItem.column) {
+        case "branch":
+          aVal = a.branchString.toLowerCase();
+          bVal = b.branchString.toLowerCase();
+          break;
+        case "path":
+          aVal = a.file.pathDisplay.toLowerCase();
+          bVal = b.file.pathDisplay.toLowerCase();
+          break;
+        case "lastModified":
+          aVal = new Date(a.file.lastModified).getTime();
+          bVal = new Date(b.file.lastModified).getTime();
+          break;
+        case "status":
+          aVal = a.file.wcStatus.toLowerCase();
+          bVal = b.file.wcStatus.toLowerCase();
+          break;
+        default:
+          aVal = 0;
+          bVal = 0;
+      }
+      if (aVal < bVal) return sortItem.direction === "asc" ? -1 : 1;
+      if (aVal > bVal) return sortItem.direction === "asc" ? 1 : -1;
+    }
+    return 0;
+  });
+}
+function getSortIndicator$1(columnKey, sortStack) {
+  const itemIndex = sortStack.findIndex((s) => s.column === columnKey);
+  if (itemIndex === -1) return null;
+  return sortStack[itemIndex].direction === "asc" ? "↑" : "↓";
+}
+function SubSectionModifiedChanges() {
+  const { emitFilesRevert } = useSocketEmits();
+  const { RaiseClientNotificaiton } = useNotifications();
+  const modifiedChanges = useCommit((ctx) => ctx.modifiedChanges);
+  const selectedModifiedChanges = useCommit((ctx) => ctx.selectedModifiedChanges);
+  const setSelectedModifiedChanges = useCommit((ctx) => ctx.setSelectedModifiedChanges);
+  const [searchTerm, setSearchTerm] = reactExports.useState("");
+  const [isRevertDialogOpen, setIsRevertDialogOpen] = reactExports.useState(false);
+  const [sortStack, setSortStack] = reactExports.useState([
+    { column: "status", direction: "asc" },
+    { column: "lastModified", direction: "desc" }
+  ]);
+  const getStatusColor = reactExports.useCallback((status) => {
+    switch (status) {
+      case "modified":
+        return "cyan.500";
+      case "deleted":
+      case "missing":
+        return "red.500";
+      case "added":
+      case "unversioned":
+        return "green.500";
+      default:
+        return "purple.600";
+    }
+  }, []);
+  const handleSort = reactExports.useCallback((columnKey) => {
+    setSortStack((prev) => {
+      const existingIndex = prev.findIndex((s) => s.column === columnKey);
+      if (existingIndex === -1) {
+        return [{ column: columnKey, direction: "asc" }, ...prev];
+      }
+      const updatedSort = { ...prev[existingIndex] };
+      updatedSort.direction = updatedSort.direction === "asc" ? "desc" : "asc";
+      const newStack = [...prev];
+      newStack.splice(existingIndex, 1);
+      newStack.unshift(updatedSort);
+      return newStack;
+    });
+  }, []);
+  const handlePathSelection = reactExports.useCallback(
+    (file, checked) => {
+      setSelectedModifiedChanges((currentSelection) => {
+        if (checked) return { ...currentSelection, [file.path]: file };
+        const { [file.path]: _, ...newSelection } = currentSelection;
+        return newSelection;
+      });
+    },
+    [setSelectedModifiedChanges]
+  );
+  const handleDiffResult = reactExports.useCallback(
+    (result) => {
+      if (result.success) RaiseClientNotificaiton("TortoiseSVN diff opened successfully", "success", 3e3);
+      else RaiseClientNotificaiton(`Error opening TortoiseSVN diff: ${JSON.stringify(result.error, null, 4)}`, "error", 0);
+    },
+    [RaiseClientNotificaiton]
+  );
+  const filteredModifiedChanges = reactExports.useMemo(() => {
+    if (!searchTerm) return modifiedChanges;
+    const lowerSearch = searchTerm.toLowerCase();
+    const filtered = {};
+    Object.keys(modifiedChanges).forEach((branchPath) => {
+      const branchData = modifiedChanges[branchPath];
+      const { branchString, filesToCommit, "Branch Folder": branchFolder, "Branch Version": branchVersion } = branchData;
+      const filteredFiles = filesToCommit.filter((file) => {
+        const fieldsToCheck = [branchString, branchFolder, branchVersion, branchPath, file.pathDisplay, file.wcStatus, file.lastModified];
+        return fieldsToCheck.some(
+          (field, i) => field == null ? void 0 : field.toString().toLowerCase().includes(i === 4 ? lowerSearch.replace(/\//g, "\\") : lowerSearch)
+        );
+      });
+      if (filteredFiles.length > 0) {
+        filtered[branchPath] = {
+          ...branchData,
+          filesToCommit: filteredFiles
+        };
+      }
+    });
+    return filtered;
+  }, [modifiedChanges, searchTerm]);
+  const allFilteredRows = reactExports.useMemo(() => {
+    const rows = [];
+    Object.keys(filteredModifiedChanges).forEach((branchPath) => {
+      const { branchString, branchFolder, branchVersion, filesToCommit } = filteredModifiedChanges[branchPath];
+      filesToCommit.forEach((file) => {
+        rows.push({
+          branchPath,
+          branchString,
+          branchFolder,
+          branchVersion,
+          file
+        });
+      });
+    });
+    return rows;
+  }, [filteredModifiedChanges]);
+  const sortedRows = reactExports.useMemo(() => {
+    return sortByStack$1(allFilteredRows, sortStack);
+  }, [allFilteredRows, sortStack]);
+  const allFilteredPaths = reactExports.useMemo(() => {
+    return sortedRows.map((row) => row.file.path);
+  }, [sortedRows]);
+  const { allSelected, someSelected } = reactExports.useMemo(() => {
+    if (allFilteredPaths.length === 0) {
+      return { allSelected: false, someSelected: false };
+    }
+    const selectedCount = allFilteredPaths.filter((p) => selectedModifiedChanges[p]).length;
+    return {
+      allSelected: selectedCount === allFilteredPaths.length,
+      someSelected: selectedCount > 0 && selectedCount < allFilteredPaths.length
+    };
+  }, [allFilteredPaths, selectedModifiedChanges]);
+  const handleHeaderCheckboxChange = reactExports.useCallback(
+    (checked) => {
+      if (checked) {
+        setSelectedModifiedChanges((currentSelection) => {
+          const newSelection = { ...currentSelection };
+          for (const path of allFilteredPaths) {
+            newSelection[path] = allFilteredRows.find((p) => p.file.path === path).file;
+          }
+          return newSelection;
+        });
+      } else {
+        setSelectedModifiedChanges((currentSelection) => {
+          const newSelection = { ...currentSelection };
+          for (const path of allFilteredPaths) {
+            delete newSelection[path];
+          }
+          return newSelection;
+        });
+      }
+    },
+    [allFilteredPaths, allFilteredRows, setSelectedModifiedChanges]
+  );
+  const handleRevertFileViewFiles = reactExports.useCallback(() => {
+    console.debug("Reverting selected files: ", selectedModifiedChanges);
+    emitFilesRevert(selectedModifiedChanges);
+    setSelectedModifiedChanges({});
+  }, [selectedModifiedChanges, setSelectedModifiedChanges]);
+  return /* @__PURE__ */ jsxRuntimeExports.jsxs(Box, { ms: 9, children: [
+    /* @__PURE__ */ jsxRuntimeExports.jsx(HStack, { gap: "6", mb: 4, width: "full", colorPalette: "yellow", children: /* @__PURE__ */ jsxRuntimeExports.jsx(InputGroup, { flex: "1", startElement: /* @__PURE__ */ jsxRuntimeExports.jsx(LuSearch, {}), startElementProps: { color: "colorPalette.fg" }, children: /* @__PURE__ */ jsxRuntimeExports.jsx(Input, { placeholder: "Quick search...", variant: "flushed", borderColor: "colorPalette.fg", value: searchTerm, onChange: (e) => setSearchTerm(e.target.value) }) }) }),
+    /* @__PURE__ */ jsxRuntimeExports.jsx(TableScrollArea, { borderWidth: "1px", maxH: "xl", children: /* @__PURE__ */ jsxRuntimeExports.jsxs(TableRoot, { size: "sm", variant: "outline", colorPalette: "yellow", children: [
+      /* @__PURE__ */ jsxRuntimeExports.jsx(TableHeader, { children: /* @__PURE__ */ jsxRuntimeExports.jsxs(TableRow, { bgColor: "colorPalette.400", children: [
+        /* @__PURE__ */ jsxRuntimeExports.jsx(TableColumnHeader, { children: /* @__PURE__ */ jsxRuntimeExports.jsx(Checkbox, { "aria-label": "Select Filtered", variant: "subtle", colorPalette: "yellow", checked: someSelected && !allSelected ? "indeterminate" : allSelected, onCheckedChange: (e) => handleHeaderCheckboxChange(e.checked) }) }),
+        /* @__PURE__ */ jsxRuntimeExports.jsxs(TableColumnHeader, { color: "black", fontWeight: 900, cursor: "pointer", onClick: () => handleSort("branch"), children: [
+          "Branch ",
+          getSortIndicator$1("branch", sortStack)
+        ] }),
+        /* @__PURE__ */ jsxRuntimeExports.jsxs(TableColumnHeader, { color: "black", fontWeight: 900, cursor: "pointer", onClick: () => handleSort("path"), children: [
+          "Path ",
+          getSortIndicator$1("path", sortStack)
+        ] }),
+        /* @__PURE__ */ jsxRuntimeExports.jsxs(TableColumnHeader, { color: "black", fontWeight: 900, cursor: "pointer", onClick: () => handleSort("lastModified"), children: [
+          "Last Modified ",
+          getSortIndicator$1("lastModified", sortStack)
+        ] }),
+        /* @__PURE__ */ jsxRuntimeExports.jsxs(TableColumnHeader, { color: "black", fontWeight: 900, cursor: "pointer", onClick: () => handleSort("status"), children: [
+          "Status ",
+          getSortIndicator$1("status", sortStack)
+        ] }),
+        /* @__PURE__ */ jsxRuntimeExports.jsx(TableColumnHeader, {})
+      ] }) }),
+      /* @__PURE__ */ jsxRuntimeExports.jsx(TableBody, { children: Object.keys(sortedRows).length == 0 ? /* @__PURE__ */ jsxRuntimeExports.jsx(TableRow, { children: /* @__PURE__ */ jsxRuntimeExports.jsx(TableCell, { colSpan: 6, textAlign: "center", children: "No results found" }) }) : sortedRows.map((row) => {
+        const { branchPath, branchString, branchFolder, branchVersion, file } = row;
+        return /* @__PURE__ */ jsxRuntimeExports.jsxs(TableRow, { children: [
+          /* @__PURE__ */ jsxRuntimeExports.jsx(TableCell, { children: /* @__PURE__ */ jsxRuntimeExports.jsx(Checkbox, { "aria-label": "Select path", variant: "subtle", colorPalette: "yellow", checked: !!selectedModifiedChanges[file.path], onCheckedChange: (e) => handlePathSelection(file, e.checked) }) }),
+          /* @__PURE__ */ jsxRuntimeExports.jsx(TableCell, { color: getStatusColor(file.wcStatus), children: branchString }),
+          /* @__PURE__ */ jsxRuntimeExports.jsx(TableCell, { color: getStatusColor(file.wcStatus), children: `${branchPath.split("\\").at(-1)}\\${file.pathDisplay}` }),
+          /* @__PURE__ */ jsxRuntimeExports.jsx(TableCell, { color: getStatusColor(file.wcStatus), children: file.lastModified }),
+          /* @__PURE__ */ jsxRuntimeExports.jsx(TableCell, { color: getStatusColor(file.wcStatus), children: file.wcStatus }),
+          /* @__PURE__ */ jsxRuntimeExports.jsx(TableCell, { children: /* @__PURE__ */ jsxRuntimeExports.jsx(ButtonDiff, { fullPath: file.path, branchFolder, branchVersion, onDiffResult: handleDiffResult }) })
+        ] }, file.path);
+      }) })
+    ] }) }),
+    /* @__PURE__ */ jsxRuntimeExports.jsxs(Flex, { gap: "6", mt: 4, justifyContent: "space-between", alignItems: "center", colorPalette: "yellow", children: [
+      /* @__PURE__ */ jsxRuntimeExports.jsxs(Flex, { gap: 2, alignItems: "center", children: [
+        "Selected paths:",
+        " ",
+        /* @__PURE__ */ jsxRuntimeExports.jsx(Box, { bgColor: "yellow.subtle", color: "yellow.fg", rounded: "md", px: 3, children: Object.keys(selectedModifiedChanges).length })
+      ] }),
+      /* @__PURE__ */ jsxRuntimeExports.jsxs(HStack, { gap: 3, children: [
+        /* @__PURE__ */ jsxRuntimeExports.jsx(Button, { onClick: () => setIsRevertDialogOpen(true), colorPalette: "red", disabled: Object.keys(selectedModifiedChanges).length < 1, children: "Revert" }),
+        /* @__PURE__ */ jsxRuntimeExports.jsx(ButtonProcessCommit, {})
+      ] })
+    ] }),
+    /* @__PURE__ */ jsxRuntimeExports.jsx(DialogModifiedChangesRevert, { selectedCount: Object.keys(selectedModifiedChanges).length, isDialogOpen: isRevertDialogOpen, closeDialog: () => setIsRevertDialogOpen(false), fireDialogAction: handleRevertFileViewFiles })
+  ] });
+}
 function sortByStack(rows, sortStack) {
   return [...rows].sort((a, b) => {
     for (const sortItem of sortStack) {
@@ -1880,12 +2394,12 @@ function getSortIndicator(columnKey, sortStack) {
   if (itemIndex === -1) return null;
   return sortStack[itemIndex].direction === "asc" ? "↑" : "↓";
 }
-function SubSectionModifiedChanges() {
-  const { emitFilesRevert } = useSocketEmits();
+function SubSectionUnknownChanges() {
+  const { emitFilesRevert, emitFilesAddDelete } = useSocketEmits();
   const { RaiseClientNotificaiton } = useNotifications();
-  const modifiedChanges = useCommit((ctx) => ctx.modifiedChanges);
-  const selectedModifiedChanges = useCommit((ctx) => ctx.selectedModifiedChanges);
-  const setSelectedModifiedChanges = useCommit((ctx) => ctx.setSelectedModifiedChanges);
+  const unknownChanges = useCommit((ctx) => ctx.unknownChanges);
+  const selectedUnknownChanges = useCommit((ctx) => ctx.selectedUnknownChanges);
+  const setSelectedUnknownChanges = useCommit((ctx) => ctx.setSelectedUnknownChanges);
   const [searchTerm, setSearchTerm] = reactExports.useState("");
   const [isRevertDialogOpen, setIsRevertDialogOpen] = reactExports.useState(false);
   const [sortStack, setSortStack] = reactExports.useState([
@@ -1897,8 +2411,10 @@ function SubSectionModifiedChanges() {
       case "modified":
         return "cyan.500";
       case "deleted":
+      case "missing":
         return "red.500";
       case "added":
+      case "unversioned":
         return "green.500";
       default:
         return "purple.600";
@@ -1919,14 +2435,14 @@ function SubSectionModifiedChanges() {
     });
   }, []);
   const handlePathSelection = reactExports.useCallback(
-    (path, pathStatus, checked) => {
-      setSelectedModifiedChanges((currentSelection) => {
-        if (checked) return { ...currentSelection, [path]: pathStatus };
-        const { [path]: _, ...newSelection } = currentSelection;
+    (file, checked) => {
+      setSelectedUnknownChanges((currentSelection) => {
+        if (checked) return { ...currentSelection, [file.path]: file };
+        const { [file.path]: _, ...newSelection } = currentSelection;
         return newSelection;
       });
     },
-    [setSelectedModifiedChanges]
+    [setSelectedUnknownChanges]
   );
   const handleDiffResult = reactExports.useCallback(
     (result) => {
@@ -1935,34 +2451,36 @@ function SubSectionModifiedChanges() {
     },
     [RaiseClientNotificaiton]
   );
-  const filteredModifiedChanges = reactExports.useMemo(() => {
-    if (!searchTerm) return modifiedChanges;
+  const filteredUnknownChanges = reactExports.useMemo(() => {
+    if (!searchTerm) return unknownChanges;
     const lowerSearch = searchTerm.toLowerCase();
     const filtered = {};
-    Object.keys(modifiedChanges).forEach((branchPath) => {
-      const branchData = modifiedChanges[branchPath];
-      const { branchString: branchString2, filesToCommit, "Branch Folder": branchFolder, "Branch Version": branchVersion } = branchData;
-      const filteredFiles = filesToCommit.filter((file) => {
-        const fieldsToCheck = [branchString2, branchFolder, branchVersion, branchPath, file.pathDisplay, file.wcStatus, file.lastModified];
-        return fieldsToCheck.some((field) => field == null ? void 0 : field.toString().toLowerCase().includes(lowerSearch));
+    Object.keys(unknownChanges).forEach((branchPath) => {
+      const branchData = unknownChanges[branchPath];
+      const { branchString, filesToTrack, "Branch Folder": branchFolder, "Branch Version": branchVersion } = branchData;
+      const filteredFiles = filesToTrack.filter((file) => {
+        const fieldsToCheck = [branchString, branchFolder, branchVersion, branchPath, file.pathDisplay, file.wcStatus, file.lastModified];
+        return fieldsToCheck.some(
+          (field, i) => field == null ? void 0 : field.toString().toLowerCase().includes(i === 4 ? lowerSearch.replace(/\//g, "\\") : lowerSearch)
+        );
       });
       if (filteredFiles.length > 0) {
         filtered[branchPath] = {
           ...branchData,
-          filesToCommit: filteredFiles
+          filesToTrack: filteredFiles
         };
       }
     });
     return filtered;
-  }, [modifiedChanges, searchTerm]);
+  }, [unknownChanges, searchTerm]);
   const allFilteredRows = reactExports.useMemo(() => {
     const rows = [];
-    Object.keys(filteredModifiedChanges).forEach((branchPath) => {
-      const { branchString: branchString2, branchFolder, branchVersion, filesToCommit } = filteredModifiedChanges[branchPath];
-      filesToCommit.forEach((file) => {
+    Object.keys(filteredUnknownChanges).forEach((branchPath) => {
+      const { branchString, branchFolder, branchVersion, filesToTrack } = filteredUnknownChanges[branchPath];
+      filesToTrack.forEach((file) => {
         rows.push({
           branchPath,
-          branchString: branchString2,
+          branchString,
           branchFolder,
           branchVersion,
           file
@@ -1970,7 +2488,7 @@ function SubSectionModifiedChanges() {
       });
     });
     return rows;
-  }, [filteredModifiedChanges]);
+  }, [filteredUnknownChanges]);
   const sortedRows = reactExports.useMemo(() => {
     return sortByStack(allFilteredRows, sortStack);
   }, [allFilteredRows, sortStack]);
@@ -1981,24 +2499,24 @@ function SubSectionModifiedChanges() {
     if (allFilteredPaths.length === 0) {
       return { allSelected: false, someSelected: false };
     }
-    const selectedCount = allFilteredPaths.filter((p) => selectedModifiedChanges[p]).length;
+    const selectedCount = allFilteredPaths.filter((p) => selectedUnknownChanges[p]).length;
     return {
       allSelected: selectedCount === allFilteredPaths.length,
       someSelected: selectedCount > 0 && selectedCount < allFilteredPaths.length
     };
-  }, [allFilteredPaths, selectedModifiedChanges]);
+  }, [allFilteredPaths, selectedUnknownChanges]);
   const handleHeaderCheckboxChange = reactExports.useCallback(
     (checked) => {
       if (checked) {
-        setSelectedModifiedChanges((currentSelection) => {
+        setSelectedUnknownChanges((currentSelection) => {
           const newSelection = { ...currentSelection };
           for (const path of allFilteredPaths) {
-            newSelection[path] = true;
+            newSelection[path] = allFilteredRows.find((p) => p.file.path === path).file;
           }
           return newSelection;
         });
       } else {
-        setSelectedModifiedChanges((currentSelection) => {
+        setSelectedUnknownChanges((currentSelection) => {
           const newSelection = { ...currentSelection };
           for (const path of allFilteredPaths) {
             delete newSelection[path];
@@ -2007,17 +2525,18 @@ function SubSectionModifiedChanges() {
         });
       }
     },
-    [allFilteredPaths, setSelectedModifiedChanges]
+    [allFilteredPaths, allFilteredRows, setSelectedUnknownChanges]
   );
-  const handleRevertFileViewFiles = reactExports.useCallback(() => {
-    console.debug("Reverting selected files: ", selectedModifiedChanges);
-    const filesToRevert = Object.entries(selectedModifiedChanges).map(([path, status]) => ({
-      path,
-      status
-    }));
-    emitFilesRevert(filesToRevert);
-    setSelectedModifiedChanges({});
-  }, [selectedModifiedChanges, setSelectedModifiedChanges]);
+  const handleRevertFiles = reactExports.useCallback(() => {
+    console.debug("Reverting selected files: ", selectedUnknownChanges);
+    emitFilesRevert(selectedUnknownChanges);
+    setSelectedUnknownChanges({});
+  }, [selectedUnknownChanges]);
+  const handleTrackFiles = reactExports.useCallback(() => {
+    console.debug("Tracking selected files: ", selectedUnknownChanges);
+    emitFilesAddDelete(selectedUnknownChanges);
+    setSelectedUnknownChanges({});
+  }, [selectedUnknownChanges]);
   return /* @__PURE__ */ jsxRuntimeExports.jsxs(Box, { ms: 9, children: [
     /* @__PURE__ */ jsxRuntimeExports.jsx(HStack, { gap: "6", mb: 4, width: "full", colorPalette: "yellow", children: /* @__PURE__ */ jsxRuntimeExports.jsx(InputGroup, { flex: "1", startElement: /* @__PURE__ */ jsxRuntimeExports.jsx(LuSearch, {}), startElementProps: { color: "colorPalette.fg" }, children: /* @__PURE__ */ jsxRuntimeExports.jsx(Input, { placeholder: "Quick search...", variant: "flushed", borderColor: "colorPalette.fg", value: searchTerm, onChange: (e) => setSearchTerm(e.target.value) }) }) }),
     /* @__PURE__ */ jsxRuntimeExports.jsx(TableScrollArea, { borderWidth: "1px", maxH: "xl", children: /* @__PURE__ */ jsxRuntimeExports.jsxs(TableRoot, { size: "sm", variant: "outline", colorPalette: "yellow", children: [
@@ -2042,10 +2561,10 @@ function SubSectionModifiedChanges() {
         /* @__PURE__ */ jsxRuntimeExports.jsx(TableColumnHeader, {})
       ] }) }),
       /* @__PURE__ */ jsxRuntimeExports.jsx(TableBody, { children: Object.keys(sortedRows).length == 0 ? /* @__PURE__ */ jsxRuntimeExports.jsx(TableRow, { children: /* @__PURE__ */ jsxRuntimeExports.jsx(TableCell, { colSpan: 6, textAlign: "center", children: "No results found" }) }) : sortedRows.map((row) => {
-        const { branchPath, branchString: branchString2, branchFolder, branchVersion, file } = row;
+        const { branchPath, branchString, branchFolder, branchVersion, file } = row;
         return /* @__PURE__ */ jsxRuntimeExports.jsxs(TableRow, { children: [
-          /* @__PURE__ */ jsxRuntimeExports.jsx(TableCell, { children: /* @__PURE__ */ jsxRuntimeExports.jsx(Checkbox, { "aria-label": "Select path", variant: "subtle", colorPalette: "yellow", checked: !!selectedModifiedChanges[file.path], onCheckedChange: (e) => handlePathSelection(file.path, file.wcStatus, e.checked) }) }),
-          /* @__PURE__ */ jsxRuntimeExports.jsx(TableCell, { color: getStatusColor(file.wcStatus), children: branchString2 }),
+          /* @__PURE__ */ jsxRuntimeExports.jsx(TableCell, { children: /* @__PURE__ */ jsxRuntimeExports.jsx(Checkbox, { "aria-label": "Select path", variant: "subtle", colorPalette: "yellow", checked: !!selectedUnknownChanges[file.path], onCheckedChange: (e) => handlePathSelection(file, e.checked) }) }),
+          /* @__PURE__ */ jsxRuntimeExports.jsx(TableCell, { color: getStatusColor(file.wcStatus), children: branchString }),
           /* @__PURE__ */ jsxRuntimeExports.jsx(TableCell, { color: getStatusColor(file.wcStatus), children: `${branchPath.split("\\").at(-1)}\\${file.pathDisplay}` }),
           /* @__PURE__ */ jsxRuntimeExports.jsx(TableCell, { color: getStatusColor(file.wcStatus), children: file.lastModified }),
           /* @__PURE__ */ jsxRuntimeExports.jsx(TableCell, { color: getStatusColor(file.wcStatus), children: file.wcStatus }),
@@ -2054,22 +2573,24 @@ function SubSectionModifiedChanges() {
       }) })
     ] }) }),
     /* @__PURE__ */ jsxRuntimeExports.jsxs(Flex, { gap: "6", mt: 4, justifyContent: "space-between", alignItems: "center", colorPalette: "yellow", children: [
-      /* @__PURE__ */ jsxRuntimeExports.jsxs(Flex, { gap: 2, children: [
+      /* @__PURE__ */ jsxRuntimeExports.jsxs(Flex, { gap: 2, alignItems: "center", children: [
         "Selected paths:",
         " ",
-        /* @__PURE__ */ jsxRuntimeExports.jsx(Box, { bgColor: "yellow.subtle", color: "yellow.fg", rounded: "md", px: 3, children: Object.keys(selectedModifiedChanges).length })
+        /* @__PURE__ */ jsxRuntimeExports.jsx(Box, { bgColor: "yellow.subtle", color: "yellow.fg", rounded: "md", px: 3, children: Object.keys(selectedUnknownChanges).length })
       ] }),
-      /* @__PURE__ */ jsxRuntimeExports.jsx(Box, { children: /* @__PURE__ */ jsxRuntimeExports.jsx(Button, { onClick: () => setIsRevertDialogOpen(true), colorPalette: "red", disabled: Object.keys(selectedModifiedChanges).length < 1, children: "Revert Selected" }) })
+      /* @__PURE__ */ jsxRuntimeExports.jsxs(HStack, { gap: 3, children: [
+        /* @__PURE__ */ jsxRuntimeExports.jsx(Button, { onClick: () => setIsRevertDialogOpen(true), colorPalette: "red", disabled: Object.keys(selectedUnknownChanges).length < 1, children: "Revert" }),
+        /* @__PURE__ */ jsxRuntimeExports.jsx(Button, { onClick: () => handleTrackFiles(), colorPalette: "green", disabled: Object.keys(selectedUnknownChanges).length < 1, children: "Add/Delete" })
+      ] })
     ] }),
-    /* @__PURE__ */ jsxRuntimeExports.jsx(DialogModifiedChangesRevert, { selectedCount: Object.keys(selectedModifiedChanges).length, isDialogOpen: isRevertDialogOpen, closeDialog: () => setIsRevertDialogOpen(false), fireDialogAction: handleRevertFileViewFiles })
+    /* @__PURE__ */ jsxRuntimeExports.jsx(DialogModifiedChangesRevert, { selectedCount: Object.keys(selectedUnknownChanges).length, isDialogOpen: isRevertDialogOpen, closeDialog: () => setIsRevertDialogOpen(false), fireDialogAction: handleRevertFiles })
   ] });
 }
-function SubSectionUnknownChanges() {
-  const unknownChanges = useCommit((ctx) => ctx.unknownChanges);
-  return /* @__PURE__ */ jsxRuntimeExports.jsx(Box, { ms: 9, children: Object.keys(unknownChanges) });
-}
-function branchString(branchFolder, branchVersion, branch) {
+function toBranchString(branchFolder, branchVersion, branch) {
   return `${branchFolder == "" ? "Uncategorised" : branchFolder} ${branchVersion == "" ? "Unversioned" : branchVersion} ${String(branch).split("\\").at(-1)}`;
+}
+function branchPathFolder(branch) {
+  return String(branch).split("\\").at(-1);
 }
 const initialState = {
   isLookupSLogsOn: false,
@@ -2093,17 +2614,29 @@ const initialState = {
   conflictingChanges: {},
   unknownChanges: {},
   modifiedChanges: {},
+  selectedConflictingChanges: {},
+  setSelectedConflictingChanges: (_) => {
+  },
   selectedUnknownChanges: {},
   setSelectedUnknownChanges: (_) => {
   },
   selectedModifiedChanges: {},
   setSelectedModifiedChanges: (_) => {
   },
+  trelloData: {},
+  commitPayload: {},
+  setCommitPayload: (_) => {
+  },
+  setTrelloData: (_) => {
+  },
   isCommitMode: false,
   selectedBranchesCount: 0,
   accordionSection: [],
   commitStage: [],
   setCommitStage: (_) => {
+  },
+  isProcessCommit: false,
+  setIsProcessCommit: (_) => {
   }
 };
 const ContextCommit = createContext(initialState);
@@ -2112,14 +2645,15 @@ const useCommit = (selector) => {
   return context;
 };
 const CommitProvider = ({ children }) => {
+  const config = useApp((ctx) => ctx.config);
   const socket = useApp((ctx) => ctx.socket);
   const configurableRowData = useApp((ctx) => ctx.configurableRowData);
   const selectedBranches = useApp((ctx) => ctx.selectedBranches);
   const selectedBrachesData = useApp((ctx) => ctx.selectedBranchesData);
   const selectedBranchPaths = useApp((ctx) => ctx.selectedBranchPaths);
   const appMode = useApp((ctx) => ctx.appMode);
-  const isCommitMode = reactExports.useMemo(() => appMode === "commit", [appMode]);
   const { emitStatusSingle } = useSocketEmits();
+  const isCommitMode = reactExports.useMemo(() => appMode === "commit", [appMode]);
   const selectedBranchesCount = reactExports.useMemo(() => Object.keys(selectedBranches).length, [selectedBranches]);
   const [isLookupSLogsOn, setIsLookupSLogsOn] = reactExports.useState(false);
   const [isLookupTrelloOn, setIsLookupTrelloOn] = reactExports.useState(false);
@@ -2130,8 +2664,11 @@ const CommitProvider = ({ children }) => {
   const [conflictingChanges, setConflictingChanges] = reactExports.useState({});
   const [unknownChanges, setUnknownChanges] = reactExports.useState({});
   const [modifiedChanges, setModifiedChanges] = reactExports.useState({});
+  const [selectedConflictingChanges, setSelectedConflictingChanges] = reactExports.useState({});
   const [selectedUnknownChanges, setSelectedUnknownChanges] = reactExports.useState({});
   const [selectedModifiedChanges, setSelectedModifiedChanges] = reactExports.useState({});
+  const [trelloData, setTrelloData] = reactExports.useState({});
+  const [commitPayload, setCommitPayload] = reactExports.useState({});
   const [commitStage, setCommitStage] = reactExports.useState(["commitDetails"]);
   const accordionSections = reactExports.useMemo(
     () => [
@@ -2179,6 +2716,7 @@ const CommitProvider = ({ children }) => {
     ] }, i)),
     [accordionSections]
   );
+  const [isProcessCommit, setIsProcessCommit] = reactExports.useState(false);
   const value = reactExports.useMemo(
     () => ({
       isLookupSLogsOn,
@@ -2196,17 +2734,45 @@ const CommitProvider = ({ children }) => {
       conflictingChanges,
       unknownChanges,
       modifiedChanges,
+      selectedConflictingChanges,
+      setSelectedConflictingChanges,
       selectedUnknownChanges,
       setSelectedUnknownChanges,
       selectedModifiedChanges,
       setSelectedModifiedChanges,
+      trelloData,
+      setTrelloData,
+      commitPayload,
+      setCommitPayload,
       isCommitMode,
       selectedBranchesCount,
       accordionSection,
       commitStage,
-      setCommitStage
+      setCommitStage,
+      isProcessCommit,
+      setIsProcessCommit
     }),
-    [isLookupSLogsOn, isLookupTrelloOn, sourceBranch, sourceIssueNumber, issueNumber, commitMessage, conflictingChanges, unknownChanges, modifiedChanges, selectedUnknownChanges, selectedModifiedChanges, isCommitMode, selectedBranchesCount, accordionSection, commitStage]
+    [
+      isLookupSLogsOn,
+      isLookupTrelloOn,
+      sourceBranch,
+      sourceIssueNumber,
+      issueNumber,
+      commitMessage,
+      conflictingChanges,
+      unknownChanges,
+      modifiedChanges,
+      selectedConflictingChanges,
+      selectedUnknownChanges,
+      selectedModifiedChanges,
+      trelloData,
+      commitPayload,
+      isCommitMode,
+      selectedBranchesCount,
+      accordionSection,
+      commitStage,
+      isProcessCommit
+    ]
   );
   reactExports.useEffect(() => {
     if (!isCommitMode) return;
@@ -2229,7 +2795,7 @@ const CommitProvider = ({ children }) => {
       const branchId = data.id;
       const { branch: branchPath, filesToUpdate, filesToTrack, filesToCommit } = data.status;
       const matchedSelectedRow = configurableRowData.find((branchRow) => branchRow.id === branchId);
-      const matchedBranchString = branchString(matchedSelectedRow["Branch Folder"], matchedSelectedRow["Branch Version"], matchedSelectedRow["SVN Branch"]);
+      const matchedBranchString = toBranchString(matchedSelectedRow["Branch Folder"], matchedSelectedRow["Branch Version"], matchedSelectedRow["SVN Branch"]);
       setConflictingChanges((prevData) => {
         const newData = {};
         Object.entries(prevData).forEach(([branchPath2, branchData]) => {
@@ -2261,7 +2827,7 @@ const CommitProvider = ({ children }) => {
             "Branch Folder": matchedSelectedRow["Branch Folder"],
             "Branch Version": matchedSelectedRow["Branch Version"],
             "SVN Branch": branchPath,
-            filesToTrack
+            filesToTrack: filesToTrack.filter((f) => !(config == null ? void 0 : config.ignoredUnknownPaths.some((p) => new RegExp(p).test(f.path))))
           };
         else delete newData[branchPath];
         return newData;
@@ -2279,7 +2845,7 @@ const CommitProvider = ({ children }) => {
             "Branch Folder": matchedSelectedRow["Branch Folder"],
             "Branch Version": matchedSelectedRow["Branch Version"],
             "SVN Branch": branchPath,
-            filesToCommit
+            filesToCommit: filesToCommit.filter((f) => !(config == null ? void 0 : config.ignoredModifiedPaths.some((p) => new RegExp(p).test(f.path))))
           };
         else delete newData[branchPath];
         return newData;
@@ -2287,23 +2853,363 @@ const CommitProvider = ({ children }) => {
     };
     socket == null ? void 0 : socket.on("branch-status-single", socketCallback);
     return () => socket == null ? void 0 : socket.off("branch-status-single", socketCallback);
-  }, [socket, isCommitMode, selectedBranchesCount, configurableRowData, selectedBranchPaths]);
+  }, [socket, isCommitMode, selectedBranchesCount, configurableRowData, selectedBranchPaths, config == null ? void 0 : config.ignoredUnknownPaths, config == null ? void 0 : config.ignoredModifiedPaths]);
   reactExports.useEffect(() => {
+    console.debug("branch paths update logic has been re-rendered");
     if (!isCommitMode || selectedBranchesCount < 1) return;
     const socketCallback = (data) => {
       console.log("Received branch-paths-update from socket in ContextCommit component in background", data);
+      const { paths } = data;
+      const addedPaths = paths.filter((path) => path.action === "add");
+      const deletedPaths = paths.filter((path) => path.action === "delete");
+      const untrackedPaths = paths.filter((path) => path.action === "untrack");
+      const revertedPaths = paths.filter((path) => path.action === "revert");
+      const modifiedPaths = paths.filter((path) => path.action === "modify");
+      const conflictingPaths = paths.filter((path) => path.action === "conflict");
+      setConflictingChanges((prevData) => {
+        const newData = {};
+        for (const [branchPath, branchData] of Object.entries(prevData)) {
+          if (selectedBranchPaths.has(branchPath)) {
+            newData[branchPath] = {
+              ...branchData,
+              filesToUpdate: [...branchData.filesToUpdate]
+            };
+          }
+        }
+        for (const path of conflictingPaths) {
+          const { branchPath } = path;
+          if (!selectedBranchPaths.has(branchPath)) continue;
+          if (!newData[branchPath]) {
+            newData[branchPath] = {
+              branchString: path.branchString || "",
+              "Branch Folder": path["Branch Folder"] || "",
+              "Branch Version": path["Branch Version"] || "",
+              "SVN Branch": branchPath,
+              filesToUpdate: []
+            };
+          }
+        }
+        for (const branchPath of Object.keys(newData)) {
+          let { filesToUpdate } = newData[branchPath];
+          filesToUpdate = filesToUpdate.filter((f) => {
+            const updated = paths.find((p) => p.path === f.path);
+            return !updated || updated.action === "conflict";
+          });
+          for (const path of conflictingPaths) {
+            if (path.branchPath !== branchPath) continue;
+            const idx = filesToUpdate.findIndex((f) => f.path === path.path);
+            if (idx === -1) {
+              const { action, ...rest } = path;
+              filesToUpdate.push({ ...rest });
+            }
+          }
+          newData[branchPath].filesToUpdate = filesToUpdate;
+        }
+        return newData;
+      });
+      setUnknownChanges((prevData) => {
+        const newData = {};
+        for (const [branchPath, branchData] of Object.entries(prevData)) {
+          if (selectedBranchPaths.has(branchPath)) {
+            newData[branchPath] = {
+              ...branchData,
+              filesToTrack: [...branchData.filesToTrack]
+            };
+          }
+        }
+        for (const path of [...untrackedPaths, ...revertedPaths]) {
+          const { branchPath } = path;
+          if (!selectedBranchPaths.has(branchPath)) continue;
+          if (!newData[branchPath]) {
+            newData[branchPath] = {
+              branchString: path.branchString || "",
+              "Branch Folder": path["Branch Folder"] || "",
+              "Branch Version": path["Branch Version"] || "",
+              "SVN Branch": branchPath,
+              filesToTrack: []
+            };
+          }
+        }
+        for (const branchPath of Object.keys(newData)) {
+          let { filesToTrack } = newData[branchPath];
+          filesToTrack = filesToTrack.filter((f) => {
+            const updated = paths.find((p) => p.path === f.path);
+            return !updated || updated.action === "untrack";
+          });
+          for (const path of [...untrackedPaths, ...revertedPaths.filter((p) => ["unversioned", "missing"].includes(p.wcStatus))]) {
+            if (path.branchPath !== branchPath) continue;
+            const idx = filesToTrack.findIndex((f) => f.path === path.path);
+            if (idx === -1) {
+              const { action, ...rest } = path;
+              filesToTrack.push({ ...rest });
+            }
+          }
+          newData[branchPath].filesToTrack = filesToTrack;
+        }
+        return newData;
+      });
+      setModifiedChanges((prevData) => {
+        const newData = {};
+        for (const [branchPath, branchData] of Object.entries(prevData)) {
+          if (selectedBranchPaths.has(branchPath)) {
+            newData[branchPath] = {
+              ...branchData,
+              filesToCommit: [...branchData.filesToCommit]
+            };
+          }
+        }
+        for (const path of [...addedPaths, ...deletedPaths, ...modifiedPaths]) {
+          const { branchPath } = path;
+          if (!selectedBranchPaths.has(branchPath)) continue;
+          if (!newData[branchPath]) {
+            newData[branchPath] = {
+              branchString: path.branchString || "",
+              "Branch Folder": path["Branch Folder"] || "",
+              "Branch Version": path["Branch Version"] || "",
+              "SVN Branch": branchPath,
+              filesToCommit: []
+            };
+          }
+        }
+        for (const branchPath of Object.keys(newData)) {
+          let { filesToCommit } = newData[branchPath];
+          filesToCommit = filesToCommit.filter((f) => {
+            const updated = paths.find((p) => p.path === f.path);
+            return !updated || ["add", "delete", "modify"].includes(updated.action);
+          });
+          for (const path of [...addedPaths, ...deletedPaths, ...modifiedPaths]) {
+            if (path.branchPath !== branchPath) continue;
+            const idx = filesToCommit.findIndex((f) => f.path === path.path);
+            if (idx === -1) {
+              const { action, ...rest } = path;
+              filesToCommit.push({ ...rest });
+            }
+          }
+          newData[branchPath].filesToCommit = filesToCommit;
+        }
+        return newData;
+      });
     };
     socket == null ? void 0 : socket.on("branch-paths-update", socketCallback);
     return () => socket == null ? void 0 : socket.off("branch-paths-update", socketCallback);
-  }, [socket, isCommitMode, selectedBranchesCount]);
+  }, [socket, isCommitMode, selectedBranchesCount, configurableRowData, selectedBranchPaths]);
   return /* @__PURE__ */ jsxRuntimeExports.jsx(ContextCommit.Provider, { value, children });
 };
+const ToggleTip = reactExports.forwardRef(function ToggleTip2(props, ref) {
+  const {
+    showArrow,
+    children,
+    portalled = true,
+    content,
+    portalRef,
+    ...rest
+  } = props;
+  return /* @__PURE__ */ jsxRuntimeExports.jsxs(
+    PopoverRoot$1,
+    {
+      ...rest,
+      positioning: { ...rest.positioning, gutter: 4 },
+      children: [
+        /* @__PURE__ */ jsxRuntimeExports.jsx(PopoverTrigger$1, { asChild: true, children }),
+        /* @__PURE__ */ jsxRuntimeExports.jsx(Portal, { disabled: !portalled, container: portalRef, children: /* @__PURE__ */ jsxRuntimeExports.jsx(PopoverPositioner, { children: /* @__PURE__ */ jsxRuntimeExports.jsxs(
+          PopoverContent$1,
+          {
+            width: "auto",
+            px: "2",
+            py: "1",
+            textStyle: "xs",
+            rounded: "sm",
+            ref,
+            children: [
+              showArrow && /* @__PURE__ */ jsxRuntimeExports.jsx(PopoverArrow$1, { children: /* @__PURE__ */ jsxRuntimeExports.jsx(PopoverArrowTip, {}) }),
+              content
+            ]
+          }
+        ) }) })
+      ]
+    }
+  );
+});
+const InfoTip = reactExports.forwardRef(function InfoTip2(props, ref) {
+  const { children, ...rest } = props;
+  return /* @__PURE__ */ jsxRuntimeExports.jsx(ToggleTip, { content: children, ...rest, ref, children: /* @__PURE__ */ jsxRuntimeExports.jsx(
+    IconButton,
+    {
+      variant: "ghost",
+      "aria-label": "info",
+      size: "2xs",
+      colorPalette: "gray",
+      children: /* @__PURE__ */ jsxRuntimeExports.jsx(HiOutlineInformationCircle, {})
+    }
+  ) });
+});
+const ProgressBar = reactExports.forwardRef(function ProgressBar2(props, ref) {
+  return /* @__PURE__ */ jsxRuntimeExports.jsx(ProgressTrack, { ...props, ref, children: /* @__PURE__ */ jsxRuntimeExports.jsx(ProgressRange, {}) });
+});
+const ProgressLabel = reactExports.forwardRef(function ProgressLabel2(props, ref) {
+  const { children, info, ...rest } = props;
+  return /* @__PURE__ */ jsxRuntimeExports.jsxs(ProgressLabel$1, { ...rest, ref, children: [
+    children,
+    info && /* @__PURE__ */ jsxRuntimeExports.jsx(InfoTip, { children: info })
+  ] });
+});
+const ProgressRoot = ProgressRoot$1;
+const ProgressValueText = ProgressValueText$1;
+function ButtonClipboard({ size = "md", value }) {
+  const [isCopied, setIsCopied] = reactExports.useState(false);
+  const handleCopyValue = reactExports.useCallback(() => {
+    if (!value) return;
+    navigator.clipboard.writeText(value).then(() => {
+      setIsCopied(true);
+      setTimeout(() => setIsCopied(false), 1500);
+    });
+  }, [value]);
+  return /* @__PURE__ */ jsxRuntimeExports.jsx(IconButton, { colorPalette: "yellow", variant: "subtle", onClick: handleCopyValue, size, children: isCopied ? /* @__PURE__ */ jsxRuntimeExports.jsx(LuCheck, {}) : /* @__PURE__ */ jsxRuntimeExports.jsx(LuClipboard, {}) });
+}
+function ProcessCommit() {
+  const socket = useApp((ctx) => ctx.socket);
+  const commitPayload = useCommit((ctx) => ctx.commitPayload);
+  const { commitMessage, selectedModifiedChanges, selectedBranchProps, trelloData } = commitPayload;
+  const isProcessCommit = useCommit((ctx) => ctx.isProcessCommit);
+  const setIsProcessCommit = useCommit((ctx) => ctx.setIsProcessCommit);
+  const { emitTrelloCardUpdate } = useSocketEmits();
+  const finalCommitMessage = reactExports.useMemo(
+    () => commitMessage == null ? void 0 : commitMessage.trim().replace(/\s*\n+\s*/g, "; ").replace(/[;\s]+$/, "").trim(),
+    [commitMessage]
+  );
+  const [liveCommits, setLiveCommits] = reactExports.useState([]);
+  const selectedBranchesCount = reactExports.useMemo(() => {
+    const uniqueBranches = /* @__PURE__ */ new Set();
+    if (!selectedModifiedChanges) return 0;
+    for (const { branchPath } of Object.values(selectedModifiedChanges)) {
+      uniqueBranches.add(branchPath);
+    }
+    return uniqueBranches.size;
+  }, [selectedModifiedChanges]);
+  const progressValue = selectedBranchesCount > 0 ? liveCommits.length / selectedBranchesCount * 100 : 0;
+  const [clipboardOptions, setClipboardOptions] = reactExports.useState(["BranchFolder", "BranchVersion"]);
+  const [revisionsText, setRevisionsText] = reactExports.useState("");
+  const formatForClipboard = reactExports.useCallback(() => {
+    const newline = clipboardOptions.includes("MarkupSupport") ? `\r
+
+${"​".repeat(7)}` : "\r\n";
+    const sortedCommits = [...liveCommits];
+    const lines = sortedCommits.map((commit) => {
+      var _a, _b;
+      const parts = [];
+      if (clipboardOptions.includes("BranchFolder")) {
+        parts.push((_a = selectedBranchProps[commit.svnBranch]) == null ? void 0 : _a.folder);
+      }
+      if (clipboardOptions.includes("BranchVersion")) {
+        parts.push((_b = selectedBranchProps[commit.svnBranch]) == null ? void 0 : _b.version);
+      }
+      if (clipboardOptions.includes("SVNBranch")) {
+        parts.push(branchPathFolder(commit.svnBranch) || "[SVN-branch-unknown]");
+      }
+      if (clipboardOptions.includes("IssueNumber")) {
+        parts.push(`Issue [${commit.branchIssueNumber || "??"}]`);
+      }
+      const revisionOrError = commit.revision ? `Revision [${commit.revision}]` : `Error: ${commit.errorMessage || "Unknown"}`;
+      parts.push(revisionOrError);
+      return parts.join(" ").trim();
+    });
+    return lines.join(newline);
+  }, [liveCommits, clipboardOptions, selectedBranchProps, branchPathFolder]);
+  reactExports.useEffect(() => {
+    const socketCallback = (data) => {
+      setLiveCommits((currentCommits) => [...currentCommits, data]);
+    };
+    socket == null ? void 0 : socket.on("svn-commit-live", socketCallback);
+    return () => socket == null ? void 0 : socket.off("svn-commit-live", socketCallback);
+  }, [socket]);
+  reactExports.useEffect(() => {
+    const newText = formatForClipboard();
+    setRevisionsText(newText);
+  }, [formatForClipboard]);
+  reactExports.useEffect(() => {
+    if (isProcessCommit) return;
+    setLiveCommits([]);
+    setRevisionsText("");
+    setClipboardOptions(["BranchFolder", "BranchVersion"]);
+  }, [isProcessCommit]);
+  const handleCheckboxOption = reactExports.useCallback((newValues) => {
+    setClipboardOptions(newValues);
+  }, []);
+  const handleCompleteCommit = reactExports.useCallback(() => {
+    setIsProcessCommit(false);
+  }, []);
+  const handleUpdateTrelloCard = reactExports.useCallback(() => {
+    const newline = clipboardOptions.includes("MarkupSupport") ? `\r
+
+${"​".repeat(7)}` : "\r\n";
+    emitTrelloCardUpdate(trelloData, revisionsText.split(newline), finalCommitMessage);
+  }, [trelloData, liveCommits, finalCommitMessage, clipboardOptions, emitTrelloCardUpdate]);
+  return /* @__PURE__ */ jsxRuntimeExports.jsxs(Box, { children: [
+    /* @__PURE__ */ jsxRuntimeExports.jsx(Heading, { as: "h2", size: "lg", lineClamp: 1, mb: 4, className: "animation-pulse", lineHeight: "1.4", children: "Processing commit..." }),
+    /* @__PURE__ */ jsxRuntimeExports.jsx(Box, { mt: 6, colorPalette: "yellow", children: liveCommits.length < selectedBranchesCount ? /* @__PURE__ */ jsxRuntimeExports.jsxs(Box, { children: [
+      /* @__PURE__ */ jsxRuntimeExports.jsx(ProgressRoot, { value: progressValue, size: "lg", colorPalette: "yellow", variant: "subtle", striped: true, animated: true, mb: 4, children: /* @__PURE__ */ jsxRuntimeExports.jsxs(HStack, { gap: 5, children: [
+        /* @__PURE__ */ jsxRuntimeExports.jsx(ProgressLabel, { children: "Committed" }),
+        /* @__PURE__ */ jsxRuntimeExports.jsx(ProgressBar, { flex: "0.5" }),
+        /* @__PURE__ */ jsxRuntimeExports.jsxs(ProgressValueText, { children: [
+          liveCommits.length,
+          " / ",
+          selectedBranchesCount
+        ] })
+      ] }) }),
+      /* @__PURE__ */ jsxRuntimeExports.jsx(ListRoot, { gap: "2", variant: "plain", align: "center", colorPalette: "yellow", children: liveCommits.map((commit, i) => /* @__PURE__ */ jsxRuntimeExports.jsxs(ListItem, { alignItems: "center", children: [
+        /* @__PURE__ */ jsxRuntimeExports.jsx(ListIndicator, { color: commit.revision ? "colorPalette.fg" : "red.500", display: "flex", alignItems: "center", children: commit.revision ? /* @__PURE__ */ jsxRuntimeExports.jsx(LuCheckCircle, {}) : /* @__PURE__ */ jsxRuntimeExports.jsx(MdError, {}) }),
+        commit.branchString,
+        "  →  ",
+        commit.revision ? commit.revision : commit.errorMessage
+      ] }, i)) })
+    ] }) : /* @__PURE__ */ jsxRuntimeExports.jsxs(Box, { children: [
+      /* @__PURE__ */ jsxRuntimeExports.jsxs(Text, { mb: 3, color: "colorPalette.inverted", children: [
+        "The commit process has been ",
+        /* @__PURE__ */ jsxRuntimeExports.jsx(chakra.span, { color: "colorPalette.fg", children: "completed" }),
+        "! Please see he commit details below:"
+      ] }),
+      /* @__PURE__ */ jsxRuntimeExports.jsxs(Flex, { direction: "row", gap: 3, alignItems: "center", children: [
+        /* @__PURE__ */ jsxRuntimeExports.jsx(Text, { children: "Commit message:" }),
+        /* @__PURE__ */ jsxRuntimeExports.jsx(Text, { color: "colorPalette.fg", children: finalCommitMessage || "Commit message not found. This is a fatal error!" }),
+        /* @__PURE__ */ jsxRuntimeExports.jsx(ButtonClipboard, { value: finalCommitMessage || "Commit message not found. This is a fatal error!" })
+      ] }),
+      /* @__PURE__ */ jsxRuntimeExports.jsxs(Box, { my: 4, children: [
+        /* @__PURE__ */ jsxRuntimeExports.jsx(Text, { fontWeight: "bold", children: "Choose fields to include in your revision text:" }),
+        /* @__PURE__ */ jsxRuntimeExports.jsx(CheckboxGroup, { defaultValue: clipboardOptions, onValueChange: handleCheckboxOption, children: /* @__PURE__ */ jsxRuntimeExports.jsxs(HStack, { spacing: 4, mt: 2, children: [
+          /* @__PURE__ */ jsxRuntimeExports.jsx(Checkbox, { value: "BranchFolder", children: "Branch Folder" }),
+          /* @__PURE__ */ jsxRuntimeExports.jsx(Checkbox, { value: "BranchVersion", children: "Branch Version" }),
+          /* @__PURE__ */ jsxRuntimeExports.jsx(Checkbox, { value: "SVNBranch", children: "SVN Branch" }),
+          /* @__PURE__ */ jsxRuntimeExports.jsx(Checkbox, { value: "IssueNumber", children: "Issue Number" }),
+          /* @__PURE__ */ jsxRuntimeExports.jsx(Checkbox, { value: "MarkupSupport", children: "Markup Support" })
+        ] }) })
+      ] }),
+      /* @__PURE__ */ jsxRuntimeExports.jsxs(Box, { my: 4, children: [
+        /* @__PURE__ */ jsxRuntimeExports.jsx(Text, { children: "Your Revisions:" }),
+        /* @__PURE__ */ jsxRuntimeExports.jsxs(Flex, { alignItems: "center", gap: 3, children: [
+          /* @__PURE__ */ jsxRuntimeExports.jsx(Box, { my: 2, p: 2, bg: "yellow.subtle", color: "yellow.fg", borderRadius: "md", overflowX: "auto", whiteSpace: "pre-wrap", wordBreak: "break-word", children: revisionsText || "Commit message not displayed. This is a fatal error!" }),
+          /* @__PURE__ */ jsxRuntimeExports.jsx(ButtonClipboard, { value: revisionsText || "Commit message not copied. This is a fatal error!" })
+        ] })
+      ] }),
+      /* @__PURE__ */ jsxRuntimeExports.jsxs(HStack, { gap: 3, colorPalette: "yellow", children: [
+        /* @__PURE__ */ jsxRuntimeExports.jsxs(Button, { onClick: handleCompleteCommit, children: [
+          /* @__PURE__ */ jsxRuntimeExports.jsx(FaCheck, {}),
+          "Complete"
+        ] }),
+        /* @__PURE__ */ jsxRuntimeExports.jsxs(Button, { onClick: handleUpdateTrelloCard, children: [
+          /* @__PURE__ */ jsxRuntimeExports.jsx(FaTrello, {}),
+          "Update Card"
+        ] })
+      ] })
+    ] }) })
+  ] });
+}
 function SectionCommit() {
   const isCommitMode = useCommit((ctx) => ctx.isCommitMode);
   const selectedBranchesCount = useCommit((ctx) => ctx.selectedBranchesCount);
   const commitStage = useCommit((ctx) => ctx.commitStage);
   const accordionSection = useCommit((ctx) => ctx.accordionSection);
   const setCommitStage = useCommit((ctx) => ctx.setCommitStage);
+  const isProcessCommit = useCommit((ctx) => ctx.isProcessCommit);
   return /* @__PURE__ */ jsxRuntimeExports.jsx(CollapsibleRoot, { open: isCommitMode && selectedBranchesCount > 0, children: /* @__PURE__ */ jsxRuntimeExports.jsx(CollapsibleContent, { children: /* @__PURE__ */ jsxRuntimeExports.jsxs(Box, { id: "sectionCommit", mb: 40, children: [
     /* @__PURE__ */ jsxRuntimeExports.jsxs(Heading, { as: "h2", size: "2xl", lineClamp: 1, mb: 4, className: "animation-pulse", lineHeight: "1.4", children: [
       "Committing to ",
@@ -2312,7 +3218,8 @@ function SectionCommit() {
       selectedBranchesCount > 1 ? "es" : "",
       ":"
     ] }),
-    /* @__PURE__ */ jsxRuntimeExports.jsx(Box, { my: 6, fontSize: "sm", children: /* @__PURE__ */ jsxRuntimeExports.jsx(AccordionRoot, { size: "sm", variant: "enclosed", colorPalette: "yellow", value: commitStage, collapsible: true, multiple: true, onValueChange: (e) => setCommitStage(e.value), lazyMount: false, children: accordionSection }) })
+    /* @__PURE__ */ jsxRuntimeExports.jsx(Box, { my: 6, fontSize: "sm", children: /* @__PURE__ */ jsxRuntimeExports.jsx(AccordionRoot, { size: "sm", variant: "enclosed", colorPalette: "yellow", value: commitStage, collapsible: true, multiple: true, onValueChange: (e) => setCommitStage(e.value), lazyMount: false, children: accordionSection }) }),
+    /* @__PURE__ */ jsxRuntimeExports.jsx(CollapsibleRoot, { open: isProcessCommit, children: /* @__PURE__ */ jsxRuntimeExports.jsx(CollapsibleContent, { children: /* @__PURE__ */ jsxRuntimeExports.jsx(ProcessCommit, {}) }) })
   ] }) }) });
 }
 function AlertUpdateTitan() {

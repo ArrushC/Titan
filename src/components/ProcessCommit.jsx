@@ -4,13 +4,12 @@ import { useCommit } from "../ContextCommit.jsx";
 import useSocketEmits from "../hooks/useSocketEmits.jsx";
 import { useApp } from "../ContextApp.jsx";
 import { ProgressBar, ProgressLabel, ProgressRoot, ProgressValueText } from "./ui/progress.jsx";
-import { LuCheckCircle } from "react-icons/lu";
 import { MdError } from "react-icons/md";
 import ButtonClipboard from "./ButtonClipboard.jsx";
 import { Checkbox } from "./ui/checkbox.jsx";
 import { branchPathFolder } from "../utils/CommonConfig.jsx";
 import { Button } from "./ui/button.jsx";
-import { FaCheck, FaTrello } from "react-icons/fa6";
+import { FaCheck, FaCircleCheck, FaTrello } from "react-icons/fa6";
 
 export default function ProcessCommit() {
 	const socket = useApp((ctx) => ctx.socket);
@@ -131,7 +130,7 @@ export default function ProcessCommit() {
 							{liveCommits.map((commit, i) => (
 								<List.Item key={i} alignItems={"center"}>
 									<List.Indicator color={commit.revision ? "colorPalette.fg" : "red.500"} display={"flex"} alignItems={"center"}>
-										{commit.revision ? <LuCheckCircle /> : <MdError />}
+										{commit.revision ? <FaCircleCheck /> : <MdError />}
 									</List.Indicator>
 									{commit.branchString}&nbsp;&nbsp;&#8594;&nbsp;&nbsp;{commit.revision ? commit.revision : commit.errorMessage}
 								</List.Item>

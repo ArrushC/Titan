@@ -5,8 +5,8 @@ import path from "path";
 import os from "os";
 import { fork } from "child_process";
 import { fileURLToPath } from "url";
-import { setupLogger, setupUncaughtExceptionHandler } from "../server/logger.js";
 import { exec, execSync } from "child_process";
+import { setupLogger, setupUncaughtExceptionHandler } from "../server/logger.js";
 
 const { autoUpdater } = electronUpdaterPkg;
 const isDev = process.env.NODE_ENV === "development";
@@ -46,8 +46,8 @@ function createWindow() {
 	const { width, height } = primaryDisplay.workAreaSize;
 
 	mainWindow = new BrowserWindow({
-		width: width,
-		height: height,
+		width,
+		height,
 		backgroundColor: "#1A202C",
 		frame: false,
 		show: false,
@@ -123,19 +123,26 @@ function createWindow() {
 }
 
 function startServer() {
-	serverProcess = fork(path.join(__dirname, "../server/server.js"), [], {
+	const serverPath = path.join(__dirname, "../server/server.mjs");
+	logger.info("Firing up the server...");
+	logger.info("Using server file path: " + serverPath);
+	serverProcess = fork(serverPath, {
 		env: { ...process.env, ELECTRON_RUN_AS_NODE: "1" },
 		stdio: ["pipe", "pipe", "pipe", "ipc"],
 	});
 
 	serverProcess.on("message", (message) => {
 		if (message === "server-ready") {
-			if (process.env.VITE_DEV_SERVER_URL) {
+			if (isDev) {
 				mainWindow.loadURL(process.env.VITE_DEV_SERVER_URL);
 			} else {
-				mainWindow.loadFile(path.join(__dirname, "../dist/index.html"));
+				mainWindow.loadURL(connectionURL);
 			}
 		}
+	});
+
+	serverProcess.stderr?.on("data", (data) => {
+		logger.error(`[server.mjs] stderr: ${data}`);
 	});
 
 	serverProcess.on("error", (error) => {

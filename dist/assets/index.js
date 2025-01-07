@@ -1,4 +1,4 @@
-import { c as createToaster, j as jsxRuntimeExports, P as Portal, T as Toaster$1, a as ToastRoot, S as Spinner, b as ToastIndicator, d as Stack, e as ToastTitle, f as ToastDescription, g as ToastActionTrigger, h as ToastCloseTrigger, i as createContext, u as useContextSelector, r as reactExports, l as lookup, k as reactDomExports, m as TooltipRoot, n as TooltipTrigger, o as TooltipPositioner, p as TooltipContent, q as TooltipArrow, s as TooltipArrowTip, I as IconButton, C as ClientOnly, t as Skeleton, z, F as FaSun, v as FaMoon, J, B as Button$1, A as AbsoluteCenter, w as Span, L as LuX, x as PopoverPositioner, y as PopoverContent$1, D as PopoverArrow$1, E as PopoverArrowTip, G as PopoverCloseTrigger, H as PopoverTitle$1, K as PopoverRoot$1, M as PopoverBody$1, N as PopoverTrigger$1, O as HStack, Q as Flex, R as Heading, U as LuFileCog, V as LiaToiletSolid, W as MdBrowserUpdated, X as IoReload, Y as CheckboxRoot, Z as CheckboxHiddenInput, _ as CheckboxControl, $ as CheckboxIndicator, a0 as CheckboxLabel, a1 as DialogBackdrop$1, a2 as DialogPositioner, a3 as DialogContent$1, a4 as DialogCloseTrigger$1, a5 as DialogRoot$1, a6 as DialogFooter$1, a7 as DialogHeader$1, a8 as DialogBody$1, a9 as DialogTitle$1, aa as DialogActionTrigger$1, ab as TbAsterisk, ac as TbLetterZ, ad as TbLetterY, ae as TbLetterX, af as TbLetterW, ag as TbLetterV, ah as TbLetterU, ai as TbLetterT, aj as TbLetterS, ak as TbLetterR, al as TbLetterQ, am as TbLetterP, an as TbLetterO, ao as TbLetterN, ap as TbLetterM, aq as TbLetterL, ar as TbLetterK, as as TbLetterJ, at as TbLetterI, au as TbLetterH, av as TbLetterG, aw as TbLetterF, ax as TbLetterE, ay as TbLetterD, az as TbLetterC, aA as TbLetterB, aB as TbLetterA, aC as Input, aD as keyframes, aE as chroma, aF as Text, aG as TableRow, aH as TableCell, aI as FaFolderOpen, aJ as MdAutoFixHigh, aK as ActionBarPositioner, aL as ActionBarContent$1, aM as ActionBarCloseTrigger, aN as ActionBarRoot$1, aO as ActionBarSelectionTrigger$1, aP as ActionBarSeparator$1, aQ as Kbd, aR as IoMdClose, aS as Group, aT as InputElement, aU as React, aV as FaChevronDown, aW as FaChevronRight, aX as Box, aY as TableRoot, aZ as TableColumnGroup, a_ as TableColumn, a$ as TableHeader, b0 as TableColumnHeader, b1 as TableBody, b2 as VscDiffSingle, b3 as SiSubversion, b4 as LuSearch, b5 as TableFooter, b6 as IoMdAdd, b7 as MdUpdate, b8 as AccordionItemTrigger$1, b9 as AccordionItemIndicator, ba as AccordionItemContent$1, bb as AccordionItemBody, bc as AccordionRoot$1, bd as AccordionItem$1, be as FieldRoot, bf as FieldLabel, bg as FieldRequiredIndicator, bh as FieldHelperText, bi as FieldErrorText, bj as NumberInputRoot$1, bk as NumberInputControl, bl as NumberInputIncrementTrigger, bm as NumberInputDecrementTrigger, bn as NumberInputInput, bo as chakra, bp as index, bq as FaTrello, br as MdKeyboardReturn, bs as TableScrollArea, bt as Link, bu as LuExternalLink, bv as FaChevronUp, bw as Code, bx as MdError, by as BiMessageDetail, bz as IoWarning, bA as FiHelpCircle, bB as FiEdit, bC as HiOutlineInformationCircle, bD as ProgressTrack, bE as ProgressRange, bF as ProgressLabel$1, bG as ProgressRoot$1, bH as ProgressValueText$1, bI as LuCheck, bJ as LuClipboard, bK as ListRoot, bL as ListItem, bM as ListIndicator, bN as FaCircleCheck, bO as CheckboxGroup, bP as FaCheck, bQ as CollapsibleRoot, bR as CollapsibleContent, bS as Image, bT as VscChromeMinimize, bU as FaRegSquare, bV as ChakraProvider, bW as defaultSystem, bX as clientExports } from "./vendor.js";
+import { c as createToaster, j as jsxRuntimeExports, P as Portal, T as Toaster$1, a as ToastRoot, S as Spinner, b as ToastIndicator, d as Stack, e as ToastTitle, f as ToastDescription, g as ToastActionTrigger, h as ToastCloseTrigger, i as createContext, u as useContextSelector, r as reactExports, l as lookup, k as reactDomExports, m as TooltipRoot, n as TooltipTrigger, o as TooltipPositioner, p as TooltipContent, q as TooltipArrow, s as TooltipArrowTip, I as IconButton, C as ClientOnly, t as Skeleton, z, F as FaSun, v as FaMoon, J, B as Button$1, A as AbsoluteCenter, w as Span, L as LuX, x as PopoverPositioner, y as PopoverContent$1, D as PopoverArrow$1, E as PopoverArrowTip, G as PopoverCloseTrigger, H as PopoverTitle$1, K as PopoverRoot$1, M as PopoverBody$1, N as PopoverTrigger$1, O as HStack, Q as Flex, R as Heading, U as MdUpdate, V as IoReload, W as LuFileCog, X as MdBrowserUpdated, Y as LiaToiletSolid, Z as IoMdAdd, _ as CheckboxRoot, $ as CheckboxHiddenInput, a0 as CheckboxControl, a1 as CheckboxIndicator, a2 as CheckboxLabel, a3 as DialogBackdrop$1, a4 as DialogPositioner, a5 as DialogContent$1, a6 as DialogCloseTrigger$1, a7 as DialogRoot$1, a8 as DialogFooter$1, a9 as DialogHeader$1, aa as DialogBody$1, ab as DialogTitle$1, ac as DialogActionTrigger$1, ad as TbAsterisk, ae as TbLetterZ, af as TbLetterY, ag as TbLetterX, ah as TbLetterW, ai as TbLetterV, aj as TbLetterU, ak as TbLetterT, al as TbLetterS, am as TbLetterR, an as TbLetterQ, ao as TbLetterP, ap as TbLetterO, aq as TbLetterN, ar as TbLetterM, as as TbLetterL, at as TbLetterK, au as TbLetterJ, av as TbLetterI, aw as TbLetterH, ax as TbLetterG, ay as TbLetterF, az as TbLetterE, aA as TbLetterD, aB as TbLetterC, aC as TbLetterB, aD as TbLetterA, aE as Input, aF as keyframes, aG as chroma, aH as Text, aI as TableRow, aJ as TableCell, aK as FaFolderOpen, aL as MdAutoFixHigh, aM as ActionBarPositioner, aN as ActionBarContent$1, aO as ActionBarCloseTrigger, aP as ActionBarRoot$1, aQ as ActionBarSelectionTrigger$1, aR as ActionBarSeparator$1, aS as Kbd, aT as IoMdClose, aU as Group, aV as InputElement, aW as React, aX as FaChevronDown, aY as FaChevronRight, aZ as Box, a_ as TableRoot, a$ as TableColumnGroup, b0 as TableColumn, b1 as TableHeader, b2 as TableColumnHeader, b3 as TableBody, b4 as VscDiffSingle, b5 as SiSubversion, b6 as LuSearch, b7 as AccordionItemTrigger$1, b8 as AccordionItemIndicator, b9 as AccordionItemContent$1, ba as AccordionItemBody, bb as AccordionRoot$1, bc as AccordionItem$1, bd as FieldRoot, be as FieldLabel, bf as FieldRequiredIndicator, bg as FieldHelperText, bh as FieldErrorText, bi as NumberInputRoot$1, bj as NumberInputControl, bk as NumberInputIncrementTrigger, bl as NumberInputDecrementTrigger, bm as NumberInputInput, bn as chakra, bo as index, bp as FaTrello, bq as MdKeyboardReturn, br as TableScrollArea, bs as Link, bt as LuExternalLink, bu as TableFooter, bv as FaChevronUp, bw as Code, bx as MdError, by as BiMessageDetail, bz as IoWarning, bA as FiHelpCircle, bB as FiEdit, bC as HiOutlineInformationCircle, bD as ProgressTrack, bE as ProgressRange, bF as ProgressLabel$1, bG as ProgressRoot$1, bH as ProgressValueText$1, bI as LuCheck, bJ as LuClipboard, bK as ListRoot, bL as ListItem, bM as ListIndicator, bN as FaCircleCheck, bO as CheckboxGroup, bP as FaCheck, bQ as CollapsibleRoot, bR as CollapsibleContent, bS as Image, bT as VscChromeMinimize, bU as FaRegSquare, bV as ChakraProvider, bW as defaultSystem, bX as clientExports } from "./vendor.js";
 import { l as lodashExports } from "./lodash.js";
 /* empty css                  */
 (function polyfill() {
@@ -521,11 +521,43 @@ const PopoverRoot = PopoverRoot$1;
 const PopoverBody = PopoverBody$1;
 const PopoverTrigger = PopoverTrigger$1;
 function Header() {
+  const updateConfig = useApp((ctx) => ctx.updateConfig);
   const configurableRowData = useApp((ctx) => ctx.configurableRowData);
   const setAppClosing = useApp((ctx) => ctx.setAppClosing);
-  const { emitOpenConfig, emitFlushSvnLogs } = useSocketEmits();
-  const { RaiseClientNotificaiton } = useNotifications();
+  const { emitOpenConfig, emitFlushSvnLogs, emitInfoSingle, emitUpdateSingle } = useSocketEmits();
+  const { RaiseClientNotificaiton, RaisePromisedClientNotification } = useNotifications();
   const [reloadPopover, setReloadPopover] = reactExports.useState(false);
+  const updateAll = reactExports.useCallback(() => {
+    RaisePromisedClientNotification({
+      title: "Updating Branches",
+      totalItems: configurableRowData.length,
+      onProgress: async (index2, { onSuccess }) => {
+        const branchRow = configurableRowData[index2];
+        await new Promise((resolveUpdate) => {
+          emitUpdateSingle(branchRow.id, branchRow["SVN Branch"], branchRow["Branch Version"], branchRow["Branch Folder"], (response) => {
+            if (response.success) {
+              onSuccess();
+              emitInfoSingle(branchRow.id, branchRow["SVN Branch"], branchRow["Branch Version"], branchRow["Branch Folder"]);
+              if (window.electron)
+                window.electron.runCustomScript({
+                  scriptType: "powershell",
+                  scriptPath: "C:\\Titan\\Titan_PostUpdate_BranchSingle.ps1",
+                  branchData: branchRow
+                }).then((result) => {
+                  console.log("Custom Script Result: ", JSON.stringify(result, null, 4));
+                }).catch((err) => {
+                  console.error("Custom Script error: " + JSON.stringify(err, null, 4));
+                });
+            }
+            resolveUpdate();
+          });
+        });
+      },
+      successMessage: (count) => `${count} branches successfully updated`,
+      errorMessage: (id) => `Failed to update branch ${id}`,
+      loadingMessage: (current, total) => `Updating ${current} of ${total} branches`
+    }).catch(console.error);
+  }, [RaisePromisedClientNotification, configurableRowData, emitUpdateSingle, emitInfoSingle]);
   const handleReload = reactExports.useCallback((isAppRestart = false) => {
     if (isAppRestart) {
       window.electron.restartApp();
@@ -549,6 +581,18 @@ function Header() {
   const handleFlushSvnLogs = reactExports.useCallback(() => {
     emitFlushSvnLogs();
   }, [emitFlushSvnLogs]);
+  const addRow = reactExports.useCallback(() => {
+    updateConfig((currentConfig) => {
+      const newBranch = {
+        id: `${Date.now()}`,
+        "Branch Folder": "",
+        "Branch Version": "",
+        "SVN Branch": "",
+        "Branch Info": "Please add branch path"
+      };
+      return { ...currentConfig, branches: [...configurableRowData, newBranch] };
+    });
+  }, [updateConfig, configurableRowData]);
   return /* @__PURE__ */ jsxRuntimeExports.jsxs(HStack, { wrap: "wrap", my: 5, gapY: 5, justify: "space-between", children: [
     /* @__PURE__ */ jsxRuntimeExports.jsx(Flex, { align: "flex-start", alignItems: "center", className: "notMono", children: /* @__PURE__ */ jsxRuntimeExports.jsxs(Heading, { as: "h2", size: "2xl", lineClamp: 1, lineHeight: "1.4", className: "animation-fadein-forward", userSelect: "none", children: [
       "You have ",
@@ -558,20 +602,22 @@ function Header() {
       ":"
     ] }) }),
     /* @__PURE__ */ jsxRuntimeExports.jsxs(Flex, { align: "flex-start", alignItems: "center", columnGap: 2, children: [
-      /* @__PURE__ */ jsxRuntimeExports.jsx(ColorModeButton, {}),
-      /* @__PURE__ */ jsxRuntimeExports.jsx(ButtonIconTooltip, { icon: /* @__PURE__ */ jsxRuntimeExports.jsx(LuFileCog, {}), onClick: handleOpenConfig, colorPalette: "yellow", variant: "subtle", label: "Open Config File", placement: "bottom-start", size: "md" }),
-      /* @__PURE__ */ jsxRuntimeExports.jsx(ButtonIconTooltip, { icon: /* @__PURE__ */ jsxRuntimeExports.jsx(LiaToiletSolid, {}), onClick: handleFlushSvnLogs, colorPalette: "yellow", variant: "subtle", label: "Flush SVN Logs", placement: "bottom-start", size: "md" }),
-      /* @__PURE__ */ jsxRuntimeExports.jsx(ButtonElectron, { icon: /* @__PURE__ */ jsxRuntimeExports.jsx(MdBrowserUpdated, {}), onClick: handleCheckForUpdates, colorPalette: "yellow", variant: "subtle", label: "Check For Updates", size: "md" }),
+      /* @__PURE__ */ jsxRuntimeExports.jsx(ButtonIconTooltip, { icon: /* @__PURE__ */ jsxRuntimeExports.jsx(MdUpdate, {}), colorPalette: "yellow", variant: "subtle", label: "Update All", placement: "bottom-end", onClick: updateAll, disabled: configurableRowData.length < 1 }),
       /* @__PURE__ */ jsxRuntimeExports.jsxs(PopoverRoot, { open: window.electron && reloadPopover, onOpenChange: (e) => setReloadPopover(e.open), children: [
         /* @__PURE__ */ jsxRuntimeExports.jsx(PopoverTrigger, { as: "div", children: /* @__PURE__ */ jsxRuntimeExports.jsx(ButtonIconTooltip, { icon: /* @__PURE__ */ jsxRuntimeExports.jsx(IoReload, {}), onClick: () => setReloadPopover((prev) => !prev), colorPalette: "yellow", label: "Reload", variant: "subtle", size: "md" }) }),
         /* @__PURE__ */ jsxRuntimeExports.jsxs(PopoverContent, { children: [
           /* @__PURE__ */ jsxRuntimeExports.jsx(PopoverArrow, {}),
           /* @__PURE__ */ jsxRuntimeExports.jsx(PopoverBody, { children: /* @__PURE__ */ jsxRuntimeExports.jsxs(HStack, { gap: 8, children: [
-            /* @__PURE__ */ jsxRuntimeExports.jsx(Button, { colorPalette: "yellow", variant: "subtle", onClick: (e) => handleReload(false), children: "Refresh" }),
-            /* @__PURE__ */ jsxRuntimeExports.jsx(Button, { colorPalette: "yellow", variant: "subtle", onClick: (e) => handleReload(true), children: "Restart" })
+            /* @__PURE__ */ jsxRuntimeExports.jsx(Button, { colorPalette: "yellow", variant: "subtle", onClick: () => handleReload(false), children: "Refresh" }),
+            /* @__PURE__ */ jsxRuntimeExports.jsx(Button, { colorPalette: "yellow", variant: "subtle", onClick: () => handleReload(true), children: "Restart" })
           ] }) })
         ] })
-      ] })
+      ] }),
+      /* @__PURE__ */ jsxRuntimeExports.jsx(ButtonIconTooltip, { icon: /* @__PURE__ */ jsxRuntimeExports.jsx(LuFileCog, {}), onClick: handleOpenConfig, colorPalette: "yellow", variant: "subtle", label: "Open Config File", placement: "bottom-start", size: "md" }),
+      /* @__PURE__ */ jsxRuntimeExports.jsx(ButtonElectron, { icon: /* @__PURE__ */ jsxRuntimeExports.jsx(MdBrowserUpdated, {}), onClick: handleCheckForUpdates, colorPalette: "yellow", variant: "subtle", label: "Check For Updates", size: "md" }),
+      /* @__PURE__ */ jsxRuntimeExports.jsx(ButtonIconTooltip, { icon: /* @__PURE__ */ jsxRuntimeExports.jsx(LiaToiletSolid, {}), onClick: handleFlushSvnLogs, colorPalette: "yellow", variant: "subtle", label: "Flush SVN Logs", placement: "bottom-start", size: "md" }),
+      /* @__PURE__ */ jsxRuntimeExports.jsx(ButtonIconTooltip, { icon: /* @__PURE__ */ jsxRuntimeExports.jsx(IoMdAdd, {}), colorPalette: "yellow", variant: "subtle", label: "Add Row", placement: "bottom-end", onClick: addRow }),
+      /* @__PURE__ */ jsxRuntimeExports.jsx(ColorModeButton, {})
     ] })
   ] });
 }
@@ -802,7 +848,8 @@ const SectionBranchesRow = reactExports.memo(({ branchRow, isSelected }) => {
   const branchPath = branchRow == null ? void 0 : branchRow["SVN Branch"];
   const [branchInfo, setBranchInfo] = reactExports.useState((branchRow == null ? void 0 : branchRow["Branch Info"]) || "Refreshing...");
   const themedBgColor = (config == null ? void 0 : config.branchFolderColours[branchFolder]) || "transparent";
-  const paddingValue = "0.25rem";
+  const paddingXValue = "0.75";
+  const paddingYValue = "0.25rem";
   const gradientAnimation = keyframes`
 			0% { background-position: 0% 50%; }
 			50% { background-position: 100% 50%; }
@@ -909,15 +956,15 @@ const SectionBranchesRow = reactExports.memo(({ branchRow, isSelected }) => {
     return /* @__PURE__ */ jsxRuntimeExports.jsx(Text, { as: "span", children: branchInfo });
   }, [branchInfo]);
   return /* @__PURE__ */ jsxRuntimeExports.jsxs(TableRow, { children: [
-    /* @__PURE__ */ jsxRuntimeExports.jsx(TableCell, { display: "flex", alignItems: "center", py: paddingValue, children: /* @__PURE__ */ jsxRuntimeExports.jsx(Checkbox, { top: "5px", "aria-label": "Select row", variant: "subtle", colorPalette: "yellow", checked: isSelected, onCheckedChange: (e) => handleBranchSelection(branchPath, e.checked) }) }),
-    /* @__PURE__ */ jsxRuntimeExports.jsx(TableCell, { py: paddingValue, children: /* @__PURE__ */ jsxRuntimeExports.jsx(EditableBranchesRow, { branchId, dataColumn: "Branch Folder", dataValue: branchFolder, handleDataChange, bgLightColorValue: themedBgColor == "transparent" ? "transparent" : `${themedBgColor}30`, bgDarkColorValue: themedBgColor == "transparent" ? "transparent" : `${themedBgColor}80` }) }),
-    /* @__PURE__ */ jsxRuntimeExports.jsx(TableCell, { py: paddingValue, children: /* @__PURE__ */ jsxRuntimeExports.jsx(EditableBranchesRow, { branchId, dataColumn: "Branch Version", dataValue: branchVersion, handleDataChange, bgLightColorValue: themedBgColor == "transparent" ? "transparent" : `${themedBgColor}30`, bgDarkColorValue: themedBgColor == "transparent" ? "transparent" : `${themedBgColor}80` }) }),
-    /* @__PURE__ */ jsxRuntimeExports.jsx(TableCell, { py: paddingValue, children: /* @__PURE__ */ jsxRuntimeExports.jsxs(Flex, { gapX: 3, alignItems: "center", onDoubleClick: () => handleSelectFolder(branchPath), children: [
+    /* @__PURE__ */ jsxRuntimeExports.jsx(TableCell, { display: "flex", alignItems: "center", ps: 3.5, pe: paddingXValue, children: /* @__PURE__ */ jsxRuntimeExports.jsx(Checkbox, { "aria-label": "Select row", variant: "subtle", colorPalette: "yellow", checked: isSelected, onCheckedChange: (e) => handleBranchSelection(branchPath, e.checked) }) }),
+    /* @__PURE__ */ jsxRuntimeExports.jsx(TableCell, { py: paddingYValue, px: paddingXValue, children: /* @__PURE__ */ jsxRuntimeExports.jsx(EditableBranchesRow, { branchId, dataColumn: "Branch Folder", dataValue: branchFolder, handleDataChange, bgLightColorValue: themedBgColor == "transparent" ? "transparent" : `${themedBgColor}30`, bgDarkColorValue: themedBgColor == "transparent" ? "transparent" : `${themedBgColor}80` }) }),
+    /* @__PURE__ */ jsxRuntimeExports.jsx(TableCell, { py: paddingYValue, px: paddingXValue, children: /* @__PURE__ */ jsxRuntimeExports.jsx(EditableBranchesRow, { branchId, dataColumn: "Branch Version", dataValue: branchVersion, handleDataChange, bgLightColorValue: themedBgColor == "transparent" ? "transparent" : `${themedBgColor}30`, bgDarkColorValue: themedBgColor == "transparent" ? "transparent" : `${themedBgColor}80` }) }),
+    /* @__PURE__ */ jsxRuntimeExports.jsx(TableCell, { py: paddingYValue, px: paddingXValue, children: /* @__PURE__ */ jsxRuntimeExports.jsxs(Flex, { gapX: 3, alignItems: "center", onDoubleClick: () => handleSelectFolder(branchPath), children: [
       /* @__PURE__ */ jsxRuntimeExports.jsx(Tooltip, { content: window.electron ? "Select folder" : "Feature must be used in desktop application", showArrow: true, children: /* @__PURE__ */ jsxRuntimeExports.jsx(IconButton, { colorPalette: "yellow", variant: "subtle", size: "xs", onClick: () => handleSelectFolder(), disabled: !window.electron, children: /* @__PURE__ */ jsxRuntimeExports.jsx(FaFolderOpen, {}) }) }),
       /* @__PURE__ */ jsxRuntimeExports.jsx(Text, { children: branchPath })
     ] }) }),
-    /* @__PURE__ */ jsxRuntimeExports.jsx(TableCell, { ...gradientStyle, bgColor: "green.focusRing", textAlign: "center", py: paddingValue, children: renderedBranchInfo }),
-    /* @__PURE__ */ jsxRuntimeExports.jsx(TableCell, { py: paddingValue, children: /* @__PURE__ */ jsxRuntimeExports.jsxs(Flex, { columnGap: 1, children: [
+    /* @__PURE__ */ jsxRuntimeExports.jsx(TableCell, { ...gradientStyle, bgColor: "green.focusRing", textAlign: "center", py: paddingYValue, px: paddingXValue, children: renderedBranchInfo }),
+    /* @__PURE__ */ jsxRuntimeExports.jsx(TableCell, { py: paddingYValue, ps: 3.5, children: /* @__PURE__ */ jsxRuntimeExports.jsxs(Flex, { columnGap: 1, children: [
       branchInfo.toLowerCase().includes("🤬") && /* @__PURE__ */ jsxRuntimeExports.jsx(ButtonElectron, { icon: /* @__PURE__ */ jsxRuntimeExports.jsx(MdAutoFixHigh, {}), onClick: () => resolveConflicts(), colorPalette: "yellow", variant: "subtle", label: "Resolve Conflicts", size: "xs" }),
       customScripts.map((script, i) => /* @__PURE__ */ jsxRuntimeExports.jsx(ButtonCustomScripts, { onClick: () => executeCustomScript(script.type, script.path, branchRow), colorPalette: "yellow", label: script.fileName, size: "xs", disabled: branchInfo === "Not Found" }, i))
     ] }) })
@@ -1163,49 +1210,6 @@ function SectionBranches() {
       return { ...currentConfig, branches: newBranches };
     });
   }, [updateConfig, configurableRowData, selectedBranches]);
-  const updateAll = reactExports.useCallback(() => {
-    RaisePromisedClientNotification({
-      title: "Updating Branches",
-      totalItems: configurableRowData.length,
-      onProgress: async (index2, { onSuccess }) => {
-        const branchRow = configurableRowData[index2];
-        await new Promise((resolveUpdate) => {
-          emitUpdateSingle(branchRow.id, branchRow["SVN Branch"], branchRow["Branch Version"], branchRow["Branch Folder"], (response) => {
-            if (response.success) {
-              onSuccess();
-              emitInfoSingle(branchRow.id, branchRow["SVN Branch"], branchRow["Branch Version"], branchRow["Branch Folder"]);
-              if (window.electron)
-                window.electron.runCustomScript({
-                  scriptType: "powershell",
-                  scriptPath: "C:\\Titan\\Titan_PostUpdate_BranchSingle.ps1",
-                  branchData: branchRow
-                }).then((result) => {
-                  console.log("Custom Script Result: ", JSON.stringify(result, null, 4));
-                }).catch((err) => {
-                  console.error("Custom Script error: " + JSON.stringify(err, null, 4));
-                });
-            }
-            resolveUpdate();
-          });
-        });
-      },
-      successMessage: (count) => `${count} branches successfully updated`,
-      errorMessage: (id) => `Failed to update branch ${id}`,
-      loadingMessage: (current, total) => `Updating ${current} of ${total} branches`
-    }).catch(console.error);
-  }, [RaisePromisedClientNotification, configurableRowData, emitUpdateSingle, emitInfoSingle]);
-  const addRow = reactExports.useCallback(() => {
-    updateConfig((currentConfig) => {
-      const newBranch = {
-        id: `${Date.now()}`,
-        "Branch Folder": "",
-        "Branch Version": "",
-        "SVN Branch": "",
-        "Branch Info": "Please add branch path"
-      };
-      return { ...currentConfig, branches: [...configurableRowData, newBranch] };
-    });
-  }, [updateConfig, configurableRowData]);
   const refreshSelectedBranches = reactExports.useCallback(() => {
     configurableRowData.filter((branchRow) => selectedBranches[branchRow["SVN Branch"]]).forEach((branchRow) => {
       emitInfoSingle(branchRow.id, branchRow["SVN Branch"], branchRow["Branch Version"], branchRow["Branch Folder"]);
@@ -1288,18 +1292,14 @@ function SectionBranches() {
         /* @__PURE__ */ jsxRuntimeExports.jsx(TableColumn, {})
       ] }),
       /* @__PURE__ */ jsxRuntimeExports.jsx(TableHeader, { children: /* @__PURE__ */ jsxRuntimeExports.jsxs(TableRow, { children: [
-        /* @__PURE__ */ jsxRuntimeExports.jsx(TableColumnHeader, { w: "6", children: /* @__PURE__ */ jsxRuntimeExports.jsx(Checkbox, { top: "0", "aria-label": "Select all rows", variant: "subtle", colorPalette: "yellow", checked: selectionMetrics.indeterminate ? "indeterminate" : selectionMetrics.selectedBranchesCount === configurableRowData.length, onCheckedChange: (e) => selectAllBranches(e.checked) }) }),
+        /* @__PURE__ */ jsxRuntimeExports.jsx(TableColumnHeader, { ps: 3.5, pe: 0.75, children: /* @__PURE__ */ jsxRuntimeExports.jsx(Checkbox, { "aria-label": "Select all rows", variant: "subtle", colorPalette: "yellow", checked: selectionMetrics.indeterminate ? "indeterminate" : selectionMetrics.selectedBranchesCount === configurableRowData.length, onCheckedChange: (e) => selectAllBranches(e.checked) }) }),
         /* @__PURE__ */ jsxRuntimeExports.jsx(TableColumnHeader, { children: "Branch Folder" }),
         /* @__PURE__ */ jsxRuntimeExports.jsx(TableColumnHeader, { children: "Branch Version" }),
         /* @__PURE__ */ jsxRuntimeExports.jsx(TableColumnHeader, { children: "SVN Branch" }),
         /* @__PURE__ */ jsxRuntimeExports.jsx(TableColumnHeader, { children: "Branch Info" }),
-        /* @__PURE__ */ jsxRuntimeExports.jsx(TableColumnHeader, { children: "Custom Scripts" })
+        /* @__PURE__ */ jsxRuntimeExports.jsx(TableColumnHeader, { ps: 3.5, children: "Custom Scripts" })
       ] }) }),
-      /* @__PURE__ */ jsxRuntimeExports.jsx(TableBody, { children: configurableRowData.map((branchRow) => /* @__PURE__ */ jsxRuntimeExports.jsx(SectionBranchesRow, { branchRow, isSelected: !!selectedBranches[branchRow["SVN Branch"]] }, branchRow.id)) }),
-      /* @__PURE__ */ jsxRuntimeExports.jsx(TableFooter, { children: /* @__PURE__ */ jsxRuntimeExports.jsx(TableRow, { children: /* @__PURE__ */ jsxRuntimeExports.jsx(TableCell, { colSpan: 6, children: /* @__PURE__ */ jsxRuntimeExports.jsx(Flex, { justifyContent: "start", p: 2, children: /* @__PURE__ */ jsxRuntimeExports.jsxs(Flex, { gapX: 2, children: [
-        /* @__PURE__ */ jsxRuntimeExports.jsx(ButtonIconTooltip, { icon: /* @__PURE__ */ jsxRuntimeExports.jsx(IoMdAdd, {}), colorPalette: "yellow", variant: "subtle", label: "Add Row", placement: "bottom-end", onClick: addRow }),
-        /* @__PURE__ */ jsxRuntimeExports.jsx(ButtonIconTooltip, { icon: /* @__PURE__ */ jsxRuntimeExports.jsx(MdUpdate, {}), colorPalette: "yellow", variant: "subtle", label: "Update All", placement: "bottom-end", onClick: updateAll, disabled: configurableRowData.length < 1 })
-      ] }) }) }) }) })
+      /* @__PURE__ */ jsxRuntimeExports.jsx(TableBody, { children: configurableRowData.map((branchRow) => /* @__PURE__ */ jsxRuntimeExports.jsx(SectionBranchesRow, { branchRow, isSelected: !!selectedBranches[branchRow["SVN Branch"]] }, branchRow.id)) })
     ] }),
     /* @__PURE__ */ jsxRuntimeExports.jsx(ActionBarSelection, { selectedCount: selectionMetrics.selectedBranchesCount, onDelete: () => setIsRowDialogOpen(true), onRefresh: refreshSelectedBranches, onUpdate: updateSelectedBranches, onCommit: commitSelectedBranches, onLogs: logsSelectedBranches, onClear: () => setSelectedBranches({}) }),
     /* @__PURE__ */ jsxRuntimeExports.jsx(DialogRowDeletion, { selectedCount: selectionMetrics.selectedBranchesCount, isDialogOpen: isRowDialogOpen, closeDialog: () => setIsRowDialogOpen(false), fireDialogAction: fireRowDialogAction }),
@@ -3171,7 +3171,13 @@ ${"​".repeat(7)}` : "\r\n";
     emitTrelloCardUpdate(trelloData, revisionsText.split(newline), finalCommitMessage);
   }, [trelloData, liveCommits, finalCommitMessage, clipboardOptions, emitTrelloCardUpdate]);
   return /* @__PURE__ */ jsxRuntimeExports.jsxs(Box, { children: [
-    /* @__PURE__ */ jsxRuntimeExports.jsx(Heading, { as: "h2", size: "lg", lineClamp: 1, mb: 4, className: "animation-pulse", lineHeight: "1.4", children: "Processing commit..." }),
+    /* @__PURE__ */ jsxRuntimeExports.jsxs(Heading, { as: "h2", size: "lg", lineClamp: 1, mb: 4, className: "animation-pulse", lineHeight: "1.4", children: [
+      "Committing ",
+      selectedBranchesCount,
+      " branch",
+      selectedBranchesCount > 1 ? "es" : "",
+      ":"
+    ] }),
     /* @__PURE__ */ jsxRuntimeExports.jsx(Box, { mt: 6, colorPalette: "yellow", children: liveCommits.length < selectedBranchesCount ? /* @__PURE__ */ jsxRuntimeExports.jsxs(Box, { children: [
       /* @__PURE__ */ jsxRuntimeExports.jsx(ProgressRoot, { value: progressValue, size: "lg", colorPalette: "yellow", variant: "subtle", striped: true, animated: true, mb: 4, children: /* @__PURE__ */ jsxRuntimeExports.jsxs(HStack, { gap: 5, children: [
         /* @__PURE__ */ jsxRuntimeExports.jsx(ProgressLabel, { children: "Committed" }),
@@ -3238,8 +3244,8 @@ function SectionCommit() {
   const setCommitStage = useCommit((ctx) => ctx.setCommitStage);
   const isProcessCommit = useCommit((ctx) => ctx.isProcessCommit);
   return /* @__PURE__ */ jsxRuntimeExports.jsx(CollapsibleRoot, { open: isCommitMode && selectedBranchesCount > 0, children: /* @__PURE__ */ jsxRuntimeExports.jsx(CollapsibleContent, { children: /* @__PURE__ */ jsxRuntimeExports.jsxs(Box, { id: "sectionCommit", mb: 40, children: [
-    /* @__PURE__ */ jsxRuntimeExports.jsxs(Heading, { as: "h2", size: "2xl", lineClamp: 1, mb: 4, className: "animation-pulse", lineHeight: "1.4", children: [
-      "Committing to ",
+    /* @__PURE__ */ jsxRuntimeExports.jsxs(Heading, { as: "h2", size: "2xl", lineClamp: 1, mb: 4, lineHeight: "1.4", children: [
+      "Commit ",
       selectedBranchesCount,
       " branch",
       selectedBranchesCount > 1 ? "es" : "",

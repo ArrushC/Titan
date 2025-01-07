@@ -1,208 +1,158 @@
-import React, { useCallback, useEffect, useState, useRef } from "react";
-import { useApp } from "../AppContext";
-import { Button, Flex, Icon, Tooltip, Wrap } from "@chakra-ui/react";
-import { CloseIcon, RepeatIcon, SmallAddIcon, TimeIcon } from "@chakra-ui/icons";
-import { FaUndo } from "react-icons/fa";
-import AlertConfirmRowDelete from "./AlertConfirmRowDelete";
-import { stripBranchInfo } from "../utils/CommonConfig";
-import { MdCloudDownload, MdCloudUpload, MdOutlineSwitchAccessShortcut } from "react-icons/md";
-import { AiFillDelete } from "react-icons/ai";
-import TableBranches from "./TableBranches";
-import useSocketEmits from "../hooks/useSocketEmits";
-import useNotifications from "../hooks/useNotifications";
-import useManagedRowDataBranches from "../hooks/useManagedRowDataBranches";
+import React, { useCallback, useEffect, useState } from "react";
+import { useApp } from "../ContextApp.jsx";
+import { Box, Table } from "@chakra-ui/react";
+import { Checkbox } from "./ui/checkbox.jsx";
+import DialogRowDeletion from "./DialogRowDeletion.jsx";
+import SectionBranchesRow from "./SectionBranchesRow.jsx";
+import useSocketEmits from "../hooks/useSocketEmits.jsx";
+import useNotifications from "../hooks/useNotifications.jsx";
+import { useBranches } from "../ContextBranches.jsx";
+import ActionBarSelection from "./ActionBarSelection.jsx";
+import DialogBranchesLog from "./DialogBranchesLog.jsx";
 
 export default function SectionBranches() {
-	const { socket, updateConfig, isDebug, setShowSelectedBranchesLog, configurableRowData, branchTableGridRef, selectedBranches, setSelectedBranches, isCommitMode, setIsCommitMode, setShowCommitView } = useApp();
-	const { emitUpdateSingle, emitInfoSingle } = useSocketEmits();
-	const { RaiseClientNotificaiton } = useNotifications();
+	const updateConfig = useApp((ctx) => ctx.updateConfig);
+	const configurableRowData = useApp((ctx) => ctx.configurableRowData);
+	const selectedBranchesData = useApp((ctx) => ctx.selectedBranchesData);
+	const selectedBranches = useApp((ctx) => ctx.selectedBranches);
+	const setSelectedBranches = useApp((ctx) => ctx.setSelectedBranches);
+	const setAppMode = useApp((ctx) => ctx.setAppMode);
+	const handleBulkSelection = useApp((ctx) => ctx.handleBulkSelection);
+	const setIsDialogSBLogOpen = useBranches((ctx) => ctx.setIsDialogSBLogOpen);
+	const selectionMetrics = useBranches((ctx) => ctx.selectionMetrics);
+	const { RaisePromisedClientNotification } = useNotifications();
+	const { emitInfoSingle, emitUpdateSingle } = useSocketEmits();
 
-	const [isAlertOpen, setIsAlertOpen] = useState(false);
-	const cancelRef = useRef();
-	const onCloseAlert = () => setIsAlertOpen(false);
+	const [isRowDialogOpen, setIsRowDialogOpen] = useState(false);
+	const fireRowDialogAction = useCallback(() => {
+		updateConfig((currentConfig) => {
+			const newBranches = configurableRowData.filter((branch) => !selectedBranches[branch["SVN Branch"]]);
+			return { ...currentConfig, branches: newBranches };
+		});
+	}, [updateConfig, configurableRowData, selectedBranches]);
 
-	const { rowDataBranches, setRowDataBranches, onRowValueChanged } = useManagedRowDataBranches();
-	const [lastInfoTaskTime, setLastInfoTaskTime] = useState(0);
-
-	const [outdatedBranches, setOutdatedBranches] = useState([]);
-
-	/****************************************************
-	 * Callback Functions - Table Operations
-	 ****************************************************/
-	const clearSelection = useCallback(() => {
-		if (isDebug) console.log("SectionBranches.jsx: clearSelection: START");
-		branchTableGridRef?.current?.api?.deselectAll();
-		setSelectedBranches([]);
-		setIsCommitMode(false);
-	}, [isDebug, branchTableGridRef, setSelectedBranches]);
-
-	/****************************************************
-	 * Callback Functions - Alert Dialog
-	 ****************************************************/
-	const openAlertDialog = useCallback(() => {
-		const selectedBranches = branchTableGridRef?.current?.api?.getSelectedNodes().map((node) => node.data);
-		setSelectedBranches(selectedBranches);
-		setIsAlertOpen(true);
-	}, [branchTableGridRef, setSelectedBranches]);
-
-	/****************************************************
-	 * Callback Functions - Table Actions
-	 ****************************************************/
-	const addNewRow = useCallback(() => {
-		const newRow = {
-			id: String(Date.now()),
-			"Branch Folder": "",
-			"Branch Version": "",
-			"SVN Branch": "",
-			"Branch Info": "",
-		};
-		updateConfig((currentConfig) => ({ ...currentConfig, branches: stripBranchInfo([...currentConfig.branches, newRow]) }));
-	}, [updateConfig]);
+	const refreshSelectedBranches = useCallback(() => {
+		configurableRowData
+			.filter((branchRow) => selectedBranches[branchRow["SVN Branch"]])
+			.forEach((branchRow) => {
+				emitInfoSingle(branchRow.id, branchRow["SVN Branch"], branchRow["Branch Version"], branchRow["Branch Folder"]);
+			});
+	}, [configurableRowData, selectedBranches]);
 
 	const updateSelectedBranches = useCallback(() => {
-		selectedBranches.forEach((row) => {
-			emitUpdateSingle(row.id, row["SVN Branch"], row["Branch Version"], row["Branch Folder"]);
-		});
-	}, [selectedBranches, emitUpdateSingle]);
+		const selectedBranchRows = selectedBranchesData;
 
-	const updateOutdatedBranches = useCallback(() => {
-		outdatedBranches.forEach((row) => {
-			emitUpdateSingle(row.id, row["SVN Branch"], row["Branch Version"], row["Branch Folder"]);
-		});
-	}, [outdatedBranches, emitUpdateSingle]);
+		RaisePromisedClientNotification({
+			title: "Updating Selected Branches",
+			totalItems: selectedBranchRows.length,
+			onProgress: async (index, { onSuccess }) => {
+				const branchRow = selectedBranchRows[index];
 
-	const removeSelectedRows = useCallback(() => {
-		const selectedIds = selectedBranches.map((row) => row.id);
-		const updatedData = rowDataBranches.filter((row) => !selectedIds.includes(row.id));
-		console.log("SectionBranches.jsx: removeSelectedRows - updatedData", updatedData);
-		updateConfig((currentConfig) => ({ ...currentConfig, branches: stripBranchInfo(updatedData) }));
-		clearSelection();
-		onCloseAlert();
-	}, [selectedBranches, rowDataBranches, updateConfig]);
+				await new Promise((resolveUpdate) => {
+					emitUpdateSingle(branchRow.id, branchRow["SVN Branch"], branchRow["Branch Version"], branchRow["Branch Folder"], (response) => {
+						if (response.success) {
+							onSuccess();
+							emitInfoSingle(branchRow.id, branchRow["SVN Branch"], branchRow["Branch Version"], branchRow["Branch Folder"]);
+							if (window.electron)
+								window.electron
+									.runCustomScript({
+										scriptType: "powershell",
+										scriptPath: "C:\\Titan\\Titan_PostUpdate_BranchSingle.ps1",
+										branchData: branchRow,
+									})
+									.then((result) => {
+										console.log("Custom Script Result: ", JSON.stringify(result, null, 4));
+									})
+									.catch((err) => {
+										console.error("Custom Script error: " + JSON.stringify(err, null, 4));
+									});
+						}
+						resolveUpdate();
+					});
+				});
+			},
+			successMessage: (count) => `Successfully updated ${count} branches`,
+			errorMessage: (id) => `Failed to update branch ${id}`,
+			loadingMessage: (current, total) => `Updating ${current} of ${total} branches`,
+		}).catch(console.error);
+	}, [RaisePromisedClientNotification, selectedBranchesData, emitUpdateSingle, emitInfoSingle]);
 
-	const viewSelectedBranchesLog = useCallback(() => {
-		setShowSelectedBranchesLog(true);
-	}, []);
+	const commitSelectedBranches = useCallback(() => {
+		setAppMode((current) => (current == "commit" ? "branches" : "commit"));
+	}, [setAppMode]);
 
-	const refreshSelected = useCallback(() => {
-		setRowDataBranches((currentRowData) => {
-			const newRowData = [...currentRowData];
-			selectedBranches.forEach((row) => {
-				const index = newRowData.findIndex((r) => r.id === row.id);
-				newRowData[index]["Branch Info"] = "Refreshing";
-			});
-			return newRowData;
-		});
-		selectedBranches.forEach((row) => {
-			emitInfoSingle(row.id, row["SVN Branch"], row["Branch Version"], row["Branch Folder"]);
-		});
-	}, [selectedBranches, emitInfoSingle]);
+	const logsSelectedBranches = useCallback(() => {
+		setIsDialogSBLogOpen((prev) => !prev);
+	}, [setIsDialogSBLogOpen]);
 
-	const refreshAll = useCallback((forceRefresh = false) => {
-		if (isCommitMode && !forceRefresh) return;
-		RaiseClientNotificaiton("Refreshing all branches. Please wait until this is done!", "info", 3000);
-		const now = Date.now();
-		configurableRowData.forEach((row) => {
-			emitInfoSingle(row.id, row["SVN Branch"], row["Branch Version"], row["Branch Folder"]);
-		});
-		setLastInfoTaskTime(now);
-	}, [configurableRowData, emitInfoSingle, RaiseClientNotificaiton, isCommitMode]);
-
-	const toggleCommitSelectedBranches = useCallback(() => {
-		setIsCommitMode((currentIsCommitMode) => !currentIsCommitMode);
-		setShowCommitView(false);
-	}, [setIsCommitMode]);
-
-	/****************************************************
-	 * Hooks setup
-	 ****************************************************/
-
-	// Check for outdated branches when rowDataBranches changes
 	useEffect(() => {
-		const outdatedBranches = rowDataBranches.filter((row) => String(row["Branch Info"]).toLowerCase().includes("-"));
-		setOutdatedBranches(outdatedBranches);
-	}, [rowDataBranches]);
+		if (!selectionMetrics.hasSelection) return;
 
-	// Create and change intervals for refreshAll when configurableRowData changes
-	useEffect(() => {
-		const intervalDuration = 60_000 * 5; // 5 minutes
-		const now = Date.now();
+		const handleKeyDown = (event) => {
+			if (!event.altKey) return;
 
-		if (configurableRowData.length > 0) {
-			if (now - lastInfoTaskTime > intervalDuration) refreshAll();
-
-			const interval = setInterval(() => {
-				refreshAll();
-			}, intervalDuration);
-			return () => clearInterval(interval);
-		}
-	}, [configurableRowData, lastInfoTaskTime, refreshAll]);
-
-	// Emit svn-info-single when branch-success-single is received as a result of a successful SVN operation
-	useEffect(() => {
-		const socketCallback = (data) => {
-			if (isDebug) console.debug("branch-success-single data received:", data);
-			emitInfoSingle(data.id, data.branch, data.version, data.folder);
+			if (event.key === "Delete") {
+				setIsRowDialogOpen(true);
+			} else if (event.key === "r") {
+				refreshSelectedBranches();
+			} else if (event.key === "u") {
+				updateSelectedBranches();
+			} else if (event.key === "c") {
+				commitSelectedBranches();
+			} else if (event.key === "l") {
+				logsSelectedBranches();
+			}
 		};
 
-		socket?.on("branch-success-single", socketCallback);
-		return () => socket?.off("branch-success-single", socketCallback);
-	}, [isDebug, socket, emitInfoSingle]);
+		window.addEventListener("keydown", handleKeyDown);
+
+		return () => {
+			window.removeEventListener("keydown", handleKeyDown);
+		};
+	}, [selectionMetrics.hasSelection, refreshSelectedBranches, updateSelectedBranches]);
+
+	const selectAllBranches = useCallback(
+		(checked) => {
+			const paths = configurableRowData.map((row) => row["SVN Branch"]);
+			handleBulkSelection(paths, checked);
+		},
+		[configurableRowData, setSelectedBranches]
+	);
 
 	return (
-		<div>
-			<Wrap mb={4} justify={"space-between"}>
-				<Flex columnGap={2}>
-					{/* <Tooltip label="Requires at least 1 branch" isDisabled={selectedBranches.length > 0} hasArrow>
-						<Button onClick={refreshSelected} leftIcon={<RepeatIcon />} colorScheme={"yellow"} isDisabled={selectedBranches.length < 1}>
-							Refresh {selectedBranches.length > 0 ? `${selectedBranches.length} Branch` : ""}
-							{selectedBranches.length > 1 ? "es" : ""}
-						</Button>
-					</Tooltip> */}
-					<Tooltip label="Requires at least 1 branch" isDisabled={selectedBranches.length > 0} hasArrow>
-						<Button onClick={updateSelectedBranches} leftIcon={<Icon as={MdCloudDownload} />} colorScheme={"yellow"} isDisabled={selectedBranches.length < 1}>
-							Update {selectedBranches.length > 0 ? `${selectedBranches.length} Branch` : ""}
-							{selectedBranches.length > 1 ? "es" : ""}
-						</Button>
-					</Tooltip>
-					<Tooltip label="Requires at least 1 branch" isDisabled={selectedBranches.length > 0} hasArrow>
-						<Button onClick={toggleCommitSelectedBranches} leftIcon={<Icon as={isCommitMode ? FaUndo : MdCloudUpload} />} colorScheme={"yellow"} isDisabled={selectedBranches.length < 1}>
-							{isCommitMode ? "Undo Commit" : "Commit"}
-						</Button>
-					</Tooltip>
-					<Tooltip label="Requires at least 1 branch" isDisabled={selectedBranches.length > 0} hasArrow>
-						<Button onClick={viewSelectedBranchesLog} leftIcon={<TimeIcon />} colorScheme={"yellow"} isDisabled={selectedBranches.length < 1}>
-							View Logs
-						</Button>
-					</Tooltip>
-				</Flex>
-				<Flex columnGap={2}>
-					<Tooltip label="No outdated branches to update" isDisabled={outdatedBranches.length > 0} hasArrow>
-						<Button onClick={updateOutdatedBranches} leftIcon={<MdOutlineSwitchAccessShortcut />} colorScheme={"yellow"} isDisabled={outdatedBranches.length < 1}>
-							Update All
-						</Button>
-					</Tooltip>
-				</Flex>
-			</Wrap>
-			<TableBranches rowData={rowDataBranches} onRowValueChanged={onRowValueChanged} refreshAll={refreshAll} />
-			<Flex columnGap={2} mt={4}>
-				<Tooltip label="Please select at least 1 branch" isDisabled={selectedBranches.length > 0} hasArrow>
-					<Button onClick={clearSelection} leftIcon={<CloseIcon />} colorScheme={"red"} isDisabled={selectedBranches.length < 1}>
-						Deselect {selectedBranches.length > 0 ? `${selectedBranches.length} Branch` : ""}
-						{selectedBranches.length > 1 ? "es" : ""}
-					</Button>
-				</Tooltip>
-				<Tooltip label="Please select at least 1 branch" isDisabled={selectedBranches.length > 0} hasArrow>
-					<Button onClick={openAlertDialog} leftIcon={<AiFillDelete />} colorScheme={"red"} isDisabled={selectedBranches.length < 1}>
-						Delete {selectedBranches.length > 0 ? `${selectedBranches.length} Branch` : ""}
-						{selectedBranches.length > 1 ? "es" : ""}
-					</Button>
-				</Tooltip>
-				<Button onClick={addNewRow} leftIcon={<SmallAddIcon boxSize={8} />} colorScheme={"green"}>
-					New Row
-				</Button>
-			</Flex>
-			<AlertConfirmRowDelete isAlertOpen={isAlertOpen} onCloseAlert={onCloseAlert} cancelRef={cancelRef} removeSelectedRows={removeSelectedRows} />
-		</div>
+		<Box>
+			<Table.Root size={"sm"} variant={"outline"} transition={"backgrounds"}>
+				<Table.ColumnGroup>
+					<Table.Column width="1%" />
+					<Table.Column width="12%" />
+					<Table.Column width="12%" />
+					<Table.Column />
+					<Table.Column />
+					<Table.Column />
+				</Table.ColumnGroup>
+				<Table.Header>
+					<Table.Row>
+						<Table.ColumnHeader ps={3.5} pe={0.75}>
+							<Checkbox aria-label="Select all rows" variant="subtle" colorPalette="yellow" checked={selectionMetrics.indeterminate ? "indeterminate" : selectionMetrics.selectedBranchesCount === configurableRowData.length} onCheckedChange={(e) => selectAllBranches(e.checked)} />
+						</Table.ColumnHeader>
+						<Table.ColumnHeader>Branch Folder</Table.ColumnHeader>
+						<Table.ColumnHeader>Branch Version</Table.ColumnHeader>
+						<Table.ColumnHeader>SVN Branch</Table.ColumnHeader>
+						<Table.ColumnHeader>Branch Info</Table.ColumnHeader>
+						<Table.ColumnHeader ps={3.5}>Custom Scripts</Table.ColumnHeader>
+					</Table.Row>
+				</Table.Header>
+				<Table.Body>
+					{configurableRowData.map((branchRow) => (
+						<SectionBranchesRow key={branchRow.id} branchRow={branchRow} isSelected={!!selectedBranches[branchRow["SVN Branch"]]} />
+					))}
+				</Table.Body>
+			</Table.Root>
+
+			<ActionBarSelection selectedCount={selectionMetrics.selectedBranchesCount} onDelete={() => setIsRowDialogOpen(true)} onRefresh={refreshSelectedBranches} onUpdate={updateSelectedBranches} onCommit={commitSelectedBranches} onLogs={logsSelectedBranches} onClear={() => setSelectedBranches({})} />
+
+			<DialogRowDeletion selectedCount={selectionMetrics.selectedBranchesCount} isDialogOpen={isRowDialogOpen} closeDialog={() => setIsRowDialogOpen(false)} fireDialogAction={fireRowDialogAction} />
+			<DialogBranchesLog />
+		</Box>
 	);
 }

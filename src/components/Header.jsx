@@ -1,30 +1,70 @@
-import { Heading, Icon, Image, Link, useColorMode, Wrap, WrapItem } from "@chakra-ui/react";
-import React, { useCallback } from "react";
-import Logo from "../assets/Titan.png";
-import { useApp } from "../AppContext";
-import { MdBrowserUpdated, MdCode, MdCodeOff, MdDarkMode, MdSunny } from "react-icons/md";
+import { Flex, Heading, HStack } from "@chakra-ui/react";
+import React, { useCallback, useState } from "react";
+import { MdBrowserUpdated, MdUpdate } from "react-icons/md";
 import { IoReload } from "react-icons/io5";
-import useSocketEmits from "../hooks/useSocketEmits";
+import useSocketEmits from "../hooks/useSocketEmits.jsx";
 import { LuFileCog } from "react-icons/lu";
-import useNotifications from "../hooks/useNotifications";
-import ButtonElectron from "./ButtonElectron";
-import ButtonIconTooltip from "./ButtonIconTooltip";
+import useNotifications from "../hooks/useNotifications.jsx";
+import ButtonElectron from "./ButtonElectron.jsx";
+import ButtonIconTooltip from "./ButtonIconTooltip.jsx";
+import { ColorModeButton } from "./ui/color-mode.jsx";
+import { Button } from "./ui/button.jsx";
+import { PopoverArrow, PopoverBody, PopoverContent, PopoverRoot, PopoverTrigger } from "./ui/popover.jsx";
+import { useApp } from "../ContextApp.jsx";
+import { LiaToiletSolid } from "react-icons/lia";
+import { IoMdAdd } from "react-icons/io";
 
 export default function Header() {
-	const { isDebug, setIsDebug } = useApp();
-	const { emitOpenConfig } = useSocketEmits();
-	const { RaiseClientNotificaiton } = useNotifications();
-	const { colorMode, toggleColorMode } = useColorMode();
+	const updateConfig = useApp((ctx) => ctx.updateConfig);
+	const configurableRowData = useApp((ctx) => ctx.configurableRowData);
+	const setAppClosing = useApp((ctx) => ctx.setAppClosing);
+	const { emitOpenConfig, emitFlushSvnLogs, emitInfoSingle, emitUpdateSingle } = useSocketEmits();
+	const { RaiseClientNotificaiton, RaisePromisedClientNotification } = useNotifications();
+	const [reloadPopover, setReloadPopover] = useState(false);
 
-	const handleGetAppVersion = useCallback(() => {
-		if (!window.electron) return;
+	const updateAll = useCallback(() => {
+		RaisePromisedClientNotification({
+			title: "Updating Branches",
+			totalItems: configurableRowData.length,
+			onProgress: async (index, { onSuccess }) => {
+				const branchRow = configurableRowData[index];
 
-		window.electron.getAppVersion().then((version) => {
-			RaiseClientNotificaiton(`Application Version: v${version}`, "info", 2000);
-		});
-	}, [RaiseClientNotificaiton]);
+				await new Promise((resolveUpdate) => {
+					emitUpdateSingle(branchRow.id, branchRow["SVN Branch"], branchRow["Branch Version"], branchRow["Branch Folder"], (response) => {
+						if (response.success) {
+							onSuccess();
+							emitInfoSingle(branchRow.id, branchRow["SVN Branch"], branchRow["Branch Version"], branchRow["Branch Folder"]);
+							if (window.electron)
+								window.electron
+									.runCustomScript({
+										scriptType: "powershell",
+										scriptPath: "C:\\Titan\\Titan_PostUpdate_BranchSingle.ps1",
+										branchData: branchRow,
+									})
+									.then((result) => {
+										console.log("Custom Script Result: ", JSON.stringify(result, null, 4));
+									})
+									.catch((err) => {
+										console.error("Custom Script error: " + JSON.stringify(err, null, 4));
+									});
+						}
+						resolveUpdate();
+					});
+				});
+			},
+			successMessage: (count) => `${count} branches successfully updated`,
+			errorMessage: (id) => `Failed to update branch ${id}`,
+			loadingMessage: (current, total) => `Updating ${current} of ${total} branches`,
+		}).catch(console.error);
+	}, [RaisePromisedClientNotification, configurableRowData, emitUpdateSingle, emitInfoSingle]);
 
-	const handleReload = useCallback(() => {
+	const handleReload = useCallback((isAppRestart = false) => {
+		if (isAppRestart) {
+			window.electron.restartApp();
+			setAppClosing(true);
+			return;
+		}
+
 		window.location.reload();
 	}, []);
 
@@ -42,30 +82,56 @@ export default function Header() {
 		emitOpenConfig();
 	}, [emitOpenConfig]);
 
-	const handleToggleDebug = useCallback(() => {
-		setIsDebug((prev) => !prev);
-	}, [setIsDebug]);
+	const handleFlushSvnLogs = useCallback(() => {
+		emitFlushSvnLogs();
+	}, [emitFlushSvnLogs]);
+
+	const addRow = useCallback(() => {
+			updateConfig((currentConfig) => {
+				const newBranch = {
+					id: `${Date.now()}`,
+					"Branch Folder": "",
+					"Branch Version": "",
+					"SVN Branch": "",
+					"Branch Info": "Please add branch path",
+				};
+				return { ...currentConfig, branches: [...configurableRowData, newBranch] };
+			});
+		}, [updateConfig, configurableRowData]);
 
 	return (
-		<Wrap my={5} spacingY={5} justify={"space-between"}>
-			<WrapItem alignItems="center">
-				<Link onClick={handleGetAppVersion}>
-					<Image src={Logo} alt="Titan Logo" boxSize="100px" mr={5} borderRadius={"full"} />
-				</Link>
-				<Heading as={"h2"} size={"2xl"} noOfLines={1} className={"animation-fadein-forward"}>
-					Welcome back
+		<HStack wrap="wrap" my={5} gapY={5} justify={"space-between"}>
+			<Flex align={"flex-start"} alignItems="center" className="notMono">
+				<Heading as={"h2"} size={"2xl"} lineClamp={1} lineHeight={"1.4"} className="animation-fadein-forward" userSelect={"none"}>
+					You have {configurableRowData.length} branch{configurableRowData.length > 1 ? "es" : ""}:
 				</Heading>
-				<Heading as={"h2"} size={"2xl"} noOfLines={1} p={2} className={"animation-handwave"}>
-					👋
-				</Heading>
-			</WrapItem>
-			<WrapItem alignItems={"center"} columnGap={2}>
-				<ButtonIconTooltip icon={<Icon as={colorMode === "light" ? MdSunny : MdDarkMode} />} onClick={toggleColorMode} colorScheme={"yellow"} label="Toggle Light/Dark Mode" placement={"bottom-start"} size="md" />
-				<ButtonIconTooltip icon={<Icon as={IoReload} />} onClick={handleReload} colorScheme={"yellow"} label="Reload" placement={"bottom-start"} size="md" />
-				<ButtonElectron icon={<Icon as={MdBrowserUpdated} />} onClick={handleCheckForUpdates} colorScheme={"yellow"} label="Check For Updates" size="md" />
-				<ButtonIconTooltip icon={<Icon as={LuFileCog} />} onClick={handleOpenConfig} colorScheme={"yellow"} label="Open Config File" placement={"bottom-start"} size="md" />
-				<ButtonIconTooltip icon={!isDebug ? <Icon as={MdCodeOff} /> : <Icon as={MdCode} />} onClick={handleToggleDebug} colorScheme={"yellow"} label={`Current Debug Mode: ${isDebug ? "on" : "off"}`} placement={"bottom-start"} size="md" />
-			</WrapItem>
-		</Wrap>
+			</Flex>
+			<Flex align={"flex-start"} alignItems={"center"} columnGap={2}>
+				<ButtonIconTooltip icon={<MdUpdate />} colorPalette={"yellow"} variant={"subtle"} label={"Update All"} placement={"bottom-end"} onClick={updateAll} disabled={configurableRowData.length < 1} />
+				<PopoverRoot open={window.electron && reloadPopover} onOpenChange={(e) => setReloadPopover(e.open)}>
+					<PopoverTrigger as={"div"}>
+						<ButtonIconTooltip icon={<IoReload />} onClick={() => setReloadPopover((prev) => !prev)} colorPalette={"yellow"} label={"Reload"} variant={"subtle"} size="md" />
+					</PopoverTrigger>
+					<PopoverContent>
+						<PopoverArrow />
+						<PopoverBody>
+							<HStack gap={8}>
+								<Button colorPalette={"yellow"} variant={"subtle"} onClick={() => handleReload(false)}>
+									Refresh
+								</Button>
+								<Button colorPalette={"yellow"} variant={"subtle"} onClick={() => handleReload(true)}>
+									Restart
+								</Button>
+							</HStack>
+						</PopoverBody>
+					</PopoverContent>
+				</PopoverRoot>
+				<ButtonIconTooltip icon={<LuFileCog />} onClick={handleOpenConfig} colorPalette={"yellow"} variant={"subtle"} label="Open Config File" placement={"bottom-start"} size="md" />
+				<ButtonElectron icon={<MdBrowserUpdated />} onClick={handleCheckForUpdates} colorPalette={"yellow"} variant={"subtle"} label="Check For Updates" size="md" />
+				<ButtonIconTooltip icon={<LiaToiletSolid />} onClick={handleFlushSvnLogs} colorPalette={"yellow"} variant={"subtle"} label="Flush SVN Logs" placement={"bottom-start"} size="md" />
+				<ButtonIconTooltip icon={<IoMdAdd />} colorPalette={"yellow"} variant={"subtle"} label={"Add Row"} placement={"bottom-end"} onClick={addRow} />
+				<ColorModeButton />
+			</Flex>
+		</HStack>
 	);
 }

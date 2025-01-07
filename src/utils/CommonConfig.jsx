@@ -6,7 +6,7 @@ export function stripBranchInfo(branches = []) {
 	});
 }
 
-export function branchString(branchFolder, branchVersion, branch) {
+export function toBranchString(branchFolder, branchVersion, branch) {
 	return `${branchFolder == "" ? "Uncategorised" : branchFolder} ${branchVersion == "" ? "Unversioned" : branchVersion} ${String(branch).split("\\").at(-1)}`;
 }
 

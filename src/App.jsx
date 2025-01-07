@@ -1,23 +1,29 @@
-import React, { useEffect, useRef, useState } from "react";
-import { Box, Button, Collapse, Flex, Heading } from "@chakra-ui/react";
-import Header from "./components/Header";
-import SectionBranches from "./components/SectionBranches";
-import SectionCommit from "./components/SectionCommit";
-import { useApp } from "./AppContext";
-import useNotifications from "./hooks/useNotifications";
-import SectionBranchLog from "./components/SectionBranchLog";
-import AlertUpdateTitan from "./components/AlertUpdateTitan";
-import HeaderApp from "./components/HeaderApp";
+import React, { useEffect } from "react";
+import { Box, Flex, Heading, Image } from "@chakra-ui/react";
+import Header from "./components/Header.jsx";
+import SectionBranches from "./components/SectionBranches.jsx";
+import SectionCommit from "./components/SectionCommit.jsx";
+import useNotifications from "./hooks/useNotifications.jsx";
+import DialogTitanUpdate from "./components/DialogTitanUpdate.jsx";
+import HeaderApp from "./components/HeaderApp.jsx";
+import { Toaster } from "./components/ui/toaster.jsx";
+import { BranchesProvider } from "./ContextBranches.jsx";
+import { CommitProvider } from "./ContextCommit.jsx";
+import { useApp } from "./ContextApp.jsx";
+import Logo from "./assets/Titan.png";
 
 function App() {
-	const { isCommitMode, selectedBranches, configurableRowData } = useApp();
+	const appClosing = useApp((ctx) => ctx.appClosing);
 	const { RaiseClientNotificaiton } = useNotifications();
 
 	useEffect(() => {
 		if (window.electron) {
 			window.electron.onAppClosing(() => {
-				RaiseClientNotificaiton("App is closing, performing cleanup...", "info", 0);
-				window.electron.closeWindow();
+				RaiseClientNotificaiton("App is closing, performing cleanup...", "warning", 0);
+
+				// TODO Perform any necessary cleanup in the renderer process...
+
+				window.electron.fireShutdownComplete();
 			});
 
 			return () => {
@@ -29,26 +35,35 @@ function App() {
 	}, []);
 
 	return (
-		<Box className={"titanBody"}>
+		<Box className={"titanContainer"} h={"calc(100vh)"}>
+			<Toaster />
 			<HeaderApp />
-			<Box p={10}>
-				<Header />
-				<AlertUpdateTitan />
-				<Flex rowGap={4} flexDirection={"column"}>
-					<Box>
-						<SectionBranches />
-					</Box>
-					<Collapse in={isCommitMode} animateOpacity>
-						<Box id="sectionCommit">
-							<Heading as={"h2"} size={"lg"} noOfLines={1} mb={4} className="animation-pulse" lineHeight={"1.4"}>
-								Committing {selectedBranches.length == configurableRowData.length ? "All" : `${selectedBranches.length}/${configurableRowData.length}`} Branch{selectedBranches.length == 1 ? "" : "es"}
-							</Heading>
-							<SectionCommit />
+			{!appClosing ? (
+				<Box p={10} overflowY={"auto"} className="titanBody">
+					<Header />
+					<DialogTitanUpdate />
+					<Flex rowGap={8} flexDirection={"column"}>
+						<Box>
+							<BranchesProvider>
+								<SectionBranches />
+							</BranchesProvider>
 						</Box>
-					</Collapse>
+						<Box>
+							<CommitProvider>
+								<SectionCommit />
+							</CommitProvider>
+						</Box>
+					</Flex>
+				</Box>
+			) : (
+				<Flex alignItems="center" justifyContent="center" className="titanBody" h="100%" flexDirection="column" gap={60}>
+					<Image src={Logo} alt="Titan Logo" boxSize="256px" borderRadius="full" userSelect="none" boxShadowColor={"yellow.fg"} boxShadow="0px 0px 256px 24px var(--shadow-color)" filter="auto" brightness="110%" saturate="120%" />
+
+					<Heading as="h1" size="4xl" className="animation-pulse" lineHeight="1.4" fontWeight={900} color="yellow.fg" textAlign={"center"}>
+						App is closing...<br/>Please wait.
+					</Heading>
 				</Flex>
-				<SectionBranchLog />
-			</Box>
+			)}
 		</Box>
 	);
 }

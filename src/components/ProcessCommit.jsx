@@ -48,6 +48,8 @@ export default function ProcessCommit() {
 		// Sort commits if needed. For example, if you want them grouped by branchString or similar:
 		const sortedCommits = [...liveCommits]; // mutate a copy, if you want to apply a custom sort
 
+		const copiedCommitMsg = clipboardOptions.includes("CommitMsg") ? `${finalCommitMessage}\n` : "";
+
 		const lines = sortedCommits.map((commit) => {
 			const parts = [];
 
@@ -71,8 +73,8 @@ export default function ProcessCommit() {
 			return parts.join(" ").trim();
 		});
 
-		return lines.join(newline);
-	}, [liveCommits, clipboardOptions, selectedBranchProps, branchPathFolder]);
+		return copiedCommitMsg + lines.join(newline);
+	}, [liveCommits, clipboardOptions, finalCommitMessage, selectedBranchProps, branchPathFolder]);
 
 	useEffect(() => {
 		const socketCallback = (data) => {
@@ -157,6 +159,7 @@ export default function ProcessCommit() {
 									<Checkbox value="BranchVersion">Branch Version</Checkbox>
 									<Checkbox value="SVNBranch">SVN Branch</Checkbox>
 									<Checkbox value="IssueNumber">Issue Number</Checkbox>
+									<Checkbox value="CommitMsg">Commit Message</Checkbox>
 									<Checkbox value="MarkupSupport">Markup Support</Checkbox>
 								</HStack>
 							</CheckboxGroup>
@@ -177,7 +180,7 @@ export default function ProcessCommit() {
 								<FaCheck />
 								Complete
 							</Button>
-							<Button onClick={handleUpdateTrelloCard}>
+							<Button onClick={handleUpdateTrelloCard} disabled={trelloData?.name && trelloData?.name.trim() != ""}>
 								<FaTrello />
 								Update Card
 							</Button>

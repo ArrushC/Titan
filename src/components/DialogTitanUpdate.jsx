@@ -4,7 +4,7 @@ import useNotifications from "../hooks/useNotifications.jsx";
 import { DialogBody, DialogCloseTrigger, DialogContent, DialogFooter, DialogHeader, DialogRoot, DialogTitle } from "./ui/dialog.jsx";
 import { Button } from "./ui/button.jsx";
 
-export default function AlertUpdateTitan() {
+export default function DialogTitanUpdate() {
 	const { toast, RaiseClientNotificaiton } = useNotifications();
 	const [open, setOpen] = useState(false);
 	const cancelRef = useRef(null);

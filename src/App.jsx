@@ -4,7 +4,7 @@ import Header from "./components/Header.jsx";
 import SectionBranches from "./components/SectionBranches.jsx";
 import SectionCommit from "./components/SectionCommit.jsx";
 import useNotifications from "./hooks/useNotifications.jsx";
-import AlertUpdateTitan from "./components/AlertUpdateTitan.jsx";
+import DialogTitanUpdate from "./components/DialogTitanUpdate.jsx";
 import HeaderApp from "./components/HeaderApp.jsx";
 import { Toaster } from "./components/ui/toaster.jsx";
 import { BranchesProvider } from "./ContextBranches.jsx";
@@ -41,7 +41,7 @@ function App() {
 			{!appClosing ? (
 				<Box p={10} overflowY={"auto"} className="titanBody">
 					<Header />
-					<AlertUpdateTitan />
+					<DialogTitanUpdate />
 					<Flex rowGap={8} flexDirection={"column"}>
 						<Box>
 							<BranchesProvider>

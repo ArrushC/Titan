@@ -691,7 +691,7 @@ function ButtonCustomScripts(props) {
   }, [label]);
   return /* @__PURE__ */ jsxRuntimeExports.jsx(Tooltip, { content: window.electron ? label : "Feature must be used in desktop application", showArrow: true, disabled: !window.electron || disabled, children: /* @__PURE__ */ jsxRuntimeExports.jsx(IconButton, { "aria-label": label, size, onClick: handleClick, colorPalette, variant: "subtle", disabled: !window.electron || disabled, children: icon }) });
 }
-function EditableBranchesRow({ branchId, dataColumn, dataValue, handleDataChange }) {
+function EditableBranchesRow({ branchId, dataColumn, dataValue, handleDataChange, bgLightColorValue, bgDarkColorValue }) {
   const configurableRowData = useApp((ctx) => ctx.configurableRowData);
   const updateConfig = useApp((ctx) => ctx.updateConfig);
   const [cellData, setCellData] = reactExports.useState(dataValue);
@@ -713,16 +713,7 @@ function EditableBranchesRow({ branchId, dataColumn, dataValue, handleDataChange
     },
     [debouncedUpdate]
   );
-  return /* @__PURE__ */ jsxRuntimeExports.jsx(
-    Input,
-    {
-      colorPalette: "yellow",
-      variant: "subtle",
-      value: cellData,
-      onChange: onEditableChange,
-      h: 7
-    }
-  );
+  return /* @__PURE__ */ jsxRuntimeExports.jsx(Input, { variant: "subtle", value: cellData, onChange: onEditableChange, h: 7, _light: { bgColor: bgLightColorValue }, _dark: { bgColor: bgDarkColorValue } });
 }
 const initialState$1 = {
   branchInfos: {},
@@ -811,6 +802,7 @@ const SectionBranchesRow = reactExports.memo(({ branchRow, isSelected }) => {
   const branchPath = branchRow == null ? void 0 : branchRow["SVN Branch"];
   const [branchInfo, setBranchInfo] = reactExports.useState((branchRow == null ? void 0 : branchRow["Branch Info"]) || "Refreshing...");
   const themedBgColor = (config == null ? void 0 : config.branchFolderColours[branchFolder]) || "transparent";
+  const paddingValue = "0.25rem";
   const gradientAnimation = keyframes`
 			0% { background-position: 0% 50%; }
 			50% { background-position: 100% 50%; }
@@ -916,16 +908,16 @@ const SectionBranchesRow = reactExports.memo(({ branchRow, isSelected }) => {
     }
     return /* @__PURE__ */ jsxRuntimeExports.jsx(Text, { as: "span", children: branchInfo });
   }, [branchInfo]);
-  return /* @__PURE__ */ jsxRuntimeExports.jsxs(TableRow, { _light: { bgColor: themedBgColor == "transparent" ? "transparent" : `${themedBgColor}20` }, _dark: { bgColor: themedBgColor == "transparent" ? "transparent" : `${themedBgColor}80` }, children: [
-    /* @__PURE__ */ jsxRuntimeExports.jsx(TableCell, { display: "flex", alignItems: "center", children: /* @__PURE__ */ jsxRuntimeExports.jsx(Checkbox, { top: "2", "aria-label": "Select row", variant: "subtle", colorPalette: "yellow", checked: isSelected, onCheckedChange: (e) => handleBranchSelection(branchPath, e.checked) }) }),
-    /* @__PURE__ */ jsxRuntimeExports.jsx(TableCell, { children: /* @__PURE__ */ jsxRuntimeExports.jsx(EditableBranchesRow, { branchId, dataColumn: "Branch Folder", dataValue: branchFolder, handleDataChange }) }),
-    /* @__PURE__ */ jsxRuntimeExports.jsx(TableCell, { children: /* @__PURE__ */ jsxRuntimeExports.jsx(EditableBranchesRow, { branchId, dataColumn: "Branch Version", dataValue: branchVersion, handleDataChange }) }),
-    /* @__PURE__ */ jsxRuntimeExports.jsx(TableCell, { children: /* @__PURE__ */ jsxRuntimeExports.jsxs(Flex, { gapX: 3, alignItems: "center", onDoubleClick: () => handleSelectFolder(branchPath), children: [
+  return /* @__PURE__ */ jsxRuntimeExports.jsxs(TableRow, { children: [
+    /* @__PURE__ */ jsxRuntimeExports.jsx(TableCell, { display: "flex", alignItems: "center", py: paddingValue, children: /* @__PURE__ */ jsxRuntimeExports.jsx(Checkbox, { top: "5px", "aria-label": "Select row", variant: "subtle", colorPalette: "yellow", checked: isSelected, onCheckedChange: (e) => handleBranchSelection(branchPath, e.checked) }) }),
+    /* @__PURE__ */ jsxRuntimeExports.jsx(TableCell, { py: paddingValue, children: /* @__PURE__ */ jsxRuntimeExports.jsx(EditableBranchesRow, { branchId, dataColumn: "Branch Folder", dataValue: branchFolder, handleDataChange, bgLightColorValue: themedBgColor == "transparent" ? "transparent" : `${themedBgColor}30`, bgDarkColorValue: themedBgColor == "transparent" ? "transparent" : `${themedBgColor}80` }) }),
+    /* @__PURE__ */ jsxRuntimeExports.jsx(TableCell, { py: paddingValue, children: /* @__PURE__ */ jsxRuntimeExports.jsx(EditableBranchesRow, { branchId, dataColumn: "Branch Version", dataValue: branchVersion, handleDataChange, bgLightColorValue: themedBgColor == "transparent" ? "transparent" : `${themedBgColor}30`, bgDarkColorValue: themedBgColor == "transparent" ? "transparent" : `${themedBgColor}80` }) }),
+    /* @__PURE__ */ jsxRuntimeExports.jsx(TableCell, { py: paddingValue, children: /* @__PURE__ */ jsxRuntimeExports.jsxs(Flex, { gapX: 3, alignItems: "center", onDoubleClick: () => handleSelectFolder(branchPath), children: [
       /* @__PURE__ */ jsxRuntimeExports.jsx(Tooltip, { content: window.electron ? "Select folder" : "Feature must be used in desktop application", showArrow: true, children: /* @__PURE__ */ jsxRuntimeExports.jsx(IconButton, { colorPalette: "yellow", variant: "subtle", size: "xs", onClick: () => handleSelectFolder(), disabled: !window.electron, children: /* @__PURE__ */ jsxRuntimeExports.jsx(FaFolderOpen, {}) }) }),
       /* @__PURE__ */ jsxRuntimeExports.jsx(Text, { children: branchPath })
     ] }) }),
-    /* @__PURE__ */ jsxRuntimeExports.jsx(TableCell, { ...gradientStyle, bgColor: "green.focusRing", textAlign: "center", children: renderedBranchInfo }),
-    /* @__PURE__ */ jsxRuntimeExports.jsx(TableCell, { children: /* @__PURE__ */ jsxRuntimeExports.jsxs(Flex, { columnGap: 1, children: [
+    /* @__PURE__ */ jsxRuntimeExports.jsx(TableCell, { ...gradientStyle, bgColor: "green.focusRing", textAlign: "center", py: paddingValue, children: renderedBranchInfo }),
+    /* @__PURE__ */ jsxRuntimeExports.jsx(TableCell, { py: paddingValue, children: /* @__PURE__ */ jsxRuntimeExports.jsxs(Flex, { columnGap: 1, children: [
       branchInfo.toLowerCase().includes("🤬") && /* @__PURE__ */ jsxRuntimeExports.jsx(ButtonElectron, { icon: /* @__PURE__ */ jsxRuntimeExports.jsx(MdAutoFixHigh, {}), onClick: () => resolveConflicts(), colorPalette: "yellow", variant: "subtle", label: "Resolve Conflicts", size: "xs" }),
       customScripts.map((script, i) => /* @__PURE__ */ jsxRuntimeExports.jsx(ButtonCustomScripts, { onClick: () => executeCustomScript(script.type, script.path, branchRow), colorPalette: "yellow", label: script.fileName, size: "xs", disabled: branchInfo === "Not Found" }, i))
     ] }) })
@@ -1116,7 +1108,7 @@ function DialogBranchesLog() {
         /* @__PURE__ */ jsxRuntimeExports.jsx(SiSubversion, { size: "32px" }),
         "Selected Branches: SVN Logs (All Time)"
       ] }) }),
-      /* @__PURE__ */ jsxRuntimeExports.jsxs(DialogBody, { children: [
+      /* @__PURE__ */ jsxRuntimeExports.jsxs(DialogBody, { display: "flex", flexDirection: "column", children: [
         /* @__PURE__ */ jsxRuntimeExports.jsx(HStack, { gap: "6", mb: 4, width: "full", colorPalette: "yellow", children: /* @__PURE__ */ jsxRuntimeExports.jsx(InputGroup, { flex: "1", startElement: /* @__PURE__ */ jsxRuntimeExports.jsx(LuSearch, {}), startElementProps: { color: "colorPalette.fg" }, children: /* @__PURE__ */ jsxRuntimeExports.jsx(Input, { placeholder: "Quick search...", variant: "flushed", borderColor: "colorPalette.fg", value: searchTerm, onChange: (e) => setSearchTerm(e.target.value) }) }) }),
         /* @__PURE__ */ jsxRuntimeExports.jsxs(TableRoot, { size: "sm", variant: "outline", colorPalette: "yellow", children: [
           /* @__PURE__ */ jsxRuntimeExports.jsxs(TableColumnGroup, { children: [
@@ -1134,7 +1126,7 @@ function DialogBranchesLog() {
             /* @__PURE__ */ jsxRuntimeExports.jsx(TableColumnHeader, { color: "black", fontWeight: 900, ms: 0, children: "Message" })
           ] }) })
         ] }),
-        /* @__PURE__ */ jsxRuntimeExports.jsx(Box, { ref: containerRef, overflowY: "auto", maxH: "xl", colorPalette: "yellow", onScroll, position: "relative", children: /* @__PURE__ */ jsxRuntimeExports.jsx(Box, { position: "relative", height: `xl`, children: /* @__PURE__ */ jsxRuntimeExports.jsx(Box, { position: "absolute", width: "100%", top: `${offsetY}px`, children: /* @__PURE__ */ jsxRuntimeExports.jsxs(TableRoot, { size: "sm", variant: "outline", children: [
+        /* @__PURE__ */ jsxRuntimeExports.jsx(Box, { ref: containerRef, overflowY: "auto", flex: "1", colorPalette: "yellow", onScroll, position: "relative", children: /* @__PURE__ */ jsxRuntimeExports.jsx(Box, { position: "relative", height: `xl`, children: /* @__PURE__ */ jsxRuntimeExports.jsx(Box, { position: "absolute", width: "100%", top: `${offsetY}px`, children: /* @__PURE__ */ jsxRuntimeExports.jsxs(TableRoot, { size: "sm", variant: "outline", children: [
           /* @__PURE__ */ jsxRuntimeExports.jsxs(TableColumnGroup, { children: [
             /* @__PURE__ */ jsxRuntimeExports.jsx(TableColumn, { width: "5%" }),
             /* @__PURE__ */ jsxRuntimeExports.jsx(TableColumn, { width: "10%" }),
@@ -1159,7 +1151,7 @@ function SectionBranches() {
   const selectedBranches = useApp((ctx) => ctx.selectedBranches);
   const setSelectedBranches = useApp((ctx) => ctx.setSelectedBranches);
   const setAppMode = useApp((ctx) => ctx.setAppMode);
-  const handleBulkSelection = useBranches((ctx) => ctx.handleBulkSelection);
+  const handleBulkSelection = useApp((ctx) => ctx.handleBulkSelection);
   const setIsDialogSBLogOpen = useBranches((ctx) => ctx.setIsDialogSBLogOpen);
   const selectionMetrics = useBranches((ctx) => ctx.selectionMetrics);
   const { RaisePromisedClientNotification } = useNotifications();
@@ -1706,7 +1698,7 @@ function DialogLookupSVNLogs({ fireDialogAction }) {
         /* @__PURE__ */ jsxRuntimeExports.jsx(SiSubversion, { size: "32px" }),
         "Lookup SVN Logs"
       ] }) }),
-      /* @__PURE__ */ jsxRuntimeExports.jsxs(DialogBody, { children: [
+      /* @__PURE__ */ jsxRuntimeExports.jsxs(DialogBody, { display: "flex", flexDirection: "column", children: [
         /* @__PURE__ */ jsxRuntimeExports.jsx(HStack, { gap: "6", mb: 4, width: "full", colorPalette: "yellow", children: /* @__PURE__ */ jsxRuntimeExports.jsx(InputGroup, { flex: "1", startElement: /* @__PURE__ */ jsxRuntimeExports.jsx(LuSearch, {}), startElementProps: { color: "colorPalette.fg" }, children: /* @__PURE__ */ jsxRuntimeExports.jsx(Input, { placeholder: "Quick search...", variant: "flushed", borderColor: "colorPalette.fg", value: searchTerm, onChange: (e) => setSearchTerm(e.target.value) }) }) }),
         /* @__PURE__ */ jsxRuntimeExports.jsx(Text, { fontSize: "sm", mb: 2, fontWeight: 900, bgGradient: "to-r", gradientFrom: textColor, gradientVia: "yellow.500", gradientTo: textColor, backgroundSize: "200% auto", bgClip: "text", animation: `${shineAnimation$1} 7s ease-in infinite`, children: "Double-click a SVN revision row to select it." }),
         /* @__PURE__ */ jsxRuntimeExports.jsxs(TableRoot, { size: "sm", variant: "outline", colorPalette: "yellow", children: [
@@ -1725,7 +1717,7 @@ function DialogLookupSVNLogs({ fireDialogAction }) {
             /* @__PURE__ */ jsxRuntimeExports.jsx(TableColumnHeader, { color: "black", fontWeight: 900, ms: 0, children: "Message" })
           ] }) })
         ] }),
-        /* @__PURE__ */ jsxRuntimeExports.jsx(Box, { ref: containerRef, overflowY: "auto", maxH: "md", colorPalette: "yellow", onScroll, position: "relative", children: /* @__PURE__ */ jsxRuntimeExports.jsx(Box, { position: "relative", height: `${totalRows * ROW_HEIGHT}px`, children: /* @__PURE__ */ jsxRuntimeExports.jsx(Box, { position: "absolute", width: "100%", top: `${offsetY}px`, children: /* @__PURE__ */ jsxRuntimeExports.jsxs(TableRoot, { size: "sm", variant: "outline", children: [
+        /* @__PURE__ */ jsxRuntimeExports.jsx(Box, { ref: containerRef, overflowY: "auto", flex: "1", colorPalette: "yellow", onScroll, position: "relative", children: /* @__PURE__ */ jsxRuntimeExports.jsx(Box, { position: "relative", height: `${totalRows * ROW_HEIGHT}px`, children: /* @__PURE__ */ jsxRuntimeExports.jsx(Box, { position: "absolute", width: "100%", top: `${offsetY}px`, children: /* @__PURE__ */ jsxRuntimeExports.jsxs(TableRoot, { size: "sm", variant: "outline", children: [
           /* @__PURE__ */ jsxRuntimeExports.jsxs(TableColumnGroup, { children: [
             /* @__PURE__ */ jsxRuntimeExports.jsx(TableColumn, { width: "5%" }),
             /* @__PURE__ */ jsxRuntimeExports.jsx(TableColumn, { width: "10%" }),

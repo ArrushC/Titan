@@ -20,7 +20,7 @@ export default function SectionBranches() {
 	const selectedBranches = useApp((ctx) => ctx.selectedBranches);
 	const setSelectedBranches = useApp((ctx) => ctx.setSelectedBranches);
 	const setAppMode = useApp((ctx) => ctx.setAppMode);
-	const handleBulkSelection = useBranches((ctx) => ctx.handleBulkSelection);
+	const handleBulkSelection = useApp((ctx) => ctx.handleBulkSelection);
 	const setIsDialogSBLogOpen = useBranches((ctx) => ctx.setIsDialogSBLogOpen);
 	const selectionMetrics = useBranches((ctx) => ctx.selectionMetrics);
 	const { RaisePromisedClientNotification } = useNotifications();

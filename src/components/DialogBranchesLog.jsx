@@ -168,7 +168,7 @@ export default function DialogBranchesLog() {
 					</DialogTitle>
 				</DialogHeader>
 
-				<DialogBody>
+				<DialogBody display={"flex"} flexDirection={"column"}>
 					<HStack gap="6" mb={4} width="full" colorPalette="yellow">
 						<InputGroup flex="1" startElement={<LuSearch />} startElementProps={{ color: "colorPalette.fg" }}>
 							<Input placeholder="Quick search..." variant="flushed" borderColor="colorPalette.fg" value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)} />
@@ -202,7 +202,7 @@ export default function DialogBranchesLog() {
 						</Table.Header>
 					</Table.Root>
 
-					<Box ref={containerRef} overflowY="auto" maxH={"xl"} colorPalette={"yellow"} onScroll={onScroll} position="relative">
+					<Box ref={containerRef} overflowY="auto" flex={"1"} colorPalette={"yellow"} onScroll={onScroll} position="relative">
 						<Box position="relative" height={`xl`}>
 							<Box position="absolute" width="100%" top={`${offsetY}px`}>
 								<Table.Root size="sm" variant="outline">

@@ -3,7 +3,7 @@ import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { useApp } from "../ContextApp.jsx";
 import { debounce } from "lodash";
 
-export default function EditableBranchesRow({ branchId, dataColumn, dataValue, handleDataChange }) {
+export default function EditableBranchesRow({ branchId, dataColumn, dataValue, handleDataChange, bgLightColorValue, bgDarkColorValue }) {
 	const configurableRowData = useApp((ctx) => ctx.configurableRowData);
 	const updateConfig = useApp((ctx) => ctx.updateConfig);
 	const [cellData, setCellData] = useState(dataValue);
@@ -30,13 +30,5 @@ export default function EditableBranchesRow({ branchId, dataColumn, dataValue, h
 		[debouncedUpdate]
 	);
 
-	return (
-		<Input
-			colorPalette={"yellow"}
-			variant={"subtle"}
-			value={cellData}
-			onChange={onEditableChange}
-			h={7}
-		/>
-	);
+	return <Input variant={"subtle"} value={cellData} onChange={onEditableChange} h={7} _light={{ bgColor: bgLightColorValue }} _dark={{ bgColor: bgDarkColorValue }} />;
 }

@@ -29,6 +29,8 @@ const SectionBranchesRow = memo(({ branchRow, isSelected }) => {
 	const [branchInfo, setBranchInfo] = useState(branchRow?.["Branch Info"] || "Refreshing...");
 	const themedBgColor = config?.branchFolderColours[branchFolder] || "transparent";
 
+	const paddingValue = "0.25rem";
+
 	const gradientAnimation = keyframes`
 			0% { background-position: 0% 50%; }
 			50% { background-position: 100% 50%; }
@@ -163,17 +165,17 @@ const SectionBranchesRow = memo(({ branchRow, isSelected }) => {
 	}, [branchInfo]);
 
 	return (
-		<Table.Row _light={{ bgColor: themedBgColor == "transparent" ? "transparent" : `${themedBgColor}20` }} _dark={{ bgColor: themedBgColor == "transparent" ? "transparent" : `${themedBgColor}80` }}>
-			<Table.Cell display={"flex"} alignItems={"center"}>
-				<Checkbox top="2" aria-label="Select row" variant={"subtle"} colorPalette={"yellow"} checked={isSelected} onCheckedChange={(e) => handleBranchSelection(branchPath, e.checked)} />
+		<Table.Row>
+			<Table.Cell display={"flex"} alignItems={"center"} py={paddingValue}>
+				<Checkbox top="5px" aria-label="Select row" variant={"subtle"} colorPalette={"yellow"} checked={isSelected} onCheckedChange={(e) => handleBranchSelection(branchPath, e.checked)} />
 			</Table.Cell>
-			<Table.Cell>
-				<EditableBranchesRow branchId={branchId} dataColumn={"Branch Folder"} dataValue={branchFolder} handleDataChange={handleDataChange} />
+			<Table.Cell py={paddingValue}>
+				<EditableBranchesRow branchId={branchId} dataColumn={"Branch Folder"} dataValue={branchFolder} handleDataChange={handleDataChange} bgLightColorValue={themedBgColor == "transparent" ? "transparent" : `${themedBgColor}30`} bgDarkColorValue={themedBgColor == "transparent" ? "transparent" : `${themedBgColor}80`} />
 			</Table.Cell>
-			<Table.Cell>
-				<EditableBranchesRow branchId={branchId} dataColumn={"Branch Version"} dataValue={branchVersion} handleDataChange={handleDataChange} />
+			<Table.Cell py={paddingValue}>
+				<EditableBranchesRow branchId={branchId} dataColumn={"Branch Version"} dataValue={branchVersion} handleDataChange={handleDataChange} bgLightColorValue={themedBgColor == "transparent" ? "transparent" : `${themedBgColor}30`} bgDarkColorValue={themedBgColor == "transparent" ? "transparent" : `${themedBgColor}80`}/>
 			</Table.Cell>
-			<Table.Cell>
+			<Table.Cell py={paddingValue}>
 				<Flex gapX={3} alignItems={"center"} onDoubleClick={() => handleSelectFolder(branchPath)}>
 					<Tooltip content={window.electron ? "Select folder" : "Feature must be used in desktop application"} showArrow>
 						<IconButton colorPalette={"yellow"} variant={"subtle"} size={"xs"} onClick={() => handleSelectFolder()} disabled={!window.electron}>
@@ -183,10 +185,10 @@ const SectionBranchesRow = memo(({ branchRow, isSelected }) => {
 					<Text>{branchPath}</Text>
 				</Flex>
 			</Table.Cell>
-			<Table.Cell {...gradientStyle} bgColor={"green.focusRing"} textAlign={"center"}>
+			<Table.Cell {...gradientStyle} bgColor={"green.focusRing"} textAlign={"center"} py={paddingValue}>
 				{renderedBranchInfo}
 			</Table.Cell>
-			<Table.Cell>
+			<Table.Cell py={paddingValue}>
 				<Flex columnGap={1}>
 					{branchInfo.toLowerCase().includes("🤬") && <ButtonElectron icon={<MdAutoFixHigh />} onClick={() => resolveConflicts()} colorPalette={"yellow"} variant={"subtle"} label="Resolve Conflicts" size="xs" />}
 					{customScripts.map((script, i) => (

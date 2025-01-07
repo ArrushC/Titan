@@ -1,13 +1,10 @@
 import React, { useCallback, useEffect, useState } from "react";
 import { useApp } from "../ContextApp.jsx";
-import { Box, Flex, Heading, Table } from "@chakra-ui/react";
+import { Box, Table } from "@chakra-ui/react";
 import { Checkbox } from "./ui/checkbox.jsx";
 import DialogRowDeletion from "./DialogRowDeletion.jsx";
-import { IoMdAdd } from "react-icons/io";
 import SectionBranchesRow from "./SectionBranchesRow.jsx";
-import ButtonIconTooltip from "./ButtonIconTooltip.jsx";
 import useSocketEmits from "../hooks/useSocketEmits.jsx";
-import { MdUpdate } from "react-icons/md";
 import useNotifications from "../hooks/useNotifications.jsx";
 import { useBranches } from "../ContextBranches.jsx";
 import ActionBarSelection from "./ActionBarSelection.jsx";
@@ -33,55 +30,6 @@ export default function SectionBranches() {
 			return { ...currentConfig, branches: newBranches };
 		});
 	}, [updateConfig, configurableRowData, selectedBranches]);
-
-	const updateAll = useCallback(() => {
-		RaisePromisedClientNotification({
-			title: "Updating Branches",
-			totalItems: configurableRowData.length,
-			onProgress: async (index, { onSuccess }) => {
-				const branchRow = configurableRowData[index];
-
-				await new Promise((resolveUpdate) => {
-					emitUpdateSingle(branchRow.id, branchRow["SVN Branch"], branchRow["Branch Version"], branchRow["Branch Folder"], (response) => {
-						if (response.success) {
-							onSuccess();
-							emitInfoSingle(branchRow.id, branchRow["SVN Branch"], branchRow["Branch Version"], branchRow["Branch Folder"]);
-							if (window.electron)
-								window.electron
-									.runCustomScript({
-										scriptType: "powershell",
-										scriptPath: "C:\\Titan\\Titan_PostUpdate_BranchSingle.ps1",
-										branchData: branchRow,
-									})
-									.then((result) => {
-										console.log("Custom Script Result: ", JSON.stringify(result, null, 4));
-									})
-									.catch((err) => {
-										console.error("Custom Script error: " + JSON.stringify(err, null, 4));
-									});
-						}
-						resolveUpdate();
-					});
-				});
-			},
-			successMessage: (count) => `${count} branches successfully updated`,
-			errorMessage: (id) => `Failed to update branch ${id}`,
-			loadingMessage: (current, total) => `Updating ${current} of ${total} branches`,
-		}).catch(console.error);
-	}, [RaisePromisedClientNotification, configurableRowData, emitUpdateSingle, emitInfoSingle]);
-
-	const addRow = useCallback(() => {
-		updateConfig((currentConfig) => {
-			const newBranch = {
-				id: `${Date.now()}`,
-				"Branch Folder": "",
-				"Branch Version": "",
-				"SVN Branch": "",
-				"Branch Info": "Please add branch path",
-			};
-			return { ...currentConfig, branches: [...configurableRowData, newBranch] };
-		});
-	}, [updateConfig, configurableRowData]);
 
 	const refreshSelectedBranches = useCallback(() => {
 		configurableRowData
@@ -184,14 +132,14 @@ export default function SectionBranches() {
 				</Table.ColumnGroup>
 				<Table.Header>
 					<Table.Row>
-						<Table.ColumnHeader w="6">
-							<Checkbox top="0" aria-label="Select all rows" variant="subtle" colorPalette="yellow" checked={selectionMetrics.indeterminate ? "indeterminate" : selectionMetrics.selectedBranchesCount === configurableRowData.length} onCheckedChange={(e) => selectAllBranches(e.checked)} />
+						<Table.ColumnHeader ps={3.5} pe={0.75}>
+							<Checkbox aria-label="Select all rows" variant="subtle" colorPalette="yellow" checked={selectionMetrics.indeterminate ? "indeterminate" : selectionMetrics.selectedBranchesCount === configurableRowData.length} onCheckedChange={(e) => selectAllBranches(e.checked)} />
 						</Table.ColumnHeader>
 						<Table.ColumnHeader>Branch Folder</Table.ColumnHeader>
 						<Table.ColumnHeader>Branch Version</Table.ColumnHeader>
 						<Table.ColumnHeader>SVN Branch</Table.ColumnHeader>
 						<Table.ColumnHeader>Branch Info</Table.ColumnHeader>
-						<Table.ColumnHeader>Custom Scripts</Table.ColumnHeader>
+						<Table.ColumnHeader ps={3.5}>Custom Scripts</Table.ColumnHeader>
 					</Table.Row>
 				</Table.Header>
 				<Table.Body>
@@ -199,18 +147,6 @@ export default function SectionBranches() {
 						<SectionBranchesRow key={branchRow.id} branchRow={branchRow} isSelected={!!selectedBranches[branchRow["SVN Branch"]]} />
 					))}
 				</Table.Body>
-				<Table.Footer>
-					<Table.Row>
-						<Table.Cell colSpan={6}>
-							<Flex justifyContent={"start"} p={2}>
-								<Flex gapX={2}>
-									<ButtonIconTooltip icon={<IoMdAdd />} colorPalette={"yellow"} variant={"subtle"} label={"Add Row"} placement={"bottom-end"} onClick={addRow} />
-									<ButtonIconTooltip icon={<MdUpdate />} colorPalette={"yellow"} variant={"subtle"} label={"Update All"} placement={"bottom-end"} onClick={updateAll} disabled={configurableRowData.length < 1} />
-								</Flex>
-							</Flex>
-						</Table.Cell>
-					</Table.Row>
-				</Table.Footer>
 			</Table.Root>
 
 			<ActionBarSelection selectedCount={selectionMetrics.selectedBranchesCount} onDelete={() => setIsRowDialogOpen(true)} onRefresh={refreshSelectedBranches} onUpdate={updateSelectedBranches} onCommit={commitSelectedBranches} onLogs={logsSelectedBranches} onClear={() => setSelectedBranches({})} />

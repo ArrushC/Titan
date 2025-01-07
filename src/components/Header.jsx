@@ -1,6 +1,6 @@
 import { Flex, Heading, HStack } from "@chakra-ui/react";
-import React, { useCallback, useEffect, useState } from "react";
-import { MdBrowserUpdated } from "react-icons/md";
+import React, { useCallback, useState } from "react";
+import { MdBrowserUpdated, MdUpdate } from "react-icons/md";
 import { IoReload } from "react-icons/io5";
 import useSocketEmits from "../hooks/useSocketEmits.jsx";
 import { LuFileCog } from "react-icons/lu";
@@ -12,13 +12,51 @@ import { Button } from "./ui/button.jsx";
 import { PopoverArrow, PopoverBody, PopoverContent, PopoverRoot, PopoverTrigger } from "./ui/popover.jsx";
 import { useApp } from "../ContextApp.jsx";
 import { LiaToiletSolid } from "react-icons/lia";
+import { IoMdAdd } from "react-icons/io";
 
 export default function Header() {
+	const updateConfig = useApp((ctx) => ctx.updateConfig);
 	const configurableRowData = useApp((ctx) => ctx.configurableRowData);
 	const setAppClosing = useApp((ctx) => ctx.setAppClosing);
-	const { emitOpenConfig, emitFlushSvnLogs } = useSocketEmits();
-	const { RaiseClientNotificaiton } = useNotifications();
+	const { emitOpenConfig, emitFlushSvnLogs, emitInfoSingle, emitUpdateSingle } = useSocketEmits();
+	const { RaiseClientNotificaiton, RaisePromisedClientNotification } = useNotifications();
 	const [reloadPopover, setReloadPopover] = useState(false);
+
+	const updateAll = useCallback(() => {
+		RaisePromisedClientNotification({
+			title: "Updating Branches",
+			totalItems: configurableRowData.length,
+			onProgress: async (index, { onSuccess }) => {
+				const branchRow = configurableRowData[index];
+
+				await new Promise((resolveUpdate) => {
+					emitUpdateSingle(branchRow.id, branchRow["SVN Branch"], branchRow["Branch Version"], branchRow["Branch Folder"], (response) => {
+						if (response.success) {
+							onSuccess();
+							emitInfoSingle(branchRow.id, branchRow["SVN Branch"], branchRow["Branch Version"], branchRow["Branch Folder"]);
+							if (window.electron)
+								window.electron
+									.runCustomScript({
+										scriptType: "powershell",
+										scriptPath: "C:\\Titan\\Titan_PostUpdate_BranchSingle.ps1",
+										branchData: branchRow,
+									})
+									.then((result) => {
+										console.log("Custom Script Result: ", JSON.stringify(result, null, 4));
+									})
+									.catch((err) => {
+										console.error("Custom Script error: " + JSON.stringify(err, null, 4));
+									});
+						}
+						resolveUpdate();
+					});
+				});
+			},
+			successMessage: (count) => `${count} branches successfully updated`,
+			errorMessage: (id) => `Failed to update branch ${id}`,
+			loadingMessage: (current, total) => `Updating ${current} of ${total} branches`,
+		}).catch(console.error);
+	}, [RaisePromisedClientNotification, configurableRowData, emitUpdateSingle, emitInfoSingle]);
 
 	const handleReload = useCallback((isAppRestart = false) => {
 		if (isAppRestart) {
@@ -48,6 +86,19 @@ export default function Header() {
 		emitFlushSvnLogs();
 	}, [emitFlushSvnLogs]);
 
+	const addRow = useCallback(() => {
+			updateConfig((currentConfig) => {
+				const newBranch = {
+					id: `${Date.now()}`,
+					"Branch Folder": "",
+					"Branch Version": "",
+					"SVN Branch": "",
+					"Branch Info": "Please add branch path",
+				};
+				return { ...currentConfig, branches: [...configurableRowData, newBranch] };
+			});
+		}, [updateConfig, configurableRowData]);
+
 	return (
 		<HStack wrap="wrap" my={5} gapY={5} justify={"space-between"}>
 			<Flex align={"flex-start"} alignItems="center" className="notMono">
@@ -56,10 +107,7 @@ export default function Header() {
 				</Heading>
 			</Flex>
 			<Flex align={"flex-start"} alignItems={"center"} columnGap={2}>
-				<ColorModeButton />
-				<ButtonIconTooltip icon={<LuFileCog />} onClick={handleOpenConfig} colorPalette={"yellow"} variant={"subtle"} label="Open Config File" placement={"bottom-start"} size="md" />
-				<ButtonIconTooltip icon={<LiaToiletSolid  />} onClick={handleFlushSvnLogs} colorPalette={"yellow"} variant={"subtle"} label="Flush SVN Logs" placement={"bottom-start"} size="md" />
-				<ButtonElectron icon={<MdBrowserUpdated />} onClick={handleCheckForUpdates} colorPalette={"yellow"} variant={"subtle"} label="Check For Updates" size="md" />
+				<ButtonIconTooltip icon={<MdUpdate />} colorPalette={"yellow"} variant={"subtle"} label={"Update All"} placement={"bottom-end"} onClick={updateAll} disabled={configurableRowData.length < 1} />
 				<PopoverRoot open={window.electron && reloadPopover} onOpenChange={(e) => setReloadPopover(e.open)}>
 					<PopoverTrigger as={"div"}>
 						<ButtonIconTooltip icon={<IoReload />} onClick={() => setReloadPopover((prev) => !prev)} colorPalette={"yellow"} label={"Reload"} variant={"subtle"} size="md" />
@@ -68,16 +116,21 @@ export default function Header() {
 						<PopoverArrow />
 						<PopoverBody>
 							<HStack gap={8}>
-								<Button colorPalette={"yellow"} variant={"subtle"} onClick={(e) => handleReload(false)}>
+								<Button colorPalette={"yellow"} variant={"subtle"} onClick={() => handleReload(false)}>
 									Refresh
 								</Button>
-								<Button colorPalette={"yellow"} variant={"subtle"} onClick={(e) => handleReload(true)}>
+								<Button colorPalette={"yellow"} variant={"subtle"} onClick={() => handleReload(true)}>
 									Restart
 								</Button>
 							</HStack>
 						</PopoverBody>
 					</PopoverContent>
 				</PopoverRoot>
+				<ButtonIconTooltip icon={<LuFileCog />} onClick={handleOpenConfig} colorPalette={"yellow"} variant={"subtle"} label="Open Config File" placement={"bottom-start"} size="md" />
+				<ButtonElectron icon={<MdBrowserUpdated />} onClick={handleCheckForUpdates} colorPalette={"yellow"} variant={"subtle"} label="Check For Updates" size="md" />
+				<ButtonIconTooltip icon={<LiaToiletSolid />} onClick={handleFlushSvnLogs} colorPalette={"yellow"} variant={"subtle"} label="Flush SVN Logs" placement={"bottom-start"} size="md" />
+				<ButtonIconTooltip icon={<IoMdAdd />} colorPalette={"yellow"} variant={"subtle"} label={"Add Row"} placement={"bottom-end"} onClick={addRow} />
+				<ColorModeButton />
 			</Flex>
 		</HStack>
 	);

@@ -113,7 +113,7 @@ export default function ProcessCommit() {
 	return (
 		<Box>
 			<Heading as={"h2"} size={"lg"} lineClamp={1} mb={4} className="animation-pulse" lineHeight={"1.4"}>
-				Processing commit...
+				Committing {selectedBranchesCount} branch{selectedBranchesCount > 1 ? "es" : ""}:
 			</Heading>
 
 			<Box mt={6} colorPalette={"yellow"}>

@@ -141,6 +141,9 @@ export const AppProvider = ({ children }) => {
 		folder: branchRow["Branch Folder"],
 		version: branchRow["Branch Version"],
 	}])), [selectedBranchesData]);
+	const selectedBranchFolders = useMemo(() => {
+		return Array.from(selectedBranchesData.reduce((acc, branchRow) => acc.add(branchRow["Branch Folder"]), new Set()));
+	}, [selectedBranchesData]);
 
 	useEffect(() => {
 		if (configurableRowData?.length < 1 || Object.keys(selectedBranches).length < 1) return;
@@ -185,10 +188,11 @@ export const AppProvider = ({ children }) => {
 			updateConfig,
 			emitSocketEvent,
 			configurableRowData,
+			selectedBranches,
 			selectedBranchesData,
 			selectedBranchPaths,
 			selectedBranchProps,
-			selectedBranches,
+			selectedBranchFolders,
 			setSelectedBranches,
 			svnLogs,
 			setSvnLogs,
@@ -198,7 +202,7 @@ export const AppProvider = ({ children }) => {
 			handleBranchSelection,
 			handleBulkSelection,
 		}),
-		[appClosing, socket, config, updateConfig, emitSocketEvent, configurableRowData, selectedBranchesData, selectedBranchPaths, selectedBranchProps, selectedBranches, svnLogs, logsData, appMode, handleBranchSelection, handleBulkSelection]
+		[appClosing, socket, config, updateConfig, emitSocketEvent, configurableRowData, selectedBranches, selectedBranchesData, selectedBranchPaths, selectedBranchProps, selectedBranchFolders, svnLogs, logsData, appMode, handleBranchSelection, handleBulkSelection]
 	);
 
 	return <ContextApp.Provider value={value}>{children}</ContextApp.Provider>;

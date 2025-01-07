@@ -43,7 +43,7 @@ export function initialiseServer() {
 	const server = createServer(app);
 	const io = new Server(server, {
 		cors: {
-			origin: isDev ? "http://localhost:5173" : "*",
+			origin: "*",
 			credentials: true,
 		},
 	});
@@ -555,7 +555,7 @@ export function initialiseServer() {
 
 		if (!isForeignOrigin) {
 			socket.on("titan-config-set", async (data) => {
-				debugTask("titan-config-set", data, false);
+				debugTask("titan-config-set", null, false);
 				try {
 					await fsPromises.writeFile(configFilePath, JSON.stringify(data, null, 4));
 					emitMessage(socket, "Config file updated", "success");
@@ -563,7 +563,7 @@ export function initialiseServer() {
 					logger.error(err);
 					emitMessage(socket, "Error updating config file", "error");
 				}
-				debugTask("titan-config-set", data, true);
+				debugTask("titan-config-set", null, true);
 			});
 
 			socket.on("titan-config-open", async () => {
@@ -1604,6 +1604,7 @@ export function initialiseServer() {
 
 		socket.on("external-autofill-issue-numbers", async (data) => {
 			debugTask("external-autofill-issue-numbers", data, false);
+			io.emit("external-autofill-issue-numbers", data);
 			debugTask("external-autofill-issue-numbers", data, true);
 		});
 

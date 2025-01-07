@@ -63,6 +63,7 @@ export const CommitProvider = ({ children }) => {
 	const selectedBranches = useApp((ctx) => ctx.selectedBranches);
 	const selectedBrachesData = useApp((ctx) => ctx.selectedBranchesData);
 	const selectedBranchPaths = useApp((ctx) => ctx.selectedBranchPaths);
+	const selectedBranchFolders = useApp((ctx) => ctx.selectedBranchFolders);
 
 	const appMode = useApp((ctx) => ctx.appMode);
 	const { emitStatusSingle } = useSocketEmits();
@@ -484,6 +485,28 @@ export const CommitProvider = ({ children }) => {
 		socket?.on("branch-paths-update", socketCallback);
 		return () => socket?.off("branch-paths-update", socketCallback);
 	}, [socket, isCommitMode, selectedBranchesCount, configurableRowData, selectedBranchPaths]);
+
+	useEffect(() => {
+		if (!isCommitMode || selectedBranchesCount < 1) return;
+		const socketCallback = (data) => {
+			setIssueNumber((prevIssueNums) => {
+				const updatedEntries = selectedBranchFolders.reduce((acc, fol) => {
+					if (!prevIssueNums[fol]) {
+						acc[fol] = data[fol];
+					}
+					return acc;
+				}, {});
+
+				return {
+					...prevIssueNums,
+					...updatedEntries,
+				};
+			});
+		};
+
+		socket?.on("external-autofill-issue-numbers", socketCallback);
+		return () => socket?.off("external-autofill-issue-numbers", socketCallback);
+	}, [socket, isCommitMode, selectedBranchesCount, selectedBranchFolders]);
 
 	return <ContextCommit.Provider value={value}>{children}</ContextCommit.Provider>;
 };

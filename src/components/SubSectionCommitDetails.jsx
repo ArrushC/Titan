@@ -1,30 +1,26 @@
-import { chakra, Code, Flex, Link, Stack, Text } from "@chakra-ui/react";
-import React, { useMemo, useEffect } from "react";
+import { chakra, Code, Flex, Link, Stack } from "@chakra-ui/react";
+import React, {  } from "react";
 import { useApp } from "../ContextApp.jsx";
 import FieldIssueNumber from "./FieldIssueNumber.jsx";
 import FieldSourceBranch from "./FieldSourceBranch.jsx";
 import FieldCommitMessage from "./FieldCommitMessage.jsx";
 import { FieldLookup } from "./FieldLookup.jsx";
 import { useCommit } from "../ContextCommit.jsx";
-import { LuExternalLink } from "react-icons/lu";
 import { MdError } from "react-icons/md";
 import { FaTrello } from "react-icons/fa6";
 
 export default function SubSectionCommitDetails() {
-	const selectedBranchesData = useApp((ctx) => ctx.selectedBranchesData);
+	const selectedBranchFolders = useApp((ctx) => ctx.selectedBranchFolders);
 	const sourceBranch = useCommit((ctx) => ctx.sourceBranch);
 	const sourceIssueNumber = useCommit((ctx) => ctx.sourceIssueNumber);
 	const commitMessage = useCommit((ctx) => ctx.commitMessage);
 	const trelloData = useCommit((ctx) => ctx.trelloData);
-	const selectedFolders = useMemo(() => {
-		return Array.from(selectedBranchesData.reduce((acc, branchRow) => acc.add(branchRow["Branch Folder"]), new Set()));
-	}, [selectedBranchesData]);
 
 	return (
 		<Flex ms={9} flexDirection={"column"}>
 			<Stack gap="6" maxW="8xl" css={{ "--field-label-width": "96px" }} flex={1}>
 				<FieldLookup />
-				{selectedFolders.map((branchFolder, i) => (
+				{selectedBranchFolders.map((branchFolder, i) => (
 					<FieldIssueNumber key={branchFolder} branchFolder={branchFolder} />
 				))}
 				<FieldSourceBranch />

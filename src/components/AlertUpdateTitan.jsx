@@ -1,11 +1,13 @@
-import { Button, DialogBody, DialogCloseTrigger, DialogContent, DialogFooter, DialogHeader, DialogRoot, DialogTitle, Flex, Spinner, useDisclosure } from "@chakra-ui/react";
+import { Flex, Spinner } from "@chakra-ui/react";
 import React, { useCallback, useEffect, useRef, useState } from "react";
 import useNotifications from "../hooks/useNotifications.jsx";
+import { DialogBody, DialogCloseTrigger, DialogContent, DialogFooter, DialogHeader, DialogRoot, DialogTitle } from "./ui/dialog.jsx";
+import { Button } from "./ui/button.jsx";
 
 export default function AlertUpdateTitan() {
 	const { toast, RaiseClientNotificaiton } = useNotifications();
-	const { open: isAlertOpen, onOpen: onOpenAlert, onClose: onCloseAlert } = useDisclosure();
-	const cancelRef = useRef();
+	const [open, setOpen] = useState(false);
+	const cancelRef = useRef(null);
 	const [updateInProgress, setUpdateInProgress] = useState(false);
 
 	useEffect(() => {
@@ -16,7 +18,7 @@ export default function AlertUpdateTitan() {
 
 		window.electron.on("update-available", () => {
 			toast.closeAll();
-			onOpenAlert();
+			setOpen(true);
 		});
 
 		window.electron.on("update-error", (error) => {
@@ -28,12 +30,12 @@ export default function AlertUpdateTitan() {
 			window.electron.removeAllListeners("update-available");
 			window.electron.removeAllListeners("update-error");
 		};
-	}, [toast, onOpenAlert]);
+	}, [toast, setOpen]);
 
 	const handleCancel = useCallback(() => {
-		onCloseAlert();
+		setOpen(false);
 		RaiseClientNotificaiton("You may update the application later by manually triggering an update check or wait until Titan does this", "info", 5000);
-	}, [onCloseAlert, RaiseClientNotificaiton]);
+	}, [setOpen, RaiseClientNotificaiton]);
 
 	const handleStartUpdate = useCallback(() => {
 		if (updateInProgress) {
@@ -51,22 +53,22 @@ export default function AlertUpdateTitan() {
 			window.electron.on("update-downloaded", () => {
 				RaiseClientNotificaiton("Update has been downloaded successfully. Titan will now restart to apply the update.", "info", 5000);
 				window.electron.removeAllListeners("update-downloaded");
-				onCloseAlert();
+				setOpen(false);
 			});
 
 			window.electron.on("update-not-available", () => {
 				RaiseClientNotificaiton("Titan is up to date", "info", 3000);
 				window.electron.removeAllListeners("update-not-available");
 				setUpdateInProgress(false);
-				onCloseAlert();
+				setOpen(false);
 			});
 		} else {
 			RaiseClientNotificaiton("Cannot update Titan in a non-desktop application environment", "error", 5000);
 		}
-	}, [updateInProgress, RaiseClientNotificaiton, setUpdateInProgress, onCloseAlert]);
+	}, [updateInProgress, RaiseClientNotificaiton, setUpdateInProgress, setOpen]);
 
 	return (
-		<DialogRoot role="alertdialog" open={isAlertOpen} leastDestructiveRef={cancelRef} onOpenChange={onCloseAlert} motionPreset="slide-in-bottom" closeOnOverlayClick={!updateInProgress}>
+		<DialogRoot role="alertdialog" open={open} leastDestructiveRef={cancelRef} onOpenChange={(e) => setOpen(e.open)} motionPreset="slide-in-bottom" closeOnOverlayClick={!updateInProgress}>
 			<DialogContent>
 				<DialogHeader fontSize="lg" fontWeight="bold">
 					<DialogTitle>Update Available</DialogTitle>

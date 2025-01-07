@@ -111,6 +111,8 @@ const SectionBranchesRow = memo(({ branchRow, isSelected }) => {
 	const executeCustomScript = useCallback((scriptType, scriptPath, branchData) => {
 		window.electron.runCustomScript({ scriptType, scriptPath, branchData }).then((result) => {
 			console.log("Custom Script Result: ", JSON.stringify(result, null, 4));
+		}).catch((err) => {
+			console.error("Custom Script error: " + JSON.stringify(err, null, 4));
 		});
 	}, []);
 

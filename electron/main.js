@@ -524,6 +524,12 @@ ipcMain.handle("run-custom-script", async (event, data) => {
 
 		const args = `"${id}" "${branchFolder}" "${branchVersion}" "${svnBranch}"`;
 
+		if (!fs.existsSync(scriptPath)) {
+			logger.error(scriptPath.startsWith("C:\\Titan\\Titan_") ? `Titan script path not found: ${scriptPath}` : `Script path does not exist: ${scriptPath}`);
+			resolve({ success: false });
+			return;
+		}
+
 		if (scriptType === "batch") {
 			command = `start cmd /k "${scriptPath}" ${args}`;
 		} else if (scriptType === "powershell") {
@@ -536,13 +542,15 @@ ipcMain.handle("run-custom-script", async (event, data) => {
 			if (error) {
 				console.error(`Error: ${error.message}`);
 				reject({ success: false, error: error.message });
+				return;
 			} else if (stderr) {
 				console.error(`Stderr: ${stderr}`);
 				reject({ success: false, error: stderr });
-			} else {
-				console.log(`Stdout: ${stdout}`);
-				resolve({ success: true });
+				return;
 			}
+
+			console.log(`Stdout: ${stdout}`);
+			resolve({ success: true });
 		});
 	});
 });

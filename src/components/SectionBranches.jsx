@@ -21,8 +21,8 @@ export default function SectionBranches() {
 	const setSelectedBranches = useApp((ctx) => ctx.setSelectedBranches);
 	const setAppMode = useApp((ctx) => ctx.setAppMode);
 	const handleBulkSelection = useBranches((ctx) => ctx.handleBulkSelection);
-	const setIsDialogSBLogOpen = useBranches(ctx => ctx.setIsDialogSBLogOpen);
-	const selectionMetrics = useBranches(ctx => ctx.selectionMetrics);
+	const setIsDialogSBLogOpen = useBranches((ctx) => ctx.setIsDialogSBLogOpen);
+	const selectionMetrics = useBranches((ctx) => ctx.selectionMetrics);
 	const { RaisePromisedClientNotification } = useNotifications();
 	const { emitInfoSingle, emitUpdateSingle } = useSocketEmits();
 
@@ -46,6 +46,19 @@ export default function SectionBranches() {
 						if (response.success) {
 							onSuccess();
 							emitInfoSingle(branchRow.id, branchRow["SVN Branch"], branchRow["Branch Version"], branchRow["Branch Folder"]);
+							if (window.electron)
+								window.electron
+									.runCustomScript({
+										scriptType: "powershell",
+										scriptPath: "C:\\Titan\\Titan_PostUpdate_BranchSingle.ps1",
+										branchData: branchRow,
+									})
+									.then((result) => {
+										console.log("Custom Script Result: ", JSON.stringify(result, null, 4));
+									})
+									.catch((err) => {
+										console.error("Custom Script error: " + JSON.stringify(err, null, 4));
+									});
 						}
 						resolveUpdate();
 					});
@@ -92,6 +105,19 @@ export default function SectionBranches() {
 						if (response.success) {
 							onSuccess();
 							emitInfoSingle(branchRow.id, branchRow["SVN Branch"], branchRow["Branch Version"], branchRow["Branch Folder"]);
+							if (window.electron)
+								window.electron
+									.runCustomScript({
+										scriptType: "powershell",
+										scriptPath: "C:\\Titan\\Titan_PostUpdate_BranchSingle.ps1",
+										branchData: branchRow,
+									})
+									.then((result) => {
+										console.log("Custom Script Result: ", JSON.stringify(result, null, 4));
+									})
+									.catch((err) => {
+										console.error("Custom Script error: " + JSON.stringify(err, null, 4));
+									});
 						}
 						resolveUpdate();
 					});
@@ -170,7 +196,7 @@ export default function SectionBranches() {
 				</Table.Header>
 				<Table.Body>
 					{configurableRowData.map((branchRow) => (
-						<SectionBranchesRow key={branchRow.id} branchRow={branchRow} isSelected={!!selectedBranches[branchRow["SVN Branch"]]}  />
+						<SectionBranchesRow key={branchRow.id} branchRow={branchRow} isSelected={!!selectedBranches[branchRow["SVN Branch"]]} />
 					))}
 				</Table.Body>
 				<Table.Footer>
@@ -187,15 +213,7 @@ export default function SectionBranches() {
 				</Table.Footer>
 			</Table.Root>
 
-			<ActionBarSelection
-                selectedCount={selectionMetrics.selectedBranchesCount}
-                onDelete={() => setIsRowDialogOpen(true)}
-                onRefresh={refreshSelectedBranches}
-                onUpdate={updateSelectedBranches}
-                onCommit={commitSelectedBranches}
-                onLogs={logsSelectedBranches}
-                onClear={() => setSelectedBranches({})}
-            />
+			<ActionBarSelection selectedCount={selectionMetrics.selectedBranchesCount} onDelete={() => setIsRowDialogOpen(true)} onRefresh={refreshSelectedBranches} onUpdate={updateSelectedBranches} onCommit={commitSelectedBranches} onLogs={logsSelectedBranches} onClear={() => setSelectedBranches({})} />
 
 			<DialogRowDeletion selectedCount={selectionMetrics.selectedBranchesCount} isDialogOpen={isRowDialogOpen} closeDialog={() => setIsRowDialogOpen(false)} fireDialogAction={fireRowDialogAction} />
 			<DialogBranchesLog />

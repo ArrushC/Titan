@@ -60,7 +60,7 @@ const LogRow = React.memo(function LogRow({ entry, isExpanded, onToggleExpand, p
 				<Table.Row bgColor={"gray.subtle"} height={`${ROW_HEIGHT}px`} onDoubleClick={() => processDialogAction(entry)}>
 					<Table.Cell colSpan={5}>
 						<Box p={3}>
-							<Flex alignItems={"center"} mb={5} gap={3} p={2}>
+							<Flex alignItems={"center"} mb={1} gap={3} p={2}>
 								Commit Message: <Text color={"yellow.fg"}>{entry.message}</Text>
 							</Flex>
 
@@ -85,7 +85,7 @@ const LogRow = React.memo(function LogRow({ entry, isExpanded, onToggleExpand, p
 												{file.path} ({file.kind === "dir" ? "Directory" : "File"})
 											</Table.Cell>
 											<Table.Cell>
-												<IconButton variant="subtle" size={"xs"} disabled={!window.electron} aria-label="Diff" onClick={() => window.electron.openSvnDiff({ fullPath: `${entry.repositoryRoot}${file.path}`, revision: entry.revision })}>
+												<IconButton variant="subtle" size={"xs"} disabled={!window.electron} aria-label="Diff" onClick={() => window.electron.openSvnDiff({ fullPath: `${entry.repositoryRoot}${file.path}`, revision: entry.revision, action: file.action.toUpperCase() })}>
 													<VscDiffSingle />
 												</IconButton>
 											</Table.Cell>

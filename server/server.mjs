@@ -612,7 +612,7 @@ export function initialiseServer() {
 						} else {
 							logger.info("Successfully executed SVN command: " + task.command);
 							if (callback) callback({ success: true });
-							else socket.emit("branch-success-single", { id: data.id, branch: data.branch, version: data.version, folder: data.folder });
+							else socket.emit("branch-update-success-single", { id: data.id, branch: data.branch, version: data.version, folder: data.folder });
 						}
 					},
 				};

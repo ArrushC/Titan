@@ -485,8 +485,8 @@ ipcMain.handle("open-svn-resolve", async (event, data) => {
 });
 
 ipcMain.handle("open-svn-diff", async (event, data) => {
-	const { fullPath, revision } = data;
-	const command = `TortoiseProc.exe /command:diff /path:"${fullPath}" /startrev:${Number(revision) - 1} /endrev:${revision}`;
+	const { fullPath, revision, action } = data;
+	const command = `TortoiseProc.exe /command:diff /path:"${fullPath}" /startrev:${action === "A" ? revision : Number(revision) - 1} /endrev:${revision}`;
 
 	return new Promise((resolve, reject) => {
 		exec(command, (error, stdout, stderr) => {

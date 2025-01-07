@@ -14307,51 +14307,6 @@ const [LocaleContextProvider, useLocaleContext] = createContext$1({
   strict: false,
   defaultValue: { dir: "ltr", locale: "en-US" }
 });
-function useCallbackRef(callback, deps = []) {
-  const callbackRef = reactExports.useRef(() => {
-    throw new Error("Cannot call an event handler while rendering.");
-  });
-  reactExports.useInsertionEffect(() => {
-    callbackRef.current = callback;
-  });
-  return reactExports.useCallback((...args) => {
-    var _a2;
-    return (_a2 = callbackRef.current) == null ? void 0 : _a2.call(callbackRef, ...args);
-  }, deps);
-}
-function useDisclosure(props = {}) {
-  const { onClose: onCloseProp, onOpen: onOpenProp, open: openProp } = props;
-  const handleOpen = useCallbackRef(onOpenProp);
-  const handleClose = useCallbackRef(onCloseProp);
-  const [openState, setopen] = reactExports.useState(props.defaultOpen || false);
-  const open = openProp !== void 0 ? openProp : openState;
-  const isControlled = openProp !== void 0;
-  const onClose = reactExports.useCallback(() => {
-    if (!isControlled) {
-      setopen(false);
-    }
-    handleClose == null ? void 0 : handleClose();
-  }, [isControlled, handleClose]);
-  const onOpen = reactExports.useCallback(() => {
-    if (!isControlled) {
-      setopen(true);
-    }
-    handleOpen == null ? void 0 : handleOpen();
-  }, [isControlled, handleOpen]);
-  const onToggle = reactExports.useCallback(() => {
-    if (open) {
-      onClose();
-    } else {
-      onOpen();
-    }
-  }, [open, onOpen, onClose]);
-  return {
-    open,
-    onOpen,
-    onClose,
-    onToggle
-  };
-}
 const colorMix = (value2, token2) => {
   var _a2;
   if (!value2 || typeof value2 !== "string") {
@@ -45565,13 +45520,12 @@ export {
   FaCheck as bP,
   CollapsibleRoot as bQ,
   CollapsibleContent as bR,
-  useDisclosure as bS,
-  Image as bT,
-  VscChromeMinimize as bU,
-  FaRegSquare as bV,
-  ChakraProvider as bW,
-  defaultSystem as bX,
-  clientExports as bY,
+  Image as bS,
+  VscChromeMinimize as bT,
+  FaRegSquare as bU,
+  ChakraProvider as bV,
+  defaultSystem as bW,
+  clientExports as bX,
   AccordionItemContent as ba,
   AccordionItemBody as bb,
   AccordionRoot as bc,

@@ -16270,7 +16270,7 @@ Ve.handle("run-custom-script", async (t, a) => {
     let d = "";
     const { id: e, "Branch Folder": n, "Branch Version": u, "SVN Branch": l } = h, r = `"${e}" "${n}" "${u}" "${l}"`;
     if (!Be.existsSync(s)) {
-      Oe.error(s.startsWith("C:\\Titan\\Titan_") ? `Titan script path not found: ${s}` : `Script path does not exist: ${s}`), o({ success: !1 });
+      Oe.warn(s.startsWith("C:\\Titan\\Titan_") ? `Titan script path not found: ${s}` : `Script path does not exist: ${s}`), o({ success: !1 });
       return;
     }
     if (c === "batch")

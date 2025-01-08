@@ -1,6 +1,5 @@
 import { c as createToaster, j as jsxRuntimeExports, P as Portal, T as Toaster$1, a as ToastRoot, S as Spinner, b as ToastIndicator, d as Stack, e as ToastTitle, f as ToastDescription, g as ToastActionTrigger, h as ToastCloseTrigger, i as createContext, u as useContextSelector, r as reactExports, l as lookup, k as reactDomExports, m as TooltipRoot, n as TooltipTrigger, o as TooltipPositioner, p as TooltipContent, q as TooltipArrow, s as TooltipArrowTip, I as IconButton, C as ClientOnly, t as Skeleton, z, F as FaSun, v as FaMoon, J, B as Button$1, A as AbsoluteCenter, w as Span, L as LuX, x as PopoverPositioner, y as PopoverContent$1, D as PopoverArrow$1, E as PopoverArrowTip, G as PopoverCloseTrigger, H as PopoverTitle$1, K as PopoverRoot$1, M as PopoverBody$1, N as PopoverTrigger$1, O as HStack, Q as Flex, R as Heading, U as MdUpdate, V as IoReload, W as LuFileCog, X as MdBrowserUpdated, Y as LiaToiletSolid, Z as IoMdAdd, _ as CheckboxRoot, $ as CheckboxHiddenInput, a0 as CheckboxControl, a1 as CheckboxIndicator, a2 as CheckboxLabel, a3 as DialogBackdrop$1, a4 as DialogPositioner, a5 as DialogContent$1, a6 as DialogCloseTrigger$1, a7 as DialogRoot$1, a8 as DialogFooter$1, a9 as DialogHeader$1, aa as DialogBody$1, ab as DialogTitle$1, ac as DialogActionTrigger$1, ad as TbAsterisk, ae as TbLetterZ, af as TbLetterY, ag as TbLetterX, ah as TbLetterW, ai as TbLetterV, aj as TbLetterU, ak as TbLetterT, al as TbLetterS, am as TbLetterR, an as TbLetterQ, ao as TbLetterP, ap as TbLetterO, aq as TbLetterN, ar as TbLetterM, as as TbLetterL, at as TbLetterK, au as TbLetterJ, av as TbLetterI, aw as TbLetterH, ax as TbLetterG, ay as TbLetterF, az as TbLetterE, aA as TbLetterD, aB as TbLetterC, aC as TbLetterB, aD as TbLetterA, aE as Input, aF as keyframes, aG as chroma, aH as Text, aI as TableRow, aJ as TableCell, aK as FaFolderOpen, aL as MdAutoFixHigh, aM as ActionBarPositioner, aN as ActionBarContent$1, aO as ActionBarCloseTrigger, aP as ActionBarRoot$1, aQ as ActionBarSelectionTrigger$1, aR as ActionBarSeparator$1, aS as Kbd, aT as IoMdClose, aU as Group, aV as InputElement, aW as React, aX as FaChevronDown, aY as FaChevronRight, aZ as Box, a_ as TableRoot, a$ as TableColumnGroup, b0 as TableColumn, b1 as TableHeader, b2 as TableColumnHeader, b3 as TableBody, b4 as VscDiffSingle, b5 as SiSubversion, b6 as LuSearch, b7 as AccordionItemTrigger$1, b8 as AccordionItemIndicator, b9 as AccordionItemContent$1, ba as AccordionItemBody, bb as AccordionRoot$1, bc as AccordionItem$1, bd as FieldRoot, be as FieldLabel, bf as FieldRequiredIndicator, bg as FieldHelperText, bh as FieldErrorText, bi as NumberInputRoot$1, bj as NumberInputControl, bk as NumberInputIncrementTrigger, bl as NumberInputDecrementTrigger, bm as NumberInputInput, bn as chakra, bo as index, bp as FaTrello, bq as MdKeyboardReturn, br as TableScrollArea, bs as Link, bt as LuExternalLink, bu as TableFooter, bv as FaChevronUp, bw as Code, bx as MdError, by as BiMessageDetail, bz as IoWarning, bA as FiHelpCircle, bB as FiEdit, bC as HiOutlineInformationCircle, bD as ProgressTrack, bE as ProgressRange, bF as ProgressLabel$1, bG as ProgressRoot$1, bH as ProgressValueText$1, bI as LuCheck, bJ as LuClipboard, bK as ListRoot, bL as ListItem, bM as ListIndicator, bN as FaCircleCheck, bO as CheckboxGroup, bP as FaCheck, bQ as CollapsibleRoot, bR as CollapsibleContent, bS as Image, bT as VscChromeMinimize, bU as FaRegSquare, bV as ChakraProvider, bW as defaultSystem, bX as clientExports } from "./vendor.js";
 import { l as lodashExports } from "./lodash.js";
-/* empty css                  */
 (function polyfill() {
   const relList = document.createElement("link").relList;
   if (relList && relList.supports && relList.supports("modulepreload")) {
@@ -3115,7 +3114,39 @@ function ProcessCommit() {
     const newline = clipboardOptions.includes("MarkupSupport") ? `\r
 
 ${"​".repeat(7)}` : "\r\n";
-    const sortedCommits = [...liveCommits];
+    const versionCompare = (a, b) => {
+      const parseVersion = (version) => {
+        const match = version.match(/([A-Za-z]+)?(\d+(?:\.\d+)*)/);
+        if (!match) return { prefix: "", parts: [] };
+        const [, prefix, versionNumber] = match;
+        const parts = versionNumber.split(".").map(Number);
+        return { prefix: prefix || "", parts };
+      };
+      const aParsed = parseVersion(a);
+      const bParsed = parseVersion(b);
+      if (aParsed.prefix !== bParsed.prefix) {
+        return aParsed.prefix.localeCompare(bParsed.prefix);
+      }
+      for (let i = 0; i < Math.max(aParsed.parts.length, bParsed.parts.length); i++) {
+        const aPart = aParsed.parts[i] || 0;
+        const bPart = bParsed.parts[i] || 0;
+        if (aPart !== bPart) {
+          return aPart - bPart;
+        }
+      }
+      return 0;
+    };
+    const sortedCommits = [...liveCommits].sort((a, b) => {
+      var _a2, _b, _c, _d;
+      const folderA = ((_a2 = selectedBranchProps[a.svnBranch]) == null ? void 0 : _a2.folder) || "";
+      const folderB = ((_b = selectedBranchProps[b.svnBranch]) == null ? void 0 : _b.folder) || "";
+      if (folderA !== folderB) {
+        return folderA.localeCompare(folderB);
+      }
+      const versionA = ((_c = selectedBranchProps[a.svnBranch]) == null ? void 0 : _c.version) || "";
+      const versionB = ((_d = selectedBranchProps[b.svnBranch]) == null ? void 0 : _d.version) || "";
+      return versionCompare(versionA, versionB);
+    });
     const copiedCommitMsg = clipboardOptions.includes("CommitMsg") ? `${finalCommitMessage}
 ` : "";
     const lines = sortedCommits.map((commit) => {
@@ -3167,7 +3198,7 @@ ${"​".repeat(7)}` : "\r\n";
 
 ${"​".repeat(7)}` : "\r\n";
     emitTrelloCardUpdate(trelloData, revisionsText.split(newline), finalCommitMessage);
-  }, [trelloData, liveCommits, finalCommitMessage, clipboardOptions, emitTrelloCardUpdate]);
+  }, [trelloData, liveCommits, finalCommitMessage, revisionsText, clipboardOptions, emitTrelloCardUpdate]);
   return /* @__PURE__ */ jsxRuntimeExports.jsxs(Box, { children: [
     /* @__PURE__ */ jsxRuntimeExports.jsxs(Heading, { as: "h2", size: "lg", lineClamp: 1, mb: 4, className: "animation-pulse", lineHeight: "1.4", children: [
       "Committing ",

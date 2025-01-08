@@ -528,7 +528,7 @@ ipcMain.handle("run-custom-script", async (event, data) => {
 		const args = `"${id}" "${branchFolder}" "${branchVersion}" "${svnBranch}"`;
 
 		if (!fs.existsSync(scriptPath)) {
-			logger.error(scriptPath.startsWith("C:\\Titan\\Titan_") ? `Titan script path not found: ${scriptPath}` : `Script path does not exist: ${scriptPath}`);
+			logger.warn(scriptPath.startsWith("C:\\Titan\\Titan_") ? `Titan script path not found: ${scriptPath}` : `Script path does not exist: ${scriptPath}`);
 			resolve({ success: false });
 			return;
 		}

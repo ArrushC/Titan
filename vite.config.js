@@ -27,8 +27,6 @@ export default defineConfig({
 	// Optimize dependencies that rarely change
 	optimizeDeps: {
 		include: [
-			"ag-grid-community",
-			"ag-grid-react",
 			"lodash",
 		],
 	},
@@ -42,14 +40,8 @@ export default defineConfig({
 				chunkFileNames: "assets/[name].js",
 				assetFileNames: "assets/[name].[ext]",
 				manualChunks(id) {
-					// Separate ag-grid and lodash into their own chunks
+					// Separate lodash into their own chunks
 					if (id.includes("node_modules")) {
-						if (id.includes("ag-grid-react")) {
-							return "ag-grid-react";
-						}
-						if (id.includes("ag-grid-community")) {
-							return "ag-grid-community";
-						}
 						if (id.includes("lodash")) {
 							return "lodash";
 						}

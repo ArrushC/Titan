@@ -1598,6 +1598,7 @@ export function initialiseServer() {
 
 		socket.on("external-svn-commits-get", async () => {
 			debugTask("external-svn-commits-get", null, false);
+			logger.debug("External commits to be sent: " + JSON.stringify(instanceData.commitLiveResponses, null, 4));
 			socket.emit("external-svn-commits-get", instanceData.commitLiveResponses);
 			debugTask("external-svn-commits-get", null, true);
 		});

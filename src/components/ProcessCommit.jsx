@@ -46,8 +46,48 @@ export default function ProcessCommit() {
 		// Zero-width spaces to offset line wrapping if "MarkupSupport" is included
 		const newline = clipboardOptions.includes("MarkupSupport") ? `\r\n\n${"\u200B".repeat(7)}` : "\r\n";
 
-		// Sort commits if needed. For example, if you want them grouped by branchString or similar:
-		const sortedCommits = [...liveCommits]; // mutate a copy, if you want to apply a custom sort
+		const versionCompare = (a, b) => {
+			const parseVersion = (version) => {
+				const match = version.match(/([A-Za-z]+)?(\d+(?:\.\d+)*)/);
+				if (!match) return { prefix: "", parts: [] };
+				const [, prefix, versionNumber] = match;
+				const parts = versionNumber.split(".").map(Number);
+				return { prefix: prefix || "", parts };
+			};
+
+			const aParsed = parseVersion(a);
+			const bParsed = parseVersion(b);
+
+			// Compare prefixes (e.g., "CA")
+			if (aParsed.prefix !== bParsed.prefix) {
+				return aParsed.prefix.localeCompare(bParsed.prefix);
+			}
+
+			// Compare version parts (e.g., 3.18.3 vs. 3.20.3)
+			for (let i = 0; i < Math.max(aParsed.parts.length, bParsed.parts.length); i++) {
+				const aPart = aParsed.parts[i] || 0;
+				const bPart = bParsed.parts[i] || 0;
+				if (aPart !== bPart) {
+					return aPart - bPart;
+				}
+			}
+
+			return 0; // If all parts are identical
+		};
+
+		const sortedCommits = [...liveCommits].sort((a, b) => {
+			const folderA = selectedBranchProps[a.svnBranch]?.folder || "";
+			const folderB = selectedBranchProps[b.svnBranch]?.folder || "";
+
+			if (folderA !== folderB) {
+				return folderA.localeCompare(folderB); // Sort by folder name ascending
+			}
+
+			const versionA = selectedBranchProps[a.svnBranch]?.version || "";
+			const versionB = selectedBranchProps[b.svnBranch]?.version || "";
+
+			return versionCompare(versionA, versionB); // Sort by version
+		});
 
 		const copiedCommitMsg = clipboardOptions.includes("CommitMsg") ? `${finalCommitMessage}\n` : "";
 
@@ -109,7 +149,7 @@ export default function ProcessCommit() {
 	const handleUpdateTrelloCard = useCallback(() => {
 		const newline = clipboardOptions.includes("MarkupSupport") ? `\r\n\n${"\u200B".repeat(7)}` : "\r\n";
 		emitTrelloCardUpdate(trelloData, revisionsText.split(newline), finalCommitMessage);
-	}, [trelloData, liveCommits, finalCommitMessage, clipboardOptions, emitTrelloCardUpdate]);
+	}, [trelloData, liveCommits, finalCommitMessage, revisionsText, clipboardOptions, emitTrelloCardUpdate]);
 
 	return (
 		<Box>

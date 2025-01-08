@@ -2106,7 +2106,6 @@ function ButtonProcessCommit() {
   const sourceBranch = useCommit((ctx) => ctx.sourceBranch);
   const sourceIssueNumber = useCommit((ctx) => ctx.sourceIssueNumber);
   const commitMessage = useCommit((ctx) => ctx.commitMessage);
-  const trelloData = useCommit((ctx) => ctx.trelloData);
   const selectedModifiedChanges = useCommit((ctx) => ctx.selectedModifiedChanges);
   const isProcessCommit = useCommit((ctx) => ctx.isProcessCommit);
   const setIsProcessCommit = useCommit((ctx) => ctx.setIsProcessCommit);
@@ -2131,10 +2130,7 @@ function ButtonProcessCommit() {
       selectedModifiedChanges,
       selectedBranchProps
     };
-    setCommitPayload({
-      ...commitPayload,
-      trelloData
-    });
+    setCommitPayload(commitPayload);
     emitCommitPayload(commitPayload);
   }, [selectedModifiedChanges, issueNumber, sourceBranch, sourceIssueNumber, commitMessage, selectedBranchProps, RaiseClientNotificaiton]);
   return /* @__PURE__ */ jsxRuntimeExports.jsx(Button, { onClick: () => handleProcessCommit(), colorPalette: "yellow", disabled: Object.keys(selectedModifiedChanges).length < 1 || isCommitMode && isProcessCommit, children: "Commit" });
@@ -3091,9 +3087,11 @@ function ButtonClipboard({ size = "md", value }) {
   return /* @__PURE__ */ jsxRuntimeExports.jsx(IconButton, { colorPalette: "yellow", variant: "subtle", onClick: handleCopyValue, size, children: isCopied ? /* @__PURE__ */ jsxRuntimeExports.jsx(LuCheck, {}) : /* @__PURE__ */ jsxRuntimeExports.jsx(LuClipboard, {}) });
 }
 function ProcessCommit() {
+  var _a;
   const socket = useApp((ctx) => ctx.socket);
+  const trelloData = useCommit((ctx) => ctx.trelloData);
   const commitPayload = useCommit((ctx) => ctx.commitPayload);
-  const { commitMessage, selectedModifiedChanges, selectedBranchProps, trelloData } = commitPayload;
+  const { commitMessage, selectedModifiedChanges, selectedBranchProps } = commitPayload;
   const isProcessCommit = useCommit((ctx) => ctx.isProcessCommit);
   const setIsProcessCommit = useCommit((ctx) => ctx.setIsProcessCommit);
   const { emitTrelloCardUpdate } = useSocketEmits();
@@ -3121,10 +3119,10 @@ ${"​".repeat(7)}` : "\r\n";
     const copiedCommitMsg = clipboardOptions.includes("CommitMsg") ? `${finalCommitMessage}
 ` : "";
     const lines = sortedCommits.map((commit) => {
-      var _a, _b;
+      var _a2, _b;
       const parts = [];
       if (clipboardOptions.includes("BranchFolder")) {
-        parts.push((_a = selectedBranchProps[commit.svnBranch]) == null ? void 0 : _a.folder);
+        parts.push((_a2 = selectedBranchProps[commit.svnBranch]) == null ? void 0 : _a2.folder);
       }
       if (clipboardOptions.includes("BranchVersion")) {
         parts.push((_b = selectedBranchProps[commit.svnBranch]) == null ? void 0 : _b.version);
@@ -3228,7 +3226,7 @@ ${"​".repeat(7)}` : "\r\n";
           /* @__PURE__ */ jsxRuntimeExports.jsx(FaCheck, {}),
           "Complete"
         ] }),
-        /* @__PURE__ */ jsxRuntimeExports.jsxs(Button, { onClick: handleUpdateTrelloCard, disabled: (trelloData == null ? void 0 : trelloData.name) && (trelloData == null ? void 0 : trelloData.name.trim()) != "", children: [
+        /* @__PURE__ */ jsxRuntimeExports.jsxs(Button, { onClick: handleUpdateTrelloCard, disabled: !(trelloData == null ? void 0 : trelloData.name) || ((_a = trelloData == null ? void 0 : trelloData.name) == null ? void 0 : _a.trim()) === "", children: [
           /* @__PURE__ */ jsxRuntimeExports.jsx(FaTrello, {}),
           "Update Card"
         ] })

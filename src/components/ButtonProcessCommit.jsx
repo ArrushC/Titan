@@ -12,7 +12,6 @@ export default function ButtonProcessCommit() {
 	const sourceBranch = useCommit((ctx) => ctx.sourceBranch);
 	const sourceIssueNumber = useCommit((ctx) => ctx.sourceIssueNumber);
 	const commitMessage = useCommit((ctx) => ctx.commitMessage);
-	const trelloData = useCommit((ctx) => ctx.trelloData);
 	const selectedModifiedChanges = useCommit((ctx) => ctx.selectedModifiedChanges);
 	const isProcessCommit = useCommit((ctx) => ctx.isProcessCommit);
 	const setIsProcessCommit = useCommit((ctx) => ctx.setIsProcessCommit);
@@ -42,10 +41,7 @@ export default function ButtonProcessCommit() {
 			selectedBranchProps,
 		};
 
-		setCommitPayload({
-			...commitPayload,
-			trelloData
-		});
+		setCommitPayload(commitPayload);
 		emitCommitPayload(commitPayload);
 	}, [selectedModifiedChanges, issueNumber, sourceBranch, sourceIssueNumber, commitMessage, selectedBranchProps, RaiseClientNotificaiton]);
 

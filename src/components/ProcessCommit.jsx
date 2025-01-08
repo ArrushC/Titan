@@ -13,8 +13,9 @@ import { FaCheck, FaCircleCheck, FaTrello } from "react-icons/fa6";
 
 export default function ProcessCommit() {
 	const socket = useApp((ctx) => ctx.socket);
+	const trelloData = useCommit((ctx) => ctx.trelloData);
 	const commitPayload = useCommit((ctx) => ctx.commitPayload);
-	const { commitMessage, selectedModifiedChanges, selectedBranchProps, trelloData } = commitPayload;
+	const { commitMessage, selectedModifiedChanges, selectedBranchProps } = commitPayload;
 	const isProcessCommit = useCommit((ctx) => ctx.isProcessCommit);
 	const setIsProcessCommit = useCommit((ctx) => ctx.setIsProcessCommit);
 	const { emitTrelloCardUpdate } = useSocketEmits();
@@ -180,7 +181,7 @@ export default function ProcessCommit() {
 								<FaCheck />
 								Complete
 							</Button>
-							<Button onClick={handleUpdateTrelloCard} disabled={trelloData?.name && trelloData?.name.trim() != ""}>
+							<Button onClick={handleUpdateTrelloCard} disabled={!trelloData?.name || trelloData?.name?.trim() === ""}>
 								<FaTrello />
 								Update Card
 							</Button>

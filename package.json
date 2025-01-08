@@ -30,7 +30,7 @@
 		"electron:build:mac": "electron-builder --mac",
 		"electron:build:linux": "electron-builder --linux",
 		"build:win": "vite build && electron-builder --win nsis",
-		"publish:win": "electron-builder --win --publish always nsis",
+		"publish:win": "electron-builder --win nsis --publish always",
 		"build:mac": "vite build && electron-builder --mac",
 		"publish:mac": "electron-builder --mac --publish always",
 		"build:linux": "vite build && electron-builder --linux",

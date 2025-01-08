@@ -15,13 +15,14 @@ export default function SectionBranches() {
 	const configurableRowData = useApp((ctx) => ctx.configurableRowData);
 	const selectedBranchesData = useApp((ctx) => ctx.selectedBranchesData);
 	const selectedBranches = useApp((ctx) => ctx.selectedBranches);
+	const selectedBrachesData = useApp((ctx) => ctx.selectedBranchesData);
 	const setSelectedBranches = useApp((ctx) => ctx.setSelectedBranches);
 	const setAppMode = useApp((ctx) => ctx.setAppMode);
 	const handleBulkSelection = useApp((ctx) => ctx.handleBulkSelection);
 	const setIsDialogSBLogOpen = useBranches((ctx) => ctx.setIsDialogSBLogOpen);
 	const selectionMetrics = useBranches((ctx) => ctx.selectionMetrics);
 	const { RaisePromisedClientNotification } = useNotifications();
-	const { emitInfoSingle, emitUpdateSingle } = useSocketEmits();
+	const { emitInfoSingle, emitUpdateSingle, emitStatusSingle } = useSocketEmits();
 
 	const [isRowDialogOpen, setIsRowDialogOpen] = useState(false);
 	const fireRowDialogAction = useCallback(() => {
@@ -30,14 +31,6 @@ export default function SectionBranches() {
 			return { ...currentConfig, branches: newBranches };
 		});
 	}, [updateConfig, configurableRowData, selectedBranches]);
-
-	const refreshSelectedBranches = useCallback(() => {
-		configurableRowData
-			.filter((branchRow) => selectedBranches[branchRow["SVN Branch"]])
-			.forEach((branchRow) => {
-				emitInfoSingle(branchRow.id, branchRow["SVN Branch"], branchRow["Branch Version"], branchRow["Branch Folder"]);
-			});
-	}, [configurableRowData, selectedBranches]);
 
 	const updateSelectedBranches = useCallback(() => {
 		const selectedBranchRows = selectedBranchesData;
@@ -81,6 +74,13 @@ export default function SectionBranches() {
 		setAppMode((current) => (current == "commit" ? "branches" : "commit"));
 	}, [setAppMode]);
 
+	const refreshChangesSelectedBranches = useCallback(() => {
+		selectedBrachesData.forEach((branchRow) => {
+			console.log("Emitting status single for branch", branchRow["SVN Branch"]);
+			emitStatusSingle(branchRow);
+		});
+	}, [selectedBrachesData, emitStatusSingle]);
+
 	const logsSelectedBranches = useCallback(() => {
 		setIsDialogSBLogOpen((prev) => !prev);
 	}, [setIsDialogSBLogOpen]);
@@ -89,17 +89,17 @@ export default function SectionBranches() {
 		if (!selectionMetrics.hasSelection) return;
 
 		const handleKeyDown = (event) => {
+			const eventKey = event?.key?.toLowerCase();
 			if (!event.altKey) return;
-
-			if (event.key === "Delete") {
+			if (eventKey === "delete") {
 				setIsRowDialogOpen(true);
-			} else if (event.key === "r") {
-				refreshSelectedBranches();
-			} else if (event.key === "u") {
+			} else if (eventKey === "u") {
 				updateSelectedBranches();
-			} else if (event.key === "c") {
+			} else if (eventKey === "c") {
 				commitSelectedBranches();
-			} else if (event.key === "l") {
+			} else if (eventKey === "r") {
+				refreshChangesSelectedBranches();
+			} else if (eventKey === "l") {
 				logsSelectedBranches();
 			}
 		};
@@ -109,7 +109,7 @@ export default function SectionBranches() {
 		return () => {
 			window.removeEventListener("keydown", handleKeyDown);
 		};
-	}, [selectionMetrics.hasSelection, refreshSelectedBranches, updateSelectedBranches]);
+	}, [selectionMetrics.hasSelection, updateSelectedBranches, refreshChangesSelectedBranches]);
 
 	const selectAllBranches = useCallback(
 		(checked) => {
@@ -149,7 +149,7 @@ export default function SectionBranches() {
 				</Table.Body>
 			</Table.Root>
 
-			<ActionBarSelection selectedCount={selectionMetrics.selectedBranchesCount} onDelete={() => setIsRowDialogOpen(true)} onRefresh={refreshSelectedBranches} onUpdate={updateSelectedBranches} onCommit={commitSelectedBranches} onLogs={logsSelectedBranches} onClear={() => setSelectedBranches({})} />
+			<ActionBarSelection selectedCount={selectionMetrics.selectedBranchesCount} onDelete={() => setIsRowDialogOpen(true)} onUpdate={updateSelectedBranches} onCommit={commitSelectedBranches} onRefreshChanges={refreshChangesSelectedBranches} onLogs={logsSelectedBranches} onClear={() => setSelectedBranches({})} />
 
 			<DialogRowDeletion selectedCount={selectionMetrics.selectedBranchesCount} isDialogOpen={isRowDialogOpen} closeDialog={() => setIsRowDialogOpen(false)} fireDialogAction={fireRowDialogAction} />
 			<DialogBranchesLog />

@@ -980,7 +980,7 @@ reactExports.forwardRef(function ActionBarCloseTrigger2(props, ref) {
 const ActionBarRoot = ActionBarRoot$1;
 const ActionBarSelectionTrigger = ActionBarSelectionTrigger$1;
 const ActionBarSeparator = ActionBarSeparator$1;
-const ActionBarSelection = reactExports.memo(({ selectedCount, onDelete, onRefresh, onUpdate, onCommit, onLogs, onClear }) => {
+const ActionBarSelection = reactExports.memo(({ selectedCount, onDelete, onUpdate, onCommit, onRefreshChanges, onLogs, onClear }) => {
   if (selectedCount === 0) return null;
   return /* @__PURE__ */ jsxRuntimeExports.jsx(ActionBarRoot, { open: true, closeOnEscape: false, children: /* @__PURE__ */ jsxRuntimeExports.jsxs(ActionBarContent, { colorPalette: "yellow", children: [
     /* @__PURE__ */ jsxRuntimeExports.jsxs(ActionBarSelectionTrigger, { children: [
@@ -993,10 +993,6 @@ const ActionBarSelection = reactExports.memo(({ selectedCount, onDelete, onRefre
         "Delete ",
         /* @__PURE__ */ jsxRuntimeExports.jsx(Kbd, { variant: "subtle", wordSpacing: 0, children: "Alt+Del" })
       ] }),
-      /* @__PURE__ */ jsxRuntimeExports.jsxs(Button$1, { variant: "subtle", size: "sm", onClick: onRefresh, children: [
-        "Refresh ",
-        /* @__PURE__ */ jsxRuntimeExports.jsx(Kbd, { variant: "subtle", wordSpacing: 0, children: "Alt+R" })
-      ] }),
       /* @__PURE__ */ jsxRuntimeExports.jsxs(Button$1, { variant: "subtle", size: "sm", onClick: onUpdate, children: [
         "Update ",
         /* @__PURE__ */ jsxRuntimeExports.jsx(Kbd, { variant: "subtle", wordSpacing: 0, children: "Alt+U" })
@@ -1004,6 +1000,10 @@ const ActionBarSelection = reactExports.memo(({ selectedCount, onDelete, onRefre
       /* @__PURE__ */ jsxRuntimeExports.jsxs(Button$1, { variant: "subtle", size: "sm", onClick: onCommit, children: [
         "Commit ",
         /* @__PURE__ */ jsxRuntimeExports.jsx(Kbd, { variant: "subtle", wordSpacing: 0, children: "Alt+C" })
+      ] }),
+      /* @__PURE__ */ jsxRuntimeExports.jsxs(Button$1, { variant: "subtle", size: "sm", onClick: onRefreshChanges, children: [
+        "Refresh ",
+        /* @__PURE__ */ jsxRuntimeExports.jsx(Kbd, { variant: "subtle", wordSpacing: 0, children: "Alt+R" })
       ] }),
       /* @__PURE__ */ jsxRuntimeExports.jsxs(Button$1, { variant: "subtle", size: "sm", onClick: onLogs, children: [
         "Logs ",
@@ -1195,13 +1195,14 @@ function SectionBranches() {
   const configurableRowData = useApp((ctx) => ctx.configurableRowData);
   const selectedBranchesData = useApp((ctx) => ctx.selectedBranchesData);
   const selectedBranches = useApp((ctx) => ctx.selectedBranches);
+  const selectedBrachesData = useApp((ctx) => ctx.selectedBranchesData);
   const setSelectedBranches = useApp((ctx) => ctx.setSelectedBranches);
   const setAppMode = useApp((ctx) => ctx.setAppMode);
   const handleBulkSelection = useApp((ctx) => ctx.handleBulkSelection);
   const setIsDialogSBLogOpen = useBranches((ctx) => ctx.setIsDialogSBLogOpen);
   const selectionMetrics = useBranches((ctx) => ctx.selectionMetrics);
   const { RaisePromisedClientNotification } = useNotifications();
-  const { emitInfoSingle, emitUpdateSingle } = useSocketEmits();
+  const { emitInfoSingle, emitUpdateSingle, emitStatusSingle } = useSocketEmits();
   const [isRowDialogOpen, setIsRowDialogOpen] = reactExports.useState(false);
   const fireRowDialogAction = reactExports.useCallback(() => {
     updateConfig((currentConfig) => {
@@ -1209,11 +1210,6 @@ function SectionBranches() {
       return { ...currentConfig, branches: newBranches };
     });
   }, [updateConfig, configurableRowData, selectedBranches]);
-  const refreshSelectedBranches = reactExports.useCallback(() => {
-    configurableRowData.filter((branchRow) => selectedBranches[branchRow["SVN Branch"]]).forEach((branchRow) => {
-      emitInfoSingle(branchRow.id, branchRow["SVN Branch"], branchRow["Branch Version"], branchRow["Branch Folder"]);
-    });
-  }, [configurableRowData, selectedBranches]);
   const updateSelectedBranches = reactExports.useCallback(() => {
     const selectedBranchRows = selectedBranchesData;
     RaisePromisedClientNotification({
@@ -1249,22 +1245,30 @@ function SectionBranches() {
   const commitSelectedBranches = reactExports.useCallback(() => {
     setAppMode((current) => current == "commit" ? "branches" : "commit");
   }, [setAppMode]);
+  const refreshChangesSelectedBranches = reactExports.useCallback(() => {
+    selectedBrachesData.forEach((branchRow) => {
+      console.log("Emitting status single for branch", branchRow["SVN Branch"]);
+      emitStatusSingle(branchRow);
+    });
+  }, [selectedBrachesData, emitStatusSingle]);
   const logsSelectedBranches = reactExports.useCallback(() => {
     setIsDialogSBLogOpen((prev) => !prev);
   }, [setIsDialogSBLogOpen]);
   reactExports.useEffect(() => {
     if (!selectionMetrics.hasSelection) return;
     const handleKeyDown = (event) => {
+      var _a;
+      const eventKey = (_a = event == null ? void 0 : event.key) == null ? void 0 : _a.toLowerCase();
       if (!event.altKey) return;
-      if (event.key === "Delete") {
+      if (eventKey === "delete") {
         setIsRowDialogOpen(true);
-      } else if (event.key === "r") {
-        refreshSelectedBranches();
-      } else if (event.key === "u") {
+      } else if (eventKey === "u") {
         updateSelectedBranches();
-      } else if (event.key === "c") {
+      } else if (eventKey === "c") {
         commitSelectedBranches();
-      } else if (event.key === "l") {
+      } else if (eventKey === "r") {
+        refreshChangesSelectedBranches();
+      } else if (eventKey === "l") {
         logsSelectedBranches();
       }
     };
@@ -1272,7 +1276,7 @@ function SectionBranches() {
     return () => {
       window.removeEventListener("keydown", handleKeyDown);
     };
-  }, [selectionMetrics.hasSelection, refreshSelectedBranches, updateSelectedBranches]);
+  }, [selectionMetrics.hasSelection, updateSelectedBranches, refreshChangesSelectedBranches]);
   const selectAllBranches = reactExports.useCallback(
     (checked) => {
       const paths = configurableRowData.map((row) => row["SVN Branch"]);
@@ -1300,7 +1304,7 @@ function SectionBranches() {
       ] }) }),
       /* @__PURE__ */ jsxRuntimeExports.jsx(TableBody, { children: configurableRowData.map((branchRow) => /* @__PURE__ */ jsxRuntimeExports.jsx(SectionBranchesRow, { branchRow, isSelected: !!selectedBranches[branchRow["SVN Branch"]] }, branchRow.id)) })
     ] }),
-    /* @__PURE__ */ jsxRuntimeExports.jsx(ActionBarSelection, { selectedCount: selectionMetrics.selectedBranchesCount, onDelete: () => setIsRowDialogOpen(true), onRefresh: refreshSelectedBranches, onUpdate: updateSelectedBranches, onCommit: commitSelectedBranches, onLogs: logsSelectedBranches, onClear: () => setSelectedBranches({}) }),
+    /* @__PURE__ */ jsxRuntimeExports.jsx(ActionBarSelection, { selectedCount: selectionMetrics.selectedBranchesCount, onDelete: () => setIsRowDialogOpen(true), onUpdate: updateSelectedBranches, onCommit: commitSelectedBranches, onRefreshChanges: refreshChangesSelectedBranches, onLogs: logsSelectedBranches, onClear: () => setSelectedBranches({}) }),
     /* @__PURE__ */ jsxRuntimeExports.jsx(DialogRowDeletion, { selectedCount: selectionMetrics.selectedBranchesCount, isDialogOpen: isRowDialogOpen, closeDialog: () => setIsRowDialogOpen(false), fireDialogAction: fireRowDialogAction }),
     /* @__PURE__ */ jsxRuntimeExports.jsx(DialogBranchesLog, {})
   ] });
@@ -2669,7 +2673,7 @@ const CommitProvider = ({ children }) => {
   const [selectedModifiedChanges, setSelectedModifiedChanges] = reactExports.useState({});
   const [trelloData, setTrelloData] = reactExports.useState({});
   const [commitPayload, setCommitPayload] = reactExports.useState({});
-  const [commitStage, setCommitStage] = reactExports.useState(["commitDetails"]);
+  const [commitStage, setCommitStage] = reactExports.useState(["commitDetails", "modifiedChanges"]);
   const accordionSections = reactExports.useMemo(
     () => [
       {
@@ -3089,9 +3093,9 @@ function ProcessCommit() {
   var _a;
   const socket = useApp((ctx) => ctx.socket);
   const trelloData = useCommit((ctx) => ctx.trelloData);
+  const setSelectedModifiedChanges = useCommit((ctx) => ctx.setSelectedModifiedChanges);
   const commitPayload = useCommit((ctx) => ctx.commitPayload);
   const { commitMessage, selectedModifiedChanges, selectedBranchProps } = commitPayload;
-  const isProcessCommit = useCommit((ctx) => ctx.isProcessCommit);
   const setIsProcessCommit = useCommit((ctx) => ctx.setIsProcessCommit);
   const { emitTrelloCardUpdate } = useSocketEmits();
   const finalCommitMessage = reactExports.useMemo(
@@ -3181,16 +3185,14 @@ ${"​".repeat(7)}` : "\r\n";
     const newText = formatForClipboard();
     setRevisionsText(newText);
   }, [formatForClipboard]);
-  reactExports.useEffect(() => {
-    if (isProcessCommit) return;
-    setLiveCommits([]);
-    setRevisionsText("");
-    setClipboardOptions(["BranchFolder", "BranchVersion"]);
-  }, [isProcessCommit]);
   const handleCheckboxOption = reactExports.useCallback((newValues) => {
     setClipboardOptions(newValues);
   }, []);
   const handleCompleteCommit = reactExports.useCallback(() => {
+    setLiveCommits([]);
+    setRevisionsText("");
+    setClipboardOptions(["BranchFolder", "BranchVersion"]);
+    setSelectedModifiedChanges({});
     setIsProcessCommit(false);
   }, []);
   const handleUpdateTrelloCard = reactExports.useCallback(() => {

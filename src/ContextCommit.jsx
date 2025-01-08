@@ -90,7 +90,7 @@ export const CommitProvider = ({ children }) => {
 
 	const [commitPayload, setCommitPayload] = useState({});
 
-	const [commitStage, setCommitStage] = useState(["commitDetails"]);
+	const [commitStage, setCommitStage] = useState(["commitDetails", "modifiedChanges"]);
 	const accordionSections = useMemo(
 		() => [
 			{

@@ -14,9 +14,9 @@ import { FaCheck, FaCircleCheck, FaTrello } from "react-icons/fa6";
 export default function ProcessCommit() {
 	const socket = useApp((ctx) => ctx.socket);
 	const trelloData = useCommit((ctx) => ctx.trelloData);
+	const setSelectedModifiedChanges = useCommit((ctx) => ctx.setSelectedModifiedChanges);
 	const commitPayload = useCommit((ctx) => ctx.commitPayload);
 	const { commitMessage, selectedModifiedChanges, selectedBranchProps } = commitPayload;
-	const isProcessCommit = useCommit((ctx) => ctx.isProcessCommit);
 	const setIsProcessCommit = useCommit((ctx) => ctx.setIsProcessCommit);
 	const { emitTrelloCardUpdate } = useSocketEmits();
 
@@ -131,18 +131,15 @@ export default function ProcessCommit() {
 		setRevisionsText(newText);
 	}, [formatForClipboard]);
 
-	useEffect(() => {
-		if (isProcessCommit) return;
-		setLiveCommits([]);
-		setRevisionsText("");
-		setClipboardOptions(["BranchFolder", "BranchVersion"]);
-	}, [isProcessCommit]);
-
 	const handleCheckboxOption = useCallback((newValues) => {
 		setClipboardOptions(newValues);
 	}, []);
 
 	const handleCompleteCommit = useCallback(() => {
+		setLiveCommits([]);
+		setRevisionsText("");
+		setClipboardOptions(["BranchFolder", "BranchVersion"]);
+		setSelectedModifiedChanges({});
 		setIsProcessCommit(false);
 	}, []);
 

@@ -201,16 +201,19 @@ function checkForUpdates() {
 	autoUpdater.autoInstallOnAppQuit = true;
 	autoUpdater.autoRunAppAfterInstall = true;
 
+	logger.info("Running an initial check for any available updates.");
 	autoUpdater.checkForUpdates();
 
 	setInterval(() => {
+		logger.info("Running a scheduled check for any available update.");
 		// Check for updates every hour
 		autoUpdater.checkForUpdates();
 	}, 1000 * 60 * 60 * 2);
 
 	autoUpdater.on("update-available", () => {
-		logger.info("Update available");
-		mainWindow.webContents.send("update-available");
+		logger.info("Update available, automatically firing the downloading process...");
+		// mainWindow.webContents.send("update-available");
+		autoUpdater.downloadUpdate();
 	});
 
 	autoUpdater.on("update-downloaded", () => {
@@ -556,10 +559,12 @@ ipcMain.handle("run-custom-script", async (event, data) => {
 });
 
 ipcMain.handle("download-update", () => {
+	logger.info("Requested to download the update. Processing this request now.");
 	return autoUpdater.downloadUpdate();
 });
 
 ipcMain.handle("check-for-updates", () => {
+	logger.info("Requested to check for updates. Processing this request now.");
 	return autoUpdater.checkForUpdates();
 });
 

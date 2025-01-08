@@ -2552,7 +2552,7 @@ function Og() {
   return mi;
 }
 var on, Wu;
-function Ze() {
+function er() {
   if (Wu) return on;
   Wu = 1;
   var t = Be, a = Tg(), c = Ag(), s = Og(), h = ur, o, i;
@@ -2783,7 +2783,7 @@ GFS4: `), console.error(m);
 var zu;
 function tt() {
   return zu || (zu = 1, function(t) {
-    const a = tr().fromCallback, c = Ze(), s = [
+    const a = tr().fromCallback, c = er(), s = [
       "access",
       "appendFile",
       "chmod",
@@ -2911,7 +2911,7 @@ var wi, Ju;
 function tp() {
   if (Ju) return wi;
   Ju = 1;
-  const t = Ze();
+  const t = er();
   function a(s, h, o, i) {
     t.open(s, "r+", (d, e) => {
       if (d) return i(d);
@@ -3034,7 +3034,7 @@ var _i, Zu;
 function Pg() {
   if (Zu) return _i;
   Zu = 1;
-  const t = Ze(), a = Ae, c = gr().mkdirs, s = Gr().pathExists, h = tp().utimesMillis, o = /* @__PURE__ */ nt();
+  const t = er(), a = Ae, c = gr().mkdirs, s = Gr().pathExists, h = tp().utimesMillis, o = /* @__PURE__ */ nt();
   function i(j, U, H, M) {
     typeof H == "function" && !M ? (M = H, H = {}) : typeof H == "function" && (H = { filter: H }), M = M || function() {
     }, H = H || {}, H.clobber = "clobber" in H ? !!H.clobber : !0, H.overwrite = "overwrite" in H ? !!H.overwrite : H.clobber, H.preserveTimestamps && process.arch === "ia32" && process.emitWarning(
@@ -3137,7 +3137,7 @@ var bi, el;
 function Dg() {
   if (el) return bi;
   el = 1;
-  const t = Ze(), a = Ae, c = gr().mkdirsSync, s = tp().utimesMillisSync, h = /* @__PURE__ */ nt();
+  const t = er(), a = Ae, c = gr().mkdirsSync, s = tp().utimesMillisSync, h = /* @__PURE__ */ nt();
   function o(R, A, b) {
     typeof b == "function" && (b = { filter: b }), b = b || {}, b.clobber = "clobber" in b ? !!b.clobber : !0, b.overwrite = "overwrite" in b ? !!b.overwrite : b.clobber, b.preserveTimestamps && process.arch === "ia32" && process.emitWarning(
       `Using the preserveTimestamps option in 32-bit node is not recommended;
@@ -3243,7 +3243,7 @@ var Ri, tl;
 function Ig() {
   if (tl) return Ri;
   tl = 1;
-  const t = Ze(), a = Ae, c = Jh, s = process.platform === "win32";
+  const t = er(), a = Ae, c = Jh, s = process.platform === "win32";
   function h(p) {
     [
       "unlink",
@@ -3390,7 +3390,7 @@ var Ti, nl;
 function Xn() {
   if (nl) return Ti;
   nl = 1;
-  const t = Ze(), a = tr().fromCallback, c = /* @__PURE__ */ Ig();
+  const t = er(), a = tr().fromCallback, c = /* @__PURE__ */ Ig();
   function s(o, i) {
     if (t.rm) return t.rm(o, { recursive: !0, force: !0 }, i);
     c(o, i);
@@ -3439,7 +3439,7 @@ var Oi, al;
 function Lg() {
   if (al) return Oi;
   al = 1;
-  const t = tr().fromCallback, a = Ae, c = Ze(), s = /* @__PURE__ */ gr();
+  const t = tr().fromCallback, a = Ae, c = er(), s = /* @__PURE__ */ gr();
   function h(i, d) {
     function e() {
       c.writeFile(i, "", (n) => {
@@ -3487,7 +3487,7 @@ var Ci, ol;
 function Fg() {
   if (ol) return Ci;
   ol = 1;
-  const t = tr().fromCallback, a = Ae, c = Ze(), s = /* @__PURE__ */ gr(), h = Gr().pathExists, { areIdentical: o } = /* @__PURE__ */ nt();
+  const t = tr().fromCallback, a = Ae, c = er(), s = /* @__PURE__ */ gr(), h = Gr().pathExists, { areIdentical: o } = /* @__PURE__ */ nt();
   function i(e, n, u) {
     function l(r, f) {
       c.link(r, f, (p) => {
@@ -3536,7 +3536,7 @@ var xi, sl;
 function $g() {
   if (sl) return xi;
   sl = 1;
-  const t = Ae, a = Ze(), c = Gr().pathExists;
+  const t = Ae, a = er(), c = Gr().pathExists;
   function s(o, i, d) {
     if (t.isAbsolute(o))
       return a.lstat(o, (e) => e ? (e.message = e.message.replace("lstat", "ensureSymlink"), d(e)) : d(null, {
@@ -3585,7 +3585,7 @@ var Pi, ul;
 function qg() {
   if (ul) return Pi;
   ul = 1;
-  const t = Ze();
+  const t = er();
   function a(s, h, o) {
     if (o = typeof h == "function" ? h : o, h = typeof h == "function" ? !1 : h, h) return o(null, h);
     t.lstat(s, (i, d) => {
@@ -3704,7 +3704,7 @@ function Ug() {
   dl = 1;
   let t;
   try {
-    t = Ze();
+    t = er();
   } catch {
     t = Be;
   }
@@ -3770,7 +3770,7 @@ var $i, pl;
 function Bs() {
   if (pl) return $i;
   pl = 1;
-  const t = tr().fromCallback, a = Ze(), c = Ae, s = /* @__PURE__ */ gr(), h = Gr().pathExists;
+  const t = tr().fromCallback, a = er(), c = Ae, s = /* @__PURE__ */ gr(), h = Gr().pathExists;
   function o(d, e, n, u) {
     typeof n == "function" && (u = n, n = "utf8");
     const l = c.dirname(d);
@@ -3827,7 +3827,7 @@ var Ui, yl;
 function Wg() {
   if (yl) return Ui;
   yl = 1;
-  const t = Ze(), a = Ae, c = Us().copy, s = Xn().remove, h = gr().mkdirp, o = Gr().pathExists, i = /* @__PURE__ */ nt();
+  const t = er(), a = Ae, c = Us().copy, s = Xn().remove, h = gr().mkdirp, o = Gr().pathExists, i = /* @__PURE__ */ nt();
   function d(r, f, p, v) {
     typeof p == "function" && (v = p, p = {}), p = p || {};
     const m = p.overwrite || p.clobber || !1;
@@ -3866,7 +3866,7 @@ var ji, wl;
 function zg() {
   if (wl) return ji;
   wl = 1;
-  const t = Ze(), a = Ae, c = Us().copySync, s = Xn().removeSync, h = gr().mkdirpSync, o = /* @__PURE__ */ nt();
+  const t = er(), a = Ae, c = Us().copySync, s = Xn().removeSync, h = gr().mkdirpSync, o = /* @__PURE__ */ nt();
   function i(l, r, f) {
     f = f || {};
     const p = f.overwrite || f.clobber || !1, { srcStat: v, isChangingCase: m = !1 } = o.checkPathsSync(l, r, "move", f);
@@ -6609,16 +6609,16 @@ function b0() {
     function km(N, B, ne, me, Ie, Te) {
       var $e = Xt(N), je = Xt(B), He = $e ? e : br(N), Le = je ? e : br(B);
       He = He == d ? w : He, Le = Le == d ? w : Le;
-      var er = He == w, cr = Le == w, We = He == Le;
+      var rr = He == w, cr = Le == w, We = He == Le;
       if (We && ii(N)) {
         if (!ii(B))
           return !1;
-        $e = !0, er = !1;
+        $e = !0, rr = !1;
       }
-      if (We && !er)
+      if (We && !rr)
         return Te || (Te = new _r()), $e || Eu(N) ? pu(N, B, ne, me, Ie, Te) : Hm(N, B, He, ne, me, Ie, Te);
       if (!(ne & h)) {
-        var or = er && Se.call(N, "__wrapped__"), sr = cr && Se.call(B, "__wrapped__");
+        var or = rr && Se.call(N, "__wrapped__"), sr = cr && Se.call(B, "__wrapped__");
         if (or || sr) {
           var Sr = or ? N.value() : N, yr = sr ? B.value() : B;
           return Te || (Te = new _r()), Ie(Sr, yr, ne, me, Te);
@@ -6650,11 +6650,11 @@ function b0() {
       var Le = Te.get(N);
       if (Le && Te.get(B))
         return Le == B;
-      var er = -1, cr = !0, We = ne & o ? new zt() : void 0;
-      for (Te.set(N, B), Te.set(B, N); ++er < je; ) {
-        var or = N[er], sr = B[er];
+      var rr = -1, cr = !0, We = ne & o ? new zt() : void 0;
+      for (Te.set(N, B), Te.set(B, N); ++rr < je; ) {
+        var or = N[rr], sr = B[rr];
         if (me)
-          var Sr = $e ? me(sr, or, er, B, N, Te) : me(or, sr, er, N, B, Te);
+          var Sr = $e ? me(sr, or, rr, B, N, Te) : me(or, sr, rr, N, B, Te);
         if (Sr !== void 0) {
           if (Sr)
             continue;
@@ -6703,8 +6703,8 @@ function b0() {
           if (Le)
             return Le == B;
           me |= o, $e.set(N, B);
-          var er = pu(je(N), je(B), me, Ie, Te, $e);
-          return $e.delete(N), er;
+          var rr = pu(je(N), je(B), me, Ie, Te, $e);
+          return $e.delete(N), rr;
         case A:
           if (ni)
             return ni.call(N) == ni.call(B);
@@ -6712,8 +6712,8 @@ function b0() {
       return !1;
     }
     function Gm(N, B, ne, me, Ie, Te) {
-      var $e = ne & h, je = mu(N), He = je.length, Le = mu(B), er = Le.length;
-      if (He != er && !$e)
+      var $e = ne & h, je = mu(N), He = je.length, Le = mu(B), rr = Le.length;
+      if (He != rr && !$e)
         return !1;
       for (var cr = He; cr--; ) {
         var We = je[cr];
@@ -16023,7 +16023,7 @@ function By(t) {
     t.error("Unhandled Rejection at:", c, "reason:", a);
   });
 }
-const { autoUpdater: rr } = q0, lu = process.env.NODE_ENV === "development", Hy = "http://localhost:4000", Gy = Xh(import.meta.url), Cr = Ae.dirname(Gy), Wy = Ae.join(Cr, "../package.json"), zy = JSON.parse(Be.readFileSync(Wy, "utf-8")), Oe = jy("main.js");
+const { autoUpdater: Ze } = q0, lu = process.env.NODE_ENV === "development", Hy = "http://localhost:4000", Gy = Xh(import.meta.url), Cr = Ae.dirname(Gy), Wy = Ae.join(Cr, "../package.json"), zy = JSON.parse(Be.readFileSync(Wy, "utf-8")), Oe = jy("main.js");
 By();
 process.defaultApp ? process.argv.length >= 2 && Me.setAsDefaultProtocolClient("titan", process.execPath, [Ae.resolve(process.argv[1])]) : Me.setAsDefaultProtocolClient("titan");
 const Yy = Me.requestSingleInstanceLock();
@@ -16110,19 +16110,19 @@ function Ky() {
   Me.on("will-quit", () => clearInterval(t));
 }
 function Jy() {
-  rr.setFeedURL({
+  Ze.setFeedURL({
     provider: "github",
     owner: "ArrushC",
     repo: "Titan"
-  }), rr.autoDownload = !1, rr.autoInstallOnAppQuit = !0, rr.autoRunAppAfterInstall = !0, rr.checkForUpdates(), setInterval(() => {
-    rr.checkForUpdates();
-  }, 1e3 * 60 * 60 * 2), rr.on("update-available", () => {
-    Oe.info("Update available"), Pe.webContents.send("update-available");
-  }), rr.on("update-downloaded", () => {
-    Oe.info("Update downloaded"), Pe.webContents.send("update-downloaded"), lm = !0, rr.quitAndInstall();
-  }), rr.on("update-not-available", () => {
+  }), Ze.autoDownload = !1, Ze.autoInstallOnAppQuit = !0, Ze.autoRunAppAfterInstall = !0, Oe.info("Running an initial check for any available updates."), Ze.checkForUpdates(), setInterval(() => {
+    Oe.info("Running a scheduled check for any available update."), Ze.checkForUpdates();
+  }, 1e3 * 60 * 60 * 2), Ze.on("update-available", () => {
+    Oe.info("Update available, automatically firing the downloading process..."), Ze.downloadUpdate();
+  }), Ze.on("update-downloaded", () => {
+    Oe.info("Update downloaded"), Pe.webContents.send("update-downloaded"), lm = !0, Ze.quitAndInstall();
+  }), Ze.on("update-not-available", () => {
     Oe.info("No updates available"), Pe.webContents.send("update-not-available");
-  }), rr.on("error", (t) => {
+  }), Ze.on("error", (t) => {
     Oe.error("AutoUpdater error:", t), Pe.webContents.send("update-error", t);
   });
 }
@@ -16291,8 +16291,8 @@ Ve.handle("run-custom-script", async (t, a) => {
     });
   });
 });
-Ve.handle("download-update", () => rr.downloadUpdate());
-Ve.handle("check-for-updates", () => rr.checkForUpdates());
+Ve.handle("download-update", () => (Oe.info("Requested to download the update. Processing this request now."), Ze.downloadUpdate()));
+Ve.handle("check-for-updates", () => (Oe.info("Requested to check for updates. Processing this request now."), Ze.checkForUpdates()));
 Ve.handle("app-minimize", () => {
   Pe.minimize();
 });

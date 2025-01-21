@@ -26,7 +26,8 @@ export default function ProcessCommit() {
 				?.trim()
 				.replace(/\s*\n+\s*/g, "; ")
 				.replace(/[;\s]+$/, "")
-				.trim(),
+				.trim()
+				.replace(/["`]/g, "'"),
 		[commitMessage]
 	);
 	const [liveCommits, setLiveCommits] = useState([]);

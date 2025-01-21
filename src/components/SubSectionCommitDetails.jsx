@@ -38,7 +38,8 @@ export default function SubSectionCommitDetails() {
 									.trim()
 									.replace(/\s*\n+\s*/g, "; ")
 									.replace(/[;\s]+$/, "")
-									.trim()}
+									.trim()
+									.replace(/["`]/g, "'")}
 					</Code>
 				</Flex>
 

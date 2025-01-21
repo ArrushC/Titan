@@ -1335,7 +1335,7 @@ export function initialiseServer() {
 						.trim()
 						.replace(/\s*\n+\s*/g, "; ")
 						.replace(/[;\s]+$/, "")
-						.trim()}`;
+						.trim().replace(/["`]/g, "'")}`;
 
 					const task = {
 						command: "commit",

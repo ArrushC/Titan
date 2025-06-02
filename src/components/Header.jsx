@@ -1,4 +1,4 @@
-import { Flex, Heading, HStack } from "@chakra-ui/react";
+import { Flex, Heading, HStack, Separator } from "@chakra-ui/react";
 import React, { useCallback, useState } from "react";
 import { MdBrowserUpdated, MdUpdate, MdHealthAndSafety, MdSpeed } from "react-icons/md";
 import { TbGitBranch } from "react-icons/tb";
@@ -120,32 +120,51 @@ export default function Header() {
 				</Heading>
 			</Flex>
 			<Flex align={"flex-start"} alignItems={"center"} columnGap={2}>
-				<ButtonIconTooltip icon={<MdHealthAndSafety />} onClick={handleOpenHealthMonitor} colorPalette={"yellow"} variant={"subtle"} label="Health Monitor" placement={"bottom-end"} size="md" />
-				<ButtonIconTooltip icon={<MdSpeed />} onClick={handleOpenPerformanceMonitor} colorPalette={"yellow"} variant={"subtle"} label="Performance Dashboard" placement={"bottom-end"} size="md" />
-				<ButtonIconTooltip icon={<TbGitBranch />} onClick={handleOpenSVNDashboard} colorPalette={"yellow"} variant={"subtle"} label="SVN Dashboard" placement={"bottom-end"} size="md" />
-				<ButtonIconTooltip icon={<MdUpdate />} colorPalette={"yellow"} variant={"subtle"} label={"Update All"} placement={"bottom-end"} onClick={updateAll} disabled={configurableRowData.length < 1} />
-				<PopoverRoot open={window.electron && reloadPopover} onOpenChange={(e) => setReloadPopover(e.open)}>
-					<PopoverTrigger as={"div"}>
-						<ButtonIconTooltip icon={<IoReload />} onClick={() => setReloadPopover((prev) => !prev)} colorPalette={"yellow"} label={"Reload"} variant={"subtle"} size="md" />
-					</PopoverTrigger>
-					<PopoverContent>
-						<PopoverArrow />
-						<PopoverBody>
-							<HStack gap={8}>
-								<Button colorPalette={"yellow"} variant={"subtle"} onClick={() => handleReload(false)}>
-									Refresh
-								</Button>
-								<Button colorPalette={"yellow"} variant={"subtle"} onClick={() => handleReload(true)}>
-									Restart
-								</Button>
-							</HStack>
-						</PopoverBody>
-					</PopoverContent>
-				</PopoverRoot>
-				<ButtonIconTooltip icon={<LuFileCog />} onClick={handleOpenConfig} colorPalette={"yellow"} variant={"subtle"} label="Open Config File" placement={"bottom-start"} size="md" />
-				<ButtonElectron icon={<MdBrowserUpdated />} onClick={handleCheckForUpdates} colorPalette={"yellow"} variant={"subtle"} label="Check For Updates" size="md" />
-				<ButtonIconTooltip icon={<LiaToiletSolid />} onClick={handleFlushSvnLogs} colorPalette={"yellow"} variant={"subtle"} label="Flush SVN Logs" placement={"bottom-start"} size="md" />
-				<ButtonIconTooltip icon={<IoMdAdd />} colorPalette={"yellow"} variant={"subtle"} label={"Add Row"} placement={"bottom-end"} onClick={addRow} />
+				{/* Monitoring Group */}
+				<HStack spacing={1}>
+					<ButtonIconTooltip icon={<MdHealthAndSafety />} onClick={handleOpenHealthMonitor} colorPalette={"yellow"} variant={"subtle"} label="Health Monitor" placement={"bottom-end"} size="md" />
+					<ButtonIconTooltip icon={<MdSpeed />} onClick={handleOpenPerformanceMonitor} colorPalette={"yellow"} variant={"subtle"} label="Performance Dashboard" placement={"bottom-end"} size="md" />
+					<ButtonIconTooltip icon={<TbGitBranch />} onClick={handleOpenSVNDashboard} colorPalette={"yellow"} variant={"subtle"} label="SVN Dashboard" placement={"bottom-end"} size="md" />
+				</HStack>
+				
+				<Separator orientation="vertical" height="24px" />
+				
+				{/* Branch Management Group */}
+				<HStack spacing={1}>
+					<ButtonIconTooltip icon={<MdUpdate />} colorPalette={"yellow"} variant={"subtle"} label={"Update All"} placement={"bottom-end"} onClick={updateAll} disabled={configurableRowData.length < 1} />
+					<ButtonIconTooltip icon={<IoMdAdd />} colorPalette={"yellow"} variant={"subtle"} label={"Add Row"} placement={"bottom-end"} onClick={addRow} />
+				</HStack>
+				
+				<Separator orientation="vertical" height="24px" />
+				
+				{/* System/App Management Group */}
+				<HStack spacing={1}>
+					<ButtonIconTooltip icon={<LuFileCog />} onClick={handleOpenConfig} colorPalette={"yellow"} variant={"subtle"} label="Open Config File" placement={"bottom-start"} size="md" />
+					<ButtonElectron icon={<MdBrowserUpdated />} onClick={handleCheckForUpdates} colorPalette={"yellow"} variant={"subtle"} label="Check For Updates" size="md" />
+					<ButtonIconTooltip icon={<LiaToiletSolid />} onClick={handleFlushSvnLogs} colorPalette={"yellow"} variant={"subtle"} label="Flush SVN Logs" placement={"bottom-start"} size="md" />
+					<PopoverRoot open={window.electron && reloadPopover} onOpenChange={(e) => setReloadPopover(e.open)}>
+						<PopoverTrigger as={"div"}>
+							<ButtonIconTooltip icon={<IoReload />} onClick={() => setReloadPopover((prev) => !prev)} colorPalette={"yellow"} label={"Reload"} variant={"subtle"} size="md" />
+						</PopoverTrigger>
+						<PopoverContent>
+							<PopoverArrow />
+							<PopoverBody>
+								<HStack gap={8}>
+									<Button colorPalette={"yellow"} variant={"subtle"} onClick={() => handleReload(false)}>
+										Refresh
+									</Button>
+									<Button colorPalette={"yellow"} variant={"subtle"} onClick={() => handleReload(true)}>
+										Restart
+									</Button>
+								</HStack>
+							</PopoverBody>
+						</PopoverContent>
+					</PopoverRoot>
+				</HStack>
+				
+				<Separator orientation="vertical" height="24px" />
+				
+				{/* Theme Toggle */}
 				<ColorModeButton />
 			</Flex>
 		</HStack>

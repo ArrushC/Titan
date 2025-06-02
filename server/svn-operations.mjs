@@ -1,6 +1,5 @@
 import svnUltimate from "node-svn-ultimate";
 import async from "async";
-import _ from "lodash";
 
 // Track SVN operations to throttle repeated failures
 const svnOperationCache = new Map();

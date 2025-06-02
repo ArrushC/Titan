@@ -3,7 +3,7 @@ import chokidar from "chokidar";
 import path from "path";
 import fs from "fs";
 import { promises as fsPromises } from "fs";
-import _ from "lodash";
+import { uniqBy } from "lodash";
 import { 
     debugTask, 
     branchString, 
@@ -1055,7 +1055,7 @@ export function setupSocketHandlers(io, options) {
 
                                 if (fetchedLogs.length > 0) {
                                     const combinedLogs = [...fetchedLogs, ...cachedLogs];
-                                    const uniqueLogs = _.uniqBy(combinedLogs, "revision");
+                                    const uniqueLogs = uniqBy(combinedLogs, "revision");
                                     uniqueLogs.sort((a, b) => parseInt(b.revision, 10) - parseInt(a.revision, 10));
                                     instanceData.subversionLogsCache[svnBranchPath] = uniqueLogs;
                                 }

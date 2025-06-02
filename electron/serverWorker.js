@@ -5,10 +5,12 @@ let serverInstance = null;
 let ioInstance = null;
 
 async function startWorker() {
+    const startTime = Date.now();
+    
     try {
-        console.log("Worker thread: Initializing server...");
+        console.log("Worker thread: Starting fast server initialization...");
         
-        // Set up message handler for communication with main thread
+        // Set up message handler for communication with main thread FIRST
         parentPort.on("message", (message) => {
             if (message.type === "shutdown") {
                 console.log("Worker thread: Received shutdown signal");
@@ -29,21 +31,24 @@ async function startWorker() {
                         }
                     });
                     
-                    // Force shutdown after 5 seconds
+                    // Force shutdown after 3 seconds (reduced from 5)
                     setTimeout(() => {
                         console.error("Forced shutdown after timeout");
                         process.exit(1);
-                    }, 5000);
+                    }, 3000);
                 } else {
                     process.exit(0);
                 }
             }
         });
 
-        // Initialize the server
+        // Initialize the server with optimized startup
         const { server, io } = await initialiseServer();
         serverInstance = server;
         ioInstance = io;
+        
+        const initTime = Date.now() - startTime;
+        console.log(`Worker thread: Server initialized in ${initTime}ms`);
         
         // The server will send a "server-ready" message when it's ready
         // (handled by the sendToParent function in server.mjs)

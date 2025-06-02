@@ -65,7 +65,7 @@ export default defineConfig({
 	},
 	build: {
 		sourcemap: false,
-		minify: false,
+		minify: process.env.NODE_ENV === 'production' ? 'esbuild' : false,
 		rollupOptions: {
 			treeshake: true,
 			output: {

@@ -25635,8 +25635,11 @@ if (process.defaultApp) {
   app.setAsDefaultProtocolClient("titan");
 }
 const gotTheLock = app.requestSingleInstanceLock();
-app.commandLine.appendSwitch("js-flags", "--max-old-space-size=4096");
-app.commandLine.appendSwitch("enable-features", "V8CodeCache");
+app.commandLine.appendSwitch("js-flags", "--max-old-space-size=4096 --optimize-for-size --use-cache");
+app.commandLine.appendSwitch("enable-features", "V8CodeCache,VaapiVideoDecoder");
+app.commandLine.appendSwitch("disable-features", "MediaRouter");
+app.commandLine.appendSwitch("disable-background-timer-throttling");
+app.commandLine.appendSwitch("disable-backgrounding-occluded-windows");
 let mainWindow;
 let serverWorker = null;
 let isQuitting = false;
@@ -25659,7 +25662,9 @@ function createWindow() {
       sandbox: true
     }
   });
-  mainWindow.loadFile(path.join(__dirname, "../splash.html"));
+  if (isDev) {
+    mainWindow.loadURL(process.env.VITE_DEV_SERVER_URL || "http://localhost:5173");
+  }
   session.defaultSession.webRequest.onHeadersReceived((details, callback) => {
     const csp = isDev ? [
       "default-src 'self' 'unsafe-inline' 'unsafe-eval'",
@@ -25691,10 +25696,8 @@ function createWindow() {
       }
     });
   });
-  mainWindow.once("ready-to-show", () => {
-    mainWindow.show();
-    mainWindow.focus();
-  });
+  mainWindow.show();
+  mainWindow.focus();
   mainWindow.on("close", function(event) {
     if (!isQuitting) {
       event.preventDefault();

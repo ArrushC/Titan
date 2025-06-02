@@ -93,7 +93,7 @@
 			"server/**/*",
 			"package.json",
 			"shutdown.html",
-			"splash.html"
+			"!docs/**/*"
 		],
 		"directories": {
 			"output": "release"

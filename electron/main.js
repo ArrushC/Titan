@@ -32,9 +32,12 @@ if (process.defaultApp) {
 
 const gotTheLock = app.requestSingleInstanceLock();
 
-// Enable V8 code caching for faster startup
-app.commandLine.appendSwitch("js-flags", "--max-old-space-size=4096");
-app.commandLine.appendSwitch("enable-features", "V8CodeCache");
+// Enable V8 code caching and optimizations for faster startup
+app.commandLine.appendSwitch("js-flags", "--max-old-space-size=4096 --optimize-for-size --use-cache");
+app.commandLine.appendSwitch("enable-features", "V8CodeCache,VaapiVideoDecoder");
+app.commandLine.appendSwitch("disable-features", "MediaRouter");
+app.commandLine.appendSwitch("disable-background-timer-throttling");
+app.commandLine.appendSwitch("disable-backgrounding-occluded-windows");
 
 let mainWindow;
 let serverWorker = null;
@@ -61,7 +64,11 @@ function createWindow() {
 		},
 	});
 
-	mainWindow.loadFile(path.join(__dirname, "../splash.html"));
+	// Load app immediately in development, wait for server in production
+	if (isDev) {
+		mainWindow.loadURL(process.env.VITE_DEV_SERVER_URL || 'http://localhost:5173');
+	}
+	// Production URL will be loaded when server is ready
 
 	// Set CSP headers
 	session.defaultSession.webRequest.onHeadersReceived((details, callback) => {
@@ -102,11 +109,9 @@ function createWindow() {
 		});
 	});
 
-	// Show window when it's ready to avoid flickering
-	mainWindow.once("ready-to-show", () => {
-		mainWindow.show();
-		mainWindow.focus();
-	});
+	// Show window immediately for faster startup
+	mainWindow.show();
+	mainWindow.focus();
 
 	mainWindow.on("close", function (event) {
 		if (!isQuitting) {

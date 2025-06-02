@@ -1,7 +1,7 @@
 import fs from "fs";
 import { promises as fsPromises } from "fs";
 import path from "path";
-import _ from "lodash";
+import { debounce } from "lodash";
 
 /**
  * Debug logging for tasks
@@ -99,7 +99,7 @@ export async function deletePathRecursively(targetPath, logger) {
  * @returns {Function} Debounced write function
  */
 export function createTargetsFileWriter(targetsFilePath, logger) {
-    return _.debounce(async (targets = []) => {
+    return debounce(async (targets = []) => {
         try {
             await fsPromises.mkdir(path.dirname(targetsFilePath), { recursive: true });
             await fsPromises.writeFile(targetsFilePath, targets.join("\n"));
@@ -117,7 +117,7 @@ export function createTargetsFileWriter(targetsFilePath, logger) {
  * @returns {Function} Debounced save function
  */
 export function createSvnLogsCacheSaver(svnLogsCacheFilePath, instanceData, logger) {
-    return _.debounce(async () => {
+    return debounce(async () => {
         try {
             await fsPromises.mkdir(path.dirname(svnLogsCacheFilePath), { recursive: true });
             await fsPromises.writeFile(svnLogsCacheFilePath, JSON.stringify(instanceData.subversionLogsCache, null, 4));
@@ -135,7 +135,7 @@ export function createSvnLogsCacheSaver(svnLogsCacheFilePath, instanceData, logg
  * @returns {Function} Debounced save function
  */
 export function createCommitLiveResponsesSaver(commitLiveResponsesFilePath, instanceData, logger) {
-    return _.debounce(async () => {
+    return debounce(async () => {
         try {
             await fsPromises.mkdir(path.dirname(commitLiveResponsesFilePath), { recursive: true });
             await fsPromises.writeFile(commitLiveResponsesFilePath, JSON.stringify(instanceData.commitLiveResponses, null, 4));

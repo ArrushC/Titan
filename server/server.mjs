@@ -58,6 +58,11 @@ export function initialiseServer() {
 	setupUncaughtExceptionHandler(logger);
 
 	logger.info("1) Basic environment setup ✅");
+	sendToParent({ 
+		type: "server-initializing", 
+		status: "Starting server...",
+		detail: "Setting up core environment"
+	});
 	//-------------------------------------------------------------------
 	// 2) Initialize Express, HTTP, Socket.IO
 	//-------------------------------------------------------------------
@@ -97,6 +102,11 @@ export function initialiseServer() {
 	};
 
 	logger.info("2) Initialise Express, HTTP, Socket.IO ✅");
+	sendToParent({ 
+		type: "server-initializing", 
+		status: "Starting server...",
+		detail: "Initializing web server and real-time connections"
+	});
 	//-------------------------------------------------------------------
 	// 3) Load any disk-based state on startup (if present)
 	//-------------------------------------------------------------------
@@ -117,6 +127,11 @@ export function initialiseServer() {
 	});
 
 	logger.info("4) Express routes and middleware setup ✅");
+	sendToParent({ 
+		type: "server-initializing", 
+		status: "Starting server...",
+		detail: "Configuring API endpoints and middleware"
+	});
 	//-------------------------------------------------------------------
 	// 5) Create utility functions
 	//-------------------------------------------------------------------
@@ -153,6 +168,11 @@ export function initialiseServer() {
 	});
 
 	logger.info("7) Socket.IO handlers setup ✅");
+	sendToParent({ 
+		type: "server-initializing", 
+		status: "Server ready!",
+		detail: "Finalizing server configuration"
+	});
 	//-------------------------------------------------------------------
 	// 8) Graceful shutdown for signals
 	//-------------------------------------------------------------------
@@ -217,7 +237,10 @@ export function initialiseServer() {
 			logger.info("Initial performance metrics:", metrics);
 		}, 5000);
 
-		sendToParent({ type: "server-ready" });
+		// Add a small delay to make the progression visible
+		setTimeout(() => {
+			sendToParent({ type: "server-ready" });
+		}, 500);
 	});
 
 	logger.info("9) Server listening ✅");

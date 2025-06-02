@@ -3,7 +3,8 @@ import chokidar from "chokidar";
 import path from "path";
 import fs from "fs";
 import { promises as fsPromises } from "fs";
-import { uniqBy } from "lodash";
+import pkg from "lodash";
+const { uniqBy } = pkg;
 import { 
     debugTask, 
     branchString, 

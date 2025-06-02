@@ -17,6 +17,8 @@ contextBridge.exposeInMainWorld("electron", {
 	maximizeWindow: () => ipcRenderer.invoke("app-maximize"),
 	closeWindow: () => ipcRenderer.invoke("app-close"),
 	restartApp: () => ipcRenderer.invoke("app-restart"),
+	// Splash screen status updates
+	onSplashStatus: (callback) => ipcRenderer.on("splash-status", (event, data) => callback(data)),
 	on: (channel, func) => {
 		ipcRenderer.on(channel, (event, ...args) => func(...args));
 	},

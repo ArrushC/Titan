@@ -25621,10 +25621,46 @@ function setupUncaughtExceptionHandler(logger2) {
 const { autoUpdater } = electronUpdaterPkg;
 const isDev = process.env.NODE_ENV === "development";
 const connectionURL = "http://localhost:4000";
+if (isDev) {
+  process.env.ELECTRON_DISABLE_SECURITY_WARNINGS = "true";
+}
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 const packageJsonPath = path.join(__dirname, "../package.json");
 const packageJson = JSON.parse(fs$1.readFileSync(packageJsonPath, "utf-8"));
+const windowStateFile = path.join(app.getPath("userData"), "window-state.json");
+function loadWindowState() {
+  try {
+    if (fs$1.existsSync(windowStateFile)) {
+      const state2 = JSON.parse(fs$1.readFileSync(windowStateFile, "utf-8"));
+      logger.info("Loaded window state:", state2);
+      return state2;
+    }
+  } catch (error2) {
+    logger.error("Failed to load window state:", error2);
+  }
+  return null;
+}
+function saveWindowState() {
+  if (!mainWindow || mainWindow.isDestroyed()) return;
+  const bounds = mainWindow.getBounds();
+  const isMaximized = mainWindow.isMaximized();
+  const isFullScreen = mainWindow.isFullScreen();
+  const state2 = {
+    x: bounds.x,
+    y: bounds.y,
+    width: bounds.width,
+    height: bounds.height,
+    isMaximized,
+    isFullScreen
+  };
+  try {
+    fs$1.writeFileSync(windowStateFile, JSON.stringify(state2, null, 2));
+    logger.info("Saved window state:", state2);
+  } catch (error2) {
+    logger.error("Failed to save window state:", error2);
+  }
+}
 const logger = setupLogger("main.js");
 setupUncaughtExceptionHandler();
 if (process.defaultApp) {
@@ -25640,31 +25676,97 @@ app.commandLine.appendSwitch("enable-features", "V8CodeCache,VaapiVideoDecoder")
 app.commandLine.appendSwitch("disable-features", "MediaRouter");
 app.commandLine.appendSwitch("disable-background-timer-throttling");
 app.commandLine.appendSwitch("disable-backgrounding-occluded-windows");
+app.commandLine.appendSwitch("disable-http-cache");
+app.commandLine.appendSwitch("disable-gpu-sandbox");
+app.commandLine.appendSwitch("no-sandbox");
+app.commandLine.appendSwitch("disable-software-rasterizer");
+app.commandLine.appendSwitch("disable-dev-shm-usage");
+app.commandLine.appendSwitch("ignore-gpu-blocklist");
+app.commandLine.appendSwitch("enable-unsafe-webgpu");
+app.commandLine.appendSwitch("enable-zero-copy");
+app.commandLine.appendSwitch("disable-site-isolation-trials");
+app.commandLine.appendSwitch("disable-web-security");
+app.commandLine.appendSwitch("allow-insecure-localhost");
+app.commandLine.appendSwitch("ignore-certificate-errors");
+app.commandLine.appendSwitch("auto-detect", "false");
+app.commandLine.appendSwitch("no-proxy-server");
 let mainWindow;
 let serverWorker = null;
 let isQuitting = false;
 let updateDownloaded = false;
 function createWindow() {
   const primaryDisplay = screen.getPrimaryDisplay();
-  const { width, height } = primaryDisplay.workAreaSize;
-  mainWindow = new BrowserWindow({
-    width,
-    height,
-    backgroundColor: "#1A202C",
+  const { width: screenWidth, height: screenHeight } = primaryDisplay.workAreaSize;
+  const savedState = loadWindowState();
+  const defaultWidth = Math.round(screenWidth * 0.9);
+  const defaultHeight = Math.round(screenHeight * 0.9);
+  const windowConfig = {
+    width: (savedState == null ? void 0 : savedState.width) || defaultWidth,
+    height: (savedState == null ? void 0 : savedState.height) || defaultHeight,
+    backgroundColor: "#0f172a",
     frame: false,
     show: false,
+    // Start hidden, show after bounds are set
     resizable: true,
     autoHideMenuBar: true,
+    transparent: false,
+    // Ensure no transparency for sharp corners
+    hasShadow: true,
+    roundedCorners: false,
     webPreferences: {
       nodeIntegration: false,
       contextIsolation: true,
       preload: fs$1.existsSync(path.join(__dirname, "preload.mjs")) ? path.join(__dirname, "preload.mjs") : path.join(__dirname, "preload.js"),
       sandbox: true
     }
-  });
-  if (isDev) {
-    mainWindow.loadURL(process.env.VITE_DEV_SERVER_URL || "http://localhost:5173");
+  };
+  if ((savedState == null ? void 0 : savedState.x) !== void 0 && (savedState == null ? void 0 : savedState.y) !== void 0) {
+    const displays = screen.getAllDisplays();
+    const isOnScreen = displays.some((display) => {
+      return savedState.x >= display.bounds.x && savedState.y >= display.bounds.y && savedState.x < display.bounds.x + display.bounds.width && savedState.y < display.bounds.y + display.bounds.height;
+    });
+    if (isOnScreen) {
+      windowConfig.x = savedState.x;
+      windowConfig.y = savedState.y;
+    }
   }
+  mainWindow = new BrowserWindow(windowConfig);
+  if (savedState == null ? void 0 : savedState.isMaximized) {
+    mainWindow.maximize();
+  }
+  if (savedState == null ? void 0 : savedState.isFullScreen) {
+    mainWindow.setFullScreen(true);
+  }
+  mainWindow.show();
+  let saveStateTimeout;
+  const debouncedSaveState = () => {
+    clearTimeout(saveStateTimeout);
+    saveStateTimeout = setTimeout(saveWindowState, 1e3);
+  };
+  mainWindow.on("resize", debouncedSaveState);
+  mainWindow.on("move", debouncedSaveState);
+  mainWindow.on("maximize", saveWindowState);
+  mainWindow.on("unmaximize", saveWindowState);
+  mainWindow.on("enter-full-screen", saveWindowState);
+  mainWindow.on("leave-full-screen", saveWindowState);
+  mainWindow.loadFile(path.join(__dirname, "../splash.html"));
+  if (isDev) {
+    mainWindow.webContents.executeJavaScript(`
+			const link = document.createElement('link');
+			link.rel = 'preconnect';
+			link.href = '${process.env.VITE_DEV_SERVER_URL || "http://localhost:5173"}';
+			document.head.appendChild(link);
+		`).catch(() => {
+    });
+  }
+  mainWindow.webContents.once("did-finish-load", () => {
+    logger.info("Splash screen loaded successfully");
+    mainWindow.splashReady = true;
+    mainWindow.webContents.send("splash-status", {
+      message: "Initializing Titan...",
+      detail: "Starting application services"
+    });
+  });
   session.defaultSession.webRequest.onHeadersReceived((details, callback) => {
     const csp = isDev ? [
       "default-src 'self' 'unsafe-inline' 'unsafe-eval'",
@@ -25696,12 +25798,22 @@ function createWindow() {
       }
     });
   });
-  mainWindow.show();
+  mainWindow.webContents.on("did-start-loading", () => {
+    logger.info("Window started loading content");
+  });
+  mainWindow.webContents.on("did-fail-load", (event, errorCode, errorDescription) => {
+    logger.error(`Window failed to load: ${errorCode} - ${errorDescription}`);
+  });
   mainWindow.focus();
+  if (isDev) {
+    mainWindow.webContents.openDevTools();
+  }
   mainWindow.on("close", function(event) {
     if (!isQuitting) {
       event.preventDefault();
       mainWindow.webContents.send("app-closing");
+    } else {
+      saveWindowState();
     }
   });
   mainWindow.webContents.setWindowOpenHandler(({ url }) => {
@@ -25711,6 +25823,12 @@ function createWindow() {
 }
 function startServer() {
   logger.info("Starting server in worker thread...");
+  if (mainWindow && !mainWindow.isDestroyed()) {
+    mainWindow.webContents.send("splash-status", {
+      message: "Starting server...",
+      detail: "Initializing Node.js backend services"
+    });
+  }
   try {
     if (isDev) {
       const workerPath = path.join(__dirname, "serverWorker.js");
@@ -25719,17 +25837,17 @@ function startServer() {
       const workerCode = `
 				const { parentPort } = require('worker_threads');
 				const path = require('path');
-				
+
 				// This is a placeholder - in production build, this would include the bundled server code
 				// For now, we'll use dynamic import
 				(async () => {
 					try {
 						const serverPath = path.join(__dirname, '../server/server.mjs');
 						const { initialiseServer } = await import(serverPath);
-						
+
 						let serverInstance = null;
 						let ioInstance = null;
-						
+
 						parentPort.on("message", (message) => {
 							if (message.type === "shutdown") {
 								if (serverInstance) {
@@ -25750,7 +25868,7 @@ function startServer() {
 								}
 							}
 						});
-						
+
 						const { server, io } = await initialiseServer();
 						serverInstance = server;
 						ioInstance = io;
@@ -25765,10 +25883,31 @@ function startServer() {
     serverWorker.on("message", (message) => {
       if (message.type === "server-ready") {
         logger.info("Server is ready in worker thread");
-        if (isDev) {
-          mainWindow.loadURL(process.env.VITE_DEV_SERVER_URL);
-        } else {
-          mainWindow.loadURL(connectionURL);
+        if (mainWindow && !mainWindow.isDestroyed()) {
+          mainWindow.webContents.send("splash-status", {
+            message: "Server ready!",
+            detail: "Loading user interface..."
+          });
+        }
+        const loadMainApp = () => {
+          if (!mainWindow.splashReady) {
+            setTimeout(loadMainApp, 100);
+            return;
+          }
+          logger.info("Transitioning from splash to main app");
+          if (isDev) {
+            mainWindow.loadURL(process.env.VITE_DEV_SERVER_URL || "http://localhost:5173");
+          } else {
+            mainWindow.loadURL(connectionURL);
+          }
+        };
+        setTimeout(loadMainApp, 1e3);
+      } else if (message.type === "server-initializing") {
+        if (mainWindow && !mainWindow.isDestroyed()) {
+          mainWindow.webContents.send("splash-status", {
+            message: message.status || "Initializing server...",
+            detail: message.detail || ""
+          });
         }
       } else if (message.type === "error") {
         logger.error(`Worker thread error: ${message.error}`);

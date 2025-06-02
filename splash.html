@@ -1,0 +1,430 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Titan - Starting...</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #0f172a;
+            height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #f8fafc;
+            position: relative;
+            overflow: hidden;
+        }
+
+        /* Subtle animated background */
+        .background {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: 
+                radial-gradient(ellipse at top left, rgba(251, 191, 36, 0.15) 0%, transparent 50%),
+                radial-gradient(ellipse at bottom right, rgba(245, 158, 11, 0.15) 0%, transparent 50%);
+            animation: pulse 4s ease-in-out infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 0.3; }
+            50% { opacity: 0.6; }
+        }
+
+        /* Main container */
+        .main-container {
+            text-align: center;
+            z-index: 10;
+            position: relative;
+        }
+
+        /* Logo container */
+        .logo-container {
+            width: 140px;
+            height: 140px;
+            margin: 0 auto 40px;
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        /* Logo with gradient border */
+        .logo-outer {
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, #fbbf24, #f59e0b);
+            border-radius: 28px;
+            padding: 3px;
+            animation: breathe 3s ease-in-out infinite;
+            box-shadow: 0 20px 40px rgba(251, 191, 36, 0.2);
+        }
+
+        @keyframes breathe {
+            0%, 100% { 
+                transform: scale(1); 
+                box-shadow: 0 20px 40px rgba(251, 191, 36, 0.2);
+            }
+            50% { 
+                transform: scale(1.02); 
+                box-shadow: 0 25px 50px rgba(251, 191, 36, 0.3);
+            }
+        }
+
+        .logo-inner {
+            width: 100%;
+            height: 100%;
+            background: #0f172a;
+            border-radius: 25px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 64px;
+            font-weight: 800;
+            color: #fbbf24;
+            background: #0f172a;
+            position: relative;
+        }
+
+        /* Logo glow effect */
+        .logo-container::before {
+            content: '';
+            position: absolute;
+            width: 180px;
+            height: 180px;
+            background: radial-gradient(circle, rgba(251, 191, 36, 0.2) 0%, transparent 70%);
+            filter: blur(40px);
+            z-index: -1;
+            animation: glow 3s ease-in-out infinite;
+        }
+
+        @keyframes glow {
+            0%, 100% { opacity: 0.5; }
+            50% { opacity: 0.8; }
+        }
+
+        /* Title */
+        .title {
+            font-size: 48px;
+            font-weight: 700;
+            margin-bottom: 12px;
+            color: #f8fafc;
+            letter-spacing: -1px;
+            animation: fadeInUp 0.6s ease-out;
+        }
+
+        @keyframes fadeInUp {
+            0% { 
+                opacity: 0; 
+                transform: translateY(20px); 
+            }
+            100% { 
+                opacity: 1; 
+                transform: translateY(0); 
+            }
+        }
+
+        /* Subtitle */
+        .subtitle {
+            font-size: 18px;
+            font-weight: 400;
+            color: #94a3b8;
+            margin-bottom: 60px;
+            animation: fadeInUp 0.6s ease-out 0.1s both;
+        }
+
+        /* Loading container */
+        .loading-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 24px;
+            animation: fadeInUp 0.6s ease-out 0.2s both;
+        }
+
+        /* Progress bar */
+        .progress-wrapper {
+            width: 300px;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 6px;
+            background: rgba(148, 163, 184, 0.15);
+            border-radius: 3px;
+            overflow: hidden;
+            position: relative;
+            box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.1);
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #fbbf24 0%, #f59e0b 100%);
+            border-radius: 3px;
+            width: 0%;
+            transition: width 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 0 0 20px rgba(251, 191, 36, 0.5);
+            position: relative;
+            overflow: hidden;
+        }
+
+        /* Shimmer effect */
+        .progress-fill::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            bottom: 0;
+            right: 0;
+            background: linear-gradient(
+                90deg,
+                transparent,
+                rgba(255, 255, 255, 0.3),
+                transparent
+            );
+            transform: translateX(-100%);
+            animation: shimmer 1.5s infinite;
+        }
+
+        @keyframes shimmer {
+            100% { transform: translateX(100%); }
+        }
+
+        /* Progress stages */
+        .progress-stages {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 20px;
+            width: 100%;
+        }
+
+        .stage {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 8px;
+            flex: 1;
+        }
+
+        .stage-dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background: rgba(148, 163, 184, 0.2);
+            border: 2px solid rgba(148, 163, 184, 0.3);
+            transition: all 0.3s ease;
+        }
+
+        .stage.active .stage-dot {
+            background: #fbbf24;
+            border-color: #fbbf24;
+            box-shadow: 0 0 12px rgba(251, 191, 36, 0.6);
+            transform: scale(1.2);
+        }
+
+        .stage.completed .stage-dot {
+            background: #22c55e;
+            border-color: #22c55e;
+        }
+
+        .stage-label {
+            font-size: 12px;
+            color: #64748b;
+            font-weight: 500;
+        }
+
+        .stage.active .stage-label {
+            color: #cbd5e1;
+        }
+
+        /* Loading text */
+        .loading-text {
+            font-size: 16px;
+            font-weight: 500;
+            color: #cbd5e1;
+            margin-top: 32px;
+        }
+
+        .status-text {
+            font-size: 13px;
+            color: #64748b;
+        }
+
+        /* Version info */
+        .version-info {
+            position: absolute;
+            bottom: 24px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 12px;
+            color: #475569;
+            animation: fadeInUp 0.6s ease-out 0.3s both;
+        }
+    </style>
+</head>
+<body>
+    <div class="background"></div>
+
+    <div class="main-container">
+        <div class="logo-container">
+            <div class="logo-outer">
+                <div class="logo-inner">
+                    T
+                </div>
+            </div>
+        </div>
+        
+        <h1 class="title">Titan</h1>
+        <p class="subtitle">SVN Management Platform</p>
+        
+        <div class="loading-container">
+            <div class="progress-wrapper">
+                <div class="progress-bar">
+                    <div class="progress-fill" id="progress-fill"></div>
+                </div>
+                <div class="progress-stages">
+                    <div class="stage" id="stage-init">
+                        <div class="stage-dot"></div>
+                        <div class="stage-label">Initialize</div>
+                    </div>
+                    <div class="stage" id="stage-server">
+                        <div class="stage-dot"></div>
+                        <div class="stage-label">Server</div>
+                    </div>
+                    <div class="stage" id="stage-connect">
+                        <div class="stage-dot"></div>
+                        <div class="stage-label">Connect</div>
+                    </div>
+                    <div class="stage" id="stage-ready">
+                        <div class="stage-dot"></div>
+                        <div class="stage-label">Ready</div>
+                    </div>
+                </div>
+            </div>
+            <div class="loading-text" id="loading-text">Initializing Titan...</div>
+            <div class="status-text" id="status-text">Starting application services</div>
+        </div>
+    </div>
+
+    <div class="version-info">v2.0.4</div>
+
+    <script>
+        // Get elements
+        const loadingText = document.getElementById('loading-text');
+        const statusText = document.getElementById('status-text');
+        const progressFill = document.getElementById('progress-fill');
+        
+        // Progress stages
+        const stages = {
+            'init': { element: document.getElementById('stage-init'), progress: 0 },
+            'server': { element: document.getElementById('stage-server'), progress: 25 },
+            'connect': { element: document.getElementById('stage-connect'), progress: 50 },
+            'ready': { element: document.getElementById('stage-ready'), progress: 75 }
+        };
+        
+        let currentStage = 'init';
+        let targetProgress = 0;
+        let currentProgress = 0;
+        
+        // Set initial stage
+        stages.init.element.classList.add('active');
+        
+        // Smooth progress animation
+        function animateProgress() {
+            if (currentProgress < targetProgress) {
+                currentProgress = Math.min(currentProgress + 1, targetProgress);
+                progressFill.style.width = currentProgress + '%';
+                requestAnimationFrame(animateProgress);
+            }
+        }
+        
+        // Update stage function
+        function updateStage(stage) {
+            // Mark previous stages as completed
+            const stageKeys = Object.keys(stages);
+            const newIndex = stageKeys.indexOf(stage);
+            
+            for (let i = 0; i <= newIndex; i++) {
+                const stageKey = stageKeys[i];
+                if (i < newIndex) {
+                    stages[stageKey].element.classList.remove('active');
+                    stages[stageKey].element.classList.add('completed');
+                } else {
+                    stages[stageKey].element.classList.add('active');
+                }
+            }
+            
+            currentStage = stage;
+            targetProgress = stages[stage].progress;
+            animateProgress();
+        }
+        
+        // Message to stage mapping
+        const messageStageMap = {
+            'Initializing Titan...': 'init',
+            'Starting server...': 'server',
+            'Server ready!': 'connect',
+            'Loading user interface...': 'ready'
+        };
+        
+        console.log('Titan splash screen ready');
+
+        // Listen for status updates from Electron main process
+        if (window.electron && window.electron.onSplashStatus) {
+            window.electron.onSplashStatus((data) => {
+                console.log('Splash status:', data);
+                if (data.message) {
+                    loadingText.textContent = data.message;
+                    
+                    // Update stage based on message
+                    const stage = messageStageMap[data.message];
+                    if (stage) {
+                        updateStage(stage);
+                    }
+                    
+                    // Final stage
+                    if (data.message.includes('Loading user interface')) {
+                        setTimeout(() => {
+                            targetProgress = 100;
+                            animateProgress();
+                        }, 300);
+                    }
+                }
+                if (data.detail) {
+                    statusText.textContent = data.detail;
+                }
+            });
+        } else {
+            // Demo mode for browser testing
+            console.log('Running in demo mode');
+            setTimeout(() => {
+                loadingText.textContent = 'Starting server...';
+                statusText.textContent = 'Initializing backend services';
+                updateStage('server');
+            }, 1000);
+            setTimeout(() => {
+                loadingText.textContent = 'Server ready!';
+                statusText.textContent = 'Establishing connections';
+                updateStage('connect');
+            }, 2000);
+            setTimeout(() => {
+                loadingText.textContent = 'Loading user interface...';
+                statusText.textContent = 'Preparing workspace';
+                updateStage('ready');
+                targetProgress = 100;
+                animateProgress();
+            }, 3000);
+        }
+    </script>
+</body>
+</html>

@@ -1,7 +1,8 @@
 import fs from "fs";
 import { promises as fsPromises } from "fs";
 import path from "path";
-import { debounce } from "lodash";
+import pkg from "lodash";
+const { debounce } = pkg;
 
 /**
  * Debug logging for tasks

@@ -11,7 +11,44 @@ const packageJson = JSON.parse(fs.readFileSync(packageJsonPath, 'utf-8'));
 
 const { combine, timestamp, printf, errors } = format;
 
+// Track recent SVN errors to avoid duplicates
+const recentSvnErrors = new Map();
+const SVN_ERROR_CACHE_TIME = 5000; // 5 seconds
+
+// Clean up old entries periodically
+setInterval(() => {
+	const now = Date.now();
+	for (const [key, time] of recentSvnErrors.entries()) {
+		if (now - time > SVN_ERROR_CACHE_TIME) {
+			recentSvnErrors.delete(key);
+		}
+	}
+}, 10000);
+
 const myFormat = printf(({ level, message, timestamp, stack, label }) => {
+	// Filter out duplicate SVN errors
+	if (level === 'error' && message && typeof message === 'string') {
+		// Check if it's an SVN error
+		if (message.includes('SVN') && message.includes('failed for')) {
+			// Extract the path and operation to create a unique key
+			const match = message.match(/SVN (\w+) failed for (.+?) -/);
+			if (match) {
+				const key = `${match[1]}_${match[2]}`;
+				const now = Date.now();
+				
+				// Check if we've seen this error recently
+				if (recentSvnErrors.has(key)) {
+					const lastTime = recentSvnErrors.get(key);
+					if (now - lastTime < SVN_ERROR_CACHE_TIME) {
+						return null; // Skip duplicate
+					}
+				}
+				
+				recentSvnErrors.set(key, now);
+			}
+		}
+	}
+	
 	return `${timestamp} [${label}] [${level}]: ${stack || message}`;
 });
 
@@ -25,8 +62,22 @@ if (!fs.existsSync(logDir)) {
 
 fs.writeFileSync(logFilePath, "");
 
+// Custom filter to remove null messages
+const filterNullMessages = format((info) => {
+	// If the formatted message is null, don't log it
+	if (info[Symbol.for('message')] === null || info.message === null) {
+		return false;
+	}
+	return info;
+});
+
 const baseLogger = createLogger({
-	format: combine(timestamp({ format: "YYYY-MM-DD HH:mm:ss" }), errors({ stack: true }), myFormat),
+	format: combine(
+		timestamp({ format: "YYYY-MM-DD HH:mm:ss" }), 
+		errors({ stack: true }), 
+		filterNullMessages(),
+		myFormat
+	),
 	transports: [
 		new transports.Console({
 			level: "info",

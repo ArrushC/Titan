@@ -1,0 +1,364 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Titan Health Check</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #0f0f0f 0%, #1a1a2e 100%);
+            color: #e0e0e0;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .health-container {
+            background: rgba(30, 30, 46, 0.9);
+            border-radius: 20px;
+            padding: 40px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.3);
+            text-align: center;
+            max-width: 600px;
+            width: 90%;
+        }
+
+        .status-icon {
+            width: 120px;
+            height: 120px;
+            margin: 0 auto 30px;
+            position: relative;
+        }
+
+        .status-circle {
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 48px;
+        }
+
+        .status-healthy {
+            background: linear-gradient(135deg, #00ff88 0%, #00d4ff 100%);
+            animation: pulse-healthy 2s infinite;
+        }
+
+        .status-warning {
+            background: linear-gradient(135deg, #ffd700 0%, #ff8c00 100%);
+            animation: pulse-warning 2s infinite;
+        }
+
+        .status-error {
+            background: linear-gradient(135deg, #ff4444 0%, #cc0000 100%);
+            animation: pulse-error 1s infinite;
+        }
+
+        @keyframes pulse-healthy {
+            0%, 100% { transform: scale(1); opacity: 1; }
+            50% { transform: scale(1.05); opacity: 0.8; }
+        }
+
+        @keyframes pulse-warning {
+            0%, 100% { transform: scale(1); opacity: 1; }
+            50% { transform: scale(1.1); opacity: 0.7; }
+        }
+
+        @keyframes pulse-error {
+            0%, 100% { transform: scale(1); opacity: 1; }
+            50% { transform: scale(1.15); opacity: 0.6; }
+        }
+
+        h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            font-weight: 300;
+        }
+
+        .status-text {
+            font-size: 1.5em;
+            margin-bottom: 30px;
+            font-weight: 500;
+        }
+
+        .health-details {
+            background: rgba(42, 42, 62, 0.5);
+            border-radius: 15px;
+            padding: 20px;
+            margin-bottom: 30px;
+        }
+
+        .detail-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 10px 0;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+        }
+
+        .detail-row:last-child {
+            border-bottom: none;
+        }
+
+        .detail-label {
+            color: #a0a0a0;
+        }
+
+        .detail-value {
+            font-weight: 500;
+        }
+
+        .metrics-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 20px;
+            margin-top: 30px;
+        }
+
+        .metric-box {
+            background: rgba(42, 42, 62, 0.5);
+            border-radius: 10px;
+            padding: 20px;
+            transition: transform 0.2s ease;
+        }
+
+        .metric-box:hover {
+            transform: translateY(-5px);
+        }
+
+        .metric-label {
+            font-size: 0.9em;
+            color: #a0a0a0;
+            margin-bottom: 5px;
+        }
+
+        .metric-value {
+            font-size: 1.8em;
+            font-weight: bold;
+            color: #00ff88;
+        }
+
+        .last-check {
+            margin-top: 30px;
+            font-size: 0.9em;
+            color: #a0a0a0;
+        }
+
+        .refresh-button {
+            background: linear-gradient(135deg, #00d4ff 0%, #00ff88 100%);
+            border: none;
+            color: #0f0f0f;
+            padding: 12px 30px;
+            border-radius: 25px;
+            font-size: 1em;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-top: 20px;
+        }
+
+        .refresh-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 20px rgba(0, 212, 255, 0.4);
+        }
+
+        .loading {
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body>
+    <div class="health-container">
+        <div class="status-icon">
+            <div class="status-circle" id="status-circle">
+                <span id="status-emoji">⏳</span>
+            </div>
+        </div>
+        
+        <h1>Titan Server Health</h1>
+        <div class="status-text" id="status-text">Checking...</div>
+        
+        <div class="health-details">
+            <div class="detail-row">
+                <span class="detail-label">Status</span>
+                <span class="detail-value" id="health-status">-</span>
+            </div>
+            <div class="detail-row">
+                <span class="detail-label">Version</span>
+                <span class="detail-value" id="health-version">-</span>
+            </div>
+            <div class="detail-row">
+                <span class="detail-label">Uptime</span>
+                <span class="detail-value" id="health-uptime">-</span>
+            </div>
+            <div class="detail-row">
+                <span class="detail-label">Response Time</span>
+                <span class="detail-value" id="response-time">-</span>
+            </div>
+        </div>
+        
+        <div class="metrics-grid">
+            <div class="metric-box">
+                <div class="metric-label">Active Connections</div>
+                <div class="metric-value" id="metric-connections">0</div>
+            </div>
+            <div class="metric-box">
+                <div class="metric-label">Memory Usage</div>
+                <div class="metric-value" id="metric-memory">0%</div>
+            </div>
+            <div class="metric-box">
+                <div class="metric-label">Cache Hit Rate</div>
+                <div class="metric-value" id="metric-cache">0%</div>
+            </div>
+        </div>
+        
+        <button class="refresh-button" onclick="checkHealth()">
+            <span id="refresh-text">Refresh</span>
+        </button>
+        
+        <div class="last-check" id="last-check">Last checked: Never</div>
+    </div>
+
+    <script>
+        let socket = null;
+
+        async function checkHealth() {
+            const button = document.querySelector('.refresh-button');
+            const refreshText = document.getElementById('refresh-text');
+            const statusCircle = document.getElementById('status-circle');
+            const statusEmoji = document.getElementById('status-emoji');
+            const statusText = document.getElementById('status-text');
+            
+            // Show loading state
+            button.disabled = true;
+            refreshText.textContent = 'Checking...';
+            statusEmoji.textContent = '⏳';
+            statusCircle.className = 'status-circle loading';
+            
+            const startTime = performance.now();
+            
+            try {
+                // Check basic HTTP endpoint
+                const response = await fetch('/api/health');
+                const endTime = performance.now();
+                const responseTime = Math.round(endTime - startTime);
+                
+                if (response.ok) {
+                    const data = await response.json();
+                    
+                    // Update UI with healthy status
+                    statusCircle.className = 'status-circle status-healthy';
+                    statusEmoji.textContent = '✓';
+                    statusText.textContent = 'Server is Healthy';
+                    
+                    document.getElementById('health-status').textContent = data.status;
+                    document.getElementById('health-version').textContent = data.version;
+                    document.getElementById('response-time').textContent = `${responseTime}ms`;
+                    
+                    // Connect to Socket.IO for real-time updates
+                    connectToSocket();
+                } else {
+                    throw new Error(`HTTP ${response.status}`);
+                }
+            } catch (error) {
+                // Update UI with error status
+                statusCircle.className = 'status-circle status-error';
+                statusEmoji.textContent = '✗';
+                statusText.textContent = 'Server Unreachable';
+                
+                document.getElementById('health-status').textContent = 'Error';
+                document.getElementById('response-time').textContent = 'Timeout';
+                
+                console.error('Health check failed:', error);
+            } finally {
+                button.disabled = false;
+                refreshText.textContent = 'Refresh';
+                document.getElementById('last-check').textContent = 
+                    `Last checked: ${new Date().toLocaleTimeString()}`;
+            }
+        }
+
+        function connectToSocket() {
+            if (socket && socket.connected) return;
+            
+            // Load Socket.IO dynamically
+            const script = document.createElement('script');
+            script.src = '/socket.io/socket.io.js';
+            script.onload = () => {
+                socket = io();
+                
+                socket.on('connect', () => {
+                    console.log('Connected to real-time health monitoring');
+                    socket.emit('request-performance-data');
+                });
+                
+                socket.on('performance-update', (data) => {
+                    updateMetrics(data);
+                });
+                
+                socket.on('disconnect', () => {
+                    console.log('Disconnected from health monitoring');
+                });
+            };
+            document.head.appendChild(script);
+        }
+
+        function updateMetrics(data) {
+            // Update uptime
+            if (data.uptime) {
+                document.getElementById('health-uptime').textContent = formatUptime(data.uptime);
+            }
+            
+            // Update connections
+            if (data.sockets && data.sockets.connections) {
+                document.getElementById('metric-connections').textContent = 
+                    data.sockets.connections.total;
+            }
+            
+            // Update memory
+            if (data.memory) {
+                const memoryPercent = Math.round(
+                    (data.memory.heapUsed / data.memory.heapTotal) * 100
+                );
+                document.getElementById('metric-memory').textContent = `${memoryPercent}%`;
+            }
+            
+            // Update cache
+            if (data.svn && data.svn.cacheStats) {
+                document.getElementById('metric-cache').textContent = 
+                    `${data.svn.cacheStats.utilizationPercent}%`;
+            }
+        }
+
+        function formatUptime(seconds) {
+            const days = Math.floor(seconds / 86400);
+            const hours = Math.floor((seconds % 86400) / 3600);
+            const minutes = Math.floor((seconds % 3600) / 60);
+            
+            if (days > 0) return `${days}d ${hours}h ${minutes}m`;
+            if (hours > 0) return `${hours}h ${minutes}m`;
+            return `${minutes}m`;
+        }
+
+        // Check health on page load
+        window.addEventListener('load', checkHealth);
+        
+        // Auto-refresh every 30 seconds
+        setInterval(checkHealth, 30000);
+    </script>
+</body>
+</html>

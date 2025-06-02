@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Titan Monitoring Tools</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #0f0f0f 0%, #1a1a2e 100%);
+            color: #e0e0e0;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .container {
+            background: rgba(30, 30, 46, 0.9);
+            border-radius: 20px;
+            padding: 60px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.3);
+            text-align: center;
+            max-width: 800px;
+            width: 90%;
+        }
+
+        h1 {
+            font-size: 3em;
+            margin-bottom: 20px;
+            background: linear-gradient(45deg, #00d4ff, #00ff88);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            font-weight: 300;
+        }
+
+        .subtitle {
+            font-size: 1.2em;
+            color: #a0a0a0;
+            margin-bottom: 50px;
+        }
+
+        .tools-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 30px;
+            margin-bottom: 40px;
+        }
+
+        .tool-card {
+            background: linear-gradient(135deg, #1e1e2e 0%, #2a2a3e 100%);
+            border-radius: 15px;
+            padding: 30px;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            text-decoration: none;
+            color: inherit;
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+
+        .tool-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 15px 40px rgba(0,0,0,0.4);
+            border-color: #00d4ff;
+        }
+
+        .tool-icon {
+            font-size: 3em;
+            margin-bottom: 20px;
+            display: block;
+        }
+
+        .tool-title {
+            font-size: 1.5em;
+            font-weight: 600;
+            margin-bottom: 15px;
+            color: #00d4ff;
+        }
+
+        .tool-description {
+            color: #a0a0a0;
+            line-height: 1.6;
+        }
+
+        .footer {
+            margin-top: 40px;
+            padding-top: 30px;
+            border-top: 1px solid rgba(255,255,255,0.1);
+            color: #666;
+            font-size: 0.9em;
+        }
+
+        .status-indicator {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            margin-top: 20px;
+            padding: 10px 20px;
+            background: rgba(0, 255, 136, 0.1);
+            border-radius: 25px;
+            border: 1px solid rgba(0, 255, 136, 0.3);
+        }
+
+        .status-dot {
+            width: 10px;
+            height: 10px;
+            background: #00ff88;
+            border-radius: 50%;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Titan Monitoring</h1>
+        <p class="subtitle">Real-time performance monitoring and health checks</p>
+        
+        <div class="tools-grid">
+            <a href="/health" class="tool-card">
+                <div class="tool-icon">🩺</div>
+                <div class="tool-title">Health Check</div>
+                <div class="tool-description">
+                    Quick server health status, uptime, and basic metrics overview.
+                </div>
+            </a>
+            
+            <a href="/performance" class="tool-card">
+                <div class="tool-icon">📊</div>
+                <div class="tool-title">Performance Dashboard</div>
+                <div class="tool-description">
+                    Comprehensive real-time performance metrics, charts, and detailed analytics.
+                </div>
+            </a>
+            
+            <a href="/api/health" class="tool-card">
+                <div class="tool-icon">🔗</div>
+                <div class="tool-title">Health API</div>
+                <div class="tool-description">
+                    JSON endpoint for programmatic health checks and monitoring integrations.
+                </div>
+            </a>
+            
+            <a href="/api/performance" class="tool-card">
+                <div class="tool-icon">📈</div>
+                <div class="tool-title">Metrics API</div>
+                <div class="tool-description">
+                    Raw performance data in JSON format for custom monitoring solutions.
+                </div>
+            </a>
+        </div>
+        
+        <div class="status-indicator">
+            <div class="status-dot"></div>
+            <span>Monitoring Active</span>
+        </div>
+        
+        <div class="footer">
+            <p>Titan Performance Monitoring Suite</p>
+            <p>Real-time data updates every 5 seconds via WebSocket</p>
+        </div>
+    </div>
+
+    <script>
+        // Add click animation
+        document.querySelectorAll('.tool-card').forEach(card => {
+            card.addEventListener('click', function(e) {
+                const ripple = document.createElement('div');
+                ripple.style.position = 'absolute';
+                ripple.style.borderRadius = '50%';
+                ripple.style.background = 'rgba(0, 212, 255, 0.6)';
+                ripple.style.width = '100px';
+                ripple.style.height = '100px';
+                ripple.style.left = (e.clientX - this.offsetLeft - 50) + 'px';
+                ripple.style.top = (e.clientY - this.offsetTop - 50) + 'px';
+                ripple.style.pointerEvents = 'none';
+                ripple.style.transform = 'scale(0)';
+                ripple.style.transition = 'transform 0.6s ease-out, opacity 0.6s ease-out';
+                ripple.style.opacity = '1';
+                
+                this.style.position = 'relative';
+                this.appendChild(ripple);
+                
+                setTimeout(() => {
+                    ripple.style.transform = 'scale(4)';
+                    ripple.style.opacity = '0';
+                }, 10);
+                
+                setTimeout(() => {
+                    ripple.remove();
+                }, 600);
+            });
+        });
+    </script>
+</body>
+</html>

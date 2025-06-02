@@ -3,7 +3,7 @@ import electronUpdaterPkg from "electron-updater";
 import fs from "fs";
 import path from "path";
 import os from "os";
-import { fork } from "child_process";
+import { Worker } from "worker_threads";
 import { fileURLToPath } from "url";
 import { exec, execSync } from "child_process";
 import { setupLogger, setupUncaughtExceptionHandler } from "../server/logger.js";
@@ -37,7 +37,7 @@ app.commandLine.appendSwitch("js-flags", "--max-old-space-size=4096");
 app.commandLine.appendSwitch("enable-features", "V8CodeCache");
 
 let mainWindow;
-let serverProcess;
+let serverWorker = null;
 let isQuitting = false;
 let updateDownloaded = false;
 
@@ -123,37 +123,95 @@ function createWindow() {
 }
 
 function startServer() {
-	const serverPath = path.join(__dirname, "../server/server.mjs");
-	logger.info("Firing up the server...");
-	logger.info("Using server file path: " + serverPath);
-	serverProcess = fork(serverPath, {
-		env: { ...process.env, ELECTRON_RUN_AS_NODE: "1" },
-		stdio: ["pipe", "pipe", "pipe", "ipc"],
-	});
-
-	serverProcess.on("message", (message) => {
-		if (message === "server-ready") {
-			if (isDev) {
-				mainWindow.loadURL(process.env.VITE_DEV_SERVER_URL);
-			} else {
-				mainWindow.loadURL(connectionURL);
-			}
+	logger.info("Starting server in worker thread...");
+	
+	try {
+		// In development, use the actual file path
+		// In production, the worker code will be bundled
+		if (isDev) {
+			const workerPath = path.join(__dirname, "serverWorker.js");
+			serverWorker = new Worker(workerPath);
+		} else {
+			// In production, we need to use a different approach
+			// Create a worker from bundled code
+			const workerCode = `
+				const { parentPort } = require('worker_threads');
+				const path = require('path');
+				
+				// This is a placeholder - in production build, this would include the bundled server code
+				// For now, we'll use dynamic import
+				(async () => {
+					try {
+						const serverPath = path.join(__dirname, '../server/server.mjs');
+						const { initialiseServer } = await import(serverPath);
+						
+						let serverInstance = null;
+						let ioInstance = null;
+						
+						parentPort.on("message", (message) => {
+							if (message.type === "shutdown") {
+								if (serverInstance) {
+									serverInstance.close(() => {
+										if (ioInstance) {
+											ioInstance.close(() => {
+												parentPort.postMessage({ type: "shutdown-complete" });
+												process.exit(0);
+											});
+										} else {
+											parentPort.postMessage({ type: "shutdown-complete" });
+											process.exit(0);
+										}
+									});
+									setTimeout(() => process.exit(1), 5000);
+								} else {
+									process.exit(0);
+								}
+							}
+						});
+						
+						const { server, io } = await initialiseServer();
+						serverInstance = server;
+						ioInstance = io;
+					} catch (error) {
+						parentPort.postMessage({ type: "error", error: error.message });
+						process.exit(1);
+					}
+				})();
+			`;
+			
+			serverWorker = new Worker(workerCode, { eval: true });
 		}
-	});
+		
+		serverWorker.on("message", (message) => {
+			if (message.type === "server-ready") {
+				logger.info("Server is ready in worker thread");
+				if (isDev) {
+					mainWindow.loadURL(process.env.VITE_DEV_SERVER_URL);
+				} else {
+					mainWindow.loadURL(connectionURL);
+				}
+			} else if (message.type === "error") {
+				logger.error(`Worker thread error: ${message.error}`);
+			} else if (message.type === "shutdown-complete") {
+				logger.info("Server shutdown complete in worker thread");
+			}
+		});
 
-	serverProcess.stderr?.on("data", (data) => {
-		logger.error(`[server.mjs] stderr: ${data}`);
-	});
+		serverWorker.on("error", (error) => {
+			logger.error("Server worker error:");
+			logger.error(error);
+		});
 
-	serverProcess.on("error", (error) => {
-		logger.error("Server process error:");
+		serverWorker.on("exit", (code) => {
+			logger.info(`Server worker exited with code ${code}`);
+			if (!isQuitting) app.quit();
+		});
+		
+	} catch (error) {
+		logger.error("Failed to start server worker:");
 		logger.error(error);
-	});
-
-	serverProcess.on("exit", (code, signal) => {
-		logger.info(`Server process exited with code ${code} and signal ${signal}`);
 		if (!isQuitting) app.quit();
-	});
+	}
 }
 
 async function getFormattedMemoryInfo() {
@@ -314,7 +372,7 @@ function gracefulShutdown() {
 	});
 
 	// Shutdown server process
-	const serverShutdownPromise = shutdownServerProcess();
+	const serverShutdownPromise = shutdownServerWorker();
 
 	// Wait for both renderer and server shutdowns
 	Promise.all([rendererShutdownPromise, serverShutdownPromise])
@@ -327,54 +385,52 @@ function gracefulShutdown() {
 		});
 }
 
-function shutdownServerProcess() {
+function shutdownServerWorker() {
 	return /** @type {Promise<void>} */ (
-		new Promise((resolve, reject) => {
-			if (serverProcess && !serverProcess.killed && !serverProcess.exited && serverProcess.connected) {
-				logger.info("Sending shutdown signal to server");
-				serverProcess.send("shutdown");
+		new Promise((resolve) => {
+			if (serverWorker) {
+				logger.info("Sending shutdown signal to server worker");
+				serverWorker.postMessage({ type: "shutdown" });
 
 				const onShutdownComplete = () => {
-					logger.info("Server process reported shutdown complete");
+					logger.info("Server worker reported shutdown complete");
 					cleanup();
 					resolve();
 				};
 
-				const onExit = (code, signal) => {
-					logger.info(`Server process exited with code ${code} and signal ${signal}`);
+				const onExit = (code) => {
+					logger.info(`Server worker exited with code ${code}`);
 					cleanup();
 					resolve();
 				};
 
 				const onError = (error) => {
-					logger.error("Server process error during shutdown:", error);
+					logger.error("Server worker error during shutdown:", error);
 					cleanup();
-					reject(error);
+					resolve(); // Still resolve to continue shutdown
 				};
 
 				const cleanup = () => {
 					clearTimeout(timeout);
-					serverProcess.removeListener("message", onMessage);
-					serverProcess.removeListener("exit", onExit);
-					serverProcess.removeListener("error", onError);
+					serverWorker.removeListener("message", onMessage);
+					serverWorker.removeListener("exit", onExit);
+					serverWorker.removeListener("error", onError);
 				};
 
 				const onMessage = (message) => {
-					if (message === "shutdown-complete") {
+					if (message.type === "shutdown-complete") {
 						onShutdownComplete();
 					}
 				};
 
-				serverProcess.once("message", onMessage);
-				serverProcess.once("exit", onExit);
-				serverProcess.once("error", onError);
+				serverWorker.once("message", onMessage);
+				serverWorker.once("exit", onExit);
+				serverWorker.once("error", onError);
 
-				// Set a timeout to force kill if necessary
+				// Set a timeout to force terminate if necessary
 				const timeout = setTimeout(() => {
-					if (serverProcess && !serverProcess.killed) {
-						logger.warn("Server shutdown timed out, forcing termination");
-						serverProcess.kill();
-					}
+					logger.warn("Server worker shutdown timed out, forcing termination");
+					serverWorker.terminate();
 					cleanup();
 					resolve();
 				}, 5000); // 5-second timeout
@@ -595,8 +651,8 @@ ipcMain.handle("app-restart", () => {
 // Cleanup any remaining listeners
 app.on("will-quit", () => {
 	ipcMain.removeAllListeners();
-	if (serverProcess) {
-		serverProcess.removeAllListeners();
+	if (serverWorker) {
+		serverWorker.removeAllListeners();
 	}
 
 	if (isDev) {

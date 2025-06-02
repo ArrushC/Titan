@@ -81,6 +81,11 @@ export function setupRoutes(app, options) {
         res.sendFile(path.join(__dirname, "performance-dashboard.html"));
     });
 
+    // Serve SVN dashboard
+    app.get("/svn-dashboard", (req, res) => {
+        res.sendFile(path.join(__dirname, "svn-dashboard.html"));
+    });
+
     // API endpoint for health check
     app.get("/api/health", (req, res) => {
         res.json({

@@ -17,6 +17,7 @@ import {
 } from "./utils.mjs";
 import { fetchConfig, saveConfig, openConfigFile } from "./config-manager.mjs";
 import { getTrelloCardNames, updateTrelloCard } from "./trello.mjs";
+import { SVNMonitor } from "./svn-monitor.mjs";
 
 /**
  * Setup Socket.IO handlers
@@ -41,6 +42,9 @@ export function setupSocketHandlers(io, options) {
         socketManager,
         fileWatcher
     } = options;
+
+    // Initialize SVN Monitor (will be updated with config after it's loaded)
+    let svnMonitor = null;
 
     // Helper function to send performance updates
     function sendPerformanceUpdate(socket = null) {
@@ -86,11 +90,22 @@ export function setupSocketHandlers(io, options) {
         const config = await fetchConfig(socket, configFilePath, latestVersion, logger);
         socket.emit("titan-config-get", { config });
 
+        // Initialize SVN Monitor with real config data (only once)
+        if (!svnMonitor) {
+            svnMonitor = new SVNMonitor(io, logger, config);
+        }
+
         if (!isForeignOrigin) {
             // Titan client handlers
             socket.on("titan-config-set", async (data) => {
                 debugTask("titan-config-set", null, false, logger);
                 await saveConfig(data, configFilePath, socket, logger);
+                
+                // Update SVN Monitor with new config
+                if (svnMonitor) {
+                    svnMonitor.updateConfig(data);
+                }
+                
                 debugTask("titan-config-set", null, true, logger);
             });
 
@@ -112,6 +127,12 @@ export function setupSocketHandlers(io, options) {
                             if (callback) callback({ success: false, error: err });
                         } else {
                             logger.info("Successfully executed SVN command: " + task.command);
+                            
+                            // Track update in SVN monitor
+                            if (svnMonitor) {
+                                svnMonitor.trackUpdate(data.branch, 'HEAD');
+                            }
+                            
                             if (callback) callback({ success: true });
                             else socket.emit("branch-update-success-single", { id: data.id, branch: data.branch, version: data.version, folder: data.folder });
                         }
@@ -250,6 +271,12 @@ export function setupSocketHandlers(io, options) {
                                 }
                             }
                         });
+                    }
+
+                    // Track file changes for SVN monitor
+                    const allChanges = [...filesToTrack, ...filesToCommit, ...filesToUpdate];
+                    if (allChanges.length > 0 && svnMonitor) {
+                        svnMonitor.trackFileChanges(allChanges);
                     }
 
                     emitBranchStatus(socket, data.selectedBranch.id, {
@@ -898,6 +925,7 @@ export function setupSocketHandlers(io, options) {
                                 logger.info(`Successfully committed files in ${svnBranch}`);
                                 emitMessage(socket, `Successfully committed files in ${branchString(branchFolder, branchVersion, svnBranch)}`, "success");
 
+                                const revision = svnOperations.extractRevisionNumber(result[0].result);
                                 const liveResponse = {
                                     branchIssueNumber,
                                     branchFolder,
@@ -906,9 +934,14 @@ export function setupSocketHandlers(io, options) {
                                     branchPathFolder: branchPathFolder(svnBranch),
                                     branchString: branchString(branchFolder, branchVersion, svnBranch),
                                     commitMessage: finalCommitMessage,
-                                    revision: svnOperations.extractRevisionNumber(result[0].result),
+                                    revision,
                                     bulkCommitLength: Object.entries(filesByBranch).length,
                                 };
+
+                                // Track commit in SVN monitor
+                                if (svnMonitor) {
+                                    svnMonitor.trackCommit(revision, finalCommitMessage, files, svnBranch);
+                                }
 
                                 io.emit("svn-commit-live", liveResponse);
                                 instanceData.commitLiveResponses.push(liveResponse);
@@ -1148,11 +1181,19 @@ export function setupSocketHandlers(io, options) {
         socket.on("request-performance-data", () => {
             sendPerformanceUpdate(socket);
         });
+
+        // SVN Dashboard socket events
+        if (svnMonitor) {
+            svnMonitor.setupSocketHandlers(socket);
+        }
     });
 
     // Cleanup function
     function cleanup() {
         clearInterval(performanceInterval);
+        if (svnMonitor) {
+            svnMonitor.cleanup();
+        }
     }
 
     return {

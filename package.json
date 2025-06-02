@@ -15,7 +15,8 @@
 	"commitLiveResponsesFilePath": "C:\\Titan\\Titan.commitLiveResponses.json",
 	"scripts": {
 		"start": "npm run server:start",
-		"dev": "cross-env EDGE_CHROMIUM=1 NODE_ENV=development vite",
+		"dev": "concurrently \"npm run client:dev\" \"npm run server:dev\" --names \"CLIENT,SERVER\" --prefix-colors \"cyan,yellow\"",
+		"client:dev": "cross-env EDGE_CHROMIUM=1 NODE_ENV=development vite",
 		"client:build": "vite build",
 		"client:build:watch": "vite build --watch",
 		"client:lint": "eslint . --ext js,jsx --report-unused-disable-directives --max-warnings 0",

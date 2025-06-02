@@ -1,6 +1,7 @@
 import { Flex, Heading, HStack } from "@chakra-ui/react";
 import React, { useCallback, useState } from "react";
-import { MdBrowserUpdated, MdUpdate } from "react-icons/md";
+import { MdBrowserUpdated, MdUpdate, MdHealthAndSafety, MdSpeed } from "react-icons/md";
+import { TbGitBranch } from "react-icons/tb";
 import { IoReload } from "react-icons/io5";
 import useSocketEmits from "../hooks/useSocketEmits.jsx";
 import { LuFileCog } from "react-icons/lu";
@@ -86,6 +87,18 @@ export default function Header() {
 		emitFlushSvnLogs();
 	}, [emitFlushSvnLogs]);
 
+	const handleOpenHealthMonitor = useCallback(() => {
+		window.open("http://localhost:4000/health");
+	}, []);
+
+	const handleOpenPerformanceMonitor = useCallback(() => {
+		window.open("http://localhost:4000/performance");
+	}, []);
+
+	const handleOpenSVNDashboard = useCallback(() => {
+		window.open("http://localhost:4000/svn-dashboard");
+	}, []);
+
 	const addRow = useCallback(() => {
 			updateConfig((currentConfig) => {
 				const newBranch = {
@@ -107,6 +120,9 @@ export default function Header() {
 				</Heading>
 			</Flex>
 			<Flex align={"flex-start"} alignItems={"center"} columnGap={2}>
+				<ButtonIconTooltip icon={<MdHealthAndSafety />} onClick={handleOpenHealthMonitor} colorPalette={"yellow"} variant={"subtle"} label="Health Monitor" placement={"bottom-end"} size="md" />
+				<ButtonIconTooltip icon={<MdSpeed />} onClick={handleOpenPerformanceMonitor} colorPalette={"yellow"} variant={"subtle"} label="Performance Dashboard" placement={"bottom-end"} size="md" />
+				<ButtonIconTooltip icon={<TbGitBranch />} onClick={handleOpenSVNDashboard} colorPalette={"yellow"} variant={"subtle"} label="SVN Dashboard" placement={"bottom-end"} size="md" />
 				<ButtonIconTooltip icon={<MdUpdate />} colorPalette={"yellow"} variant={"subtle"} label={"Update All"} placement={"bottom-end"} onClick={updateAll} disabled={configurableRowData.length < 1} />
 				<PopoverRoot open={window.electron && reloadPopover} onOpenChange={(e) => setReloadPopover(e.open)}>
 					<PopoverTrigger as={"div"}>

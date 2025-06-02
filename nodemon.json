@@ -1,3 +1,21 @@
 {
-	"ignore": ["test.js", "**/*.jsx"]
+	"watch": ["server/**/*"],
+	"ignore": [
+		"test.js", 
+		"**/*.jsx",
+		"src/**/*",
+		"dist/**/*",
+		"dist-electron/**/*",
+		"public/**/*",
+		"electron/**/*",
+		"node_modules/**/*",
+		"**/*.log",
+		"**/*.json",
+		"**/*.html"
+	],
+	"ext": "js,mjs,ts",
+	"env": {
+		"NODE_ENV": "development"
+	},
+	"delay": "1000"
 }

@@ -1903,7 +1903,7 @@ function requireLodash() {
             return symbolToString ? symbolToString.call(value) : "";
           }
           var result2 = value + "";
-          return result2 == "0" && 1 / value == -INFINITY ? "-0" : result2;
+          return result2 == "0" && 1 / value == -Infinity ? "-0" : result2;
         }
         function baseUniq(array, iteratee2, comparator) {
           var index = -1, includes2 = arrayIncludes, length = array.length, isCommon = true, result2 = [], seen = result2;
@@ -2455,7 +2455,7 @@ function requireLodash() {
           bitmask |= isCurry ? WRAP_PARTIAL_FLAG : WRAP_PARTIAL_RIGHT_FLAG;
           bitmask &= ~(isCurry ? WRAP_PARTIAL_RIGHT_FLAG : WRAP_PARTIAL_FLAG);
           if (!(bitmask & WRAP_CURRY_BOUND_FLAG)) {
-            bitmask &= ~(WRAP_BIND_FLAG | WRAP_BIND_KEY_FLAG);
+            bitmask &= -4;
           }
           var newData = [
             func,
@@ -2511,7 +2511,7 @@ function requireLodash() {
           }
           var length = partials ? partials.length : 0;
           if (!length) {
-            bitmask &= ~(WRAP_PARTIAL_FLAG | WRAP_PARTIAL_RIGHT_FLAG);
+            bitmask &= -97;
             partials = holders = undefined$1;
           }
           ary2 = ary2 === undefined$1 ? ary2 : nativeMax(toInteger(ary2), 0);
@@ -2544,7 +2544,7 @@ function requireLodash() {
           holders = newData[4];
           arity = newData[9] = newData[9] === undefined$1 ? isBindKey ? 0 : func.length : nativeMax(newData[9] - length, 0);
           if (!arity && bitmask & (WRAP_CURRY_FLAG | WRAP_CURRY_RIGHT_FLAG)) {
-            bitmask &= ~(WRAP_CURRY_FLAG | WRAP_CURRY_RIGHT_FLAG);
+            bitmask &= -25;
           }
           if (!bitmask || bitmask == WRAP_BIND_FLAG) {
             var result2 = createBind(func, bitmask, thisArg);
@@ -3110,7 +3110,7 @@ function requireLodash() {
             return value;
           }
           var result2 = value + "";
-          return result2 == "0" && 1 / value == -INFINITY ? "-0" : result2;
+          return result2 == "0" && 1 / value == -Infinity ? "-0" : result2;
         }
         function toSource(func) {
           if (func != null) {
@@ -4174,7 +4174,7 @@ function requireLodash() {
         }
         var isRegExp = nodeIsRegExp ? baseUnary(nodeIsRegExp) : baseIsRegExp;
         function isSafeInteger(value) {
-          return isInteger(value) && value >= -MAX_SAFE_INTEGER && value <= MAX_SAFE_INTEGER;
+          return isInteger(value) && value >= -9007199254740991 && value <= MAX_SAFE_INTEGER;
         }
         var isSet = nodeIsSet ? baseUnary(nodeIsSet) : baseIsSet;
         function isString(value) {
@@ -4215,7 +4215,7 @@ function requireLodash() {
             return value === 0 ? value : 0;
           }
           value = toNumber(value);
-          if (value === INFINITY || value === -INFINITY) {
+          if (value === INFINITY || value === -Infinity) {
             var sign = value < 0 ? -1 : 1;
             return sign * MAX_INTEGER;
           }
@@ -4250,7 +4250,7 @@ function requireLodash() {
           return copyObject(value, keysIn(value));
         }
         function toSafeInteger(value) {
-          return value ? baseClamp(toInteger(value), -MAX_SAFE_INTEGER, MAX_SAFE_INTEGER) : value === 0 ? value : 0;
+          return value ? baseClamp(toInteger(value), -9007199254740991, MAX_SAFE_INTEGER) : value === 0 ? value : 0;
         }
         function toString(value) {
           return value == null ? "" : baseToString(value);

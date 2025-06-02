@@ -1,18 +1,18 @@
 import require$$1$2, { app, dialog, BrowserWindow, ipcMain, session, screen, shell } from "electron";
-import require$$0$1 from "events";
-import require$$0$5 from "crypto";
-import require$$1 from "tty";
-import require$$0$3 from "util";
-import require$$0$2 from "os";
 import fs$1 from "fs";
-import require$$0$4 from "stream";
-import require$$4, { fileURLToPath } from "url";
-import require$$1$1 from "string_decoder";
-import require$$0$6 from "constants";
+import require$$0$1 from "constants";
+import require$$0$2 from "stream";
+import require$$0$3 from "util";
 import require$$5 from "assert";
 import path from "path";
 import require$$1$3, { exec, execSync } from "child_process";
-import require$$15 from "zlib";
+import require$$0$4 from "events";
+import require$$0$6 from "crypto";
+import require$$1 from "tty";
+import require$$0$5 from "os";
+import require$$4, { fileURLToPath } from "url";
+import require$$1$1 from "string_decoder";
+import require$$14 from "zlib";
 import require$$4$1 from "http";
 import { Worker } from "worker_threads";
 import require$$0$7 from "buffer";
@@ -22,7 +22,7 @@ function getDefaultExportFromCjs(x) {
   return x && x.__esModule && Object.prototype.hasOwnProperty.call(x, "default") ? x["default"] : x;
 }
 function getAugmentedNamespace(n) {
-  if (n.__esModule) return n;
+  if (Object.prototype.hasOwnProperty.call(n, "__esModule")) return n;
   var f = n.default;
   if (typeof f == "function") {
     var a = function a2() {
@@ -45,3393 +45,7 @@ function getAugmentedNamespace(n) {
   });
   return a;
 }
-var main$2 = {};
-var out = {};
-var CancellationToken = {};
-var hasRequiredCancellationToken;
-function requireCancellationToken() {
-  if (hasRequiredCancellationToken) return CancellationToken;
-  hasRequiredCancellationToken = 1;
-  Object.defineProperty(CancellationToken, "__esModule", { value: true });
-  CancellationToken.CancellationError = CancellationToken.CancellationToken = void 0;
-  const events_1 = require$$0$1;
-  let CancellationToken$1 = class CancellationToken extends events_1.EventEmitter {
-    get cancelled() {
-      return this._cancelled || this._parent != null && this._parent.cancelled;
-    }
-    set parent(value) {
-      this.removeParentCancelHandler();
-      this._parent = value;
-      this.parentCancelHandler = () => this.cancel();
-      this._parent.onCancel(this.parentCancelHandler);
-    }
-    // babel cannot compile ... correctly for super calls
-    constructor(parent) {
-      super();
-      this.parentCancelHandler = null;
-      this._parent = null;
-      this._cancelled = false;
-      if (parent != null) {
-        this.parent = parent;
-      }
-    }
-    cancel() {
-      this._cancelled = true;
-      this.emit("cancel");
-    }
-    onCancel(handler) {
-      if (this.cancelled) {
-        handler();
-      } else {
-        this.once("cancel", handler);
-      }
-    }
-    createPromise(callback) {
-      if (this.cancelled) {
-        return Promise.reject(new CancellationError());
-      }
-      const finallyHandler = () => {
-        if (cancelHandler != null) {
-          try {
-            this.removeListener("cancel", cancelHandler);
-            cancelHandler = null;
-          } catch (_ignore) {
-          }
-        }
-      };
-      let cancelHandler = null;
-      return new Promise((resolve, reject) => {
-        let addedCancelHandler = null;
-        cancelHandler = () => {
-          try {
-            if (addedCancelHandler != null) {
-              addedCancelHandler();
-              addedCancelHandler = null;
-            }
-          } finally {
-            reject(new CancellationError());
-          }
-        };
-        if (this.cancelled) {
-          cancelHandler();
-          return;
-        }
-        this.onCancel(cancelHandler);
-        callback(resolve, reject, (callback2) => {
-          addedCancelHandler = callback2;
-        });
-      }).then((it) => {
-        finallyHandler();
-        return it;
-      }).catch((e) => {
-        finallyHandler();
-        throw e;
-      });
-    }
-    removeParentCancelHandler() {
-      const parent = this._parent;
-      if (parent != null && this.parentCancelHandler != null) {
-        parent.removeListener("cancel", this.parentCancelHandler);
-        this.parentCancelHandler = null;
-      }
-    }
-    dispose() {
-      try {
-        this.removeParentCancelHandler();
-      } finally {
-        this.removeAllListeners();
-        this._parent = null;
-      }
-    }
-  };
-  CancellationToken.CancellationToken = CancellationToken$1;
-  class CancellationError extends Error {
-    constructor() {
-      super("cancelled");
-    }
-  }
-  CancellationToken.CancellationError = CancellationError;
-  return CancellationToken;
-}
-var httpExecutor = {};
-var src = { exports: {} };
-var browser$1 = { exports: {} };
-var ms;
-var hasRequiredMs$1;
-function requireMs$1() {
-  if (hasRequiredMs$1) return ms;
-  hasRequiredMs$1 = 1;
-  var s = 1e3;
-  var m = s * 60;
-  var h = m * 60;
-  var d = h * 24;
-  var w = d * 7;
-  var y = d * 365.25;
-  ms = function(val, options) {
-    options = options || {};
-    var type2 = typeof val;
-    if (type2 === "string" && val.length > 0) {
-      return parse2(val);
-    } else if (type2 === "number" && isFinite(val)) {
-      return options.long ? fmtLong(val) : fmtShort(val);
-    }
-    throw new Error(
-      "val is not a non-empty string or a valid number. val=" + JSON.stringify(val)
-    );
-  };
-  function parse2(str2) {
-    str2 = String(str2);
-    if (str2.length > 100) {
-      return;
-    }
-    var match = /^(-?(?:\d+)?\.?\d+) *(milliseconds?|msecs?|ms|seconds?|secs?|s|minutes?|mins?|m|hours?|hrs?|h|days?|d|weeks?|w|years?|yrs?|y)?$/i.exec(
-      str2
-    );
-    if (!match) {
-      return;
-    }
-    var n = parseFloat(match[1]);
-    var type2 = (match[2] || "ms").toLowerCase();
-    switch (type2) {
-      case "years":
-      case "year":
-      case "yrs":
-      case "yr":
-      case "y":
-        return n * y;
-      case "weeks":
-      case "week":
-      case "w":
-        return n * w;
-      case "days":
-      case "day":
-      case "d":
-        return n * d;
-      case "hours":
-      case "hour":
-      case "hrs":
-      case "hr":
-      case "h":
-        return n * h;
-      case "minutes":
-      case "minute":
-      case "mins":
-      case "min":
-      case "m":
-        return n * m;
-      case "seconds":
-      case "second":
-      case "secs":
-      case "sec":
-      case "s":
-        return n * s;
-      case "milliseconds":
-      case "millisecond":
-      case "msecs":
-      case "msec":
-      case "ms":
-        return n;
-      default:
-        return void 0;
-    }
-  }
-  function fmtShort(ms2) {
-    var msAbs = Math.abs(ms2);
-    if (msAbs >= d) {
-      return Math.round(ms2 / d) + "d";
-    }
-    if (msAbs >= h) {
-      return Math.round(ms2 / h) + "h";
-    }
-    if (msAbs >= m) {
-      return Math.round(ms2 / m) + "m";
-    }
-    if (msAbs >= s) {
-      return Math.round(ms2 / s) + "s";
-    }
-    return ms2 + "ms";
-  }
-  function fmtLong(ms2) {
-    var msAbs = Math.abs(ms2);
-    if (msAbs >= d) {
-      return plural(ms2, msAbs, d, "day");
-    }
-    if (msAbs >= h) {
-      return plural(ms2, msAbs, h, "hour");
-    }
-    if (msAbs >= m) {
-      return plural(ms2, msAbs, m, "minute");
-    }
-    if (msAbs >= s) {
-      return plural(ms2, msAbs, s, "second");
-    }
-    return ms2 + " ms";
-  }
-  function plural(ms2, msAbs, n, name2) {
-    var isPlural = msAbs >= n * 1.5;
-    return Math.round(ms2 / n) + " " + name2 + (isPlural ? "s" : "");
-  }
-  return ms;
-}
-var common$2;
-var hasRequiredCommon$2;
-function requireCommon$2() {
-  if (hasRequiredCommon$2) return common$2;
-  hasRequiredCommon$2 = 1;
-  function setup(env) {
-    createDebug.debug = createDebug;
-    createDebug.default = createDebug;
-    createDebug.coerce = coerce;
-    createDebug.disable = disable;
-    createDebug.enable = enable;
-    createDebug.enabled = enabled2;
-    createDebug.humanize = requireMs$1();
-    createDebug.destroy = destroy;
-    Object.keys(env).forEach((key) => {
-      createDebug[key] = env[key];
-    });
-    createDebug.names = [];
-    createDebug.skips = [];
-    createDebug.formatters = {};
-    function selectColor(namespace) {
-      let hash = 0;
-      for (let i = 0; i < namespace.length; i++) {
-        hash = (hash << 5) - hash + namespace.charCodeAt(i);
-        hash |= 0;
-      }
-      return createDebug.colors[Math.abs(hash) % createDebug.colors.length];
-    }
-    createDebug.selectColor = selectColor;
-    function createDebug(namespace) {
-      let prevTime;
-      let enableOverride = null;
-      let namespacesCache;
-      let enabledCache;
-      function debug(...args) {
-        if (!debug.enabled) {
-          return;
-        }
-        const self2 = debug;
-        const curr = Number(/* @__PURE__ */ new Date());
-        const ms2 = curr - (prevTime || curr);
-        self2.diff = ms2;
-        self2.prev = prevTime;
-        self2.curr = curr;
-        prevTime = curr;
-        args[0] = createDebug.coerce(args[0]);
-        if (typeof args[0] !== "string") {
-          args.unshift("%O");
-        }
-        let index = 0;
-        args[0] = args[0].replace(/%([a-zA-Z%])/g, (match, format2) => {
-          if (match === "%%") {
-            return "%";
-          }
-          index++;
-          const formatter = createDebug.formatters[format2];
-          if (typeof formatter === "function") {
-            const val = args[index];
-            match = formatter.call(self2, val);
-            args.splice(index, 1);
-            index--;
-          }
-          return match;
-        });
-        createDebug.formatArgs.call(self2, args);
-        const logFn = self2.log || createDebug.log;
-        logFn.apply(self2, args);
-      }
-      debug.namespace = namespace;
-      debug.useColors = createDebug.useColors();
-      debug.color = createDebug.selectColor(namespace);
-      debug.extend = extend;
-      debug.destroy = createDebug.destroy;
-      Object.defineProperty(debug, "enabled", {
-        enumerable: true,
-        configurable: false,
-        get: () => {
-          if (enableOverride !== null) {
-            return enableOverride;
-          }
-          if (namespacesCache !== createDebug.namespaces) {
-            namespacesCache = createDebug.namespaces;
-            enabledCache = createDebug.enabled(namespace);
-          }
-          return enabledCache;
-        },
-        set: (v) => {
-          enableOverride = v;
-        }
-      });
-      if (typeof createDebug.init === "function") {
-        createDebug.init(debug);
-      }
-      return debug;
-    }
-    function extend(namespace, delimiter) {
-      const newDebug = createDebug(this.namespace + (typeof delimiter === "undefined" ? ":" : delimiter) + namespace);
-      newDebug.log = this.log;
-      return newDebug;
-    }
-    function enable(namespaces) {
-      createDebug.save(namespaces);
-      createDebug.namespaces = namespaces;
-      createDebug.names = [];
-      createDebug.skips = [];
-      let i;
-      const split = (typeof namespaces === "string" ? namespaces : "").split(/[\s,]+/);
-      const len = split.length;
-      for (i = 0; i < len; i++) {
-        if (!split[i]) {
-          continue;
-        }
-        namespaces = split[i].replace(/\*/g, ".*?");
-        if (namespaces[0] === "-") {
-          createDebug.skips.push(new RegExp("^" + namespaces.slice(1) + "$"));
-        } else {
-          createDebug.names.push(new RegExp("^" + namespaces + "$"));
-        }
-      }
-    }
-    function disable() {
-      const namespaces = [
-        ...createDebug.names.map(toNamespace),
-        ...createDebug.skips.map(toNamespace).map((namespace) => "-" + namespace)
-      ].join(",");
-      createDebug.enable("");
-      return namespaces;
-    }
-    function enabled2(name2) {
-      if (name2[name2.length - 1] === "*") {
-        return true;
-      }
-      let i;
-      let len;
-      for (i = 0, len = createDebug.skips.length; i < len; i++) {
-        if (createDebug.skips[i].test(name2)) {
-          return false;
-        }
-      }
-      for (i = 0, len = createDebug.names.length; i < len; i++) {
-        if (createDebug.names[i].test(name2)) {
-          return true;
-        }
-      }
-      return false;
-    }
-    function toNamespace(regexp) {
-      return regexp.toString().substring(2, regexp.toString().length - 2).replace(/\.\*\?$/, "*");
-    }
-    function coerce(val) {
-      if (val instanceof Error) {
-        return val.stack || val.message;
-      }
-      return val;
-    }
-    function destroy() {
-      console.warn("Instance method `debug.destroy()` is deprecated and no longer does anything. It will be removed in the next major version of `debug`.");
-    }
-    createDebug.enable(createDebug.load());
-    return createDebug;
-  }
-  common$2 = setup;
-  return common$2;
-}
-var hasRequiredBrowser;
-function requireBrowser() {
-  if (hasRequiredBrowser) return browser$1.exports;
-  hasRequiredBrowser = 1;
-  (function(module, exports) {
-    exports.formatArgs = formatArgs;
-    exports.save = save;
-    exports.load = load;
-    exports.useColors = useColors;
-    exports.storage = localstorage();
-    exports.destroy = /* @__PURE__ */ (() => {
-      let warned = false;
-      return () => {
-        if (!warned) {
-          warned = true;
-          console.warn("Instance method `debug.destroy()` is deprecated and no longer does anything. It will be removed in the next major version of `debug`.");
-        }
-      };
-    })();
-    exports.colors = [
-      "#0000CC",
-      "#0000FF",
-      "#0033CC",
-      "#0033FF",
-      "#0066CC",
-      "#0066FF",
-      "#0099CC",
-      "#0099FF",
-      "#00CC00",
-      "#00CC33",
-      "#00CC66",
-      "#00CC99",
-      "#00CCCC",
-      "#00CCFF",
-      "#3300CC",
-      "#3300FF",
-      "#3333CC",
-      "#3333FF",
-      "#3366CC",
-      "#3366FF",
-      "#3399CC",
-      "#3399FF",
-      "#33CC00",
-      "#33CC33",
-      "#33CC66",
-      "#33CC99",
-      "#33CCCC",
-      "#33CCFF",
-      "#6600CC",
-      "#6600FF",
-      "#6633CC",
-      "#6633FF",
-      "#66CC00",
-      "#66CC33",
-      "#9900CC",
-      "#9900FF",
-      "#9933CC",
-      "#9933FF",
-      "#99CC00",
-      "#99CC33",
-      "#CC0000",
-      "#CC0033",
-      "#CC0066",
-      "#CC0099",
-      "#CC00CC",
-      "#CC00FF",
-      "#CC3300",
-      "#CC3333",
-      "#CC3366",
-      "#CC3399",
-      "#CC33CC",
-      "#CC33FF",
-      "#CC6600",
-      "#CC6633",
-      "#CC9900",
-      "#CC9933",
-      "#CCCC00",
-      "#CCCC33",
-      "#FF0000",
-      "#FF0033",
-      "#FF0066",
-      "#FF0099",
-      "#FF00CC",
-      "#FF00FF",
-      "#FF3300",
-      "#FF3333",
-      "#FF3366",
-      "#FF3399",
-      "#FF33CC",
-      "#FF33FF",
-      "#FF6600",
-      "#FF6633",
-      "#FF9900",
-      "#FF9933",
-      "#FFCC00",
-      "#FFCC33"
-    ];
-    function useColors() {
-      if (typeof window !== "undefined" && window.process && (window.process.type === "renderer" || window.process.__nwjs)) {
-        return true;
-      }
-      if (typeof navigator !== "undefined" && navigator.userAgent && navigator.userAgent.toLowerCase().match(/(edge|trident)\/(\d+)/)) {
-        return false;
-      }
-      let m;
-      return typeof document !== "undefined" && document.documentElement && document.documentElement.style && document.documentElement.style.WebkitAppearance || // Is firebug? http://stackoverflow.com/a/398120/376773
-      typeof window !== "undefined" && window.console && (window.console.firebug || window.console.exception && window.console.table) || // Is firefox >= v31?
-      // https://developer.mozilla.org/en-US/docs/Tools/Web_Console#Styling_messages
-      typeof navigator !== "undefined" && navigator.userAgent && (m = navigator.userAgent.toLowerCase().match(/firefox\/(\d+)/)) && parseInt(m[1], 10) >= 31 || // Double check webkit in userAgent just in case we are in a worker
-      typeof navigator !== "undefined" && navigator.userAgent && navigator.userAgent.toLowerCase().match(/applewebkit\/(\d+)/);
-    }
-    function formatArgs(args) {
-      args[0] = (this.useColors ? "%c" : "") + this.namespace + (this.useColors ? " %c" : " ") + args[0] + (this.useColors ? "%c " : " ") + "+" + module.exports.humanize(this.diff);
-      if (!this.useColors) {
-        return;
-      }
-      const c = "color: " + this.color;
-      args.splice(1, 0, c, "color: inherit");
-      let index = 0;
-      let lastC = 0;
-      args[0].replace(/%[a-zA-Z%]/g, (match) => {
-        if (match === "%%") {
-          return;
-        }
-        index++;
-        if (match === "%c") {
-          lastC = index;
-        }
-      });
-      args.splice(lastC, 0, c);
-    }
-    exports.log = console.debug || console.log || (() => {
-    });
-    function save(namespaces) {
-      try {
-        if (namespaces) {
-          exports.storage.setItem("debug", namespaces);
-        } else {
-          exports.storage.removeItem("debug");
-        }
-      } catch (error2) {
-      }
-    }
-    function load() {
-      let r;
-      try {
-        r = exports.storage.getItem("debug");
-      } catch (error2) {
-      }
-      if (!r && typeof process !== "undefined" && "env" in process) {
-        r = process.env.DEBUG;
-      }
-      return r;
-    }
-    function localstorage() {
-      try {
-        return localStorage;
-      } catch (error2) {
-      }
-    }
-    module.exports = requireCommon$2()(exports);
-    const { formatters } = module.exports;
-    formatters.j = function(v) {
-      try {
-        return JSON.stringify(v);
-      } catch (error2) {
-        return "[UnexpectedJSONParseError]: " + error2.message;
-      }
-    };
-  })(browser$1, browser$1.exports);
-  return browser$1.exports;
-}
-var node$2 = { exports: {} };
-var hasFlag$1;
-var hasRequiredHasFlag$1;
-function requireHasFlag$1() {
-  if (hasRequiredHasFlag$1) return hasFlag$1;
-  hasRequiredHasFlag$1 = 1;
-  hasFlag$1 = (flag, argv = process.argv) => {
-    const prefix = flag.startsWith("-") ? "" : flag.length === 1 ? "-" : "--";
-    const position = argv.indexOf(prefix + flag);
-    const terminatorPosition = argv.indexOf("--");
-    return position !== -1 && (terminatorPosition === -1 || position < terminatorPosition);
-  };
-  return hasFlag$1;
-}
-var supportsColor_1;
-var hasRequiredSupportsColor;
-function requireSupportsColor() {
-  if (hasRequiredSupportsColor) return supportsColor_1;
-  hasRequiredSupportsColor = 1;
-  const os = require$$0$2;
-  const tty = require$$1;
-  const hasFlag2 = requireHasFlag$1();
-  const { env } = process;
-  let flagForceColor;
-  if (hasFlag2("no-color") || hasFlag2("no-colors") || hasFlag2("color=false") || hasFlag2("color=never")) {
-    flagForceColor = 0;
-  } else if (hasFlag2("color") || hasFlag2("colors") || hasFlag2("color=true") || hasFlag2("color=always")) {
-    flagForceColor = 1;
-  }
-  function envForceColor() {
-    if ("FORCE_COLOR" in env) {
-      if (env.FORCE_COLOR === "true") {
-        return 1;
-      }
-      if (env.FORCE_COLOR === "false") {
-        return 0;
-      }
-      return env.FORCE_COLOR.length === 0 ? 1 : Math.min(Number.parseInt(env.FORCE_COLOR, 10), 3);
-    }
-  }
-  function translateLevel(level) {
-    if (level === 0) {
-      return false;
-    }
-    return {
-      level,
-      hasBasic: true,
-      has256: level >= 2,
-      has16m: level >= 3
-    };
-  }
-  function supportsColor(haveStream, { streamIsTTY, sniffFlags = true } = {}) {
-    const noFlagForceColor = envForceColor();
-    if (noFlagForceColor !== void 0) {
-      flagForceColor = noFlagForceColor;
-    }
-    const forceColor = sniffFlags ? flagForceColor : noFlagForceColor;
-    if (forceColor === 0) {
-      return 0;
-    }
-    if (sniffFlags) {
-      if (hasFlag2("color=16m") || hasFlag2("color=full") || hasFlag2("color=truecolor")) {
-        return 3;
-      }
-      if (hasFlag2("color=256")) {
-        return 2;
-      }
-    }
-    if (haveStream && !streamIsTTY && forceColor === void 0) {
-      return 0;
-    }
-    const min = forceColor || 0;
-    if (env.TERM === "dumb") {
-      return min;
-    }
-    if (process.platform === "win32") {
-      const osRelease = os.release().split(".");
-      if (Number(osRelease[0]) >= 10 && Number(osRelease[2]) >= 10586) {
-        return Number(osRelease[2]) >= 14931 ? 3 : 2;
-      }
-      return 1;
-    }
-    if ("CI" in env) {
-      if (["TRAVIS", "CIRCLECI", "APPVEYOR", "GITLAB_CI", "GITHUB_ACTIONS", "BUILDKITE", "DRONE"].some((sign) => sign in env) || env.CI_NAME === "codeship") {
-        return 1;
-      }
-      return min;
-    }
-    if ("TEAMCITY_VERSION" in env) {
-      return /^(9\.(0*[1-9]\d*)\.|\d{2,}\.)/.test(env.TEAMCITY_VERSION) ? 1 : 0;
-    }
-    if (env.COLORTERM === "truecolor") {
-      return 3;
-    }
-    if ("TERM_PROGRAM" in env) {
-      const version2 = Number.parseInt((env.TERM_PROGRAM_VERSION || "").split(".")[0], 10);
-      switch (env.TERM_PROGRAM) {
-        case "iTerm.app":
-          return version2 >= 3 ? 3 : 2;
-        case "Apple_Terminal":
-          return 2;
-      }
-    }
-    if (/-256(color)?$/i.test(env.TERM)) {
-      return 2;
-    }
-    if (/^screen|^xterm|^vt100|^vt220|^rxvt|color|ansi|cygwin|linux/i.test(env.TERM)) {
-      return 1;
-    }
-    if ("COLORTERM" in env) {
-      return 1;
-    }
-    return min;
-  }
-  function getSupportLevel(stream2, options = {}) {
-    const level = supportsColor(stream2, {
-      streamIsTTY: stream2 && stream2.isTTY,
-      ...options
-    });
-    return translateLevel(level);
-  }
-  supportsColor_1 = {
-    supportsColor: getSupportLevel,
-    stdout: getSupportLevel({ isTTY: tty.isatty(1) }),
-    stderr: getSupportLevel({ isTTY: tty.isatty(2) })
-  };
-  return supportsColor_1;
-}
-var hasRequiredNode$2;
-function requireNode$2() {
-  if (hasRequiredNode$2) return node$2.exports;
-  hasRequiredNode$2 = 1;
-  (function(module, exports) {
-    const tty = require$$1;
-    const util2 = require$$0$3;
-    exports.init = init;
-    exports.log = log;
-    exports.formatArgs = formatArgs;
-    exports.save = save;
-    exports.load = load;
-    exports.useColors = useColors;
-    exports.destroy = util2.deprecate(
-      () => {
-      },
-      "Instance method `debug.destroy()` is deprecated and no longer does anything. It will be removed in the next major version of `debug`."
-    );
-    exports.colors = [6, 2, 3, 4, 5, 1];
-    try {
-      const supportsColor = requireSupportsColor();
-      if (supportsColor && (supportsColor.stderr || supportsColor).level >= 2) {
-        exports.colors = [
-          20,
-          21,
-          26,
-          27,
-          32,
-          33,
-          38,
-          39,
-          40,
-          41,
-          42,
-          43,
-          44,
-          45,
-          56,
-          57,
-          62,
-          63,
-          68,
-          69,
-          74,
-          75,
-          76,
-          77,
-          78,
-          79,
-          80,
-          81,
-          92,
-          93,
-          98,
-          99,
-          112,
-          113,
-          128,
-          129,
-          134,
-          135,
-          148,
-          149,
-          160,
-          161,
-          162,
-          163,
-          164,
-          165,
-          166,
-          167,
-          168,
-          169,
-          170,
-          171,
-          172,
-          173,
-          178,
-          179,
-          184,
-          185,
-          196,
-          197,
-          198,
-          199,
-          200,
-          201,
-          202,
-          203,
-          204,
-          205,
-          206,
-          207,
-          208,
-          209,
-          214,
-          215,
-          220,
-          221
-        ];
-      }
-    } catch (error2) {
-    }
-    exports.inspectOpts = Object.keys(process.env).filter((key) => {
-      return /^debug_/i.test(key);
-    }).reduce((obj, key) => {
-      const prop = key.substring(6).toLowerCase().replace(/_([a-z])/g, (_, k) => {
-        return k.toUpperCase();
-      });
-      let val = process.env[key];
-      if (/^(yes|on|true|enabled)$/i.test(val)) {
-        val = true;
-      } else if (/^(no|off|false|disabled)$/i.test(val)) {
-        val = false;
-      } else if (val === "null") {
-        val = null;
-      } else {
-        val = Number(val);
-      }
-      obj[prop] = val;
-      return obj;
-    }, {});
-    function useColors() {
-      return "colors" in exports.inspectOpts ? Boolean(exports.inspectOpts.colors) : tty.isatty(process.stderr.fd);
-    }
-    function formatArgs(args) {
-      const { namespace: name2, useColors: useColors2 } = this;
-      if (useColors2) {
-        const c = this.color;
-        const colorCode = "\x1B[3" + (c < 8 ? c : "8;5;" + c);
-        const prefix = `  ${colorCode};1m${name2} \x1B[0m`;
-        args[0] = prefix + args[0].split("\n").join("\n" + prefix);
-        args.push(colorCode + "m+" + module.exports.humanize(this.diff) + "\x1B[0m");
-      } else {
-        args[0] = getDate() + name2 + " " + args[0];
-      }
-    }
-    function getDate() {
-      if (exports.inspectOpts.hideDate) {
-        return "";
-      }
-      return (/* @__PURE__ */ new Date()).toISOString() + " ";
-    }
-    function log(...args) {
-      return process.stderr.write(util2.formatWithOptions(exports.inspectOpts, ...args) + "\n");
-    }
-    function save(namespaces) {
-      if (namespaces) {
-        process.env.DEBUG = namespaces;
-      } else {
-        delete process.env.DEBUG;
-      }
-    }
-    function load() {
-      return process.env.DEBUG;
-    }
-    function init(debug) {
-      debug.inspectOpts = {};
-      const keys = Object.keys(exports.inspectOpts);
-      for (let i = 0; i < keys.length; i++) {
-        debug.inspectOpts[keys[i]] = exports.inspectOpts[keys[i]];
-      }
-    }
-    module.exports = requireCommon$2()(exports);
-    const { formatters } = module.exports;
-    formatters.o = function(v) {
-      this.inspectOpts.colors = this.useColors;
-      return util2.inspect(v, this.inspectOpts).split("\n").map((str2) => str2.trim()).join(" ");
-    };
-    formatters.O = function(v) {
-      this.inspectOpts.colors = this.useColors;
-      return util2.inspect(v, this.inspectOpts);
-    };
-  })(node$2, node$2.exports);
-  return node$2.exports;
-}
-var hasRequiredSrc;
-function requireSrc() {
-  if (hasRequiredSrc) return src.exports;
-  hasRequiredSrc = 1;
-  if (typeof process === "undefined" || process.type === "renderer" || process.browser === true || process.__nwjs) {
-    src.exports = requireBrowser();
-  } else {
-    src.exports = requireNode$2();
-  }
-  return src.exports;
-}
-var error = {};
-var hasRequiredError;
-function requireError() {
-  if (hasRequiredError) return error;
-  hasRequiredError = 1;
-  Object.defineProperty(error, "__esModule", { value: true });
-  error.newError = newError;
-  function newError(message, code) {
-    const error2 = new Error(message);
-    error2.code = code;
-    return error2;
-  }
-  return error;
-}
-var ProgressCallbackTransform = {};
-var hasRequiredProgressCallbackTransform;
-function requireProgressCallbackTransform() {
-  if (hasRequiredProgressCallbackTransform) return ProgressCallbackTransform;
-  hasRequiredProgressCallbackTransform = 1;
-  Object.defineProperty(ProgressCallbackTransform, "__esModule", { value: true });
-  ProgressCallbackTransform.ProgressCallbackTransform = void 0;
-  const stream_1 = require$$0$4;
-  let ProgressCallbackTransform$1 = class ProgressCallbackTransform extends stream_1.Transform {
-    constructor(total, cancellationToken, onProgress) {
-      super();
-      this.total = total;
-      this.cancellationToken = cancellationToken;
-      this.onProgress = onProgress;
-      this.start = Date.now();
-      this.transferred = 0;
-      this.delta = 0;
-      this.nextUpdate = this.start + 1e3;
-    }
-    _transform(chunk, encoding, callback) {
-      if (this.cancellationToken.cancelled) {
-        callback(new Error("cancelled"), null);
-        return;
-      }
-      this.transferred += chunk.length;
-      this.delta += chunk.length;
-      const now = Date.now();
-      if (now >= this.nextUpdate && this.transferred !== this.total) {
-        this.nextUpdate = now + 1e3;
-        this.onProgress({
-          total: this.total,
-          delta: this.delta,
-          transferred: this.transferred,
-          percent: this.transferred / this.total * 100,
-          bytesPerSecond: Math.round(this.transferred / ((now - this.start) / 1e3))
-        });
-        this.delta = 0;
-      }
-      callback(null, chunk);
-    }
-    _flush(callback) {
-      if (this.cancellationToken.cancelled) {
-        callback(new Error("cancelled"));
-        return;
-      }
-      this.onProgress({
-        total: this.total,
-        delta: this.delta,
-        transferred: this.total,
-        percent: 100,
-        bytesPerSecond: Math.round(this.transferred / ((Date.now() - this.start) / 1e3))
-      });
-      this.delta = 0;
-      callback(null);
-    }
-  };
-  ProgressCallbackTransform.ProgressCallbackTransform = ProgressCallbackTransform$1;
-  return ProgressCallbackTransform;
-}
-var hasRequiredHttpExecutor;
-function requireHttpExecutor() {
-  if (hasRequiredHttpExecutor) return httpExecutor;
-  hasRequiredHttpExecutor = 1;
-  Object.defineProperty(httpExecutor, "__esModule", { value: true });
-  httpExecutor.DigestTransform = httpExecutor.HttpExecutor = httpExecutor.HttpError = void 0;
-  httpExecutor.createHttpError = createHttpError;
-  httpExecutor.parseJson = parseJson;
-  httpExecutor.configureRequestOptionsFromUrl = configureRequestOptionsFromUrl;
-  httpExecutor.configureRequestUrl = configureRequestUrl;
-  httpExecutor.safeGetHeader = safeGetHeader;
-  httpExecutor.configureRequestOptions = configureRequestOptions;
-  httpExecutor.safeStringifyJson = safeStringifyJson;
-  const crypto_1 = require$$0$5;
-  const debug_12 = requireSrc();
-  const fs_1 = fs$1;
-  const stream_1 = require$$0$4;
-  const url_1 = require$$4;
-  const CancellationToken_1 = requireCancellationToken();
-  const error_1 = requireError();
-  const ProgressCallbackTransform_1 = requireProgressCallbackTransform();
-  const debug = (0, debug_12.default)("electron-builder");
-  function createHttpError(response, description2 = null) {
-    return new HttpError(response.statusCode || -1, `${response.statusCode} ${response.statusMessage}` + (description2 == null ? "" : "\n" + JSON.stringify(description2, null, "  ")) + "\nHeaders: " + safeStringifyJson(response.headers), description2);
-  }
-  const HTTP_STATUS_CODES = /* @__PURE__ */ new Map([
-    [429, "Too many requests"],
-    [400, "Bad request"],
-    [403, "Forbidden"],
-    [404, "Not found"],
-    [405, "Method not allowed"],
-    [406, "Not acceptable"],
-    [408, "Request timeout"],
-    [413, "Request entity too large"],
-    [500, "Internal server error"],
-    [502, "Bad gateway"],
-    [503, "Service unavailable"],
-    [504, "Gateway timeout"],
-    [505, "HTTP version not supported"]
-  ]);
-  class HttpError extends Error {
-    constructor(statusCode, message = `HTTP error: ${HTTP_STATUS_CODES.get(statusCode) || statusCode}`, description2 = null) {
-      super(message);
-      this.statusCode = statusCode;
-      this.description = description2;
-      this.name = "HttpError";
-      this.code = `HTTP_ERROR_${statusCode}`;
-    }
-    isServerError() {
-      return this.statusCode >= 500 && this.statusCode <= 599;
-    }
-  }
-  httpExecutor.HttpError = HttpError;
-  function parseJson(result) {
-    return result.then((it) => it == null || it.length === 0 ? null : JSON.parse(it));
-  }
-  class HttpExecutor {
-    constructor() {
-      this.maxRedirects = 10;
-    }
-    request(options, cancellationToken = new CancellationToken_1.CancellationToken(), data) {
-      configureRequestOptions(options);
-      const json2 = data == null ? void 0 : JSON.stringify(data);
-      const encodedData = json2 ? Buffer.from(json2) : void 0;
-      if (encodedData != null) {
-        debug(json2);
-        const { headers, ...opts } = options;
-        options = {
-          method: "post",
-          headers: {
-            "Content-Type": "application/json",
-            "Content-Length": encodedData.length,
-            ...headers
-          },
-          ...opts
-        };
-      }
-      return this.doApiRequest(options, cancellationToken, (it) => it.end(encodedData));
-    }
-    doApiRequest(options, cancellationToken, requestProcessor, redirectCount = 0) {
-      if (debug.enabled) {
-        debug(`Request: ${safeStringifyJson(options)}`);
-      }
-      return cancellationToken.createPromise((resolve, reject, onCancel) => {
-        const request = this.createRequest(options, (response) => {
-          try {
-            this.handleResponse(response, options, cancellationToken, resolve, reject, redirectCount, requestProcessor);
-          } catch (e) {
-            reject(e);
-          }
-        });
-        this.addErrorAndTimeoutHandlers(request, reject, options.timeout);
-        this.addRedirectHandlers(request, options, reject, redirectCount, (options2) => {
-          this.doApiRequest(options2, cancellationToken, requestProcessor, redirectCount).then(resolve).catch(reject);
-        });
-        requestProcessor(request, reject);
-        onCancel(() => request.abort());
-      });
-    }
-    // noinspection JSUnusedLocalSymbols
-    // eslint-disable-next-line
-    addRedirectHandlers(request, options, reject, redirectCount, handler) {
-    }
-    addErrorAndTimeoutHandlers(request, reject, timeout = 60 * 1e3) {
-      this.addTimeOutHandler(request, reject, timeout);
-      request.on("error", reject);
-      request.on("aborted", () => {
-        reject(new Error("Request has been aborted by the server"));
-      });
-    }
-    handleResponse(response, options, cancellationToken, resolve, reject, redirectCount, requestProcessor) {
-      var _a;
-      if (debug.enabled) {
-        debug(`Response: ${response.statusCode} ${response.statusMessage}, request options: ${safeStringifyJson(options)}`);
-      }
-      if (response.statusCode === 404) {
-        reject(createHttpError(response, `method: ${options.method || "GET"} url: ${options.protocol || "https:"}//${options.hostname}${options.port ? `:${options.port}` : ""}${options.path}
-
-Please double check that your authentication token is correct. Due to security reasons, actual status maybe not reported, but 404.
-`));
-        return;
-      } else if (response.statusCode === 204) {
-        resolve();
-        return;
-      }
-      const code = (_a = response.statusCode) !== null && _a !== void 0 ? _a : 0;
-      const shouldRedirect = code >= 300 && code < 400;
-      const redirectUrl = safeGetHeader(response, "location");
-      if (shouldRedirect && redirectUrl != null) {
-        if (redirectCount > this.maxRedirects) {
-          reject(this.createMaxRedirectError());
-          return;
-        }
-        this.doApiRequest(HttpExecutor.prepareRedirectUrlOptions(redirectUrl, options), cancellationToken, requestProcessor, redirectCount).then(resolve).catch(reject);
-        return;
-      }
-      response.setEncoding("utf8");
-      let data = "";
-      response.on("error", reject);
-      response.on("data", (chunk) => data += chunk);
-      response.on("end", () => {
-        try {
-          if (response.statusCode != null && response.statusCode >= 400) {
-            const contentType = safeGetHeader(response, "content-type");
-            const isJson = contentType != null && (Array.isArray(contentType) ? contentType.find((it) => it.includes("json")) != null : contentType.includes("json"));
-            reject(createHttpError(response, `method: ${options.method || "GET"} url: ${options.protocol || "https:"}//${options.hostname}${options.port ? `:${options.port}` : ""}${options.path}
-
-          Data:
-          ${isJson ? JSON.stringify(JSON.parse(data)) : data}
-          `));
-          } else {
-            resolve(data.length === 0 ? null : data);
-          }
-        } catch (e) {
-          reject(e);
-        }
-      });
-    }
-    async downloadToBuffer(url, options) {
-      return await options.cancellationToken.createPromise((resolve, reject, onCancel) => {
-        const responseChunks = [];
-        const requestOptions = {
-          headers: options.headers || void 0,
-          // because PrivateGitHubProvider requires HttpExecutor.prepareRedirectUrlOptions logic, so, we need to redirect manually
-          redirect: "manual"
-        };
-        configureRequestUrl(url, requestOptions);
-        configureRequestOptions(requestOptions);
-        this.doDownload(requestOptions, {
-          destination: null,
-          options,
-          onCancel,
-          callback: (error2) => {
-            if (error2 == null) {
-              resolve(Buffer.concat(responseChunks));
-            } else {
-              reject(error2);
-            }
-          },
-          responseHandler: (response, callback) => {
-            let receivedLength = 0;
-            response.on("data", (chunk) => {
-              receivedLength += chunk.length;
-              if (receivedLength > 524288e3) {
-                callback(new Error("Maximum allowed size is 500 MB"));
-                return;
-              }
-              responseChunks.push(chunk);
-            });
-            response.on("end", () => {
-              callback(null);
-            });
-          }
-        }, 0);
-      });
-    }
-    doDownload(requestOptions, options, redirectCount) {
-      const request = this.createRequest(requestOptions, (response) => {
-        if (response.statusCode >= 400) {
-          options.callback(new Error(`Cannot download "${requestOptions.protocol || "https:"}//${requestOptions.hostname}${requestOptions.path}", status ${response.statusCode}: ${response.statusMessage}`));
-          return;
-        }
-        response.on("error", options.callback);
-        const redirectUrl = safeGetHeader(response, "location");
-        if (redirectUrl != null) {
-          if (redirectCount < this.maxRedirects) {
-            this.doDownload(HttpExecutor.prepareRedirectUrlOptions(redirectUrl, requestOptions), options, redirectCount++);
-          } else {
-            options.callback(this.createMaxRedirectError());
-          }
-          return;
-        }
-        if (options.responseHandler == null) {
-          configurePipes(options, response);
-        } else {
-          options.responseHandler(response, options.callback);
-        }
-      });
-      this.addErrorAndTimeoutHandlers(request, options.callback, requestOptions.timeout);
-      this.addRedirectHandlers(request, requestOptions, options.callback, redirectCount, (requestOptions2) => {
-        this.doDownload(requestOptions2, options, redirectCount++);
-      });
-      request.end();
-    }
-    createMaxRedirectError() {
-      return new Error(`Too many redirects (> ${this.maxRedirects})`);
-    }
-    addTimeOutHandler(request, callback, timeout) {
-      request.on("socket", (socket) => {
-        socket.setTimeout(timeout, () => {
-          request.abort();
-          callback(new Error("Request timed out"));
-        });
-      });
-    }
-    static prepareRedirectUrlOptions(redirectUrl, options) {
-      const newOptions = configureRequestOptionsFromUrl(redirectUrl, { ...options });
-      const headers = newOptions.headers;
-      if (headers === null || headers === void 0 ? void 0 : headers.authorization) {
-        const parsedNewUrl = new url_1.URL(redirectUrl);
-        if (parsedNewUrl.hostname.endsWith(".amazonaws.com") || parsedNewUrl.searchParams.has("X-Amz-Credential")) {
-          delete headers.authorization;
-        }
-      }
-      return newOptions;
-    }
-    static retryOnServerError(task, maxRetries = 3) {
-      for (let attemptNumber = 0; ; attemptNumber++) {
-        try {
-          return task();
-        } catch (e) {
-          if (attemptNumber < maxRetries && (e instanceof HttpError && e.isServerError() || e.code === "EPIPE")) {
-            continue;
-          }
-          throw e;
-        }
-      }
-    }
-  }
-  httpExecutor.HttpExecutor = HttpExecutor;
-  function configureRequestOptionsFromUrl(url, options) {
-    const result = configureRequestOptions(options);
-    configureRequestUrl(new url_1.URL(url), result);
-    return result;
-  }
-  function configureRequestUrl(url, options) {
-    options.protocol = url.protocol;
-    options.hostname = url.hostname;
-    if (url.port) {
-      options.port = url.port;
-    } else if (options.port) {
-      delete options.port;
-    }
-    options.path = url.pathname + url.search;
-  }
-  class DigestTransform extends stream_1.Transform {
-    // noinspection JSUnusedGlobalSymbols
-    get actual() {
-      return this._actual;
-    }
-    constructor(expected, algorithm = "sha512", encoding = "base64") {
-      super();
-      this.expected = expected;
-      this.algorithm = algorithm;
-      this.encoding = encoding;
-      this._actual = null;
-      this.isValidateOnEnd = true;
-      this.digester = (0, crypto_1.createHash)(algorithm);
-    }
-    // noinspection JSUnusedGlobalSymbols
-    _transform(chunk, encoding, callback) {
-      this.digester.update(chunk);
-      callback(null, chunk);
-    }
-    // noinspection JSUnusedGlobalSymbols
-    _flush(callback) {
-      this._actual = this.digester.digest(this.encoding);
-      if (this.isValidateOnEnd) {
-        try {
-          this.validate();
-        } catch (e) {
-          callback(e);
-          return;
-        }
-      }
-      callback(null);
-    }
-    validate() {
-      if (this._actual == null) {
-        throw (0, error_1.newError)("Not finished yet", "ERR_STREAM_NOT_FINISHED");
-      }
-      if (this._actual !== this.expected) {
-        throw (0, error_1.newError)(`${this.algorithm} checksum mismatch, expected ${this.expected}, got ${this._actual}`, "ERR_CHECKSUM_MISMATCH");
-      }
-      return null;
-    }
-  }
-  httpExecutor.DigestTransform = DigestTransform;
-  function checkSha2(sha2Header, sha2, callback) {
-    if (sha2Header != null && sha2 != null && sha2Header !== sha2) {
-      callback(new Error(`checksum mismatch: expected ${sha2} but got ${sha2Header} (X-Checksum-Sha2 header)`));
-      return false;
-    }
-    return true;
-  }
-  function safeGetHeader(response, headerKey) {
-    const value = response.headers[headerKey];
-    if (value == null) {
-      return null;
-    } else if (Array.isArray(value)) {
-      return value.length === 0 ? null : value[value.length - 1];
-    } else {
-      return value;
-    }
-  }
-  function configurePipes(options, response) {
-    if (!checkSha2(safeGetHeader(response, "X-Checksum-Sha2"), options.options.sha2, options.callback)) {
-      return;
-    }
-    const streams = [];
-    if (options.options.onProgress != null) {
-      const contentLength = safeGetHeader(response, "content-length");
-      if (contentLength != null) {
-        streams.push(new ProgressCallbackTransform_1.ProgressCallbackTransform(parseInt(contentLength, 10), options.options.cancellationToken, options.options.onProgress));
-      }
-    }
-    const sha512 = options.options.sha512;
-    if (sha512 != null) {
-      streams.push(new DigestTransform(sha512, "sha512", sha512.length === 128 && !sha512.includes("+") && !sha512.includes("Z") && !sha512.includes("=") ? "hex" : "base64"));
-    } else if (options.options.sha2 != null) {
-      streams.push(new DigestTransform(options.options.sha2, "sha256", "hex"));
-    }
-    const fileOut = (0, fs_1.createWriteStream)(options.destination);
-    streams.push(fileOut);
-    let lastStream = response;
-    for (const stream2 of streams) {
-      stream2.on("error", (error2) => {
-        fileOut.close();
-        if (!options.options.cancellationToken.cancelled) {
-          options.callback(error2);
-        }
-      });
-      lastStream = lastStream.pipe(stream2);
-    }
-    fileOut.on("finish", () => {
-      fileOut.close(options.callback);
-    });
-  }
-  function configureRequestOptions(options, token2, method) {
-    if (method != null) {
-      options.method = method;
-    }
-    options.headers = { ...options.headers };
-    const headers = options.headers;
-    if (token2 != null) {
-      headers.authorization = token2.startsWith("Basic") || token2.startsWith("Bearer") ? token2 : `token ${token2}`;
-    }
-    if (headers["User-Agent"] == null) {
-      headers["User-Agent"] = "electron-builder";
-    }
-    if (method == null || method === "GET" || headers["Cache-Control"] == null) {
-      headers["Cache-Control"] = "no-cache";
-    }
-    if (options.protocol == null && process.versions.electron != null) {
-      options.protocol = "https:";
-    }
-    return options;
-  }
-  function safeStringifyJson(data, skippedNames) {
-    return JSON.stringify(data, (name2, value) => {
-      if (name2.endsWith("Authorization") || name2.endsWith("authorization") || name2.endsWith("Password") || name2.endsWith("PASSWORD") || name2.endsWith("Token") || name2.includes("password") || name2.includes("token") || skippedNames != null && skippedNames.has(name2)) {
-        return "<stripped sensitive data>";
-      }
-      return value;
-    }, 2);
-  }
-  return httpExecutor;
-}
-var publishOptions = {};
-var hasRequiredPublishOptions;
-function requirePublishOptions() {
-  if (hasRequiredPublishOptions) return publishOptions;
-  hasRequiredPublishOptions = 1;
-  Object.defineProperty(publishOptions, "__esModule", { value: true });
-  publishOptions.githubUrl = githubUrl;
-  publishOptions.getS3LikeProviderBaseUrl = getS3LikeProviderBaseUrl;
-  function githubUrl(options, defaultHost = "github.com") {
-    return `${options.protocol || "https"}://${options.host || defaultHost}`;
-  }
-  function getS3LikeProviderBaseUrl(configuration) {
-    const provider = configuration.provider;
-    if (provider === "s3") {
-      return s3Url(configuration);
-    }
-    if (provider === "spaces") {
-      return spacesUrl(configuration);
-    }
-    throw new Error(`Not supported provider: ${provider}`);
-  }
-  function s3Url(options) {
-    let url;
-    if (options.accelerate == true) {
-      url = `https://${options.bucket}.s3-accelerate.amazonaws.com`;
-    } else if (options.endpoint != null) {
-      url = `${options.endpoint}/${options.bucket}`;
-    } else if (options.bucket.includes(".")) {
-      if (options.region == null) {
-        throw new Error(`Bucket name "${options.bucket}" includes a dot, but S3 region is missing`);
-      }
-      if (options.region === "us-east-1") {
-        url = `https://s3.amazonaws.com/${options.bucket}`;
-      } else {
-        url = `https://s3-${options.region}.amazonaws.com/${options.bucket}`;
-      }
-    } else if (options.region === "cn-north-1") {
-      url = `https://${options.bucket}.s3.${options.region}.amazonaws.com.cn`;
-    } else {
-      url = `https://${options.bucket}.s3.amazonaws.com`;
-    }
-    return appendPath(url, options.path);
-  }
-  function appendPath(url, p) {
-    if (p != null && p.length > 0) {
-      if (!p.startsWith("/")) {
-        url += "/";
-      }
-      url += p;
-    }
-    return url;
-  }
-  function spacesUrl(options) {
-    if (options.name == null) {
-      throw new Error(`name is missing`);
-    }
-    if (options.region == null) {
-      throw new Error(`region is missing`);
-    }
-    return appendPath(`https://${options.name}.${options.region}.digitaloceanspaces.com`, options.path);
-  }
-  return publishOptions;
-}
-var rfc2253Parser = {};
-var hasRequiredRfc2253Parser;
-function requireRfc2253Parser() {
-  if (hasRequiredRfc2253Parser) return rfc2253Parser;
-  hasRequiredRfc2253Parser = 1;
-  Object.defineProperty(rfc2253Parser, "__esModule", { value: true });
-  rfc2253Parser.parseDn = parseDn;
-  function parseDn(seq2) {
-    let quoted = false;
-    let key = null;
-    let token2 = "";
-    let nextNonSpace = 0;
-    seq2 = seq2.trim();
-    const result = /* @__PURE__ */ new Map();
-    for (let i = 0; i <= seq2.length; i++) {
-      if (i === seq2.length) {
-        if (key !== null) {
-          result.set(key, token2);
-        }
-        break;
-      }
-      const ch = seq2[i];
-      if (quoted) {
-        if (ch === '"') {
-          quoted = false;
-          continue;
-        }
-      } else {
-        if (ch === '"') {
-          quoted = true;
-          continue;
-        }
-        if (ch === "\\") {
-          i++;
-          const ord = parseInt(seq2.slice(i, i + 2), 16);
-          if (Number.isNaN(ord)) {
-            token2 += seq2[i];
-          } else {
-            i++;
-            token2 += String.fromCharCode(ord);
-          }
-          continue;
-        }
-        if (key === null && ch === "=") {
-          key = token2;
-          token2 = "";
-          continue;
-        }
-        if (ch === "," || ch === ";" || ch === "+") {
-          if (key !== null) {
-            result.set(key, token2);
-          }
-          key = null;
-          token2 = "";
-          continue;
-        }
-      }
-      if (ch === " " && !quoted) {
-        if (token2.length === 0) {
-          continue;
-        }
-        if (i > nextNonSpace) {
-          let j = i;
-          while (seq2[j] === " ") {
-            j++;
-          }
-          nextNonSpace = j;
-        }
-        if (nextNonSpace >= seq2.length || seq2[nextNonSpace] === "," || seq2[nextNonSpace] === ";" || key === null && seq2[nextNonSpace] === "=" || key !== null && seq2[nextNonSpace] === "+") {
-          i = nextNonSpace - 1;
-          continue;
-        }
-      }
-      token2 += ch;
-    }
-    return result;
-  }
-  return rfc2253Parser;
-}
-var uuid = {};
-var hasRequiredUuid;
-function requireUuid() {
-  if (hasRequiredUuid) return uuid;
-  hasRequiredUuid = 1;
-  Object.defineProperty(uuid, "__esModule", { value: true });
-  uuid.nil = uuid.UUID = void 0;
-  const crypto_1 = require$$0$5;
-  const error_1 = requireError();
-  const invalidName = "options.name must be either a string or a Buffer";
-  const randomHost = (0, crypto_1.randomBytes)(16);
-  randomHost[0] = randomHost[0] | 1;
-  const hex2byte = {};
-  const byte2hex = [];
-  for (let i = 0; i < 256; i++) {
-    const hex = (i + 256).toString(16).substr(1);
-    hex2byte[hex] = i;
-    byte2hex[i] = hex;
-  }
-  class UUID {
-    constructor(uuid2) {
-      this.ascii = null;
-      this.binary = null;
-      const check = UUID.check(uuid2);
-      if (!check) {
-        throw new Error("not a UUID");
-      }
-      this.version = check.version;
-      if (check.format === "ascii") {
-        this.ascii = uuid2;
-      } else {
-        this.binary = uuid2;
-      }
-    }
-    static v5(name2, namespace) {
-      return uuidNamed(name2, "sha1", 80, namespace);
-    }
-    toString() {
-      if (this.ascii == null) {
-        this.ascii = stringify(this.binary);
-      }
-      return this.ascii;
-    }
-    inspect() {
-      return `UUID v${this.version} ${this.toString()}`;
-    }
-    static check(uuid2, offset = 0) {
-      if (typeof uuid2 === "string") {
-        uuid2 = uuid2.toLowerCase();
-        if (!/^[a-f0-9]{8}(-[a-f0-9]{4}){3}-([a-f0-9]{12})$/.test(uuid2)) {
-          return false;
-        }
-        if (uuid2 === "00000000-0000-0000-0000-000000000000") {
-          return { version: void 0, variant: "nil", format: "ascii" };
-        }
-        return {
-          version: (hex2byte[uuid2[14] + uuid2[15]] & 240) >> 4,
-          variant: getVariant((hex2byte[uuid2[19] + uuid2[20]] & 224) >> 5),
-          format: "ascii"
-        };
-      }
-      if (Buffer.isBuffer(uuid2)) {
-        if (uuid2.length < offset + 16) {
-          return false;
-        }
-        let i = 0;
-        for (; i < 16; i++) {
-          if (uuid2[offset + i] !== 0) {
-            break;
-          }
-        }
-        if (i === 16) {
-          return { version: void 0, variant: "nil", format: "binary" };
-        }
-        return {
-          version: (uuid2[offset + 6] & 240) >> 4,
-          variant: getVariant((uuid2[offset + 8] & 224) >> 5),
-          format: "binary"
-        };
-      }
-      throw (0, error_1.newError)("Unknown type of uuid", "ERR_UNKNOWN_UUID_TYPE");
-    }
-    // read stringified uuid into a Buffer
-    static parse(input) {
-      const buffer = Buffer.allocUnsafe(16);
-      let j = 0;
-      for (let i = 0; i < 16; i++) {
-        buffer[i] = hex2byte[input[j++] + input[j++]];
-        if (i === 3 || i === 5 || i === 7 || i === 9) {
-          j += 1;
-        }
-      }
-      return buffer;
-    }
-  }
-  uuid.UUID = UUID;
-  UUID.OID = UUID.parse("6ba7b812-9dad-11d1-80b4-00c04fd430c8");
-  function getVariant(bits) {
-    switch (bits) {
-      case 0:
-      case 1:
-      case 3:
-        return "ncs";
-      case 4:
-      case 5:
-        return "rfc4122";
-      case 6:
-        return "microsoft";
-      default:
-        return "future";
-    }
-  }
-  var UuidEncoding;
-  (function(UuidEncoding2) {
-    UuidEncoding2[UuidEncoding2["ASCII"] = 0] = "ASCII";
-    UuidEncoding2[UuidEncoding2["BINARY"] = 1] = "BINARY";
-    UuidEncoding2[UuidEncoding2["OBJECT"] = 2] = "OBJECT";
-  })(UuidEncoding || (UuidEncoding = {}));
-  function uuidNamed(name2, hashMethod, version2, namespace, encoding = UuidEncoding.ASCII) {
-    const hash = (0, crypto_1.createHash)(hashMethod);
-    const nameIsNotAString = typeof name2 !== "string";
-    if (nameIsNotAString && !Buffer.isBuffer(name2)) {
-      throw (0, error_1.newError)(invalidName, "ERR_INVALID_UUID_NAME");
-    }
-    hash.update(namespace);
-    hash.update(name2);
-    const buffer = hash.digest();
-    let result;
-    switch (encoding) {
-      case UuidEncoding.BINARY:
-        buffer[6] = buffer[6] & 15 | version2;
-        buffer[8] = buffer[8] & 63 | 128;
-        result = buffer;
-        break;
-      case UuidEncoding.OBJECT:
-        buffer[6] = buffer[6] & 15 | version2;
-        buffer[8] = buffer[8] & 63 | 128;
-        result = new UUID(buffer);
-        break;
-      default:
-        result = byte2hex[buffer[0]] + byte2hex[buffer[1]] + byte2hex[buffer[2]] + byte2hex[buffer[3]] + "-" + byte2hex[buffer[4]] + byte2hex[buffer[5]] + "-" + byte2hex[buffer[6] & 15 | version2] + byte2hex[buffer[7]] + "-" + byte2hex[buffer[8] & 63 | 128] + byte2hex[buffer[9]] + "-" + byte2hex[buffer[10]] + byte2hex[buffer[11]] + byte2hex[buffer[12]] + byte2hex[buffer[13]] + byte2hex[buffer[14]] + byte2hex[buffer[15]];
-        break;
-    }
-    return result;
-  }
-  function stringify(buffer) {
-    return byte2hex[buffer[0]] + byte2hex[buffer[1]] + byte2hex[buffer[2]] + byte2hex[buffer[3]] + "-" + byte2hex[buffer[4]] + byte2hex[buffer[5]] + "-" + byte2hex[buffer[6]] + byte2hex[buffer[7]] + "-" + byte2hex[buffer[8]] + byte2hex[buffer[9]] + "-" + byte2hex[buffer[10]] + byte2hex[buffer[11]] + byte2hex[buffer[12]] + byte2hex[buffer[13]] + byte2hex[buffer[14]] + byte2hex[buffer[15]];
-  }
-  uuid.nil = new UUID("00000000-0000-0000-0000-000000000000");
-  return uuid;
-}
-var xml = {};
-var sax = {};
-var hasRequiredSax;
-function requireSax() {
-  if (hasRequiredSax) return sax;
-  hasRequiredSax = 1;
-  (function(exports) {
-    (function(sax2) {
-      sax2.parser = function(strict, opt) {
-        return new SAXParser(strict, opt);
-      };
-      sax2.SAXParser = SAXParser;
-      sax2.SAXStream = SAXStream;
-      sax2.createStream = createStream;
-      sax2.MAX_BUFFER_LENGTH = 64 * 1024;
-      var buffers = [
-        "comment",
-        "sgmlDecl",
-        "textNode",
-        "tagName",
-        "doctype",
-        "procInstName",
-        "procInstBody",
-        "entity",
-        "attribName",
-        "attribValue",
-        "cdata",
-        "script"
-      ];
-      sax2.EVENTS = [
-        "text",
-        "processinginstruction",
-        "sgmldeclaration",
-        "doctype",
-        "comment",
-        "opentagstart",
-        "attribute",
-        "opentag",
-        "closetag",
-        "opencdata",
-        "cdata",
-        "closecdata",
-        "error",
-        "end",
-        "ready",
-        "script",
-        "opennamespace",
-        "closenamespace"
-      ];
-      function SAXParser(strict, opt) {
-        if (!(this instanceof SAXParser)) {
-          return new SAXParser(strict, opt);
-        }
-        var parser = this;
-        clearBuffers(parser);
-        parser.q = parser.c = "";
-        parser.bufferCheckPosition = sax2.MAX_BUFFER_LENGTH;
-        parser.opt = opt || {};
-        parser.opt.lowercase = parser.opt.lowercase || parser.opt.lowercasetags;
-        parser.looseCase = parser.opt.lowercase ? "toLowerCase" : "toUpperCase";
-        parser.tags = [];
-        parser.closed = parser.closedRoot = parser.sawRoot = false;
-        parser.tag = parser.error = null;
-        parser.strict = !!strict;
-        parser.noscript = !!(strict || parser.opt.noscript);
-        parser.state = S.BEGIN;
-        parser.strictEntities = parser.opt.strictEntities;
-        parser.ENTITIES = parser.strictEntities ? Object.create(sax2.XML_ENTITIES) : Object.create(sax2.ENTITIES);
-        parser.attribList = [];
-        if (parser.opt.xmlns) {
-          parser.ns = Object.create(rootNS);
-        }
-        if (parser.opt.unquotedAttributeValues === void 0) {
-          parser.opt.unquotedAttributeValues = !strict;
-        }
-        parser.trackPosition = parser.opt.position !== false;
-        if (parser.trackPosition) {
-          parser.position = parser.line = parser.column = 0;
-        }
-        emit(parser, "onready");
-      }
-      if (!Object.create) {
-        Object.create = function(o) {
-          function F() {
-          }
-          F.prototype = o;
-          var newf = new F();
-          return newf;
-        };
-      }
-      if (!Object.keys) {
-        Object.keys = function(o) {
-          var a = [];
-          for (var i in o) if (o.hasOwnProperty(i)) a.push(i);
-          return a;
-        };
-      }
-      function checkBufferLength(parser) {
-        var maxAllowed = Math.max(sax2.MAX_BUFFER_LENGTH, 10);
-        var maxActual = 0;
-        for (var i = 0, l = buffers.length; i < l; i++) {
-          var len = parser[buffers[i]].length;
-          if (len > maxAllowed) {
-            switch (buffers[i]) {
-              case "textNode":
-                closeText(parser);
-                break;
-              case "cdata":
-                emitNode(parser, "oncdata", parser.cdata);
-                parser.cdata = "";
-                break;
-              case "script":
-                emitNode(parser, "onscript", parser.script);
-                parser.script = "";
-                break;
-              default:
-                error2(parser, "Max buffer length exceeded: " + buffers[i]);
-            }
-          }
-          maxActual = Math.max(maxActual, len);
-        }
-        var m = sax2.MAX_BUFFER_LENGTH - maxActual;
-        parser.bufferCheckPosition = m + parser.position;
-      }
-      function clearBuffers(parser) {
-        for (var i = 0, l = buffers.length; i < l; i++) {
-          parser[buffers[i]] = "";
-        }
-      }
-      function flushBuffers(parser) {
-        closeText(parser);
-        if (parser.cdata !== "") {
-          emitNode(parser, "oncdata", parser.cdata);
-          parser.cdata = "";
-        }
-        if (parser.script !== "") {
-          emitNode(parser, "onscript", parser.script);
-          parser.script = "";
-        }
-      }
-      SAXParser.prototype = {
-        end: function() {
-          end(this);
-        },
-        write,
-        resume: function() {
-          this.error = null;
-          return this;
-        },
-        close: function() {
-          return this.write(null);
-        },
-        flush: function() {
-          flushBuffers(this);
-        }
-      };
-      var Stream;
-      try {
-        Stream = require("stream").Stream;
-      } catch (ex) {
-        Stream = function() {
-        };
-      }
-      if (!Stream) Stream = function() {
-      };
-      var streamWraps = sax2.EVENTS.filter(function(ev) {
-        return ev !== "error" && ev !== "end";
-      });
-      function createStream(strict, opt) {
-        return new SAXStream(strict, opt);
-      }
-      function SAXStream(strict, opt) {
-        if (!(this instanceof SAXStream)) {
-          return new SAXStream(strict, opt);
-        }
-        Stream.apply(this);
-        this._parser = new SAXParser(strict, opt);
-        this.writable = true;
-        this.readable = true;
-        var me = this;
-        this._parser.onend = function() {
-          me.emit("end");
-        };
-        this._parser.onerror = function(er) {
-          me.emit("error", er);
-          me._parser.error = null;
-        };
-        this._decoder = null;
-        streamWraps.forEach(function(ev) {
-          Object.defineProperty(me, "on" + ev, {
-            get: function() {
-              return me._parser["on" + ev];
-            },
-            set: function(h) {
-              if (!h) {
-                me.removeAllListeners(ev);
-                me._parser["on" + ev] = h;
-                return h;
-              }
-              me.on(ev, h);
-            },
-            enumerable: true,
-            configurable: false
-          });
-        });
-      }
-      SAXStream.prototype = Object.create(Stream.prototype, {
-        constructor: {
-          value: SAXStream
-        }
-      });
-      SAXStream.prototype.write = function(data) {
-        if (typeof Buffer === "function" && typeof Buffer.isBuffer === "function" && Buffer.isBuffer(data)) {
-          if (!this._decoder) {
-            var SD = require$$1$1.StringDecoder;
-            this._decoder = new SD("utf8");
-          }
-          data = this._decoder.write(data);
-        }
-        this._parser.write(data.toString());
-        this.emit("data", data);
-        return true;
-      };
-      SAXStream.prototype.end = function(chunk) {
-        if (chunk && chunk.length) {
-          this.write(chunk);
-        }
-        this._parser.end();
-        return true;
-      };
-      SAXStream.prototype.on = function(ev, handler) {
-        var me = this;
-        if (!me._parser["on" + ev] && streamWraps.indexOf(ev) !== -1) {
-          me._parser["on" + ev] = function() {
-            var args = arguments.length === 1 ? [arguments[0]] : Array.apply(null, arguments);
-            args.splice(0, 0, ev);
-            me.emit.apply(me, args);
-          };
-        }
-        return Stream.prototype.on.call(me, ev, handler);
-      };
-      var CDATA = "[CDATA[";
-      var DOCTYPE = "DOCTYPE";
-      var XML_NAMESPACE = "http://www.w3.org/XML/1998/namespace";
-      var XMLNS_NAMESPACE = "http://www.w3.org/2000/xmlns/";
-      var rootNS = { xml: XML_NAMESPACE, xmlns: XMLNS_NAMESPACE };
-      var nameStart = /[:_A-Za-z\u00C0-\u00D6\u00D8-\u00F6\u00F8-\u02FF\u0370-\u037D\u037F-\u1FFF\u200C-\u200D\u2070-\u218F\u2C00-\u2FEF\u3001-\uD7FF\uF900-\uFDCF\uFDF0-\uFFFD]/;
-      var nameBody = /[:_A-Za-z\u00C0-\u00D6\u00D8-\u00F6\u00F8-\u02FF\u0370-\u037D\u037F-\u1FFF\u200C-\u200D\u2070-\u218F\u2C00-\u2FEF\u3001-\uD7FF\uF900-\uFDCF\uFDF0-\uFFFD\u00B7\u0300-\u036F\u203F-\u2040.\d-]/;
-      var entityStart = /[#:_A-Za-z\u00C0-\u00D6\u00D8-\u00F6\u00F8-\u02FF\u0370-\u037D\u037F-\u1FFF\u200C-\u200D\u2070-\u218F\u2C00-\u2FEF\u3001-\uD7FF\uF900-\uFDCF\uFDF0-\uFFFD]/;
-      var entityBody = /[#:_A-Za-z\u00C0-\u00D6\u00D8-\u00F6\u00F8-\u02FF\u0370-\u037D\u037F-\u1FFF\u200C-\u200D\u2070-\u218F\u2C00-\u2FEF\u3001-\uD7FF\uF900-\uFDCF\uFDF0-\uFFFD\u00B7\u0300-\u036F\u203F-\u2040.\d-]/;
-      function isWhitespace(c) {
-        return c === " " || c === "\n" || c === "\r" || c === "	";
-      }
-      function isQuote(c) {
-        return c === '"' || c === "'";
-      }
-      function isAttribEnd(c) {
-        return c === ">" || isWhitespace(c);
-      }
-      function isMatch(regex, c) {
-        return regex.test(c);
-      }
-      function notMatch(regex, c) {
-        return !isMatch(regex, c);
-      }
-      var S = 0;
-      sax2.STATE = {
-        BEGIN: S++,
-        // leading byte order mark or whitespace
-        BEGIN_WHITESPACE: S++,
-        // leading whitespace
-        TEXT: S++,
-        // general stuff
-        TEXT_ENTITY: S++,
-        // &amp and such.
-        OPEN_WAKA: S++,
-        // <
-        SGML_DECL: S++,
-        // <!BLARG
-        SGML_DECL_QUOTED: S++,
-        // <!BLARG foo "bar
-        DOCTYPE: S++,
-        // <!DOCTYPE
-        DOCTYPE_QUOTED: S++,
-        // <!DOCTYPE "//blah
-        DOCTYPE_DTD: S++,
-        // <!DOCTYPE "//blah" [ ...
-        DOCTYPE_DTD_QUOTED: S++,
-        // <!DOCTYPE "//blah" [ "foo
-        COMMENT_STARTING: S++,
-        // <!-
-        COMMENT: S++,
-        // <!--
-        COMMENT_ENDING: S++,
-        // <!-- blah -
-        COMMENT_ENDED: S++,
-        // <!-- blah --
-        CDATA: S++,
-        // <![CDATA[ something
-        CDATA_ENDING: S++,
-        // ]
-        CDATA_ENDING_2: S++,
-        // ]]
-        PROC_INST: S++,
-        // <?hi
-        PROC_INST_BODY: S++,
-        // <?hi there
-        PROC_INST_ENDING: S++,
-        // <?hi "there" ?
-        OPEN_TAG: S++,
-        // <strong
-        OPEN_TAG_SLASH: S++,
-        // <strong /
-        ATTRIB: S++,
-        // <a
-        ATTRIB_NAME: S++,
-        // <a foo
-        ATTRIB_NAME_SAW_WHITE: S++,
-        // <a foo _
-        ATTRIB_VALUE: S++,
-        // <a foo=
-        ATTRIB_VALUE_QUOTED: S++,
-        // <a foo="bar
-        ATTRIB_VALUE_CLOSED: S++,
-        // <a foo="bar"
-        ATTRIB_VALUE_UNQUOTED: S++,
-        // <a foo=bar
-        ATTRIB_VALUE_ENTITY_Q: S++,
-        // <foo bar="&quot;"
-        ATTRIB_VALUE_ENTITY_U: S++,
-        // <foo bar=&quot
-        CLOSE_TAG: S++,
-        // </a
-        CLOSE_TAG_SAW_WHITE: S++,
-        // </a   >
-        SCRIPT: S++,
-        // <script> ...
-        SCRIPT_ENDING: S++
-        // <script> ... <
-      };
-      sax2.XML_ENTITIES = {
-        "amp": "&",
-        "gt": ">",
-        "lt": "<",
-        "quot": '"',
-        "apos": "'"
-      };
-      sax2.ENTITIES = {
-        "amp": "&",
-        "gt": ">",
-        "lt": "<",
-        "quot": '"',
-        "apos": "'",
-        "AElig": 198,
-        "Aacute": 193,
-        "Acirc": 194,
-        "Agrave": 192,
-        "Aring": 197,
-        "Atilde": 195,
-        "Auml": 196,
-        "Ccedil": 199,
-        "ETH": 208,
-        "Eacute": 201,
-        "Ecirc": 202,
-        "Egrave": 200,
-        "Euml": 203,
-        "Iacute": 205,
-        "Icirc": 206,
-        "Igrave": 204,
-        "Iuml": 207,
-        "Ntilde": 209,
-        "Oacute": 211,
-        "Ocirc": 212,
-        "Ograve": 210,
-        "Oslash": 216,
-        "Otilde": 213,
-        "Ouml": 214,
-        "THORN": 222,
-        "Uacute": 218,
-        "Ucirc": 219,
-        "Ugrave": 217,
-        "Uuml": 220,
-        "Yacute": 221,
-        "aacute": 225,
-        "acirc": 226,
-        "aelig": 230,
-        "agrave": 224,
-        "aring": 229,
-        "atilde": 227,
-        "auml": 228,
-        "ccedil": 231,
-        "eacute": 233,
-        "ecirc": 234,
-        "egrave": 232,
-        "eth": 240,
-        "euml": 235,
-        "iacute": 237,
-        "icirc": 238,
-        "igrave": 236,
-        "iuml": 239,
-        "ntilde": 241,
-        "oacute": 243,
-        "ocirc": 244,
-        "ograve": 242,
-        "oslash": 248,
-        "otilde": 245,
-        "ouml": 246,
-        "szlig": 223,
-        "thorn": 254,
-        "uacute": 250,
-        "ucirc": 251,
-        "ugrave": 249,
-        "uuml": 252,
-        "yacute": 253,
-        "yuml": 255,
-        "copy": 169,
-        "reg": 174,
-        "nbsp": 160,
-        "iexcl": 161,
-        "cent": 162,
-        "pound": 163,
-        "curren": 164,
-        "yen": 165,
-        "brvbar": 166,
-        "sect": 167,
-        "uml": 168,
-        "ordf": 170,
-        "laquo": 171,
-        "not": 172,
-        "shy": 173,
-        "macr": 175,
-        "deg": 176,
-        "plusmn": 177,
-        "sup1": 185,
-        "sup2": 178,
-        "sup3": 179,
-        "acute": 180,
-        "micro": 181,
-        "para": 182,
-        "middot": 183,
-        "cedil": 184,
-        "ordm": 186,
-        "raquo": 187,
-        "frac14": 188,
-        "frac12": 189,
-        "frac34": 190,
-        "iquest": 191,
-        "times": 215,
-        "divide": 247,
-        "OElig": 338,
-        "oelig": 339,
-        "Scaron": 352,
-        "scaron": 353,
-        "Yuml": 376,
-        "fnof": 402,
-        "circ": 710,
-        "tilde": 732,
-        "Alpha": 913,
-        "Beta": 914,
-        "Gamma": 915,
-        "Delta": 916,
-        "Epsilon": 917,
-        "Zeta": 918,
-        "Eta": 919,
-        "Theta": 920,
-        "Iota": 921,
-        "Kappa": 922,
-        "Lambda": 923,
-        "Mu": 924,
-        "Nu": 925,
-        "Xi": 926,
-        "Omicron": 927,
-        "Pi": 928,
-        "Rho": 929,
-        "Sigma": 931,
-        "Tau": 932,
-        "Upsilon": 933,
-        "Phi": 934,
-        "Chi": 935,
-        "Psi": 936,
-        "Omega": 937,
-        "alpha": 945,
-        "beta": 946,
-        "gamma": 947,
-        "delta": 948,
-        "epsilon": 949,
-        "zeta": 950,
-        "eta": 951,
-        "theta": 952,
-        "iota": 953,
-        "kappa": 954,
-        "lambda": 955,
-        "mu": 956,
-        "nu": 957,
-        "xi": 958,
-        "omicron": 959,
-        "pi": 960,
-        "rho": 961,
-        "sigmaf": 962,
-        "sigma": 963,
-        "tau": 964,
-        "upsilon": 965,
-        "phi": 966,
-        "chi": 967,
-        "psi": 968,
-        "omega": 969,
-        "thetasym": 977,
-        "upsih": 978,
-        "piv": 982,
-        "ensp": 8194,
-        "emsp": 8195,
-        "thinsp": 8201,
-        "zwnj": 8204,
-        "zwj": 8205,
-        "lrm": 8206,
-        "rlm": 8207,
-        "ndash": 8211,
-        "mdash": 8212,
-        "lsquo": 8216,
-        "rsquo": 8217,
-        "sbquo": 8218,
-        "ldquo": 8220,
-        "rdquo": 8221,
-        "bdquo": 8222,
-        "dagger": 8224,
-        "Dagger": 8225,
-        "bull": 8226,
-        "hellip": 8230,
-        "permil": 8240,
-        "prime": 8242,
-        "Prime": 8243,
-        "lsaquo": 8249,
-        "rsaquo": 8250,
-        "oline": 8254,
-        "frasl": 8260,
-        "euro": 8364,
-        "image": 8465,
-        "weierp": 8472,
-        "real": 8476,
-        "trade": 8482,
-        "alefsym": 8501,
-        "larr": 8592,
-        "uarr": 8593,
-        "rarr": 8594,
-        "darr": 8595,
-        "harr": 8596,
-        "crarr": 8629,
-        "lArr": 8656,
-        "uArr": 8657,
-        "rArr": 8658,
-        "dArr": 8659,
-        "hArr": 8660,
-        "forall": 8704,
-        "part": 8706,
-        "exist": 8707,
-        "empty": 8709,
-        "nabla": 8711,
-        "isin": 8712,
-        "notin": 8713,
-        "ni": 8715,
-        "prod": 8719,
-        "sum": 8721,
-        "minus": 8722,
-        "lowast": 8727,
-        "radic": 8730,
-        "prop": 8733,
-        "infin": 8734,
-        "ang": 8736,
-        "and": 8743,
-        "or": 8744,
-        "cap": 8745,
-        "cup": 8746,
-        "int": 8747,
-        "there4": 8756,
-        "sim": 8764,
-        "cong": 8773,
-        "asymp": 8776,
-        "ne": 8800,
-        "equiv": 8801,
-        "le": 8804,
-        "ge": 8805,
-        "sub": 8834,
-        "sup": 8835,
-        "nsub": 8836,
-        "sube": 8838,
-        "supe": 8839,
-        "oplus": 8853,
-        "otimes": 8855,
-        "perp": 8869,
-        "sdot": 8901,
-        "lceil": 8968,
-        "rceil": 8969,
-        "lfloor": 8970,
-        "rfloor": 8971,
-        "lang": 9001,
-        "rang": 9002,
-        "loz": 9674,
-        "spades": 9824,
-        "clubs": 9827,
-        "hearts": 9829,
-        "diams": 9830
-      };
-      Object.keys(sax2.ENTITIES).forEach(function(key) {
-        var e = sax2.ENTITIES[key];
-        var s2 = typeof e === "number" ? String.fromCharCode(e) : e;
-        sax2.ENTITIES[key] = s2;
-      });
-      for (var s in sax2.STATE) {
-        sax2.STATE[sax2.STATE[s]] = s;
-      }
-      S = sax2.STATE;
-      function emit(parser, event, data) {
-        parser[event] && parser[event](data);
-      }
-      function emitNode(parser, nodeType, data) {
-        if (parser.textNode) closeText(parser);
-        emit(parser, nodeType, data);
-      }
-      function closeText(parser) {
-        parser.textNode = textopts(parser.opt, parser.textNode);
-        if (parser.textNode) emit(parser, "ontext", parser.textNode);
-        parser.textNode = "";
-      }
-      function textopts(opt, text) {
-        if (opt.trim) text = text.trim();
-        if (opt.normalize) text = text.replace(/\s+/g, " ");
-        return text;
-      }
-      function error2(parser, er) {
-        closeText(parser);
-        if (parser.trackPosition) {
-          er += "\nLine: " + parser.line + "\nColumn: " + parser.column + "\nChar: " + parser.c;
-        }
-        er = new Error(er);
-        parser.error = er;
-        emit(parser, "onerror", er);
-        return parser;
-      }
-      function end(parser) {
-        if (parser.sawRoot && !parser.closedRoot) strictFail(parser, "Unclosed root tag");
-        if (parser.state !== S.BEGIN && parser.state !== S.BEGIN_WHITESPACE && parser.state !== S.TEXT) {
-          error2(parser, "Unexpected end");
-        }
-        closeText(parser);
-        parser.c = "";
-        parser.closed = true;
-        emit(parser, "onend");
-        SAXParser.call(parser, parser.strict, parser.opt);
-        return parser;
-      }
-      function strictFail(parser, message) {
-        if (typeof parser !== "object" || !(parser instanceof SAXParser)) {
-          throw new Error("bad call to strictFail");
-        }
-        if (parser.strict) {
-          error2(parser, message);
-        }
-      }
-      function newTag(parser) {
-        if (!parser.strict) parser.tagName = parser.tagName[parser.looseCase]();
-        var parent = parser.tags[parser.tags.length - 1] || parser;
-        var tag = parser.tag = { name: parser.tagName, attributes: {} };
-        if (parser.opt.xmlns) {
-          tag.ns = parent.ns;
-        }
-        parser.attribList.length = 0;
-        emitNode(parser, "onopentagstart", tag);
-      }
-      function qname(name2, attribute) {
-        var i = name2.indexOf(":");
-        var qualName = i < 0 ? ["", name2] : name2.split(":");
-        var prefix = qualName[0];
-        var local = qualName[1];
-        if (attribute && name2 === "xmlns") {
-          prefix = "xmlns";
-          local = "";
-        }
-        return { prefix, local };
-      }
-      function attrib(parser) {
-        if (!parser.strict) {
-          parser.attribName = parser.attribName[parser.looseCase]();
-        }
-        if (parser.attribList.indexOf(parser.attribName) !== -1 || parser.tag.attributes.hasOwnProperty(parser.attribName)) {
-          parser.attribName = parser.attribValue = "";
-          return;
-        }
-        if (parser.opt.xmlns) {
-          var qn = qname(parser.attribName, true);
-          var prefix = qn.prefix;
-          var local = qn.local;
-          if (prefix === "xmlns") {
-            if (local === "xml" && parser.attribValue !== XML_NAMESPACE) {
-              strictFail(
-                parser,
-                "xml: prefix must be bound to " + XML_NAMESPACE + "\nActual: " + parser.attribValue
-              );
-            } else if (local === "xmlns" && parser.attribValue !== XMLNS_NAMESPACE) {
-              strictFail(
-                parser,
-                "xmlns: prefix must be bound to " + XMLNS_NAMESPACE + "\nActual: " + parser.attribValue
-              );
-            } else {
-              var tag = parser.tag;
-              var parent = parser.tags[parser.tags.length - 1] || parser;
-              if (tag.ns === parent.ns) {
-                tag.ns = Object.create(parent.ns);
-              }
-              tag.ns[local] = parser.attribValue;
-            }
-          }
-          parser.attribList.push([parser.attribName, parser.attribValue]);
-        } else {
-          parser.tag.attributes[parser.attribName] = parser.attribValue;
-          emitNode(parser, "onattribute", {
-            name: parser.attribName,
-            value: parser.attribValue
-          });
-        }
-        parser.attribName = parser.attribValue = "";
-      }
-      function openTag(parser, selfClosing) {
-        if (parser.opt.xmlns) {
-          var tag = parser.tag;
-          var qn = qname(parser.tagName);
-          tag.prefix = qn.prefix;
-          tag.local = qn.local;
-          tag.uri = tag.ns[qn.prefix] || "";
-          if (tag.prefix && !tag.uri) {
-            strictFail(parser, "Unbound namespace prefix: " + JSON.stringify(parser.tagName));
-            tag.uri = qn.prefix;
-          }
-          var parent = parser.tags[parser.tags.length - 1] || parser;
-          if (tag.ns && parent.ns !== tag.ns) {
-            Object.keys(tag.ns).forEach(function(p) {
-              emitNode(parser, "onopennamespace", {
-                prefix: p,
-                uri: tag.ns[p]
-              });
-            });
-          }
-          for (var i = 0, l = parser.attribList.length; i < l; i++) {
-            var nv = parser.attribList[i];
-            var name2 = nv[0];
-            var value = nv[1];
-            var qualName = qname(name2, true);
-            var prefix = qualName.prefix;
-            var local = qualName.local;
-            var uri = prefix === "" ? "" : tag.ns[prefix] || "";
-            var a = {
-              name: name2,
-              value,
-              prefix,
-              local,
-              uri
-            };
-            if (prefix && prefix !== "xmlns" && !uri) {
-              strictFail(parser, "Unbound namespace prefix: " + JSON.stringify(prefix));
-              a.uri = prefix;
-            }
-            parser.tag.attributes[name2] = a;
-            emitNode(parser, "onattribute", a);
-          }
-          parser.attribList.length = 0;
-        }
-        parser.tag.isSelfClosing = !!selfClosing;
-        parser.sawRoot = true;
-        parser.tags.push(parser.tag);
-        emitNode(parser, "onopentag", parser.tag);
-        if (!selfClosing) {
-          if (!parser.noscript && parser.tagName.toLowerCase() === "script") {
-            parser.state = S.SCRIPT;
-          } else {
-            parser.state = S.TEXT;
-          }
-          parser.tag = null;
-          parser.tagName = "";
-        }
-        parser.attribName = parser.attribValue = "";
-        parser.attribList.length = 0;
-      }
-      function closeTag(parser) {
-        if (!parser.tagName) {
-          strictFail(parser, "Weird empty close tag.");
-          parser.textNode += "</>";
-          parser.state = S.TEXT;
-          return;
-        }
-        if (parser.script) {
-          if (parser.tagName !== "script") {
-            parser.script += "</" + parser.tagName + ">";
-            parser.tagName = "";
-            parser.state = S.SCRIPT;
-            return;
-          }
-          emitNode(parser, "onscript", parser.script);
-          parser.script = "";
-        }
-        var t = parser.tags.length;
-        var tagName = parser.tagName;
-        if (!parser.strict) {
-          tagName = tagName[parser.looseCase]();
-        }
-        var closeTo = tagName;
-        while (t--) {
-          var close = parser.tags[t];
-          if (close.name !== closeTo) {
-            strictFail(parser, "Unexpected close tag");
-          } else {
-            break;
-          }
-        }
-        if (t < 0) {
-          strictFail(parser, "Unmatched closing tag: " + parser.tagName);
-          parser.textNode += "</" + parser.tagName + ">";
-          parser.state = S.TEXT;
-          return;
-        }
-        parser.tagName = tagName;
-        var s2 = parser.tags.length;
-        while (s2-- > t) {
-          var tag = parser.tag = parser.tags.pop();
-          parser.tagName = parser.tag.name;
-          emitNode(parser, "onclosetag", parser.tagName);
-          var x = {};
-          for (var i in tag.ns) {
-            x[i] = tag.ns[i];
-          }
-          var parent = parser.tags[parser.tags.length - 1] || parser;
-          if (parser.opt.xmlns && tag.ns !== parent.ns) {
-            Object.keys(tag.ns).forEach(function(p) {
-              var n = tag.ns[p];
-              emitNode(parser, "onclosenamespace", { prefix: p, uri: n });
-            });
-          }
-        }
-        if (t === 0) parser.closedRoot = true;
-        parser.tagName = parser.attribValue = parser.attribName = "";
-        parser.attribList.length = 0;
-        parser.state = S.TEXT;
-      }
-      function parseEntity(parser) {
-        var entity = parser.entity;
-        var entityLC = entity.toLowerCase();
-        var num;
-        var numStr = "";
-        if (parser.ENTITIES[entity]) {
-          return parser.ENTITIES[entity];
-        }
-        if (parser.ENTITIES[entityLC]) {
-          return parser.ENTITIES[entityLC];
-        }
-        entity = entityLC;
-        if (entity.charAt(0) === "#") {
-          if (entity.charAt(1) === "x") {
-            entity = entity.slice(2);
-            num = parseInt(entity, 16);
-            numStr = num.toString(16);
-          } else {
-            entity = entity.slice(1);
-            num = parseInt(entity, 10);
-            numStr = num.toString(10);
-          }
-        }
-        entity = entity.replace(/^0+/, "");
-        if (isNaN(num) || numStr.toLowerCase() !== entity) {
-          strictFail(parser, "Invalid character entity");
-          return "&" + parser.entity + ";";
-        }
-        return String.fromCodePoint(num);
-      }
-      function beginWhiteSpace(parser, c) {
-        if (c === "<") {
-          parser.state = S.OPEN_WAKA;
-          parser.startTagPosition = parser.position;
-        } else if (!isWhitespace(c)) {
-          strictFail(parser, "Non-whitespace before first tag.");
-          parser.textNode = c;
-          parser.state = S.TEXT;
-        }
-      }
-      function charAt(chunk, i) {
-        var result = "";
-        if (i < chunk.length) {
-          result = chunk.charAt(i);
-        }
-        return result;
-      }
-      function write(chunk) {
-        var parser = this;
-        if (this.error) {
-          throw this.error;
-        }
-        if (parser.closed) {
-          return error2(
-            parser,
-            "Cannot write after close. Assign an onready handler."
-          );
-        }
-        if (chunk === null) {
-          return end(parser);
-        }
-        if (typeof chunk === "object") {
-          chunk = chunk.toString();
-        }
-        var i = 0;
-        var c = "";
-        while (true) {
-          c = charAt(chunk, i++);
-          parser.c = c;
-          if (!c) {
-            break;
-          }
-          if (parser.trackPosition) {
-            parser.position++;
-            if (c === "\n") {
-              parser.line++;
-              parser.column = 0;
-            } else {
-              parser.column++;
-            }
-          }
-          switch (parser.state) {
-            case S.BEGIN:
-              parser.state = S.BEGIN_WHITESPACE;
-              if (c === "\uFEFF") {
-                continue;
-              }
-              beginWhiteSpace(parser, c);
-              continue;
-            case S.BEGIN_WHITESPACE:
-              beginWhiteSpace(parser, c);
-              continue;
-            case S.TEXT:
-              if (parser.sawRoot && !parser.closedRoot) {
-                var starti = i - 1;
-                while (c && c !== "<" && c !== "&") {
-                  c = charAt(chunk, i++);
-                  if (c && parser.trackPosition) {
-                    parser.position++;
-                    if (c === "\n") {
-                      parser.line++;
-                      parser.column = 0;
-                    } else {
-                      parser.column++;
-                    }
-                  }
-                }
-                parser.textNode += chunk.substring(starti, i - 1);
-              }
-              if (c === "<" && !(parser.sawRoot && parser.closedRoot && !parser.strict)) {
-                parser.state = S.OPEN_WAKA;
-                parser.startTagPosition = parser.position;
-              } else {
-                if (!isWhitespace(c) && (!parser.sawRoot || parser.closedRoot)) {
-                  strictFail(parser, "Text data outside of root node.");
-                }
-                if (c === "&") {
-                  parser.state = S.TEXT_ENTITY;
-                } else {
-                  parser.textNode += c;
-                }
-              }
-              continue;
-            case S.SCRIPT:
-              if (c === "<") {
-                parser.state = S.SCRIPT_ENDING;
-              } else {
-                parser.script += c;
-              }
-              continue;
-            case S.SCRIPT_ENDING:
-              if (c === "/") {
-                parser.state = S.CLOSE_TAG;
-              } else {
-                parser.script += "<" + c;
-                parser.state = S.SCRIPT;
-              }
-              continue;
-            case S.OPEN_WAKA:
-              if (c === "!") {
-                parser.state = S.SGML_DECL;
-                parser.sgmlDecl = "";
-              } else if (isWhitespace(c)) ;
-              else if (isMatch(nameStart, c)) {
-                parser.state = S.OPEN_TAG;
-                parser.tagName = c;
-              } else if (c === "/") {
-                parser.state = S.CLOSE_TAG;
-                parser.tagName = "";
-              } else if (c === "?") {
-                parser.state = S.PROC_INST;
-                parser.procInstName = parser.procInstBody = "";
-              } else {
-                strictFail(parser, "Unencoded <");
-                if (parser.startTagPosition + 1 < parser.position) {
-                  var pad2 = parser.position - parser.startTagPosition;
-                  c = new Array(pad2).join(" ") + c;
-                }
-                parser.textNode += "<" + c;
-                parser.state = S.TEXT;
-              }
-              continue;
-            case S.SGML_DECL:
-              if (parser.sgmlDecl + c === "--") {
-                parser.state = S.COMMENT;
-                parser.comment = "";
-                parser.sgmlDecl = "";
-                continue;
-              }
-              if (parser.doctype && parser.doctype !== true && parser.sgmlDecl) {
-                parser.state = S.DOCTYPE_DTD;
-                parser.doctype += "<!" + parser.sgmlDecl + c;
-                parser.sgmlDecl = "";
-              } else if ((parser.sgmlDecl + c).toUpperCase() === CDATA) {
-                emitNode(parser, "onopencdata");
-                parser.state = S.CDATA;
-                parser.sgmlDecl = "";
-                parser.cdata = "";
-              } else if ((parser.sgmlDecl + c).toUpperCase() === DOCTYPE) {
-                parser.state = S.DOCTYPE;
-                if (parser.doctype || parser.sawRoot) {
-                  strictFail(
-                    parser,
-                    "Inappropriately located doctype declaration"
-                  );
-                }
-                parser.doctype = "";
-                parser.sgmlDecl = "";
-              } else if (c === ">") {
-                emitNode(parser, "onsgmldeclaration", parser.sgmlDecl);
-                parser.sgmlDecl = "";
-                parser.state = S.TEXT;
-              } else if (isQuote(c)) {
-                parser.state = S.SGML_DECL_QUOTED;
-                parser.sgmlDecl += c;
-              } else {
-                parser.sgmlDecl += c;
-              }
-              continue;
-            case S.SGML_DECL_QUOTED:
-              if (c === parser.q) {
-                parser.state = S.SGML_DECL;
-                parser.q = "";
-              }
-              parser.sgmlDecl += c;
-              continue;
-            case S.DOCTYPE:
-              if (c === ">") {
-                parser.state = S.TEXT;
-                emitNode(parser, "ondoctype", parser.doctype);
-                parser.doctype = true;
-              } else {
-                parser.doctype += c;
-                if (c === "[") {
-                  parser.state = S.DOCTYPE_DTD;
-                } else if (isQuote(c)) {
-                  parser.state = S.DOCTYPE_QUOTED;
-                  parser.q = c;
-                }
-              }
-              continue;
-            case S.DOCTYPE_QUOTED:
-              parser.doctype += c;
-              if (c === parser.q) {
-                parser.q = "";
-                parser.state = S.DOCTYPE;
-              }
-              continue;
-            case S.DOCTYPE_DTD:
-              if (c === "]") {
-                parser.doctype += c;
-                parser.state = S.DOCTYPE;
-              } else if (c === "<") {
-                parser.state = S.OPEN_WAKA;
-                parser.startTagPosition = parser.position;
-              } else if (isQuote(c)) {
-                parser.doctype += c;
-                parser.state = S.DOCTYPE_DTD_QUOTED;
-                parser.q = c;
-              } else {
-                parser.doctype += c;
-              }
-              continue;
-            case S.DOCTYPE_DTD_QUOTED:
-              parser.doctype += c;
-              if (c === parser.q) {
-                parser.state = S.DOCTYPE_DTD;
-                parser.q = "";
-              }
-              continue;
-            case S.COMMENT:
-              if (c === "-") {
-                parser.state = S.COMMENT_ENDING;
-              } else {
-                parser.comment += c;
-              }
-              continue;
-            case S.COMMENT_ENDING:
-              if (c === "-") {
-                parser.state = S.COMMENT_ENDED;
-                parser.comment = textopts(parser.opt, parser.comment);
-                if (parser.comment) {
-                  emitNode(parser, "oncomment", parser.comment);
-                }
-                parser.comment = "";
-              } else {
-                parser.comment += "-" + c;
-                parser.state = S.COMMENT;
-              }
-              continue;
-            case S.COMMENT_ENDED:
-              if (c !== ">") {
-                strictFail(parser, "Malformed comment");
-                parser.comment += "--" + c;
-                parser.state = S.COMMENT;
-              } else if (parser.doctype && parser.doctype !== true) {
-                parser.state = S.DOCTYPE_DTD;
-              } else {
-                parser.state = S.TEXT;
-              }
-              continue;
-            case S.CDATA:
-              if (c === "]") {
-                parser.state = S.CDATA_ENDING;
-              } else {
-                parser.cdata += c;
-              }
-              continue;
-            case S.CDATA_ENDING:
-              if (c === "]") {
-                parser.state = S.CDATA_ENDING_2;
-              } else {
-                parser.cdata += "]" + c;
-                parser.state = S.CDATA;
-              }
-              continue;
-            case S.CDATA_ENDING_2:
-              if (c === ">") {
-                if (parser.cdata) {
-                  emitNode(parser, "oncdata", parser.cdata);
-                }
-                emitNode(parser, "onclosecdata");
-                parser.cdata = "";
-                parser.state = S.TEXT;
-              } else if (c === "]") {
-                parser.cdata += "]";
-              } else {
-                parser.cdata += "]]" + c;
-                parser.state = S.CDATA;
-              }
-              continue;
-            case S.PROC_INST:
-              if (c === "?") {
-                parser.state = S.PROC_INST_ENDING;
-              } else if (isWhitespace(c)) {
-                parser.state = S.PROC_INST_BODY;
-              } else {
-                parser.procInstName += c;
-              }
-              continue;
-            case S.PROC_INST_BODY:
-              if (!parser.procInstBody && isWhitespace(c)) {
-                continue;
-              } else if (c === "?") {
-                parser.state = S.PROC_INST_ENDING;
-              } else {
-                parser.procInstBody += c;
-              }
-              continue;
-            case S.PROC_INST_ENDING:
-              if (c === ">") {
-                emitNode(parser, "onprocessinginstruction", {
-                  name: parser.procInstName,
-                  body: parser.procInstBody
-                });
-                parser.procInstName = parser.procInstBody = "";
-                parser.state = S.TEXT;
-              } else {
-                parser.procInstBody += "?" + c;
-                parser.state = S.PROC_INST_BODY;
-              }
-              continue;
-            case S.OPEN_TAG:
-              if (isMatch(nameBody, c)) {
-                parser.tagName += c;
-              } else {
-                newTag(parser);
-                if (c === ">") {
-                  openTag(parser);
-                } else if (c === "/") {
-                  parser.state = S.OPEN_TAG_SLASH;
-                } else {
-                  if (!isWhitespace(c)) {
-                    strictFail(parser, "Invalid character in tag name");
-                  }
-                  parser.state = S.ATTRIB;
-                }
-              }
-              continue;
-            case S.OPEN_TAG_SLASH:
-              if (c === ">") {
-                openTag(parser, true);
-                closeTag(parser);
-              } else {
-                strictFail(parser, "Forward-slash in opening tag not followed by >");
-                parser.state = S.ATTRIB;
-              }
-              continue;
-            case S.ATTRIB:
-              if (isWhitespace(c)) {
-                continue;
-              } else if (c === ">") {
-                openTag(parser);
-              } else if (c === "/") {
-                parser.state = S.OPEN_TAG_SLASH;
-              } else if (isMatch(nameStart, c)) {
-                parser.attribName = c;
-                parser.attribValue = "";
-                parser.state = S.ATTRIB_NAME;
-              } else {
-                strictFail(parser, "Invalid attribute name");
-              }
-              continue;
-            case S.ATTRIB_NAME:
-              if (c === "=") {
-                parser.state = S.ATTRIB_VALUE;
-              } else if (c === ">") {
-                strictFail(parser, "Attribute without value");
-                parser.attribValue = parser.attribName;
-                attrib(parser);
-                openTag(parser);
-              } else if (isWhitespace(c)) {
-                parser.state = S.ATTRIB_NAME_SAW_WHITE;
-              } else if (isMatch(nameBody, c)) {
-                parser.attribName += c;
-              } else {
-                strictFail(parser, "Invalid attribute name");
-              }
-              continue;
-            case S.ATTRIB_NAME_SAW_WHITE:
-              if (c === "=") {
-                parser.state = S.ATTRIB_VALUE;
-              } else if (isWhitespace(c)) {
-                continue;
-              } else {
-                strictFail(parser, "Attribute without value");
-                parser.tag.attributes[parser.attribName] = "";
-                parser.attribValue = "";
-                emitNode(parser, "onattribute", {
-                  name: parser.attribName,
-                  value: ""
-                });
-                parser.attribName = "";
-                if (c === ">") {
-                  openTag(parser);
-                } else if (isMatch(nameStart, c)) {
-                  parser.attribName = c;
-                  parser.state = S.ATTRIB_NAME;
-                } else {
-                  strictFail(parser, "Invalid attribute name");
-                  parser.state = S.ATTRIB;
-                }
-              }
-              continue;
-            case S.ATTRIB_VALUE:
-              if (isWhitespace(c)) {
-                continue;
-              } else if (isQuote(c)) {
-                parser.q = c;
-                parser.state = S.ATTRIB_VALUE_QUOTED;
-              } else {
-                if (!parser.opt.unquotedAttributeValues) {
-                  error2(parser, "Unquoted attribute value");
-                }
-                parser.state = S.ATTRIB_VALUE_UNQUOTED;
-                parser.attribValue = c;
-              }
-              continue;
-            case S.ATTRIB_VALUE_QUOTED:
-              if (c !== parser.q) {
-                if (c === "&") {
-                  parser.state = S.ATTRIB_VALUE_ENTITY_Q;
-                } else {
-                  parser.attribValue += c;
-                }
-                continue;
-              }
-              attrib(parser);
-              parser.q = "";
-              parser.state = S.ATTRIB_VALUE_CLOSED;
-              continue;
-            case S.ATTRIB_VALUE_CLOSED:
-              if (isWhitespace(c)) {
-                parser.state = S.ATTRIB;
-              } else if (c === ">") {
-                openTag(parser);
-              } else if (c === "/") {
-                parser.state = S.OPEN_TAG_SLASH;
-              } else if (isMatch(nameStart, c)) {
-                strictFail(parser, "No whitespace between attributes");
-                parser.attribName = c;
-                parser.attribValue = "";
-                parser.state = S.ATTRIB_NAME;
-              } else {
-                strictFail(parser, "Invalid attribute name");
-              }
-              continue;
-            case S.ATTRIB_VALUE_UNQUOTED:
-              if (!isAttribEnd(c)) {
-                if (c === "&") {
-                  parser.state = S.ATTRIB_VALUE_ENTITY_U;
-                } else {
-                  parser.attribValue += c;
-                }
-                continue;
-              }
-              attrib(parser);
-              if (c === ">") {
-                openTag(parser);
-              } else {
-                parser.state = S.ATTRIB;
-              }
-              continue;
-            case S.CLOSE_TAG:
-              if (!parser.tagName) {
-                if (isWhitespace(c)) {
-                  continue;
-                } else if (notMatch(nameStart, c)) {
-                  if (parser.script) {
-                    parser.script += "</" + c;
-                    parser.state = S.SCRIPT;
-                  } else {
-                    strictFail(parser, "Invalid tagname in closing tag.");
-                  }
-                } else {
-                  parser.tagName = c;
-                }
-              } else if (c === ">") {
-                closeTag(parser);
-              } else if (isMatch(nameBody, c)) {
-                parser.tagName += c;
-              } else if (parser.script) {
-                parser.script += "</" + parser.tagName;
-                parser.tagName = "";
-                parser.state = S.SCRIPT;
-              } else {
-                if (!isWhitespace(c)) {
-                  strictFail(parser, "Invalid tagname in closing tag");
-                }
-                parser.state = S.CLOSE_TAG_SAW_WHITE;
-              }
-              continue;
-            case S.CLOSE_TAG_SAW_WHITE:
-              if (isWhitespace(c)) {
-                continue;
-              }
-              if (c === ">") {
-                closeTag(parser);
-              } else {
-                strictFail(parser, "Invalid characters in closing tag");
-              }
-              continue;
-            case S.TEXT_ENTITY:
-            case S.ATTRIB_VALUE_ENTITY_Q:
-            case S.ATTRIB_VALUE_ENTITY_U:
-              var returnState;
-              var buffer;
-              switch (parser.state) {
-                case S.TEXT_ENTITY:
-                  returnState = S.TEXT;
-                  buffer = "textNode";
-                  break;
-                case S.ATTRIB_VALUE_ENTITY_Q:
-                  returnState = S.ATTRIB_VALUE_QUOTED;
-                  buffer = "attribValue";
-                  break;
-                case S.ATTRIB_VALUE_ENTITY_U:
-                  returnState = S.ATTRIB_VALUE_UNQUOTED;
-                  buffer = "attribValue";
-                  break;
-              }
-              if (c === ";") {
-                var parsedEntity = parseEntity(parser);
-                if (parser.opt.unparsedEntities && !Object.values(sax2.XML_ENTITIES).includes(parsedEntity)) {
-                  parser.entity = "";
-                  parser.state = returnState;
-                  parser.write(parsedEntity);
-                } else {
-                  parser[buffer] += parsedEntity;
-                  parser.entity = "";
-                  parser.state = returnState;
-                }
-              } else if (isMatch(parser.entity.length ? entityBody : entityStart, c)) {
-                parser.entity += c;
-              } else {
-                strictFail(parser, "Invalid character in entity name");
-                parser[buffer] += "&" + parser.entity + c;
-                parser.entity = "";
-                parser.state = returnState;
-              }
-              continue;
-            default: {
-              throw new Error(parser, "Unknown state: " + parser.state);
-            }
-          }
-        }
-        if (parser.position >= parser.bufferCheckPosition) {
-          checkBufferLength(parser);
-        }
-        return parser;
-      }
-      /*! http://mths.be/fromcodepoint v0.1.0 by @mathias */
-      if (!String.fromCodePoint) {
-        (function() {
-          var stringFromCharCode = String.fromCharCode;
-          var floor = Math.floor;
-          var fromCodePoint = function() {
-            var MAX_SIZE = 16384;
-            var codeUnits = [];
-            var highSurrogate;
-            var lowSurrogate;
-            var index = -1;
-            var length = arguments.length;
-            if (!length) {
-              return "";
-            }
-            var result = "";
-            while (++index < length) {
-              var codePoint = Number(arguments[index]);
-              if (!isFinite(codePoint) || // `NaN`, `+Infinity`, or `-Infinity`
-              codePoint < 0 || // not a valid Unicode code point
-              codePoint > 1114111 || // not a valid Unicode code point
-              floor(codePoint) !== codePoint) {
-                throw RangeError("Invalid code point: " + codePoint);
-              }
-              if (codePoint <= 65535) {
-                codeUnits.push(codePoint);
-              } else {
-                codePoint -= 65536;
-                highSurrogate = (codePoint >> 10) + 55296;
-                lowSurrogate = codePoint % 1024 + 56320;
-                codeUnits.push(highSurrogate, lowSurrogate);
-              }
-              if (index + 1 === length || codeUnits.length > MAX_SIZE) {
-                result += stringFromCharCode.apply(null, codeUnits);
-                codeUnits.length = 0;
-              }
-            }
-            return result;
-          };
-          if (Object.defineProperty) {
-            Object.defineProperty(String, "fromCodePoint", {
-              value: fromCodePoint,
-              configurable: true,
-              writable: true
-            });
-          } else {
-            String.fromCodePoint = fromCodePoint;
-          }
-        })();
-      }
-    })(exports);
-  })(sax);
-  return sax;
-}
-var hasRequiredXml;
-function requireXml() {
-  if (hasRequiredXml) return xml;
-  hasRequiredXml = 1;
-  Object.defineProperty(xml, "__esModule", { value: true });
-  xml.XElement = void 0;
-  xml.parseXml = parseXml;
-  const sax2 = requireSax();
-  const error_1 = requireError();
-  class XElement {
-    constructor(name2) {
-      this.name = name2;
-      this.value = "";
-      this.attributes = null;
-      this.isCData = false;
-      this.elements = null;
-      if (!name2) {
-        throw (0, error_1.newError)("Element name cannot be empty", "ERR_XML_ELEMENT_NAME_EMPTY");
-      }
-      if (!isValidName(name2)) {
-        throw (0, error_1.newError)(`Invalid element name: ${name2}`, "ERR_XML_ELEMENT_INVALID_NAME");
-      }
-    }
-    attribute(name2) {
-      const result = this.attributes === null ? null : this.attributes[name2];
-      if (result == null) {
-        throw (0, error_1.newError)(`No attribute "${name2}"`, "ERR_XML_MISSED_ATTRIBUTE");
-      }
-      return result;
-    }
-    removeAttribute(name2) {
-      if (this.attributes !== null) {
-        delete this.attributes[name2];
-      }
-    }
-    element(name2, ignoreCase = false, errorIfMissed = null) {
-      const result = this.elementOrNull(name2, ignoreCase);
-      if (result === null) {
-        throw (0, error_1.newError)(errorIfMissed || `No element "${name2}"`, "ERR_XML_MISSED_ELEMENT");
-      }
-      return result;
-    }
-    elementOrNull(name2, ignoreCase = false) {
-      if (this.elements === null) {
-        return null;
-      }
-      for (const element of this.elements) {
-        if (isNameEquals(element, name2, ignoreCase)) {
-          return element;
-        }
-      }
-      return null;
-    }
-    getElements(name2, ignoreCase = false) {
-      if (this.elements === null) {
-        return [];
-      }
-      return this.elements.filter((it) => isNameEquals(it, name2, ignoreCase));
-    }
-    elementValueOrEmpty(name2, ignoreCase = false) {
-      const element = this.elementOrNull(name2, ignoreCase);
-      return element === null ? "" : element.value;
-    }
-  }
-  xml.XElement = XElement;
-  const NAME_REG_EXP = new RegExp(/^[A-Za-z_][:A-Za-z0-9_-]*$/i);
-  function isValidName(name2) {
-    return NAME_REG_EXP.test(name2);
-  }
-  function isNameEquals(element, name2, ignoreCase) {
-    const elementName = element.name;
-    return elementName === name2 || ignoreCase === true && elementName.length === name2.length && elementName.toLowerCase() === name2.toLowerCase();
-  }
-  function parseXml(data) {
-    let rootElement = null;
-    const parser = sax2.parser(true, {});
-    const elements = [];
-    parser.onopentag = (saxElement) => {
-      const element = new XElement(saxElement.name);
-      element.attributes = saxElement.attributes;
-      if (rootElement === null) {
-        rootElement = element;
-      } else {
-        const parent = elements[elements.length - 1];
-        if (parent.elements == null) {
-          parent.elements = [];
-        }
-        parent.elements.push(element);
-      }
-      elements.push(element);
-    };
-    parser.onclosetag = () => {
-      elements.pop();
-    };
-    parser.ontext = (text) => {
-      if (elements.length > 0) {
-        elements[elements.length - 1].value = text;
-      }
-    };
-    parser.oncdata = (cdata) => {
-      const element = elements[elements.length - 1];
-      element.value = cdata;
-      element.isCData = true;
-    };
-    parser.onerror = (err) => {
-      throw err;
-    };
-    parser.write(data);
-    return rootElement;
-  }
-  return xml;
-}
-var MemoLazy = {};
-var hasRequiredMemoLazy;
-function requireMemoLazy() {
-  if (hasRequiredMemoLazy) return MemoLazy;
-  hasRequiredMemoLazy = 1;
-  Object.defineProperty(MemoLazy, "__esModule", { value: true });
-  MemoLazy.MemoLazy = void 0;
-  let MemoLazy$1 = class MemoLazy {
-    constructor(selector, creator) {
-      this.selector = selector;
-      this.creator = creator;
-      this.selected = void 0;
-      this._value = void 0;
-    }
-    get hasValue() {
-      return this._value !== void 0;
-    }
-    get value() {
-      const selected = this.selector();
-      if (this._value !== void 0 && equals(this.selected, selected)) {
-        return this._value;
-      }
-      this.selected = selected;
-      const result = this.creator(selected);
-      this.value = result;
-      return result;
-    }
-    set value(value) {
-      this._value = value;
-    }
-  };
-  MemoLazy.MemoLazy = MemoLazy$1;
-  function equals(firstValue, secondValue) {
-    const isFirstObject = typeof firstValue === "object" && firstValue !== null;
-    const isSecondObject = typeof secondValue === "object" && secondValue !== null;
-    if (isFirstObject && isSecondObject) {
-      const keys1 = Object.keys(firstValue);
-      const keys2 = Object.keys(secondValue);
-      return keys1.length === keys2.length && keys1.every((key) => equals(firstValue[key], secondValue[key]));
-    }
-    return firstValue === secondValue;
-  }
-  return MemoLazy;
-}
-var retry = {};
-var hasRequiredRetry;
-function requireRetry() {
-  if (hasRequiredRetry) return retry;
-  hasRequiredRetry = 1;
-  Object.defineProperty(retry, "__esModule", { value: true });
-  retry.retry = retry$1;
-  const CancellationToken_1 = requireCancellationToken();
-  async function retry$1(task, retryCount, interval, backoff = 0, attempt = 0, shouldRetry) {
-    var _a;
-    const cancellationToken = new CancellationToken_1.CancellationToken();
-    try {
-      return await task();
-    } catch (error2) {
-      if (((_a = shouldRetry === null || shouldRetry === void 0 ? void 0 : shouldRetry(error2)) !== null && _a !== void 0 ? _a : true) && retryCount > 0 && !cancellationToken.cancelled) {
-        await new Promise((resolve) => setTimeout(resolve, interval + backoff * attempt));
-        return await retry$1(task, retryCount - 1, interval, backoff, attempt + 1, shouldRetry);
-      } else {
-        throw error2;
-      }
-    }
-  }
-  return retry;
-}
-var hasRequiredOut;
-function requireOut() {
-  if (hasRequiredOut) return out;
-  hasRequiredOut = 1;
-  (function(exports) {
-    Object.defineProperty(exports, "__esModule", { value: true });
-    exports.CURRENT_APP_PACKAGE_FILE_NAME = exports.CURRENT_APP_INSTALLER_FILE_NAME = exports.retry = exports.MemoLazy = exports.newError = exports.XElement = exports.parseXml = exports.ProgressCallbackTransform = exports.UUID = exports.parseDn = exports.githubUrl = exports.getS3LikeProviderBaseUrl = exports.configureRequestUrl = exports.parseJson = exports.safeStringifyJson = exports.configureRequestOptionsFromUrl = exports.configureRequestOptions = exports.safeGetHeader = exports.DigestTransform = exports.HttpExecutor = exports.createHttpError = exports.HttpError = exports.CancellationError = exports.CancellationToken = void 0;
-    exports.asArray = asArray;
-    var CancellationToken_1 = requireCancellationToken();
-    Object.defineProperty(exports, "CancellationToken", { enumerable: true, get: function() {
-      return CancellationToken_1.CancellationToken;
-    } });
-    Object.defineProperty(exports, "CancellationError", { enumerable: true, get: function() {
-      return CancellationToken_1.CancellationError;
-    } });
-    var httpExecutor_1 = requireHttpExecutor();
-    Object.defineProperty(exports, "HttpError", { enumerable: true, get: function() {
-      return httpExecutor_1.HttpError;
-    } });
-    Object.defineProperty(exports, "createHttpError", { enumerable: true, get: function() {
-      return httpExecutor_1.createHttpError;
-    } });
-    Object.defineProperty(exports, "HttpExecutor", { enumerable: true, get: function() {
-      return httpExecutor_1.HttpExecutor;
-    } });
-    Object.defineProperty(exports, "DigestTransform", { enumerable: true, get: function() {
-      return httpExecutor_1.DigestTransform;
-    } });
-    Object.defineProperty(exports, "safeGetHeader", { enumerable: true, get: function() {
-      return httpExecutor_1.safeGetHeader;
-    } });
-    Object.defineProperty(exports, "configureRequestOptions", { enumerable: true, get: function() {
-      return httpExecutor_1.configureRequestOptions;
-    } });
-    Object.defineProperty(exports, "configureRequestOptionsFromUrl", { enumerable: true, get: function() {
-      return httpExecutor_1.configureRequestOptionsFromUrl;
-    } });
-    Object.defineProperty(exports, "safeStringifyJson", { enumerable: true, get: function() {
-      return httpExecutor_1.safeStringifyJson;
-    } });
-    Object.defineProperty(exports, "parseJson", { enumerable: true, get: function() {
-      return httpExecutor_1.parseJson;
-    } });
-    Object.defineProperty(exports, "configureRequestUrl", { enumerable: true, get: function() {
-      return httpExecutor_1.configureRequestUrl;
-    } });
-    var publishOptions_1 = requirePublishOptions();
-    Object.defineProperty(exports, "getS3LikeProviderBaseUrl", { enumerable: true, get: function() {
-      return publishOptions_1.getS3LikeProviderBaseUrl;
-    } });
-    Object.defineProperty(exports, "githubUrl", { enumerable: true, get: function() {
-      return publishOptions_1.githubUrl;
-    } });
-    var rfc2253Parser_1 = requireRfc2253Parser();
-    Object.defineProperty(exports, "parseDn", { enumerable: true, get: function() {
-      return rfc2253Parser_1.parseDn;
-    } });
-    var uuid_1 = requireUuid();
-    Object.defineProperty(exports, "UUID", { enumerable: true, get: function() {
-      return uuid_1.UUID;
-    } });
-    var ProgressCallbackTransform_1 = requireProgressCallbackTransform();
-    Object.defineProperty(exports, "ProgressCallbackTransform", { enumerable: true, get: function() {
-      return ProgressCallbackTransform_1.ProgressCallbackTransform;
-    } });
-    var xml_1 = requireXml();
-    Object.defineProperty(exports, "parseXml", { enumerable: true, get: function() {
-      return xml_1.parseXml;
-    } });
-    Object.defineProperty(exports, "XElement", { enumerable: true, get: function() {
-      return xml_1.XElement;
-    } });
-    var error_1 = requireError();
-    Object.defineProperty(exports, "newError", { enumerable: true, get: function() {
-      return error_1.newError;
-    } });
-    var MemoLazy_1 = requireMemoLazy();
-    Object.defineProperty(exports, "MemoLazy", { enumerable: true, get: function() {
-      return MemoLazy_1.MemoLazy;
-    } });
-    var retry_1 = requireRetry();
-    Object.defineProperty(exports, "retry", { enumerable: true, get: function() {
-      return retry_1.retry;
-    } });
-    exports.CURRENT_APP_INSTALLER_FILE_NAME = "installer.exe";
-    exports.CURRENT_APP_PACKAGE_FILE_NAME = "package.7z";
-    function asArray(v) {
-      if (v == null) {
-        return [];
-      } else if (Array.isArray(v)) {
-        return v;
-      } else {
-        return [v];
-      }
-    }
-  })(out);
-  return out;
-}
+var main$1 = {};
 var fs = {};
 var universalify = {};
 var hasRequiredUniversalify;
@@ -3466,7 +80,7 @@ var hasRequiredPolyfills;
 function requirePolyfills() {
   if (hasRequiredPolyfills) return polyfills;
   hasRequiredPolyfills = 1;
-  var constants2 = require$$0$6;
+  var constants2 = require$$0$1;
   var origCwd = process.cwd;
   var cwd = null;
   var platform = process.env.GRACEFUL_FS_PLATFORM || process.platform;
@@ -3754,7 +368,7 @@ var hasRequiredLegacyStreams;
 function requireLegacyStreams() {
   if (hasRequiredLegacyStreams) return legacyStreams;
   hasRequiredLegacyStreams = 1;
-  var Stream = require$$0$4.Stream;
+  var Stream = require$$0$2.Stream;
   legacyStreams = legacy2;
   function legacy2(fs2) {
     return {
@@ -5910,6 +2524,3392 @@ function requireLib() {
 }
 var BaseUpdater = {};
 var AppUpdater = {};
+var out = {};
+var CancellationToken = {};
+var hasRequiredCancellationToken;
+function requireCancellationToken() {
+  if (hasRequiredCancellationToken) return CancellationToken;
+  hasRequiredCancellationToken = 1;
+  Object.defineProperty(CancellationToken, "__esModule", { value: true });
+  CancellationToken.CancellationError = CancellationToken.CancellationToken = void 0;
+  const events_1 = require$$0$4;
+  let CancellationToken$1 = class CancellationToken extends events_1.EventEmitter {
+    get cancelled() {
+      return this._cancelled || this._parent != null && this._parent.cancelled;
+    }
+    set parent(value) {
+      this.removeParentCancelHandler();
+      this._parent = value;
+      this.parentCancelHandler = () => this.cancel();
+      this._parent.onCancel(this.parentCancelHandler);
+    }
+    // babel cannot compile ... correctly for super calls
+    constructor(parent) {
+      super();
+      this.parentCancelHandler = null;
+      this._parent = null;
+      this._cancelled = false;
+      if (parent != null) {
+        this.parent = parent;
+      }
+    }
+    cancel() {
+      this._cancelled = true;
+      this.emit("cancel");
+    }
+    onCancel(handler) {
+      if (this.cancelled) {
+        handler();
+      } else {
+        this.once("cancel", handler);
+      }
+    }
+    createPromise(callback) {
+      if (this.cancelled) {
+        return Promise.reject(new CancellationError());
+      }
+      const finallyHandler = () => {
+        if (cancelHandler != null) {
+          try {
+            this.removeListener("cancel", cancelHandler);
+            cancelHandler = null;
+          } catch (_ignore) {
+          }
+        }
+      };
+      let cancelHandler = null;
+      return new Promise((resolve, reject) => {
+        let addedCancelHandler = null;
+        cancelHandler = () => {
+          try {
+            if (addedCancelHandler != null) {
+              addedCancelHandler();
+              addedCancelHandler = null;
+            }
+          } finally {
+            reject(new CancellationError());
+          }
+        };
+        if (this.cancelled) {
+          cancelHandler();
+          return;
+        }
+        this.onCancel(cancelHandler);
+        callback(resolve, reject, (callback2) => {
+          addedCancelHandler = callback2;
+        });
+      }).then((it) => {
+        finallyHandler();
+        return it;
+      }).catch((e) => {
+        finallyHandler();
+        throw e;
+      });
+    }
+    removeParentCancelHandler() {
+      const parent = this._parent;
+      if (parent != null && this.parentCancelHandler != null) {
+        parent.removeListener("cancel", this.parentCancelHandler);
+        this.parentCancelHandler = null;
+      }
+    }
+    dispose() {
+      try {
+        this.removeParentCancelHandler();
+      } finally {
+        this.removeAllListeners();
+        this._parent = null;
+      }
+    }
+  };
+  CancellationToken.CancellationToken = CancellationToken$1;
+  class CancellationError extends Error {
+    constructor() {
+      super("cancelled");
+    }
+  }
+  CancellationToken.CancellationError = CancellationError;
+  return CancellationToken;
+}
+var error = {};
+var hasRequiredError;
+function requireError() {
+  if (hasRequiredError) return error;
+  hasRequiredError = 1;
+  Object.defineProperty(error, "__esModule", { value: true });
+  error.newError = newError;
+  function newError(message, code) {
+    const error2 = new Error(message);
+    error2.code = code;
+    return error2;
+  }
+  return error;
+}
+var httpExecutor = {};
+var src = { exports: {} };
+var browser = { exports: {} };
+var ms;
+var hasRequiredMs$1;
+function requireMs$1() {
+  if (hasRequiredMs$1) return ms;
+  hasRequiredMs$1 = 1;
+  var s = 1e3;
+  var m = s * 60;
+  var h = m * 60;
+  var d = h * 24;
+  var w = d * 7;
+  var y = d * 365.25;
+  ms = function(val, options) {
+    options = options || {};
+    var type2 = typeof val;
+    if (type2 === "string" && val.length > 0) {
+      return parse2(val);
+    } else if (type2 === "number" && isFinite(val)) {
+      return options.long ? fmtLong(val) : fmtShort(val);
+    }
+    throw new Error(
+      "val is not a non-empty string or a valid number. val=" + JSON.stringify(val)
+    );
+  };
+  function parse2(str2) {
+    str2 = String(str2);
+    if (str2.length > 100) {
+      return;
+    }
+    var match = /^(-?(?:\d+)?\.?\d+) *(milliseconds?|msecs?|ms|seconds?|secs?|s|minutes?|mins?|m|hours?|hrs?|h|days?|d|weeks?|w|years?|yrs?|y)?$/i.exec(
+      str2
+    );
+    if (!match) {
+      return;
+    }
+    var n = parseFloat(match[1]);
+    var type2 = (match[2] || "ms").toLowerCase();
+    switch (type2) {
+      case "years":
+      case "year":
+      case "yrs":
+      case "yr":
+      case "y":
+        return n * y;
+      case "weeks":
+      case "week":
+      case "w":
+        return n * w;
+      case "days":
+      case "day":
+      case "d":
+        return n * d;
+      case "hours":
+      case "hour":
+      case "hrs":
+      case "hr":
+      case "h":
+        return n * h;
+      case "minutes":
+      case "minute":
+      case "mins":
+      case "min":
+      case "m":
+        return n * m;
+      case "seconds":
+      case "second":
+      case "secs":
+      case "sec":
+      case "s":
+        return n * s;
+      case "milliseconds":
+      case "millisecond":
+      case "msecs":
+      case "msec":
+      case "ms":
+        return n;
+      default:
+        return void 0;
+    }
+  }
+  function fmtShort(ms2) {
+    var msAbs = Math.abs(ms2);
+    if (msAbs >= d) {
+      return Math.round(ms2 / d) + "d";
+    }
+    if (msAbs >= h) {
+      return Math.round(ms2 / h) + "h";
+    }
+    if (msAbs >= m) {
+      return Math.round(ms2 / m) + "m";
+    }
+    if (msAbs >= s) {
+      return Math.round(ms2 / s) + "s";
+    }
+    return ms2 + "ms";
+  }
+  function fmtLong(ms2) {
+    var msAbs = Math.abs(ms2);
+    if (msAbs >= d) {
+      return plural(ms2, msAbs, d, "day");
+    }
+    if (msAbs >= h) {
+      return plural(ms2, msAbs, h, "hour");
+    }
+    if (msAbs >= m) {
+      return plural(ms2, msAbs, m, "minute");
+    }
+    if (msAbs >= s) {
+      return plural(ms2, msAbs, s, "second");
+    }
+    return ms2 + " ms";
+  }
+  function plural(ms2, msAbs, n, name) {
+    var isPlural = msAbs >= n * 1.5;
+    return Math.round(ms2 / n) + " " + name + (isPlural ? "s" : "");
+  }
+  return ms;
+}
+var common$2;
+var hasRequiredCommon$2;
+function requireCommon$2() {
+  if (hasRequiredCommon$2) return common$2;
+  hasRequiredCommon$2 = 1;
+  function setup(env) {
+    createDebug.debug = createDebug;
+    createDebug.default = createDebug;
+    createDebug.coerce = coerce;
+    createDebug.disable = disable;
+    createDebug.enable = enable;
+    createDebug.enabled = enabled2;
+    createDebug.humanize = requireMs$1();
+    createDebug.destroy = destroy;
+    Object.keys(env).forEach((key) => {
+      createDebug[key] = env[key];
+    });
+    createDebug.names = [];
+    createDebug.skips = [];
+    createDebug.formatters = {};
+    function selectColor(namespace) {
+      let hash = 0;
+      for (let i = 0; i < namespace.length; i++) {
+        hash = (hash << 5) - hash + namespace.charCodeAt(i);
+        hash |= 0;
+      }
+      return createDebug.colors[Math.abs(hash) % createDebug.colors.length];
+    }
+    createDebug.selectColor = selectColor;
+    function createDebug(namespace) {
+      let prevTime;
+      let enableOverride = null;
+      let namespacesCache;
+      let enabledCache;
+      function debug(...args) {
+        if (!debug.enabled) {
+          return;
+        }
+        const self2 = debug;
+        const curr = Number(/* @__PURE__ */ new Date());
+        const ms2 = curr - (prevTime || curr);
+        self2.diff = ms2;
+        self2.prev = prevTime;
+        self2.curr = curr;
+        prevTime = curr;
+        args[0] = createDebug.coerce(args[0]);
+        if (typeof args[0] !== "string") {
+          args.unshift("%O");
+        }
+        let index = 0;
+        args[0] = args[0].replace(/%([a-zA-Z%])/g, (match, format2) => {
+          if (match === "%%") {
+            return "%";
+          }
+          index++;
+          const formatter = createDebug.formatters[format2];
+          if (typeof formatter === "function") {
+            const val = args[index];
+            match = formatter.call(self2, val);
+            args.splice(index, 1);
+            index--;
+          }
+          return match;
+        });
+        createDebug.formatArgs.call(self2, args);
+        const logFn = self2.log || createDebug.log;
+        logFn.apply(self2, args);
+      }
+      debug.namespace = namespace;
+      debug.useColors = createDebug.useColors();
+      debug.color = createDebug.selectColor(namespace);
+      debug.extend = extend;
+      debug.destroy = createDebug.destroy;
+      Object.defineProperty(debug, "enabled", {
+        enumerable: true,
+        configurable: false,
+        get: () => {
+          if (enableOverride !== null) {
+            return enableOverride;
+          }
+          if (namespacesCache !== createDebug.namespaces) {
+            namespacesCache = createDebug.namespaces;
+            enabledCache = createDebug.enabled(namespace);
+          }
+          return enabledCache;
+        },
+        set: (v) => {
+          enableOverride = v;
+        }
+      });
+      if (typeof createDebug.init === "function") {
+        createDebug.init(debug);
+      }
+      return debug;
+    }
+    function extend(namespace, delimiter) {
+      const newDebug = createDebug(this.namespace + (typeof delimiter === "undefined" ? ":" : delimiter) + namespace);
+      newDebug.log = this.log;
+      return newDebug;
+    }
+    function enable(namespaces) {
+      createDebug.save(namespaces);
+      createDebug.namespaces = namespaces;
+      createDebug.names = [];
+      createDebug.skips = [];
+      let i;
+      const split = (typeof namespaces === "string" ? namespaces : "").split(/[\s,]+/);
+      const len = split.length;
+      for (i = 0; i < len; i++) {
+        if (!split[i]) {
+          continue;
+        }
+        namespaces = split[i].replace(/\*/g, ".*?");
+        if (namespaces[0] === "-") {
+          createDebug.skips.push(new RegExp("^" + namespaces.slice(1) + "$"));
+        } else {
+          createDebug.names.push(new RegExp("^" + namespaces + "$"));
+        }
+      }
+    }
+    function disable() {
+      const namespaces = [
+        ...createDebug.names.map(toNamespace),
+        ...createDebug.skips.map(toNamespace).map((namespace) => "-" + namespace)
+      ].join(",");
+      createDebug.enable("");
+      return namespaces;
+    }
+    function enabled2(name) {
+      if (name[name.length - 1] === "*") {
+        return true;
+      }
+      let i;
+      let len;
+      for (i = 0, len = createDebug.skips.length; i < len; i++) {
+        if (createDebug.skips[i].test(name)) {
+          return false;
+        }
+      }
+      for (i = 0, len = createDebug.names.length; i < len; i++) {
+        if (createDebug.names[i].test(name)) {
+          return true;
+        }
+      }
+      return false;
+    }
+    function toNamespace(regexp) {
+      return regexp.toString().substring(2, regexp.toString().length - 2).replace(/\.\*\?$/, "*");
+    }
+    function coerce(val) {
+      if (val instanceof Error) {
+        return val.stack || val.message;
+      }
+      return val;
+    }
+    function destroy() {
+      console.warn("Instance method `debug.destroy()` is deprecated and no longer does anything. It will be removed in the next major version of `debug`.");
+    }
+    createDebug.enable(createDebug.load());
+    return createDebug;
+  }
+  common$2 = setup;
+  return common$2;
+}
+var hasRequiredBrowser;
+function requireBrowser() {
+  if (hasRequiredBrowser) return browser.exports;
+  hasRequiredBrowser = 1;
+  (function(module, exports) {
+    exports.formatArgs = formatArgs;
+    exports.save = save;
+    exports.load = load;
+    exports.useColors = useColors;
+    exports.storage = localstorage();
+    exports.destroy = /* @__PURE__ */ (() => {
+      let warned = false;
+      return () => {
+        if (!warned) {
+          warned = true;
+          console.warn("Instance method `debug.destroy()` is deprecated and no longer does anything. It will be removed in the next major version of `debug`.");
+        }
+      };
+    })();
+    exports.colors = [
+      "#0000CC",
+      "#0000FF",
+      "#0033CC",
+      "#0033FF",
+      "#0066CC",
+      "#0066FF",
+      "#0099CC",
+      "#0099FF",
+      "#00CC00",
+      "#00CC33",
+      "#00CC66",
+      "#00CC99",
+      "#00CCCC",
+      "#00CCFF",
+      "#3300CC",
+      "#3300FF",
+      "#3333CC",
+      "#3333FF",
+      "#3366CC",
+      "#3366FF",
+      "#3399CC",
+      "#3399FF",
+      "#33CC00",
+      "#33CC33",
+      "#33CC66",
+      "#33CC99",
+      "#33CCCC",
+      "#33CCFF",
+      "#6600CC",
+      "#6600FF",
+      "#6633CC",
+      "#6633FF",
+      "#66CC00",
+      "#66CC33",
+      "#9900CC",
+      "#9900FF",
+      "#9933CC",
+      "#9933FF",
+      "#99CC00",
+      "#99CC33",
+      "#CC0000",
+      "#CC0033",
+      "#CC0066",
+      "#CC0099",
+      "#CC00CC",
+      "#CC00FF",
+      "#CC3300",
+      "#CC3333",
+      "#CC3366",
+      "#CC3399",
+      "#CC33CC",
+      "#CC33FF",
+      "#CC6600",
+      "#CC6633",
+      "#CC9900",
+      "#CC9933",
+      "#CCCC00",
+      "#CCCC33",
+      "#FF0000",
+      "#FF0033",
+      "#FF0066",
+      "#FF0099",
+      "#FF00CC",
+      "#FF00FF",
+      "#FF3300",
+      "#FF3333",
+      "#FF3366",
+      "#FF3399",
+      "#FF33CC",
+      "#FF33FF",
+      "#FF6600",
+      "#FF6633",
+      "#FF9900",
+      "#FF9933",
+      "#FFCC00",
+      "#FFCC33"
+    ];
+    function useColors() {
+      if (typeof window !== "undefined" && window.process && (window.process.type === "renderer" || window.process.__nwjs)) {
+        return true;
+      }
+      if (typeof navigator !== "undefined" && navigator.userAgent && navigator.userAgent.toLowerCase().match(/(edge|trident)\/(\d+)/)) {
+        return false;
+      }
+      let m;
+      return typeof document !== "undefined" && document.documentElement && document.documentElement.style && document.documentElement.style.WebkitAppearance || // Is firebug? http://stackoverflow.com/a/398120/376773
+      typeof window !== "undefined" && window.console && (window.console.firebug || window.console.exception && window.console.table) || // Is firefox >= v31?
+      // https://developer.mozilla.org/en-US/docs/Tools/Web_Console#Styling_messages
+      typeof navigator !== "undefined" && navigator.userAgent && (m = navigator.userAgent.toLowerCase().match(/firefox\/(\d+)/)) && parseInt(m[1], 10) >= 31 || // Double check webkit in userAgent just in case we are in a worker
+      typeof navigator !== "undefined" && navigator.userAgent && navigator.userAgent.toLowerCase().match(/applewebkit\/(\d+)/);
+    }
+    function formatArgs(args) {
+      args[0] = (this.useColors ? "%c" : "") + this.namespace + (this.useColors ? " %c" : " ") + args[0] + (this.useColors ? "%c " : " ") + "+" + module.exports.humanize(this.diff);
+      if (!this.useColors) {
+        return;
+      }
+      const c = "color: " + this.color;
+      args.splice(1, 0, c, "color: inherit");
+      let index = 0;
+      let lastC = 0;
+      args[0].replace(/%[a-zA-Z%]/g, (match) => {
+        if (match === "%%") {
+          return;
+        }
+        index++;
+        if (match === "%c") {
+          lastC = index;
+        }
+      });
+      args.splice(lastC, 0, c);
+    }
+    exports.log = console.debug || console.log || (() => {
+    });
+    function save(namespaces) {
+      try {
+        if (namespaces) {
+          exports.storage.setItem("debug", namespaces);
+        } else {
+          exports.storage.removeItem("debug");
+        }
+      } catch (error2) {
+      }
+    }
+    function load() {
+      let r;
+      try {
+        r = exports.storage.getItem("debug");
+      } catch (error2) {
+      }
+      if (!r && typeof process !== "undefined" && "env" in process) {
+        r = process.env.DEBUG;
+      }
+      return r;
+    }
+    function localstorage() {
+      try {
+        return localStorage;
+      } catch (error2) {
+      }
+    }
+    module.exports = requireCommon$2()(exports);
+    const { formatters } = module.exports;
+    formatters.j = function(v) {
+      try {
+        return JSON.stringify(v);
+      } catch (error2) {
+        return "[UnexpectedJSONParseError]: " + error2.message;
+      }
+    };
+  })(browser, browser.exports);
+  return browser.exports;
+}
+var node$2 = { exports: {} };
+var hasFlag$1;
+var hasRequiredHasFlag$1;
+function requireHasFlag$1() {
+  if (hasRequiredHasFlag$1) return hasFlag$1;
+  hasRequiredHasFlag$1 = 1;
+  hasFlag$1 = (flag, argv = process.argv) => {
+    const prefix = flag.startsWith("-") ? "" : flag.length === 1 ? "-" : "--";
+    const position = argv.indexOf(prefix + flag);
+    const terminatorPosition = argv.indexOf("--");
+    return position !== -1 && (terminatorPosition === -1 || position < terminatorPosition);
+  };
+  return hasFlag$1;
+}
+var supportsColor_1;
+var hasRequiredSupportsColor;
+function requireSupportsColor() {
+  if (hasRequiredSupportsColor) return supportsColor_1;
+  hasRequiredSupportsColor = 1;
+  const os = require$$0$5;
+  const tty = require$$1;
+  const hasFlag2 = requireHasFlag$1();
+  const { env } = process;
+  let flagForceColor;
+  if (hasFlag2("no-color") || hasFlag2("no-colors") || hasFlag2("color=false") || hasFlag2("color=never")) {
+    flagForceColor = 0;
+  } else if (hasFlag2("color") || hasFlag2("colors") || hasFlag2("color=true") || hasFlag2("color=always")) {
+    flagForceColor = 1;
+  }
+  function envForceColor() {
+    if ("FORCE_COLOR" in env) {
+      if (env.FORCE_COLOR === "true") {
+        return 1;
+      }
+      if (env.FORCE_COLOR === "false") {
+        return 0;
+      }
+      return env.FORCE_COLOR.length === 0 ? 1 : Math.min(Number.parseInt(env.FORCE_COLOR, 10), 3);
+    }
+  }
+  function translateLevel(level) {
+    if (level === 0) {
+      return false;
+    }
+    return {
+      level,
+      hasBasic: true,
+      has256: level >= 2,
+      has16m: level >= 3
+    };
+  }
+  function supportsColor(haveStream, { streamIsTTY, sniffFlags = true } = {}) {
+    const noFlagForceColor = envForceColor();
+    if (noFlagForceColor !== void 0) {
+      flagForceColor = noFlagForceColor;
+    }
+    const forceColor = sniffFlags ? flagForceColor : noFlagForceColor;
+    if (forceColor === 0) {
+      return 0;
+    }
+    if (sniffFlags) {
+      if (hasFlag2("color=16m") || hasFlag2("color=full") || hasFlag2("color=truecolor")) {
+        return 3;
+      }
+      if (hasFlag2("color=256")) {
+        return 2;
+      }
+    }
+    if (haveStream && !streamIsTTY && forceColor === void 0) {
+      return 0;
+    }
+    const min = forceColor || 0;
+    if (env.TERM === "dumb") {
+      return min;
+    }
+    if (process.platform === "win32") {
+      const osRelease = os.release().split(".");
+      if (Number(osRelease[0]) >= 10 && Number(osRelease[2]) >= 10586) {
+        return Number(osRelease[2]) >= 14931 ? 3 : 2;
+      }
+      return 1;
+    }
+    if ("CI" in env) {
+      if (["TRAVIS", "CIRCLECI", "APPVEYOR", "GITLAB_CI", "GITHUB_ACTIONS", "BUILDKITE", "DRONE"].some((sign) => sign in env) || env.CI_NAME === "codeship") {
+        return 1;
+      }
+      return min;
+    }
+    if ("TEAMCITY_VERSION" in env) {
+      return /^(9\.(0*[1-9]\d*)\.|\d{2,}\.)/.test(env.TEAMCITY_VERSION) ? 1 : 0;
+    }
+    if (env.COLORTERM === "truecolor") {
+      return 3;
+    }
+    if ("TERM_PROGRAM" in env) {
+      const version2 = Number.parseInt((env.TERM_PROGRAM_VERSION || "").split(".")[0], 10);
+      switch (env.TERM_PROGRAM) {
+        case "iTerm.app":
+          return version2 >= 3 ? 3 : 2;
+        case "Apple_Terminal":
+          return 2;
+      }
+    }
+    if (/-256(color)?$/i.test(env.TERM)) {
+      return 2;
+    }
+    if (/^screen|^xterm|^vt100|^vt220|^rxvt|color|ansi|cygwin|linux/i.test(env.TERM)) {
+      return 1;
+    }
+    if ("COLORTERM" in env) {
+      return 1;
+    }
+    return min;
+  }
+  function getSupportLevel(stream2, options = {}) {
+    const level = supportsColor(stream2, {
+      streamIsTTY: stream2 && stream2.isTTY,
+      ...options
+    });
+    return translateLevel(level);
+  }
+  supportsColor_1 = {
+    supportsColor: getSupportLevel,
+    stdout: getSupportLevel({ isTTY: tty.isatty(1) }),
+    stderr: getSupportLevel({ isTTY: tty.isatty(2) })
+  };
+  return supportsColor_1;
+}
+var hasRequiredNode$2;
+function requireNode$2() {
+  if (hasRequiredNode$2) return node$2.exports;
+  hasRequiredNode$2 = 1;
+  (function(module, exports) {
+    const tty = require$$1;
+    const util2 = require$$0$3;
+    exports.init = init;
+    exports.log = log;
+    exports.formatArgs = formatArgs;
+    exports.save = save;
+    exports.load = load;
+    exports.useColors = useColors;
+    exports.destroy = util2.deprecate(
+      () => {
+      },
+      "Instance method `debug.destroy()` is deprecated and no longer does anything. It will be removed in the next major version of `debug`."
+    );
+    exports.colors = [6, 2, 3, 4, 5, 1];
+    try {
+      const supportsColor = requireSupportsColor();
+      if (supportsColor && (supportsColor.stderr || supportsColor).level >= 2) {
+        exports.colors = [
+          20,
+          21,
+          26,
+          27,
+          32,
+          33,
+          38,
+          39,
+          40,
+          41,
+          42,
+          43,
+          44,
+          45,
+          56,
+          57,
+          62,
+          63,
+          68,
+          69,
+          74,
+          75,
+          76,
+          77,
+          78,
+          79,
+          80,
+          81,
+          92,
+          93,
+          98,
+          99,
+          112,
+          113,
+          128,
+          129,
+          134,
+          135,
+          148,
+          149,
+          160,
+          161,
+          162,
+          163,
+          164,
+          165,
+          166,
+          167,
+          168,
+          169,
+          170,
+          171,
+          172,
+          173,
+          178,
+          179,
+          184,
+          185,
+          196,
+          197,
+          198,
+          199,
+          200,
+          201,
+          202,
+          203,
+          204,
+          205,
+          206,
+          207,
+          208,
+          209,
+          214,
+          215,
+          220,
+          221
+        ];
+      }
+    } catch (error2) {
+    }
+    exports.inspectOpts = Object.keys(process.env).filter((key) => {
+      return /^debug_/i.test(key);
+    }).reduce((obj, key) => {
+      const prop = key.substring(6).toLowerCase().replace(/_([a-z])/g, (_, k) => {
+        return k.toUpperCase();
+      });
+      let val = process.env[key];
+      if (/^(yes|on|true|enabled)$/i.test(val)) {
+        val = true;
+      } else if (/^(no|off|false|disabled)$/i.test(val)) {
+        val = false;
+      } else if (val === "null") {
+        val = null;
+      } else {
+        val = Number(val);
+      }
+      obj[prop] = val;
+      return obj;
+    }, {});
+    function useColors() {
+      return "colors" in exports.inspectOpts ? Boolean(exports.inspectOpts.colors) : tty.isatty(process.stderr.fd);
+    }
+    function formatArgs(args) {
+      const { namespace: name, useColors: useColors2 } = this;
+      if (useColors2) {
+        const c = this.color;
+        const colorCode = "\x1B[3" + (c < 8 ? c : "8;5;" + c);
+        const prefix = `  ${colorCode};1m${name} \x1B[0m`;
+        args[0] = prefix + args[0].split("\n").join("\n" + prefix);
+        args.push(colorCode + "m+" + module.exports.humanize(this.diff) + "\x1B[0m");
+      } else {
+        args[0] = getDate() + name + " " + args[0];
+      }
+    }
+    function getDate() {
+      if (exports.inspectOpts.hideDate) {
+        return "";
+      }
+      return (/* @__PURE__ */ new Date()).toISOString() + " ";
+    }
+    function log(...args) {
+      return process.stderr.write(util2.formatWithOptions(exports.inspectOpts, ...args) + "\n");
+    }
+    function save(namespaces) {
+      if (namespaces) {
+        process.env.DEBUG = namespaces;
+      } else {
+        delete process.env.DEBUG;
+      }
+    }
+    function load() {
+      return process.env.DEBUG;
+    }
+    function init(debug) {
+      debug.inspectOpts = {};
+      const keys = Object.keys(exports.inspectOpts);
+      for (let i = 0; i < keys.length; i++) {
+        debug.inspectOpts[keys[i]] = exports.inspectOpts[keys[i]];
+      }
+    }
+    module.exports = requireCommon$2()(exports);
+    const { formatters } = module.exports;
+    formatters.o = function(v) {
+      this.inspectOpts.colors = this.useColors;
+      return util2.inspect(v, this.inspectOpts).split("\n").map((str2) => str2.trim()).join(" ");
+    };
+    formatters.O = function(v) {
+      this.inspectOpts.colors = this.useColors;
+      return util2.inspect(v, this.inspectOpts);
+    };
+  })(node$2, node$2.exports);
+  return node$2.exports;
+}
+var hasRequiredSrc;
+function requireSrc() {
+  if (hasRequiredSrc) return src.exports;
+  hasRequiredSrc = 1;
+  if (typeof process === "undefined" || process.type === "renderer" || process.browser === true || process.__nwjs) {
+    src.exports = requireBrowser();
+  } else {
+    src.exports = requireNode$2();
+  }
+  return src.exports;
+}
+var ProgressCallbackTransform = {};
+var hasRequiredProgressCallbackTransform;
+function requireProgressCallbackTransform() {
+  if (hasRequiredProgressCallbackTransform) return ProgressCallbackTransform;
+  hasRequiredProgressCallbackTransform = 1;
+  Object.defineProperty(ProgressCallbackTransform, "__esModule", { value: true });
+  ProgressCallbackTransform.ProgressCallbackTransform = void 0;
+  const stream_1 = require$$0$2;
+  let ProgressCallbackTransform$1 = class ProgressCallbackTransform extends stream_1.Transform {
+    constructor(total, cancellationToken, onProgress) {
+      super();
+      this.total = total;
+      this.cancellationToken = cancellationToken;
+      this.onProgress = onProgress;
+      this.start = Date.now();
+      this.transferred = 0;
+      this.delta = 0;
+      this.nextUpdate = this.start + 1e3;
+    }
+    _transform(chunk, encoding, callback) {
+      if (this.cancellationToken.cancelled) {
+        callback(new Error("cancelled"), null);
+        return;
+      }
+      this.transferred += chunk.length;
+      this.delta += chunk.length;
+      const now = Date.now();
+      if (now >= this.nextUpdate && this.transferred !== this.total) {
+        this.nextUpdate = now + 1e3;
+        this.onProgress({
+          total: this.total,
+          delta: this.delta,
+          transferred: this.transferred,
+          percent: this.transferred / this.total * 100,
+          bytesPerSecond: Math.round(this.transferred / ((now - this.start) / 1e3))
+        });
+        this.delta = 0;
+      }
+      callback(null, chunk);
+    }
+    _flush(callback) {
+      if (this.cancellationToken.cancelled) {
+        callback(new Error("cancelled"));
+        return;
+      }
+      this.onProgress({
+        total: this.total,
+        delta: this.delta,
+        transferred: this.total,
+        percent: 100,
+        bytesPerSecond: Math.round(this.transferred / ((Date.now() - this.start) / 1e3))
+      });
+      this.delta = 0;
+      callback(null);
+    }
+  };
+  ProgressCallbackTransform.ProgressCallbackTransform = ProgressCallbackTransform$1;
+  return ProgressCallbackTransform;
+}
+var hasRequiredHttpExecutor;
+function requireHttpExecutor() {
+  if (hasRequiredHttpExecutor) return httpExecutor;
+  hasRequiredHttpExecutor = 1;
+  Object.defineProperty(httpExecutor, "__esModule", { value: true });
+  httpExecutor.DigestTransform = httpExecutor.HttpExecutor = httpExecutor.HttpError = void 0;
+  httpExecutor.createHttpError = createHttpError;
+  httpExecutor.parseJson = parseJson;
+  httpExecutor.configureRequestOptionsFromUrl = configureRequestOptionsFromUrl;
+  httpExecutor.configureRequestUrl = configureRequestUrl;
+  httpExecutor.safeGetHeader = safeGetHeader;
+  httpExecutor.configureRequestOptions = configureRequestOptions;
+  httpExecutor.safeStringifyJson = safeStringifyJson;
+  const crypto_1 = require$$0$6;
+  const debug_12 = requireSrc();
+  const fs_1 = fs$1;
+  const stream_1 = require$$0$2;
+  const url_1 = require$$4;
+  const CancellationToken_1 = requireCancellationToken();
+  const error_1 = requireError();
+  const ProgressCallbackTransform_1 = requireProgressCallbackTransform();
+  const debug = (0, debug_12.default)("electron-builder");
+  function createHttpError(response, description = null) {
+    return new HttpError(response.statusCode || -1, `${response.statusCode} ${response.statusMessage}` + (description == null ? "" : "\n" + JSON.stringify(description, null, "  ")) + "\nHeaders: " + safeStringifyJson(response.headers), description);
+  }
+  const HTTP_STATUS_CODES = /* @__PURE__ */ new Map([
+    [429, "Too many requests"],
+    [400, "Bad request"],
+    [403, "Forbidden"],
+    [404, "Not found"],
+    [405, "Method not allowed"],
+    [406, "Not acceptable"],
+    [408, "Request timeout"],
+    [413, "Request entity too large"],
+    [500, "Internal server error"],
+    [502, "Bad gateway"],
+    [503, "Service unavailable"],
+    [504, "Gateway timeout"],
+    [505, "HTTP version not supported"]
+  ]);
+  class HttpError extends Error {
+    constructor(statusCode, message = `HTTP error: ${HTTP_STATUS_CODES.get(statusCode) || statusCode}`, description = null) {
+      super(message);
+      this.statusCode = statusCode;
+      this.description = description;
+      this.name = "HttpError";
+      this.code = `HTTP_ERROR_${statusCode}`;
+    }
+    isServerError() {
+      return this.statusCode >= 500 && this.statusCode <= 599;
+    }
+  }
+  httpExecutor.HttpError = HttpError;
+  function parseJson(result) {
+    return result.then((it) => it == null || it.length === 0 ? null : JSON.parse(it));
+  }
+  class HttpExecutor {
+    constructor() {
+      this.maxRedirects = 10;
+    }
+    request(options, cancellationToken = new CancellationToken_1.CancellationToken(), data) {
+      configureRequestOptions(options);
+      const json2 = data == null ? void 0 : JSON.stringify(data);
+      const encodedData = json2 ? Buffer.from(json2) : void 0;
+      if (encodedData != null) {
+        debug(json2);
+        const { headers, ...opts } = options;
+        options = {
+          method: "post",
+          headers: {
+            "Content-Type": "application/json",
+            "Content-Length": encodedData.length,
+            ...headers
+          },
+          ...opts
+        };
+      }
+      return this.doApiRequest(options, cancellationToken, (it) => it.end(encodedData));
+    }
+    doApiRequest(options, cancellationToken, requestProcessor, redirectCount = 0) {
+      if (debug.enabled) {
+        debug(`Request: ${safeStringifyJson(options)}`);
+      }
+      return cancellationToken.createPromise((resolve, reject, onCancel) => {
+        const request = this.createRequest(options, (response) => {
+          try {
+            this.handleResponse(response, options, cancellationToken, resolve, reject, redirectCount, requestProcessor);
+          } catch (e) {
+            reject(e);
+          }
+        });
+        this.addErrorAndTimeoutHandlers(request, reject, options.timeout);
+        this.addRedirectHandlers(request, options, reject, redirectCount, (options2) => {
+          this.doApiRequest(options2, cancellationToken, requestProcessor, redirectCount).then(resolve).catch(reject);
+        });
+        requestProcessor(request, reject);
+        onCancel(() => request.abort());
+      });
+    }
+    // noinspection JSUnusedLocalSymbols
+    // eslint-disable-next-line
+    addRedirectHandlers(request, options, reject, redirectCount, handler) {
+    }
+    addErrorAndTimeoutHandlers(request, reject, timeout = 60 * 1e3) {
+      this.addTimeOutHandler(request, reject, timeout);
+      request.on("error", reject);
+      request.on("aborted", () => {
+        reject(new Error("Request has been aborted by the server"));
+      });
+    }
+    handleResponse(response, options, cancellationToken, resolve, reject, redirectCount, requestProcessor) {
+      var _a;
+      if (debug.enabled) {
+        debug(`Response: ${response.statusCode} ${response.statusMessage}, request options: ${safeStringifyJson(options)}`);
+      }
+      if (response.statusCode === 404) {
+        reject(createHttpError(response, `method: ${options.method || "GET"} url: ${options.protocol || "https:"}//${options.hostname}${options.port ? `:${options.port}` : ""}${options.path}
+
+Please double check that your authentication token is correct. Due to security reasons, actual status maybe not reported, but 404.
+`));
+        return;
+      } else if (response.statusCode === 204) {
+        resolve();
+        return;
+      }
+      const code = (_a = response.statusCode) !== null && _a !== void 0 ? _a : 0;
+      const shouldRedirect = code >= 300 && code < 400;
+      const redirectUrl = safeGetHeader(response, "location");
+      if (shouldRedirect && redirectUrl != null) {
+        if (redirectCount > this.maxRedirects) {
+          reject(this.createMaxRedirectError());
+          return;
+        }
+        this.doApiRequest(HttpExecutor.prepareRedirectUrlOptions(redirectUrl, options), cancellationToken, requestProcessor, redirectCount).then(resolve).catch(reject);
+        return;
+      }
+      response.setEncoding("utf8");
+      let data = "";
+      response.on("error", reject);
+      response.on("data", (chunk) => data += chunk);
+      response.on("end", () => {
+        try {
+          if (response.statusCode != null && response.statusCode >= 400) {
+            const contentType = safeGetHeader(response, "content-type");
+            const isJson = contentType != null && (Array.isArray(contentType) ? contentType.find((it) => it.includes("json")) != null : contentType.includes("json"));
+            reject(createHttpError(response, `method: ${options.method || "GET"} url: ${options.protocol || "https:"}//${options.hostname}${options.port ? `:${options.port}` : ""}${options.path}
+
+          Data:
+          ${isJson ? JSON.stringify(JSON.parse(data)) : data}
+          `));
+          } else {
+            resolve(data.length === 0 ? null : data);
+          }
+        } catch (e) {
+          reject(e);
+        }
+      });
+    }
+    async downloadToBuffer(url, options) {
+      return await options.cancellationToken.createPromise((resolve, reject, onCancel) => {
+        const responseChunks = [];
+        const requestOptions = {
+          headers: options.headers || void 0,
+          // because PrivateGitHubProvider requires HttpExecutor.prepareRedirectUrlOptions logic, so, we need to redirect manually
+          redirect: "manual"
+        };
+        configureRequestUrl(url, requestOptions);
+        configureRequestOptions(requestOptions);
+        this.doDownload(requestOptions, {
+          destination: null,
+          options,
+          onCancel,
+          callback: (error2) => {
+            if (error2 == null) {
+              resolve(Buffer.concat(responseChunks));
+            } else {
+              reject(error2);
+            }
+          },
+          responseHandler: (response, callback) => {
+            let receivedLength = 0;
+            response.on("data", (chunk) => {
+              receivedLength += chunk.length;
+              if (receivedLength > 524288e3) {
+                callback(new Error("Maximum allowed size is 500 MB"));
+                return;
+              }
+              responseChunks.push(chunk);
+            });
+            response.on("end", () => {
+              callback(null);
+            });
+          }
+        }, 0);
+      });
+    }
+    doDownload(requestOptions, options, redirectCount) {
+      const request = this.createRequest(requestOptions, (response) => {
+        if (response.statusCode >= 400) {
+          options.callback(new Error(`Cannot download "${requestOptions.protocol || "https:"}//${requestOptions.hostname}${requestOptions.path}", status ${response.statusCode}: ${response.statusMessage}`));
+          return;
+        }
+        response.on("error", options.callback);
+        const redirectUrl = safeGetHeader(response, "location");
+        if (redirectUrl != null) {
+          if (redirectCount < this.maxRedirects) {
+            this.doDownload(HttpExecutor.prepareRedirectUrlOptions(redirectUrl, requestOptions), options, redirectCount++);
+          } else {
+            options.callback(this.createMaxRedirectError());
+          }
+          return;
+        }
+        if (options.responseHandler == null) {
+          configurePipes(options, response);
+        } else {
+          options.responseHandler(response, options.callback);
+        }
+      });
+      this.addErrorAndTimeoutHandlers(request, options.callback, requestOptions.timeout);
+      this.addRedirectHandlers(request, requestOptions, options.callback, redirectCount, (requestOptions2) => {
+        this.doDownload(requestOptions2, options, redirectCount++);
+      });
+      request.end();
+    }
+    createMaxRedirectError() {
+      return new Error(`Too many redirects (> ${this.maxRedirects})`);
+    }
+    addTimeOutHandler(request, callback, timeout) {
+      request.on("socket", (socket) => {
+        socket.setTimeout(timeout, () => {
+          request.abort();
+          callback(new Error("Request timed out"));
+        });
+      });
+    }
+    static prepareRedirectUrlOptions(redirectUrl, options) {
+      const newOptions = configureRequestOptionsFromUrl(redirectUrl, { ...options });
+      const headers = newOptions.headers;
+      if (headers === null || headers === void 0 ? void 0 : headers.authorization) {
+        const parsedNewUrl = new url_1.URL(redirectUrl);
+        if (parsedNewUrl.hostname.endsWith(".amazonaws.com") || parsedNewUrl.searchParams.has("X-Amz-Credential")) {
+          delete headers.authorization;
+        }
+      }
+      return newOptions;
+    }
+    static retryOnServerError(task, maxRetries = 3) {
+      for (let attemptNumber = 0; ; attemptNumber++) {
+        try {
+          return task();
+        } catch (e) {
+          if (attemptNumber < maxRetries && (e instanceof HttpError && e.isServerError() || e.code === "EPIPE")) {
+            continue;
+          }
+          throw e;
+        }
+      }
+    }
+  }
+  httpExecutor.HttpExecutor = HttpExecutor;
+  function configureRequestOptionsFromUrl(url, options) {
+    const result = configureRequestOptions(options);
+    configureRequestUrl(new url_1.URL(url), result);
+    return result;
+  }
+  function configureRequestUrl(url, options) {
+    options.protocol = url.protocol;
+    options.hostname = url.hostname;
+    if (url.port) {
+      options.port = url.port;
+    } else if (options.port) {
+      delete options.port;
+    }
+    options.path = url.pathname + url.search;
+  }
+  class DigestTransform extends stream_1.Transform {
+    // noinspection JSUnusedGlobalSymbols
+    get actual() {
+      return this._actual;
+    }
+    constructor(expected, algorithm = "sha512", encoding = "base64") {
+      super();
+      this.expected = expected;
+      this.algorithm = algorithm;
+      this.encoding = encoding;
+      this._actual = null;
+      this.isValidateOnEnd = true;
+      this.digester = (0, crypto_1.createHash)(algorithm);
+    }
+    // noinspection JSUnusedGlobalSymbols
+    _transform(chunk, encoding, callback) {
+      this.digester.update(chunk);
+      callback(null, chunk);
+    }
+    // noinspection JSUnusedGlobalSymbols
+    _flush(callback) {
+      this._actual = this.digester.digest(this.encoding);
+      if (this.isValidateOnEnd) {
+        try {
+          this.validate();
+        } catch (e) {
+          callback(e);
+          return;
+        }
+      }
+      callback(null);
+    }
+    validate() {
+      if (this._actual == null) {
+        throw (0, error_1.newError)("Not finished yet", "ERR_STREAM_NOT_FINISHED");
+      }
+      if (this._actual !== this.expected) {
+        throw (0, error_1.newError)(`${this.algorithm} checksum mismatch, expected ${this.expected}, got ${this._actual}`, "ERR_CHECKSUM_MISMATCH");
+      }
+      return null;
+    }
+  }
+  httpExecutor.DigestTransform = DigestTransform;
+  function checkSha2(sha2Header, sha2, callback) {
+    if (sha2Header != null && sha2 != null && sha2Header !== sha2) {
+      callback(new Error(`checksum mismatch: expected ${sha2} but got ${sha2Header} (X-Checksum-Sha2 header)`));
+      return false;
+    }
+    return true;
+  }
+  function safeGetHeader(response, headerKey) {
+    const value = response.headers[headerKey];
+    if (value == null) {
+      return null;
+    } else if (Array.isArray(value)) {
+      return value.length === 0 ? null : value[value.length - 1];
+    } else {
+      return value;
+    }
+  }
+  function configurePipes(options, response) {
+    if (!checkSha2(safeGetHeader(response, "X-Checksum-Sha2"), options.options.sha2, options.callback)) {
+      return;
+    }
+    const streams = [];
+    if (options.options.onProgress != null) {
+      const contentLength = safeGetHeader(response, "content-length");
+      if (contentLength != null) {
+        streams.push(new ProgressCallbackTransform_1.ProgressCallbackTransform(parseInt(contentLength, 10), options.options.cancellationToken, options.options.onProgress));
+      }
+    }
+    const sha512 = options.options.sha512;
+    if (sha512 != null) {
+      streams.push(new DigestTransform(sha512, "sha512", sha512.length === 128 && !sha512.includes("+") && !sha512.includes("Z") && !sha512.includes("=") ? "hex" : "base64"));
+    } else if (options.options.sha2 != null) {
+      streams.push(new DigestTransform(options.options.sha2, "sha256", "hex"));
+    }
+    const fileOut = (0, fs_1.createWriteStream)(options.destination);
+    streams.push(fileOut);
+    let lastStream = response;
+    for (const stream2 of streams) {
+      stream2.on("error", (error2) => {
+        fileOut.close();
+        if (!options.options.cancellationToken.cancelled) {
+          options.callback(error2);
+        }
+      });
+      lastStream = lastStream.pipe(stream2);
+    }
+    fileOut.on("finish", () => {
+      fileOut.close(options.callback);
+    });
+  }
+  function configureRequestOptions(options, token2, method) {
+    if (method != null) {
+      options.method = method;
+    }
+    options.headers = { ...options.headers };
+    const headers = options.headers;
+    if (token2 != null) {
+      headers.authorization = token2.startsWith("Basic") || token2.startsWith("Bearer") ? token2 : `token ${token2}`;
+    }
+    if (headers["User-Agent"] == null) {
+      headers["User-Agent"] = "electron-builder";
+    }
+    if (method == null || method === "GET" || headers["Cache-Control"] == null) {
+      headers["Cache-Control"] = "no-cache";
+    }
+    if (options.protocol == null && process.versions.electron != null) {
+      options.protocol = "https:";
+    }
+    return options;
+  }
+  function safeStringifyJson(data, skippedNames) {
+    return JSON.stringify(data, (name, value) => {
+      if (name.endsWith("Authorization") || name.endsWith("authorization") || name.endsWith("Password") || name.endsWith("PASSWORD") || name.endsWith("Token") || name.includes("password") || name.includes("token") || skippedNames != null && skippedNames.has(name)) {
+        return "<stripped sensitive data>";
+      }
+      return value;
+    }, 2);
+  }
+  return httpExecutor;
+}
+var MemoLazy = {};
+var hasRequiredMemoLazy;
+function requireMemoLazy() {
+  if (hasRequiredMemoLazy) return MemoLazy;
+  hasRequiredMemoLazy = 1;
+  Object.defineProperty(MemoLazy, "__esModule", { value: true });
+  MemoLazy.MemoLazy = void 0;
+  let MemoLazy$1 = class MemoLazy {
+    constructor(selector, creator) {
+      this.selector = selector;
+      this.creator = creator;
+      this.selected = void 0;
+      this._value = void 0;
+    }
+    get hasValue() {
+      return this._value !== void 0;
+    }
+    get value() {
+      const selected = this.selector();
+      if (this._value !== void 0 && equals(this.selected, selected)) {
+        return this._value;
+      }
+      this.selected = selected;
+      const result = this.creator(selected);
+      this.value = result;
+      return result;
+    }
+    set value(value) {
+      this._value = value;
+    }
+  };
+  MemoLazy.MemoLazy = MemoLazy$1;
+  function equals(firstValue, secondValue) {
+    const isFirstObject = typeof firstValue === "object" && firstValue !== null;
+    const isSecondObject = typeof secondValue === "object" && secondValue !== null;
+    if (isFirstObject && isSecondObject) {
+      const keys1 = Object.keys(firstValue);
+      const keys2 = Object.keys(secondValue);
+      return keys1.length === keys2.length && keys1.every((key) => equals(firstValue[key], secondValue[key]));
+    }
+    return firstValue === secondValue;
+  }
+  return MemoLazy;
+}
+var publishOptions = {};
+var hasRequiredPublishOptions;
+function requirePublishOptions() {
+  if (hasRequiredPublishOptions) return publishOptions;
+  hasRequiredPublishOptions = 1;
+  Object.defineProperty(publishOptions, "__esModule", { value: true });
+  publishOptions.githubUrl = githubUrl;
+  publishOptions.getS3LikeProviderBaseUrl = getS3LikeProviderBaseUrl;
+  function githubUrl(options, defaultHost = "github.com") {
+    return `${options.protocol || "https"}://${options.host || defaultHost}`;
+  }
+  function getS3LikeProviderBaseUrl(configuration) {
+    const provider = configuration.provider;
+    if (provider === "s3") {
+      return s3Url(configuration);
+    }
+    if (provider === "spaces") {
+      return spacesUrl(configuration);
+    }
+    throw new Error(`Not supported provider: ${provider}`);
+  }
+  function s3Url(options) {
+    let url;
+    if (options.accelerate == true) {
+      url = `https://${options.bucket}.s3-accelerate.amazonaws.com`;
+    } else if (options.endpoint != null) {
+      url = `${options.endpoint}/${options.bucket}`;
+    } else if (options.bucket.includes(".")) {
+      if (options.region == null) {
+        throw new Error(`Bucket name "${options.bucket}" includes a dot, but S3 region is missing`);
+      }
+      if (options.region === "us-east-1") {
+        url = `https://s3.amazonaws.com/${options.bucket}`;
+      } else {
+        url = `https://s3-${options.region}.amazonaws.com/${options.bucket}`;
+      }
+    } else if (options.region === "cn-north-1") {
+      url = `https://${options.bucket}.s3.${options.region}.amazonaws.com.cn`;
+    } else {
+      url = `https://${options.bucket}.s3.amazonaws.com`;
+    }
+    return appendPath(url, options.path);
+  }
+  function appendPath(url, p) {
+    if (p != null && p.length > 0) {
+      if (!p.startsWith("/")) {
+        url += "/";
+      }
+      url += p;
+    }
+    return url;
+  }
+  function spacesUrl(options) {
+    if (options.name == null) {
+      throw new Error(`name is missing`);
+    }
+    if (options.region == null) {
+      throw new Error(`region is missing`);
+    }
+    return appendPath(`https://${options.name}.${options.region}.digitaloceanspaces.com`, options.path);
+  }
+  return publishOptions;
+}
+var retry = {};
+var hasRequiredRetry;
+function requireRetry() {
+  if (hasRequiredRetry) return retry;
+  hasRequiredRetry = 1;
+  Object.defineProperty(retry, "__esModule", { value: true });
+  retry.retry = retry$1;
+  const CancellationToken_1 = requireCancellationToken();
+  async function retry$1(task, retryCount, interval, backoff = 0, attempt = 0, shouldRetry) {
+    var _a;
+    const cancellationToken = new CancellationToken_1.CancellationToken();
+    try {
+      return await task();
+    } catch (error2) {
+      if (((_a = shouldRetry === null || shouldRetry === void 0 ? void 0 : shouldRetry(error2)) !== null && _a !== void 0 ? _a : true) && retryCount > 0 && !cancellationToken.cancelled) {
+        await new Promise((resolve) => setTimeout(resolve, interval + backoff * attempt));
+        return await retry$1(task, retryCount - 1, interval, backoff, attempt + 1, shouldRetry);
+      } else {
+        throw error2;
+      }
+    }
+  }
+  return retry;
+}
+var rfc2253Parser = {};
+var hasRequiredRfc2253Parser;
+function requireRfc2253Parser() {
+  if (hasRequiredRfc2253Parser) return rfc2253Parser;
+  hasRequiredRfc2253Parser = 1;
+  Object.defineProperty(rfc2253Parser, "__esModule", { value: true });
+  rfc2253Parser.parseDn = parseDn;
+  function parseDn(seq2) {
+    let quoted = false;
+    let key = null;
+    let token2 = "";
+    let nextNonSpace = 0;
+    seq2 = seq2.trim();
+    const result = /* @__PURE__ */ new Map();
+    for (let i = 0; i <= seq2.length; i++) {
+      if (i === seq2.length) {
+        if (key !== null) {
+          result.set(key, token2);
+        }
+        break;
+      }
+      const ch = seq2[i];
+      if (quoted) {
+        if (ch === '"') {
+          quoted = false;
+          continue;
+        }
+      } else {
+        if (ch === '"') {
+          quoted = true;
+          continue;
+        }
+        if (ch === "\\") {
+          i++;
+          const ord = parseInt(seq2.slice(i, i + 2), 16);
+          if (Number.isNaN(ord)) {
+            token2 += seq2[i];
+          } else {
+            i++;
+            token2 += String.fromCharCode(ord);
+          }
+          continue;
+        }
+        if (key === null && ch === "=") {
+          key = token2;
+          token2 = "";
+          continue;
+        }
+        if (ch === "," || ch === ";" || ch === "+") {
+          if (key !== null) {
+            result.set(key, token2);
+          }
+          key = null;
+          token2 = "";
+          continue;
+        }
+      }
+      if (ch === " " && !quoted) {
+        if (token2.length === 0) {
+          continue;
+        }
+        if (i > nextNonSpace) {
+          let j = i;
+          while (seq2[j] === " ") {
+            j++;
+          }
+          nextNonSpace = j;
+        }
+        if (nextNonSpace >= seq2.length || seq2[nextNonSpace] === "," || seq2[nextNonSpace] === ";" || key === null && seq2[nextNonSpace] === "=" || key !== null && seq2[nextNonSpace] === "+") {
+          i = nextNonSpace - 1;
+          continue;
+        }
+      }
+      token2 += ch;
+    }
+    return result;
+  }
+  return rfc2253Parser;
+}
+var uuid = {};
+var hasRequiredUuid;
+function requireUuid() {
+  if (hasRequiredUuid) return uuid;
+  hasRequiredUuid = 1;
+  Object.defineProperty(uuid, "__esModule", { value: true });
+  uuid.nil = uuid.UUID = void 0;
+  const crypto_1 = require$$0$6;
+  const error_1 = requireError();
+  const invalidName = "options.name must be either a string or a Buffer";
+  const randomHost = (0, crypto_1.randomBytes)(16);
+  randomHost[0] = randomHost[0] | 1;
+  const hex2byte = {};
+  const byte2hex = [];
+  for (let i = 0; i < 256; i++) {
+    const hex = (i + 256).toString(16).substr(1);
+    hex2byte[hex] = i;
+    byte2hex[i] = hex;
+  }
+  class UUID {
+    constructor(uuid2) {
+      this.ascii = null;
+      this.binary = null;
+      const check = UUID.check(uuid2);
+      if (!check) {
+        throw new Error("not a UUID");
+      }
+      this.version = check.version;
+      if (check.format === "ascii") {
+        this.ascii = uuid2;
+      } else {
+        this.binary = uuid2;
+      }
+    }
+    static v5(name, namespace) {
+      return uuidNamed(name, "sha1", 80, namespace);
+    }
+    toString() {
+      if (this.ascii == null) {
+        this.ascii = stringify(this.binary);
+      }
+      return this.ascii;
+    }
+    inspect() {
+      return `UUID v${this.version} ${this.toString()}`;
+    }
+    static check(uuid2, offset = 0) {
+      if (typeof uuid2 === "string") {
+        uuid2 = uuid2.toLowerCase();
+        if (!/^[a-f0-9]{8}(-[a-f0-9]{4}){3}-([a-f0-9]{12})$/.test(uuid2)) {
+          return false;
+        }
+        if (uuid2 === "00000000-0000-0000-0000-000000000000") {
+          return { version: void 0, variant: "nil", format: "ascii" };
+        }
+        return {
+          version: (hex2byte[uuid2[14] + uuid2[15]] & 240) >> 4,
+          variant: getVariant((hex2byte[uuid2[19] + uuid2[20]] & 224) >> 5),
+          format: "ascii"
+        };
+      }
+      if (Buffer.isBuffer(uuid2)) {
+        if (uuid2.length < offset + 16) {
+          return false;
+        }
+        let i = 0;
+        for (; i < 16; i++) {
+          if (uuid2[offset + i] !== 0) {
+            break;
+          }
+        }
+        if (i === 16) {
+          return { version: void 0, variant: "nil", format: "binary" };
+        }
+        return {
+          version: (uuid2[offset + 6] & 240) >> 4,
+          variant: getVariant((uuid2[offset + 8] & 224) >> 5),
+          format: "binary"
+        };
+      }
+      throw (0, error_1.newError)("Unknown type of uuid", "ERR_UNKNOWN_UUID_TYPE");
+    }
+    // read stringified uuid into a Buffer
+    static parse(input) {
+      const buffer = Buffer.allocUnsafe(16);
+      let j = 0;
+      for (let i = 0; i < 16; i++) {
+        buffer[i] = hex2byte[input[j++] + input[j++]];
+        if (i === 3 || i === 5 || i === 7 || i === 9) {
+          j += 1;
+        }
+      }
+      return buffer;
+    }
+  }
+  uuid.UUID = UUID;
+  UUID.OID = UUID.parse("6ba7b812-9dad-11d1-80b4-00c04fd430c8");
+  function getVariant(bits) {
+    switch (bits) {
+      case 0:
+      case 1:
+      case 3:
+        return "ncs";
+      case 4:
+      case 5:
+        return "rfc4122";
+      case 6:
+        return "microsoft";
+      default:
+        return "future";
+    }
+  }
+  var UuidEncoding;
+  (function(UuidEncoding2) {
+    UuidEncoding2[UuidEncoding2["ASCII"] = 0] = "ASCII";
+    UuidEncoding2[UuidEncoding2["BINARY"] = 1] = "BINARY";
+    UuidEncoding2[UuidEncoding2["OBJECT"] = 2] = "OBJECT";
+  })(UuidEncoding || (UuidEncoding = {}));
+  function uuidNamed(name, hashMethod, version2, namespace, encoding = UuidEncoding.ASCII) {
+    const hash = (0, crypto_1.createHash)(hashMethod);
+    const nameIsNotAString = typeof name !== "string";
+    if (nameIsNotAString && !Buffer.isBuffer(name)) {
+      throw (0, error_1.newError)(invalidName, "ERR_INVALID_UUID_NAME");
+    }
+    hash.update(namespace);
+    hash.update(name);
+    const buffer = hash.digest();
+    let result;
+    switch (encoding) {
+      case UuidEncoding.BINARY:
+        buffer[6] = buffer[6] & 15 | version2;
+        buffer[8] = buffer[8] & 63 | 128;
+        result = buffer;
+        break;
+      case UuidEncoding.OBJECT:
+        buffer[6] = buffer[6] & 15 | version2;
+        buffer[8] = buffer[8] & 63 | 128;
+        result = new UUID(buffer);
+        break;
+      default:
+        result = byte2hex[buffer[0]] + byte2hex[buffer[1]] + byte2hex[buffer[2]] + byte2hex[buffer[3]] + "-" + byte2hex[buffer[4]] + byte2hex[buffer[5]] + "-" + byte2hex[buffer[6] & 15 | version2] + byte2hex[buffer[7]] + "-" + byte2hex[buffer[8] & 63 | 128] + byte2hex[buffer[9]] + "-" + byte2hex[buffer[10]] + byte2hex[buffer[11]] + byte2hex[buffer[12]] + byte2hex[buffer[13]] + byte2hex[buffer[14]] + byte2hex[buffer[15]];
+        break;
+    }
+    return result;
+  }
+  function stringify(buffer) {
+    return byte2hex[buffer[0]] + byte2hex[buffer[1]] + byte2hex[buffer[2]] + byte2hex[buffer[3]] + "-" + byte2hex[buffer[4]] + byte2hex[buffer[5]] + "-" + byte2hex[buffer[6]] + byte2hex[buffer[7]] + "-" + byte2hex[buffer[8]] + byte2hex[buffer[9]] + "-" + byte2hex[buffer[10]] + byte2hex[buffer[11]] + byte2hex[buffer[12]] + byte2hex[buffer[13]] + byte2hex[buffer[14]] + byte2hex[buffer[15]];
+  }
+  uuid.nil = new UUID("00000000-0000-0000-0000-000000000000");
+  return uuid;
+}
+var xml = {};
+var sax = {};
+var hasRequiredSax;
+function requireSax() {
+  if (hasRequiredSax) return sax;
+  hasRequiredSax = 1;
+  (function(exports) {
+    (function(sax2) {
+      sax2.parser = function(strict, opt) {
+        return new SAXParser(strict, opt);
+      };
+      sax2.SAXParser = SAXParser;
+      sax2.SAXStream = SAXStream;
+      sax2.createStream = createStream;
+      sax2.MAX_BUFFER_LENGTH = 64 * 1024;
+      var buffers = [
+        "comment",
+        "sgmlDecl",
+        "textNode",
+        "tagName",
+        "doctype",
+        "procInstName",
+        "procInstBody",
+        "entity",
+        "attribName",
+        "attribValue",
+        "cdata",
+        "script"
+      ];
+      sax2.EVENTS = [
+        "text",
+        "processinginstruction",
+        "sgmldeclaration",
+        "doctype",
+        "comment",
+        "opentagstart",
+        "attribute",
+        "opentag",
+        "closetag",
+        "opencdata",
+        "cdata",
+        "closecdata",
+        "error",
+        "end",
+        "ready",
+        "script",
+        "opennamespace",
+        "closenamespace"
+      ];
+      function SAXParser(strict, opt) {
+        if (!(this instanceof SAXParser)) {
+          return new SAXParser(strict, opt);
+        }
+        var parser = this;
+        clearBuffers(parser);
+        parser.q = parser.c = "";
+        parser.bufferCheckPosition = sax2.MAX_BUFFER_LENGTH;
+        parser.opt = opt || {};
+        parser.opt.lowercase = parser.opt.lowercase || parser.opt.lowercasetags;
+        parser.looseCase = parser.opt.lowercase ? "toLowerCase" : "toUpperCase";
+        parser.tags = [];
+        parser.closed = parser.closedRoot = parser.sawRoot = false;
+        parser.tag = parser.error = null;
+        parser.strict = !!strict;
+        parser.noscript = !!(strict || parser.opt.noscript);
+        parser.state = S.BEGIN;
+        parser.strictEntities = parser.opt.strictEntities;
+        parser.ENTITIES = parser.strictEntities ? Object.create(sax2.XML_ENTITIES) : Object.create(sax2.ENTITIES);
+        parser.attribList = [];
+        if (parser.opt.xmlns) {
+          parser.ns = Object.create(rootNS);
+        }
+        if (parser.opt.unquotedAttributeValues === void 0) {
+          parser.opt.unquotedAttributeValues = !strict;
+        }
+        parser.trackPosition = parser.opt.position !== false;
+        if (parser.trackPosition) {
+          parser.position = parser.line = parser.column = 0;
+        }
+        emit(parser, "onready");
+      }
+      if (!Object.create) {
+        Object.create = function(o) {
+          function F() {
+          }
+          F.prototype = o;
+          var newf = new F();
+          return newf;
+        };
+      }
+      if (!Object.keys) {
+        Object.keys = function(o) {
+          var a = [];
+          for (var i in o) if (o.hasOwnProperty(i)) a.push(i);
+          return a;
+        };
+      }
+      function checkBufferLength(parser) {
+        var maxAllowed = Math.max(sax2.MAX_BUFFER_LENGTH, 10);
+        var maxActual = 0;
+        for (var i = 0, l = buffers.length; i < l; i++) {
+          var len = parser[buffers[i]].length;
+          if (len > maxAllowed) {
+            switch (buffers[i]) {
+              case "textNode":
+                closeText(parser);
+                break;
+              case "cdata":
+                emitNode(parser, "oncdata", parser.cdata);
+                parser.cdata = "";
+                break;
+              case "script":
+                emitNode(parser, "onscript", parser.script);
+                parser.script = "";
+                break;
+              default:
+                error2(parser, "Max buffer length exceeded: " + buffers[i]);
+            }
+          }
+          maxActual = Math.max(maxActual, len);
+        }
+        var m = sax2.MAX_BUFFER_LENGTH - maxActual;
+        parser.bufferCheckPosition = m + parser.position;
+      }
+      function clearBuffers(parser) {
+        for (var i = 0, l = buffers.length; i < l; i++) {
+          parser[buffers[i]] = "";
+        }
+      }
+      function flushBuffers(parser) {
+        closeText(parser);
+        if (parser.cdata !== "") {
+          emitNode(parser, "oncdata", parser.cdata);
+          parser.cdata = "";
+        }
+        if (parser.script !== "") {
+          emitNode(parser, "onscript", parser.script);
+          parser.script = "";
+        }
+      }
+      SAXParser.prototype = {
+        end: function() {
+          end(this);
+        },
+        write,
+        resume: function() {
+          this.error = null;
+          return this;
+        },
+        close: function() {
+          return this.write(null);
+        },
+        flush: function() {
+          flushBuffers(this);
+        }
+      };
+      var Stream;
+      try {
+        Stream = require("stream").Stream;
+      } catch (ex) {
+        Stream = function() {
+        };
+      }
+      if (!Stream) Stream = function() {
+      };
+      var streamWraps = sax2.EVENTS.filter(function(ev) {
+        return ev !== "error" && ev !== "end";
+      });
+      function createStream(strict, opt) {
+        return new SAXStream(strict, opt);
+      }
+      function SAXStream(strict, opt) {
+        if (!(this instanceof SAXStream)) {
+          return new SAXStream(strict, opt);
+        }
+        Stream.apply(this);
+        this._parser = new SAXParser(strict, opt);
+        this.writable = true;
+        this.readable = true;
+        var me = this;
+        this._parser.onend = function() {
+          me.emit("end");
+        };
+        this._parser.onerror = function(er) {
+          me.emit("error", er);
+          me._parser.error = null;
+        };
+        this._decoder = null;
+        streamWraps.forEach(function(ev) {
+          Object.defineProperty(me, "on" + ev, {
+            get: function() {
+              return me._parser["on" + ev];
+            },
+            set: function(h) {
+              if (!h) {
+                me.removeAllListeners(ev);
+                me._parser["on" + ev] = h;
+                return h;
+              }
+              me.on(ev, h);
+            },
+            enumerable: true,
+            configurable: false
+          });
+        });
+      }
+      SAXStream.prototype = Object.create(Stream.prototype, {
+        constructor: {
+          value: SAXStream
+        }
+      });
+      SAXStream.prototype.write = function(data) {
+        if (typeof Buffer === "function" && typeof Buffer.isBuffer === "function" && Buffer.isBuffer(data)) {
+          if (!this._decoder) {
+            var SD = require$$1$1.StringDecoder;
+            this._decoder = new SD("utf8");
+          }
+          data = this._decoder.write(data);
+        }
+        this._parser.write(data.toString());
+        this.emit("data", data);
+        return true;
+      };
+      SAXStream.prototype.end = function(chunk) {
+        if (chunk && chunk.length) {
+          this.write(chunk);
+        }
+        this._parser.end();
+        return true;
+      };
+      SAXStream.prototype.on = function(ev, handler) {
+        var me = this;
+        if (!me._parser["on" + ev] && streamWraps.indexOf(ev) !== -1) {
+          me._parser["on" + ev] = function() {
+            var args = arguments.length === 1 ? [arguments[0]] : Array.apply(null, arguments);
+            args.splice(0, 0, ev);
+            me.emit.apply(me, args);
+          };
+        }
+        return Stream.prototype.on.call(me, ev, handler);
+      };
+      var CDATA = "[CDATA[";
+      var DOCTYPE = "DOCTYPE";
+      var XML_NAMESPACE = "http://www.w3.org/XML/1998/namespace";
+      var XMLNS_NAMESPACE = "http://www.w3.org/2000/xmlns/";
+      var rootNS = { xml: XML_NAMESPACE, xmlns: XMLNS_NAMESPACE };
+      var nameStart = /[:_A-Za-z\u00C0-\u00D6\u00D8-\u00F6\u00F8-\u02FF\u0370-\u037D\u037F-\u1FFF\u200C-\u200D\u2070-\u218F\u2C00-\u2FEF\u3001-\uD7FF\uF900-\uFDCF\uFDF0-\uFFFD]/;
+      var nameBody = /[:_A-Za-z\u00C0-\u00D6\u00D8-\u00F6\u00F8-\u02FF\u0370-\u037D\u037F-\u1FFF\u200C-\u200D\u2070-\u218F\u2C00-\u2FEF\u3001-\uD7FF\uF900-\uFDCF\uFDF0-\uFFFD\u00B7\u0300-\u036F\u203F-\u2040.\d-]/;
+      var entityStart = /[#:_A-Za-z\u00C0-\u00D6\u00D8-\u00F6\u00F8-\u02FF\u0370-\u037D\u037F-\u1FFF\u200C-\u200D\u2070-\u218F\u2C00-\u2FEF\u3001-\uD7FF\uF900-\uFDCF\uFDF0-\uFFFD]/;
+      var entityBody = /[#:_A-Za-z\u00C0-\u00D6\u00D8-\u00F6\u00F8-\u02FF\u0370-\u037D\u037F-\u1FFF\u200C-\u200D\u2070-\u218F\u2C00-\u2FEF\u3001-\uD7FF\uF900-\uFDCF\uFDF0-\uFFFD\u00B7\u0300-\u036F\u203F-\u2040.\d-]/;
+      function isWhitespace(c) {
+        return c === " " || c === "\n" || c === "\r" || c === "	";
+      }
+      function isQuote(c) {
+        return c === '"' || c === "'";
+      }
+      function isAttribEnd(c) {
+        return c === ">" || isWhitespace(c);
+      }
+      function isMatch(regex, c) {
+        return regex.test(c);
+      }
+      function notMatch(regex, c) {
+        return !isMatch(regex, c);
+      }
+      var S = 0;
+      sax2.STATE = {
+        BEGIN: S++,
+        // leading byte order mark or whitespace
+        BEGIN_WHITESPACE: S++,
+        // leading whitespace
+        TEXT: S++,
+        // general stuff
+        TEXT_ENTITY: S++,
+        // &amp and such.
+        OPEN_WAKA: S++,
+        // <
+        SGML_DECL: S++,
+        // <!BLARG
+        SGML_DECL_QUOTED: S++,
+        // <!BLARG foo "bar
+        DOCTYPE: S++,
+        // <!DOCTYPE
+        DOCTYPE_QUOTED: S++,
+        // <!DOCTYPE "//blah
+        DOCTYPE_DTD: S++,
+        // <!DOCTYPE "//blah" [ ...
+        DOCTYPE_DTD_QUOTED: S++,
+        // <!DOCTYPE "//blah" [ "foo
+        COMMENT_STARTING: S++,
+        // <!-
+        COMMENT: S++,
+        // <!--
+        COMMENT_ENDING: S++,
+        // <!-- blah -
+        COMMENT_ENDED: S++,
+        // <!-- blah --
+        CDATA: S++,
+        // <![CDATA[ something
+        CDATA_ENDING: S++,
+        // ]
+        CDATA_ENDING_2: S++,
+        // ]]
+        PROC_INST: S++,
+        // <?hi
+        PROC_INST_BODY: S++,
+        // <?hi there
+        PROC_INST_ENDING: S++,
+        // <?hi "there" ?
+        OPEN_TAG: S++,
+        // <strong
+        OPEN_TAG_SLASH: S++,
+        // <strong /
+        ATTRIB: S++,
+        // <a
+        ATTRIB_NAME: S++,
+        // <a foo
+        ATTRIB_NAME_SAW_WHITE: S++,
+        // <a foo _
+        ATTRIB_VALUE: S++,
+        // <a foo=
+        ATTRIB_VALUE_QUOTED: S++,
+        // <a foo="bar
+        ATTRIB_VALUE_CLOSED: S++,
+        // <a foo="bar"
+        ATTRIB_VALUE_UNQUOTED: S++,
+        // <a foo=bar
+        ATTRIB_VALUE_ENTITY_Q: S++,
+        // <foo bar="&quot;"
+        ATTRIB_VALUE_ENTITY_U: S++,
+        // <foo bar=&quot
+        CLOSE_TAG: S++,
+        // </a
+        CLOSE_TAG_SAW_WHITE: S++,
+        // </a   >
+        SCRIPT: S++,
+        // <script> ...
+        SCRIPT_ENDING: S++
+        // <script> ... <
+      };
+      sax2.XML_ENTITIES = {
+        "amp": "&",
+        "gt": ">",
+        "lt": "<",
+        "quot": '"',
+        "apos": "'"
+      };
+      sax2.ENTITIES = {
+        "amp": "&",
+        "gt": ">",
+        "lt": "<",
+        "quot": '"',
+        "apos": "'",
+        "AElig": 198,
+        "Aacute": 193,
+        "Acirc": 194,
+        "Agrave": 192,
+        "Aring": 197,
+        "Atilde": 195,
+        "Auml": 196,
+        "Ccedil": 199,
+        "ETH": 208,
+        "Eacute": 201,
+        "Ecirc": 202,
+        "Egrave": 200,
+        "Euml": 203,
+        "Iacute": 205,
+        "Icirc": 206,
+        "Igrave": 204,
+        "Iuml": 207,
+        "Ntilde": 209,
+        "Oacute": 211,
+        "Ocirc": 212,
+        "Ograve": 210,
+        "Oslash": 216,
+        "Otilde": 213,
+        "Ouml": 214,
+        "THORN": 222,
+        "Uacute": 218,
+        "Ucirc": 219,
+        "Ugrave": 217,
+        "Uuml": 220,
+        "Yacute": 221,
+        "aacute": 225,
+        "acirc": 226,
+        "aelig": 230,
+        "agrave": 224,
+        "aring": 229,
+        "atilde": 227,
+        "auml": 228,
+        "ccedil": 231,
+        "eacute": 233,
+        "ecirc": 234,
+        "egrave": 232,
+        "eth": 240,
+        "euml": 235,
+        "iacute": 237,
+        "icirc": 238,
+        "igrave": 236,
+        "iuml": 239,
+        "ntilde": 241,
+        "oacute": 243,
+        "ocirc": 244,
+        "ograve": 242,
+        "oslash": 248,
+        "otilde": 245,
+        "ouml": 246,
+        "szlig": 223,
+        "thorn": 254,
+        "uacute": 250,
+        "ucirc": 251,
+        "ugrave": 249,
+        "uuml": 252,
+        "yacute": 253,
+        "yuml": 255,
+        "copy": 169,
+        "reg": 174,
+        "nbsp": 160,
+        "iexcl": 161,
+        "cent": 162,
+        "pound": 163,
+        "curren": 164,
+        "yen": 165,
+        "brvbar": 166,
+        "sect": 167,
+        "uml": 168,
+        "ordf": 170,
+        "laquo": 171,
+        "not": 172,
+        "shy": 173,
+        "macr": 175,
+        "deg": 176,
+        "plusmn": 177,
+        "sup1": 185,
+        "sup2": 178,
+        "sup3": 179,
+        "acute": 180,
+        "micro": 181,
+        "para": 182,
+        "middot": 183,
+        "cedil": 184,
+        "ordm": 186,
+        "raquo": 187,
+        "frac14": 188,
+        "frac12": 189,
+        "frac34": 190,
+        "iquest": 191,
+        "times": 215,
+        "divide": 247,
+        "OElig": 338,
+        "oelig": 339,
+        "Scaron": 352,
+        "scaron": 353,
+        "Yuml": 376,
+        "fnof": 402,
+        "circ": 710,
+        "tilde": 732,
+        "Alpha": 913,
+        "Beta": 914,
+        "Gamma": 915,
+        "Delta": 916,
+        "Epsilon": 917,
+        "Zeta": 918,
+        "Eta": 919,
+        "Theta": 920,
+        "Iota": 921,
+        "Kappa": 922,
+        "Lambda": 923,
+        "Mu": 924,
+        "Nu": 925,
+        "Xi": 926,
+        "Omicron": 927,
+        "Pi": 928,
+        "Rho": 929,
+        "Sigma": 931,
+        "Tau": 932,
+        "Upsilon": 933,
+        "Phi": 934,
+        "Chi": 935,
+        "Psi": 936,
+        "Omega": 937,
+        "alpha": 945,
+        "beta": 946,
+        "gamma": 947,
+        "delta": 948,
+        "epsilon": 949,
+        "zeta": 950,
+        "eta": 951,
+        "theta": 952,
+        "iota": 953,
+        "kappa": 954,
+        "lambda": 955,
+        "mu": 956,
+        "nu": 957,
+        "xi": 958,
+        "omicron": 959,
+        "pi": 960,
+        "rho": 961,
+        "sigmaf": 962,
+        "sigma": 963,
+        "tau": 964,
+        "upsilon": 965,
+        "phi": 966,
+        "chi": 967,
+        "psi": 968,
+        "omega": 969,
+        "thetasym": 977,
+        "upsih": 978,
+        "piv": 982,
+        "ensp": 8194,
+        "emsp": 8195,
+        "thinsp": 8201,
+        "zwnj": 8204,
+        "zwj": 8205,
+        "lrm": 8206,
+        "rlm": 8207,
+        "ndash": 8211,
+        "mdash": 8212,
+        "lsquo": 8216,
+        "rsquo": 8217,
+        "sbquo": 8218,
+        "ldquo": 8220,
+        "rdquo": 8221,
+        "bdquo": 8222,
+        "dagger": 8224,
+        "Dagger": 8225,
+        "bull": 8226,
+        "hellip": 8230,
+        "permil": 8240,
+        "prime": 8242,
+        "Prime": 8243,
+        "lsaquo": 8249,
+        "rsaquo": 8250,
+        "oline": 8254,
+        "frasl": 8260,
+        "euro": 8364,
+        "image": 8465,
+        "weierp": 8472,
+        "real": 8476,
+        "trade": 8482,
+        "alefsym": 8501,
+        "larr": 8592,
+        "uarr": 8593,
+        "rarr": 8594,
+        "darr": 8595,
+        "harr": 8596,
+        "crarr": 8629,
+        "lArr": 8656,
+        "uArr": 8657,
+        "rArr": 8658,
+        "dArr": 8659,
+        "hArr": 8660,
+        "forall": 8704,
+        "part": 8706,
+        "exist": 8707,
+        "empty": 8709,
+        "nabla": 8711,
+        "isin": 8712,
+        "notin": 8713,
+        "ni": 8715,
+        "prod": 8719,
+        "sum": 8721,
+        "minus": 8722,
+        "lowast": 8727,
+        "radic": 8730,
+        "prop": 8733,
+        "infin": 8734,
+        "ang": 8736,
+        "and": 8743,
+        "or": 8744,
+        "cap": 8745,
+        "cup": 8746,
+        "int": 8747,
+        "there4": 8756,
+        "sim": 8764,
+        "cong": 8773,
+        "asymp": 8776,
+        "ne": 8800,
+        "equiv": 8801,
+        "le": 8804,
+        "ge": 8805,
+        "sub": 8834,
+        "sup": 8835,
+        "nsub": 8836,
+        "sube": 8838,
+        "supe": 8839,
+        "oplus": 8853,
+        "otimes": 8855,
+        "perp": 8869,
+        "sdot": 8901,
+        "lceil": 8968,
+        "rceil": 8969,
+        "lfloor": 8970,
+        "rfloor": 8971,
+        "lang": 9001,
+        "rang": 9002,
+        "loz": 9674,
+        "spades": 9824,
+        "clubs": 9827,
+        "hearts": 9829,
+        "diams": 9830
+      };
+      Object.keys(sax2.ENTITIES).forEach(function(key) {
+        var e = sax2.ENTITIES[key];
+        var s2 = typeof e === "number" ? String.fromCharCode(e) : e;
+        sax2.ENTITIES[key] = s2;
+      });
+      for (var s in sax2.STATE) {
+        sax2.STATE[sax2.STATE[s]] = s;
+      }
+      S = sax2.STATE;
+      function emit(parser, event, data) {
+        parser[event] && parser[event](data);
+      }
+      function emitNode(parser, nodeType, data) {
+        if (parser.textNode) closeText(parser);
+        emit(parser, nodeType, data);
+      }
+      function closeText(parser) {
+        parser.textNode = textopts(parser.opt, parser.textNode);
+        if (parser.textNode) emit(parser, "ontext", parser.textNode);
+        parser.textNode = "";
+      }
+      function textopts(opt, text) {
+        if (opt.trim) text = text.trim();
+        if (opt.normalize) text = text.replace(/\s+/g, " ");
+        return text;
+      }
+      function error2(parser, er) {
+        closeText(parser);
+        if (parser.trackPosition) {
+          er += "\nLine: " + parser.line + "\nColumn: " + parser.column + "\nChar: " + parser.c;
+        }
+        er = new Error(er);
+        parser.error = er;
+        emit(parser, "onerror", er);
+        return parser;
+      }
+      function end(parser) {
+        if (parser.sawRoot && !parser.closedRoot) strictFail(parser, "Unclosed root tag");
+        if (parser.state !== S.BEGIN && parser.state !== S.BEGIN_WHITESPACE && parser.state !== S.TEXT) {
+          error2(parser, "Unexpected end");
+        }
+        closeText(parser);
+        parser.c = "";
+        parser.closed = true;
+        emit(parser, "onend");
+        SAXParser.call(parser, parser.strict, parser.opt);
+        return parser;
+      }
+      function strictFail(parser, message) {
+        if (typeof parser !== "object" || !(parser instanceof SAXParser)) {
+          throw new Error("bad call to strictFail");
+        }
+        if (parser.strict) {
+          error2(parser, message);
+        }
+      }
+      function newTag(parser) {
+        if (!parser.strict) parser.tagName = parser.tagName[parser.looseCase]();
+        var parent = parser.tags[parser.tags.length - 1] || parser;
+        var tag = parser.tag = { name: parser.tagName, attributes: {} };
+        if (parser.opt.xmlns) {
+          tag.ns = parent.ns;
+        }
+        parser.attribList.length = 0;
+        emitNode(parser, "onopentagstart", tag);
+      }
+      function qname(name, attribute) {
+        var i = name.indexOf(":");
+        var qualName = i < 0 ? ["", name] : name.split(":");
+        var prefix = qualName[0];
+        var local = qualName[1];
+        if (attribute && name === "xmlns") {
+          prefix = "xmlns";
+          local = "";
+        }
+        return { prefix, local };
+      }
+      function attrib(parser) {
+        if (!parser.strict) {
+          parser.attribName = parser.attribName[parser.looseCase]();
+        }
+        if (parser.attribList.indexOf(parser.attribName) !== -1 || parser.tag.attributes.hasOwnProperty(parser.attribName)) {
+          parser.attribName = parser.attribValue = "";
+          return;
+        }
+        if (parser.opt.xmlns) {
+          var qn = qname(parser.attribName, true);
+          var prefix = qn.prefix;
+          var local = qn.local;
+          if (prefix === "xmlns") {
+            if (local === "xml" && parser.attribValue !== XML_NAMESPACE) {
+              strictFail(
+                parser,
+                "xml: prefix must be bound to " + XML_NAMESPACE + "\nActual: " + parser.attribValue
+              );
+            } else if (local === "xmlns" && parser.attribValue !== XMLNS_NAMESPACE) {
+              strictFail(
+                parser,
+                "xmlns: prefix must be bound to " + XMLNS_NAMESPACE + "\nActual: " + parser.attribValue
+              );
+            } else {
+              var tag = parser.tag;
+              var parent = parser.tags[parser.tags.length - 1] || parser;
+              if (tag.ns === parent.ns) {
+                tag.ns = Object.create(parent.ns);
+              }
+              tag.ns[local] = parser.attribValue;
+            }
+          }
+          parser.attribList.push([parser.attribName, parser.attribValue]);
+        } else {
+          parser.tag.attributes[parser.attribName] = parser.attribValue;
+          emitNode(parser, "onattribute", {
+            name: parser.attribName,
+            value: parser.attribValue
+          });
+        }
+        parser.attribName = parser.attribValue = "";
+      }
+      function openTag(parser, selfClosing) {
+        if (parser.opt.xmlns) {
+          var tag = parser.tag;
+          var qn = qname(parser.tagName);
+          tag.prefix = qn.prefix;
+          tag.local = qn.local;
+          tag.uri = tag.ns[qn.prefix] || "";
+          if (tag.prefix && !tag.uri) {
+            strictFail(parser, "Unbound namespace prefix: " + JSON.stringify(parser.tagName));
+            tag.uri = qn.prefix;
+          }
+          var parent = parser.tags[parser.tags.length - 1] || parser;
+          if (tag.ns && parent.ns !== tag.ns) {
+            Object.keys(tag.ns).forEach(function(p) {
+              emitNode(parser, "onopennamespace", {
+                prefix: p,
+                uri: tag.ns[p]
+              });
+            });
+          }
+          for (var i = 0, l = parser.attribList.length; i < l; i++) {
+            var nv = parser.attribList[i];
+            var name = nv[0];
+            var value = nv[1];
+            var qualName = qname(name, true);
+            var prefix = qualName.prefix;
+            var local = qualName.local;
+            var uri = prefix === "" ? "" : tag.ns[prefix] || "";
+            var a = {
+              name,
+              value,
+              prefix,
+              local,
+              uri
+            };
+            if (prefix && prefix !== "xmlns" && !uri) {
+              strictFail(parser, "Unbound namespace prefix: " + JSON.stringify(prefix));
+              a.uri = prefix;
+            }
+            parser.tag.attributes[name] = a;
+            emitNode(parser, "onattribute", a);
+          }
+          parser.attribList.length = 0;
+        }
+        parser.tag.isSelfClosing = !!selfClosing;
+        parser.sawRoot = true;
+        parser.tags.push(parser.tag);
+        emitNode(parser, "onopentag", parser.tag);
+        if (!selfClosing) {
+          if (!parser.noscript && parser.tagName.toLowerCase() === "script") {
+            parser.state = S.SCRIPT;
+          } else {
+            parser.state = S.TEXT;
+          }
+          parser.tag = null;
+          parser.tagName = "";
+        }
+        parser.attribName = parser.attribValue = "";
+        parser.attribList.length = 0;
+      }
+      function closeTag(parser) {
+        if (!parser.tagName) {
+          strictFail(parser, "Weird empty close tag.");
+          parser.textNode += "</>";
+          parser.state = S.TEXT;
+          return;
+        }
+        if (parser.script) {
+          if (parser.tagName !== "script") {
+            parser.script += "</" + parser.tagName + ">";
+            parser.tagName = "";
+            parser.state = S.SCRIPT;
+            return;
+          }
+          emitNode(parser, "onscript", parser.script);
+          parser.script = "";
+        }
+        var t = parser.tags.length;
+        var tagName = parser.tagName;
+        if (!parser.strict) {
+          tagName = tagName[parser.looseCase]();
+        }
+        var closeTo = tagName;
+        while (t--) {
+          var close = parser.tags[t];
+          if (close.name !== closeTo) {
+            strictFail(parser, "Unexpected close tag");
+          } else {
+            break;
+          }
+        }
+        if (t < 0) {
+          strictFail(parser, "Unmatched closing tag: " + parser.tagName);
+          parser.textNode += "</" + parser.tagName + ">";
+          parser.state = S.TEXT;
+          return;
+        }
+        parser.tagName = tagName;
+        var s2 = parser.tags.length;
+        while (s2-- > t) {
+          var tag = parser.tag = parser.tags.pop();
+          parser.tagName = parser.tag.name;
+          emitNode(parser, "onclosetag", parser.tagName);
+          var x = {};
+          for (var i in tag.ns) {
+            x[i] = tag.ns[i];
+          }
+          var parent = parser.tags[parser.tags.length - 1] || parser;
+          if (parser.opt.xmlns && tag.ns !== parent.ns) {
+            Object.keys(tag.ns).forEach(function(p) {
+              var n = tag.ns[p];
+              emitNode(parser, "onclosenamespace", { prefix: p, uri: n });
+            });
+          }
+        }
+        if (t === 0) parser.closedRoot = true;
+        parser.tagName = parser.attribValue = parser.attribName = "";
+        parser.attribList.length = 0;
+        parser.state = S.TEXT;
+      }
+      function parseEntity(parser) {
+        var entity = parser.entity;
+        var entityLC = entity.toLowerCase();
+        var num;
+        var numStr = "";
+        if (parser.ENTITIES[entity]) {
+          return parser.ENTITIES[entity];
+        }
+        if (parser.ENTITIES[entityLC]) {
+          return parser.ENTITIES[entityLC];
+        }
+        entity = entityLC;
+        if (entity.charAt(0) === "#") {
+          if (entity.charAt(1) === "x") {
+            entity = entity.slice(2);
+            num = parseInt(entity, 16);
+            numStr = num.toString(16);
+          } else {
+            entity = entity.slice(1);
+            num = parseInt(entity, 10);
+            numStr = num.toString(10);
+          }
+        }
+        entity = entity.replace(/^0+/, "");
+        if (isNaN(num) || numStr.toLowerCase() !== entity) {
+          strictFail(parser, "Invalid character entity");
+          return "&" + parser.entity + ";";
+        }
+        return String.fromCodePoint(num);
+      }
+      function beginWhiteSpace(parser, c) {
+        if (c === "<") {
+          parser.state = S.OPEN_WAKA;
+          parser.startTagPosition = parser.position;
+        } else if (!isWhitespace(c)) {
+          strictFail(parser, "Non-whitespace before first tag.");
+          parser.textNode = c;
+          parser.state = S.TEXT;
+        }
+      }
+      function charAt(chunk, i) {
+        var result = "";
+        if (i < chunk.length) {
+          result = chunk.charAt(i);
+        }
+        return result;
+      }
+      function write(chunk) {
+        var parser = this;
+        if (this.error) {
+          throw this.error;
+        }
+        if (parser.closed) {
+          return error2(
+            parser,
+            "Cannot write after close. Assign an onready handler."
+          );
+        }
+        if (chunk === null) {
+          return end(parser);
+        }
+        if (typeof chunk === "object") {
+          chunk = chunk.toString();
+        }
+        var i = 0;
+        var c = "";
+        while (true) {
+          c = charAt(chunk, i++);
+          parser.c = c;
+          if (!c) {
+            break;
+          }
+          if (parser.trackPosition) {
+            parser.position++;
+            if (c === "\n") {
+              parser.line++;
+              parser.column = 0;
+            } else {
+              parser.column++;
+            }
+          }
+          switch (parser.state) {
+            case S.BEGIN:
+              parser.state = S.BEGIN_WHITESPACE;
+              if (c === "\uFEFF") {
+                continue;
+              }
+              beginWhiteSpace(parser, c);
+              continue;
+            case S.BEGIN_WHITESPACE:
+              beginWhiteSpace(parser, c);
+              continue;
+            case S.TEXT:
+              if (parser.sawRoot && !parser.closedRoot) {
+                var starti = i - 1;
+                while (c && c !== "<" && c !== "&") {
+                  c = charAt(chunk, i++);
+                  if (c && parser.trackPosition) {
+                    parser.position++;
+                    if (c === "\n") {
+                      parser.line++;
+                      parser.column = 0;
+                    } else {
+                      parser.column++;
+                    }
+                  }
+                }
+                parser.textNode += chunk.substring(starti, i - 1);
+              }
+              if (c === "<" && !(parser.sawRoot && parser.closedRoot && !parser.strict)) {
+                parser.state = S.OPEN_WAKA;
+                parser.startTagPosition = parser.position;
+              } else {
+                if (!isWhitespace(c) && (!parser.sawRoot || parser.closedRoot)) {
+                  strictFail(parser, "Text data outside of root node.");
+                }
+                if (c === "&") {
+                  parser.state = S.TEXT_ENTITY;
+                } else {
+                  parser.textNode += c;
+                }
+              }
+              continue;
+            case S.SCRIPT:
+              if (c === "<") {
+                parser.state = S.SCRIPT_ENDING;
+              } else {
+                parser.script += c;
+              }
+              continue;
+            case S.SCRIPT_ENDING:
+              if (c === "/") {
+                parser.state = S.CLOSE_TAG;
+              } else {
+                parser.script += "<" + c;
+                parser.state = S.SCRIPT;
+              }
+              continue;
+            case S.OPEN_WAKA:
+              if (c === "!") {
+                parser.state = S.SGML_DECL;
+                parser.sgmlDecl = "";
+              } else if (isWhitespace(c)) ;
+              else if (isMatch(nameStart, c)) {
+                parser.state = S.OPEN_TAG;
+                parser.tagName = c;
+              } else if (c === "/") {
+                parser.state = S.CLOSE_TAG;
+                parser.tagName = "";
+              } else if (c === "?") {
+                parser.state = S.PROC_INST;
+                parser.procInstName = parser.procInstBody = "";
+              } else {
+                strictFail(parser, "Unencoded <");
+                if (parser.startTagPosition + 1 < parser.position) {
+                  var pad2 = parser.position - parser.startTagPosition;
+                  c = new Array(pad2).join(" ") + c;
+                }
+                parser.textNode += "<" + c;
+                parser.state = S.TEXT;
+              }
+              continue;
+            case S.SGML_DECL:
+              if (parser.sgmlDecl + c === "--") {
+                parser.state = S.COMMENT;
+                parser.comment = "";
+                parser.sgmlDecl = "";
+                continue;
+              }
+              if (parser.doctype && parser.doctype !== true && parser.sgmlDecl) {
+                parser.state = S.DOCTYPE_DTD;
+                parser.doctype += "<!" + parser.sgmlDecl + c;
+                parser.sgmlDecl = "";
+              } else if ((parser.sgmlDecl + c).toUpperCase() === CDATA) {
+                emitNode(parser, "onopencdata");
+                parser.state = S.CDATA;
+                parser.sgmlDecl = "";
+                parser.cdata = "";
+              } else if ((parser.sgmlDecl + c).toUpperCase() === DOCTYPE) {
+                parser.state = S.DOCTYPE;
+                if (parser.doctype || parser.sawRoot) {
+                  strictFail(
+                    parser,
+                    "Inappropriately located doctype declaration"
+                  );
+                }
+                parser.doctype = "";
+                parser.sgmlDecl = "";
+              } else if (c === ">") {
+                emitNode(parser, "onsgmldeclaration", parser.sgmlDecl);
+                parser.sgmlDecl = "";
+                parser.state = S.TEXT;
+              } else if (isQuote(c)) {
+                parser.state = S.SGML_DECL_QUOTED;
+                parser.sgmlDecl += c;
+              } else {
+                parser.sgmlDecl += c;
+              }
+              continue;
+            case S.SGML_DECL_QUOTED:
+              if (c === parser.q) {
+                parser.state = S.SGML_DECL;
+                parser.q = "";
+              }
+              parser.sgmlDecl += c;
+              continue;
+            case S.DOCTYPE:
+              if (c === ">") {
+                parser.state = S.TEXT;
+                emitNode(parser, "ondoctype", parser.doctype);
+                parser.doctype = true;
+              } else {
+                parser.doctype += c;
+                if (c === "[") {
+                  parser.state = S.DOCTYPE_DTD;
+                } else if (isQuote(c)) {
+                  parser.state = S.DOCTYPE_QUOTED;
+                  parser.q = c;
+                }
+              }
+              continue;
+            case S.DOCTYPE_QUOTED:
+              parser.doctype += c;
+              if (c === parser.q) {
+                parser.q = "";
+                parser.state = S.DOCTYPE;
+              }
+              continue;
+            case S.DOCTYPE_DTD:
+              if (c === "]") {
+                parser.doctype += c;
+                parser.state = S.DOCTYPE;
+              } else if (c === "<") {
+                parser.state = S.OPEN_WAKA;
+                parser.startTagPosition = parser.position;
+              } else if (isQuote(c)) {
+                parser.doctype += c;
+                parser.state = S.DOCTYPE_DTD_QUOTED;
+                parser.q = c;
+              } else {
+                parser.doctype += c;
+              }
+              continue;
+            case S.DOCTYPE_DTD_QUOTED:
+              parser.doctype += c;
+              if (c === parser.q) {
+                parser.state = S.DOCTYPE_DTD;
+                parser.q = "";
+              }
+              continue;
+            case S.COMMENT:
+              if (c === "-") {
+                parser.state = S.COMMENT_ENDING;
+              } else {
+                parser.comment += c;
+              }
+              continue;
+            case S.COMMENT_ENDING:
+              if (c === "-") {
+                parser.state = S.COMMENT_ENDED;
+                parser.comment = textopts(parser.opt, parser.comment);
+                if (parser.comment) {
+                  emitNode(parser, "oncomment", parser.comment);
+                }
+                parser.comment = "";
+              } else {
+                parser.comment += "-" + c;
+                parser.state = S.COMMENT;
+              }
+              continue;
+            case S.COMMENT_ENDED:
+              if (c !== ">") {
+                strictFail(parser, "Malformed comment");
+                parser.comment += "--" + c;
+                parser.state = S.COMMENT;
+              } else if (parser.doctype && parser.doctype !== true) {
+                parser.state = S.DOCTYPE_DTD;
+              } else {
+                parser.state = S.TEXT;
+              }
+              continue;
+            case S.CDATA:
+              if (c === "]") {
+                parser.state = S.CDATA_ENDING;
+              } else {
+                parser.cdata += c;
+              }
+              continue;
+            case S.CDATA_ENDING:
+              if (c === "]") {
+                parser.state = S.CDATA_ENDING_2;
+              } else {
+                parser.cdata += "]" + c;
+                parser.state = S.CDATA;
+              }
+              continue;
+            case S.CDATA_ENDING_2:
+              if (c === ">") {
+                if (parser.cdata) {
+                  emitNode(parser, "oncdata", parser.cdata);
+                }
+                emitNode(parser, "onclosecdata");
+                parser.cdata = "";
+                parser.state = S.TEXT;
+              } else if (c === "]") {
+                parser.cdata += "]";
+              } else {
+                parser.cdata += "]]" + c;
+                parser.state = S.CDATA;
+              }
+              continue;
+            case S.PROC_INST:
+              if (c === "?") {
+                parser.state = S.PROC_INST_ENDING;
+              } else if (isWhitespace(c)) {
+                parser.state = S.PROC_INST_BODY;
+              } else {
+                parser.procInstName += c;
+              }
+              continue;
+            case S.PROC_INST_BODY:
+              if (!parser.procInstBody && isWhitespace(c)) {
+                continue;
+              } else if (c === "?") {
+                parser.state = S.PROC_INST_ENDING;
+              } else {
+                parser.procInstBody += c;
+              }
+              continue;
+            case S.PROC_INST_ENDING:
+              if (c === ">") {
+                emitNode(parser, "onprocessinginstruction", {
+                  name: parser.procInstName,
+                  body: parser.procInstBody
+                });
+                parser.procInstName = parser.procInstBody = "";
+                parser.state = S.TEXT;
+              } else {
+                parser.procInstBody += "?" + c;
+                parser.state = S.PROC_INST_BODY;
+              }
+              continue;
+            case S.OPEN_TAG:
+              if (isMatch(nameBody, c)) {
+                parser.tagName += c;
+              } else {
+                newTag(parser);
+                if (c === ">") {
+                  openTag(parser);
+                } else if (c === "/") {
+                  parser.state = S.OPEN_TAG_SLASH;
+                } else {
+                  if (!isWhitespace(c)) {
+                    strictFail(parser, "Invalid character in tag name");
+                  }
+                  parser.state = S.ATTRIB;
+                }
+              }
+              continue;
+            case S.OPEN_TAG_SLASH:
+              if (c === ">") {
+                openTag(parser, true);
+                closeTag(parser);
+              } else {
+                strictFail(parser, "Forward-slash in opening tag not followed by >");
+                parser.state = S.ATTRIB;
+              }
+              continue;
+            case S.ATTRIB:
+              if (isWhitespace(c)) {
+                continue;
+              } else if (c === ">") {
+                openTag(parser);
+              } else if (c === "/") {
+                parser.state = S.OPEN_TAG_SLASH;
+              } else if (isMatch(nameStart, c)) {
+                parser.attribName = c;
+                parser.attribValue = "";
+                parser.state = S.ATTRIB_NAME;
+              } else {
+                strictFail(parser, "Invalid attribute name");
+              }
+              continue;
+            case S.ATTRIB_NAME:
+              if (c === "=") {
+                parser.state = S.ATTRIB_VALUE;
+              } else if (c === ">") {
+                strictFail(parser, "Attribute without value");
+                parser.attribValue = parser.attribName;
+                attrib(parser);
+                openTag(parser);
+              } else if (isWhitespace(c)) {
+                parser.state = S.ATTRIB_NAME_SAW_WHITE;
+              } else if (isMatch(nameBody, c)) {
+                parser.attribName += c;
+              } else {
+                strictFail(parser, "Invalid attribute name");
+              }
+              continue;
+            case S.ATTRIB_NAME_SAW_WHITE:
+              if (c === "=") {
+                parser.state = S.ATTRIB_VALUE;
+              } else if (isWhitespace(c)) {
+                continue;
+              } else {
+                strictFail(parser, "Attribute without value");
+                parser.tag.attributes[parser.attribName] = "";
+                parser.attribValue = "";
+                emitNode(parser, "onattribute", {
+                  name: parser.attribName,
+                  value: ""
+                });
+                parser.attribName = "";
+                if (c === ">") {
+                  openTag(parser);
+                } else if (isMatch(nameStart, c)) {
+                  parser.attribName = c;
+                  parser.state = S.ATTRIB_NAME;
+                } else {
+                  strictFail(parser, "Invalid attribute name");
+                  parser.state = S.ATTRIB;
+                }
+              }
+              continue;
+            case S.ATTRIB_VALUE:
+              if (isWhitespace(c)) {
+                continue;
+              } else if (isQuote(c)) {
+                parser.q = c;
+                parser.state = S.ATTRIB_VALUE_QUOTED;
+              } else {
+                if (!parser.opt.unquotedAttributeValues) {
+                  error2(parser, "Unquoted attribute value");
+                }
+                parser.state = S.ATTRIB_VALUE_UNQUOTED;
+                parser.attribValue = c;
+              }
+              continue;
+            case S.ATTRIB_VALUE_QUOTED:
+              if (c !== parser.q) {
+                if (c === "&") {
+                  parser.state = S.ATTRIB_VALUE_ENTITY_Q;
+                } else {
+                  parser.attribValue += c;
+                }
+                continue;
+              }
+              attrib(parser);
+              parser.q = "";
+              parser.state = S.ATTRIB_VALUE_CLOSED;
+              continue;
+            case S.ATTRIB_VALUE_CLOSED:
+              if (isWhitespace(c)) {
+                parser.state = S.ATTRIB;
+              } else if (c === ">") {
+                openTag(parser);
+              } else if (c === "/") {
+                parser.state = S.OPEN_TAG_SLASH;
+              } else if (isMatch(nameStart, c)) {
+                strictFail(parser, "No whitespace between attributes");
+                parser.attribName = c;
+                parser.attribValue = "";
+                parser.state = S.ATTRIB_NAME;
+              } else {
+                strictFail(parser, "Invalid attribute name");
+              }
+              continue;
+            case S.ATTRIB_VALUE_UNQUOTED:
+              if (!isAttribEnd(c)) {
+                if (c === "&") {
+                  parser.state = S.ATTRIB_VALUE_ENTITY_U;
+                } else {
+                  parser.attribValue += c;
+                }
+                continue;
+              }
+              attrib(parser);
+              if (c === ">") {
+                openTag(parser);
+              } else {
+                parser.state = S.ATTRIB;
+              }
+              continue;
+            case S.CLOSE_TAG:
+              if (!parser.tagName) {
+                if (isWhitespace(c)) {
+                  continue;
+                } else if (notMatch(nameStart, c)) {
+                  if (parser.script) {
+                    parser.script += "</" + c;
+                    parser.state = S.SCRIPT;
+                  } else {
+                    strictFail(parser, "Invalid tagname in closing tag.");
+                  }
+                } else {
+                  parser.tagName = c;
+                }
+              } else if (c === ">") {
+                closeTag(parser);
+              } else if (isMatch(nameBody, c)) {
+                parser.tagName += c;
+              } else if (parser.script) {
+                parser.script += "</" + parser.tagName;
+                parser.tagName = "";
+                parser.state = S.SCRIPT;
+              } else {
+                if (!isWhitespace(c)) {
+                  strictFail(parser, "Invalid tagname in closing tag");
+                }
+                parser.state = S.CLOSE_TAG_SAW_WHITE;
+              }
+              continue;
+            case S.CLOSE_TAG_SAW_WHITE:
+              if (isWhitespace(c)) {
+                continue;
+              }
+              if (c === ">") {
+                closeTag(parser);
+              } else {
+                strictFail(parser, "Invalid characters in closing tag");
+              }
+              continue;
+            case S.TEXT_ENTITY:
+            case S.ATTRIB_VALUE_ENTITY_Q:
+            case S.ATTRIB_VALUE_ENTITY_U:
+              var returnState;
+              var buffer;
+              switch (parser.state) {
+                case S.TEXT_ENTITY:
+                  returnState = S.TEXT;
+                  buffer = "textNode";
+                  break;
+                case S.ATTRIB_VALUE_ENTITY_Q:
+                  returnState = S.ATTRIB_VALUE_QUOTED;
+                  buffer = "attribValue";
+                  break;
+                case S.ATTRIB_VALUE_ENTITY_U:
+                  returnState = S.ATTRIB_VALUE_UNQUOTED;
+                  buffer = "attribValue";
+                  break;
+              }
+              if (c === ";") {
+                var parsedEntity = parseEntity(parser);
+                if (parser.opt.unparsedEntities && !Object.values(sax2.XML_ENTITIES).includes(parsedEntity)) {
+                  parser.entity = "";
+                  parser.state = returnState;
+                  parser.write(parsedEntity);
+                } else {
+                  parser[buffer] += parsedEntity;
+                  parser.entity = "";
+                  parser.state = returnState;
+                }
+              } else if (isMatch(parser.entity.length ? entityBody : entityStart, c)) {
+                parser.entity += c;
+              } else {
+                strictFail(parser, "Invalid character in entity name");
+                parser[buffer] += "&" + parser.entity + c;
+                parser.entity = "";
+                parser.state = returnState;
+              }
+              continue;
+            default: {
+              throw new Error(parser, "Unknown state: " + parser.state);
+            }
+          }
+        }
+        if (parser.position >= parser.bufferCheckPosition) {
+          checkBufferLength(parser);
+        }
+        return parser;
+      }
+      /*! http://mths.be/fromcodepoint v0.1.0 by @mathias */
+      if (!String.fromCodePoint) {
+        (function() {
+          var stringFromCharCode = String.fromCharCode;
+          var floor = Math.floor;
+          var fromCodePoint = function() {
+            var MAX_SIZE = 16384;
+            var codeUnits = [];
+            var highSurrogate;
+            var lowSurrogate;
+            var index = -1;
+            var length = arguments.length;
+            if (!length) {
+              return "";
+            }
+            var result = "";
+            while (++index < length) {
+              var codePoint = Number(arguments[index]);
+              if (!isFinite(codePoint) || // `NaN`, `+Infinity`, or `-Infinity`
+              codePoint < 0 || // not a valid Unicode code point
+              codePoint > 1114111 || // not a valid Unicode code point
+              floor(codePoint) !== codePoint) {
+                throw RangeError("Invalid code point: " + codePoint);
+              }
+              if (codePoint <= 65535) {
+                codeUnits.push(codePoint);
+              } else {
+                codePoint -= 65536;
+                highSurrogate = (codePoint >> 10) + 55296;
+                lowSurrogate = codePoint % 1024 + 56320;
+                codeUnits.push(highSurrogate, lowSurrogate);
+              }
+              if (index + 1 === length || codeUnits.length > MAX_SIZE) {
+                result += stringFromCharCode.apply(null, codeUnits);
+                codeUnits.length = 0;
+              }
+            }
+            return result;
+          };
+          if (Object.defineProperty) {
+            Object.defineProperty(String, "fromCodePoint", {
+              value: fromCodePoint,
+              configurable: true,
+              writable: true
+            });
+          } else {
+            String.fromCodePoint = fromCodePoint;
+          }
+        })();
+      }
+    })(exports);
+  })(sax);
+  return sax;
+}
+var hasRequiredXml;
+function requireXml() {
+  if (hasRequiredXml) return xml;
+  hasRequiredXml = 1;
+  Object.defineProperty(xml, "__esModule", { value: true });
+  xml.XElement = void 0;
+  xml.parseXml = parseXml;
+  const sax2 = requireSax();
+  const error_1 = requireError();
+  class XElement {
+    constructor(name) {
+      this.name = name;
+      this.value = "";
+      this.attributes = null;
+      this.isCData = false;
+      this.elements = null;
+      if (!name) {
+        throw (0, error_1.newError)("Element name cannot be empty", "ERR_XML_ELEMENT_NAME_EMPTY");
+      }
+      if (!isValidName(name)) {
+        throw (0, error_1.newError)(`Invalid element name: ${name}`, "ERR_XML_ELEMENT_INVALID_NAME");
+      }
+    }
+    attribute(name) {
+      const result = this.attributes === null ? null : this.attributes[name];
+      if (result == null) {
+        throw (0, error_1.newError)(`No attribute "${name}"`, "ERR_XML_MISSED_ATTRIBUTE");
+      }
+      return result;
+    }
+    removeAttribute(name) {
+      if (this.attributes !== null) {
+        delete this.attributes[name];
+      }
+    }
+    element(name, ignoreCase = false, errorIfMissed = null) {
+      const result = this.elementOrNull(name, ignoreCase);
+      if (result === null) {
+        throw (0, error_1.newError)(errorIfMissed || `No element "${name}"`, "ERR_XML_MISSED_ELEMENT");
+      }
+      return result;
+    }
+    elementOrNull(name, ignoreCase = false) {
+      if (this.elements === null) {
+        return null;
+      }
+      for (const element of this.elements) {
+        if (isNameEquals(element, name, ignoreCase)) {
+          return element;
+        }
+      }
+      return null;
+    }
+    getElements(name, ignoreCase = false) {
+      if (this.elements === null) {
+        return [];
+      }
+      return this.elements.filter((it) => isNameEquals(it, name, ignoreCase));
+    }
+    elementValueOrEmpty(name, ignoreCase = false) {
+      const element = this.elementOrNull(name, ignoreCase);
+      return element === null ? "" : element.value;
+    }
+  }
+  xml.XElement = XElement;
+  const NAME_REG_EXP = new RegExp(/^[A-Za-z_][:A-Za-z0-9_-]*$/i);
+  function isValidName(name) {
+    return NAME_REG_EXP.test(name);
+  }
+  function isNameEquals(element, name, ignoreCase) {
+    const elementName = element.name;
+    return elementName === name || ignoreCase === true && elementName.length === name.length && elementName.toLowerCase() === name.toLowerCase();
+  }
+  function parseXml(data) {
+    let rootElement = null;
+    const parser = sax2.parser(true, {});
+    const elements = [];
+    parser.onopentag = (saxElement) => {
+      const element = new XElement(saxElement.name);
+      element.attributes = saxElement.attributes;
+      if (rootElement === null) {
+        rootElement = element;
+      } else {
+        const parent = elements[elements.length - 1];
+        if (parent.elements == null) {
+          parent.elements = [];
+        }
+        parent.elements.push(element);
+      }
+      elements.push(element);
+    };
+    parser.onclosetag = () => {
+      elements.pop();
+    };
+    parser.ontext = (text) => {
+      if (elements.length > 0) {
+        elements[elements.length - 1].value = text;
+      }
+    };
+    parser.oncdata = (cdata) => {
+      const element = elements[elements.length - 1];
+      element.value = cdata;
+      element.isCData = true;
+    };
+    parser.onerror = (err) => {
+      throw err;
+    };
+    parser.write(data);
+    return rootElement;
+  }
+  return xml;
+}
+var hasRequiredOut;
+function requireOut() {
+  if (hasRequiredOut) return out;
+  hasRequiredOut = 1;
+  (function(exports) {
+    Object.defineProperty(exports, "__esModule", { value: true });
+    exports.CURRENT_APP_PACKAGE_FILE_NAME = exports.CURRENT_APP_INSTALLER_FILE_NAME = exports.XElement = exports.parseXml = exports.UUID = exports.parseDn = exports.retry = exports.githubUrl = exports.getS3LikeProviderBaseUrl = exports.ProgressCallbackTransform = exports.MemoLazy = exports.safeStringifyJson = exports.safeGetHeader = exports.parseJson = exports.HttpExecutor = exports.HttpError = exports.DigestTransform = exports.createHttpError = exports.configureRequestUrl = exports.configureRequestOptionsFromUrl = exports.configureRequestOptions = exports.newError = exports.CancellationToken = exports.CancellationError = void 0;
+    exports.asArray = asArray;
+    var CancellationToken_1 = requireCancellationToken();
+    Object.defineProperty(exports, "CancellationError", { enumerable: true, get: function() {
+      return CancellationToken_1.CancellationError;
+    } });
+    Object.defineProperty(exports, "CancellationToken", { enumerable: true, get: function() {
+      return CancellationToken_1.CancellationToken;
+    } });
+    var error_1 = requireError();
+    Object.defineProperty(exports, "newError", { enumerable: true, get: function() {
+      return error_1.newError;
+    } });
+    var httpExecutor_1 = requireHttpExecutor();
+    Object.defineProperty(exports, "configureRequestOptions", { enumerable: true, get: function() {
+      return httpExecutor_1.configureRequestOptions;
+    } });
+    Object.defineProperty(exports, "configureRequestOptionsFromUrl", { enumerable: true, get: function() {
+      return httpExecutor_1.configureRequestOptionsFromUrl;
+    } });
+    Object.defineProperty(exports, "configureRequestUrl", { enumerable: true, get: function() {
+      return httpExecutor_1.configureRequestUrl;
+    } });
+    Object.defineProperty(exports, "createHttpError", { enumerable: true, get: function() {
+      return httpExecutor_1.createHttpError;
+    } });
+    Object.defineProperty(exports, "DigestTransform", { enumerable: true, get: function() {
+      return httpExecutor_1.DigestTransform;
+    } });
+    Object.defineProperty(exports, "HttpError", { enumerable: true, get: function() {
+      return httpExecutor_1.HttpError;
+    } });
+    Object.defineProperty(exports, "HttpExecutor", { enumerable: true, get: function() {
+      return httpExecutor_1.HttpExecutor;
+    } });
+    Object.defineProperty(exports, "parseJson", { enumerable: true, get: function() {
+      return httpExecutor_1.parseJson;
+    } });
+    Object.defineProperty(exports, "safeGetHeader", { enumerable: true, get: function() {
+      return httpExecutor_1.safeGetHeader;
+    } });
+    Object.defineProperty(exports, "safeStringifyJson", { enumerable: true, get: function() {
+      return httpExecutor_1.safeStringifyJson;
+    } });
+    var MemoLazy_1 = requireMemoLazy();
+    Object.defineProperty(exports, "MemoLazy", { enumerable: true, get: function() {
+      return MemoLazy_1.MemoLazy;
+    } });
+    var ProgressCallbackTransform_1 = requireProgressCallbackTransform();
+    Object.defineProperty(exports, "ProgressCallbackTransform", { enumerable: true, get: function() {
+      return ProgressCallbackTransform_1.ProgressCallbackTransform;
+    } });
+    var publishOptions_1 = requirePublishOptions();
+    Object.defineProperty(exports, "getS3LikeProviderBaseUrl", { enumerable: true, get: function() {
+      return publishOptions_1.getS3LikeProviderBaseUrl;
+    } });
+    Object.defineProperty(exports, "githubUrl", { enumerable: true, get: function() {
+      return publishOptions_1.githubUrl;
+    } });
+    var retry_1 = requireRetry();
+    Object.defineProperty(exports, "retry", { enumerable: true, get: function() {
+      return retry_1.retry;
+    } });
+    var rfc2253Parser_1 = requireRfc2253Parser();
+    Object.defineProperty(exports, "parseDn", { enumerable: true, get: function() {
+      return rfc2253Parser_1.parseDn;
+    } });
+    var uuid_1 = requireUuid();
+    Object.defineProperty(exports, "UUID", { enumerable: true, get: function() {
+      return uuid_1.UUID;
+    } });
+    var xml_1 = requireXml();
+    Object.defineProperty(exports, "parseXml", { enumerable: true, get: function() {
+      return xml_1.parseXml;
+    } });
+    Object.defineProperty(exports, "XElement", { enumerable: true, get: function() {
+      return xml_1.XElement;
+    } });
+    exports.CURRENT_APP_INSTALLER_FILE_NAME = "installer.exe";
+    exports.CURRENT_APP_PACKAGE_FILE_NAME = "package.7z";
+    function asArray(v) {
+      if (v == null) {
+        return [];
+      } else if (Array.isArray(v)) {
+        return v;
+      } else {
+        return [v];
+      }
+    }
+  })(out);
+  return out;
+}
 var jsYaml = {};
 var loader = {};
 var common$1 = {};
@@ -6110,9 +6110,9 @@ function requireType() {
   }
   function Type(tag, options) {
     options = options || {};
-    Object.keys(options).forEach(function(name2) {
-      if (TYPE_CONSTRUCTOR_OPTIONS.indexOf(name2) === -1) {
-        throw new YAMLException('Unknown option "' + name2 + '" is met in definition of "' + tag + '" YAML type.');
+    Object.keys(options).forEach(function(name) {
+      if (TYPE_CONSTRUCTOR_OPTIONS.indexOf(name) === -1) {
+        throw new YAMLException('Unknown option "' + name + '" is met in definition of "' + tag + '" YAML type.');
       }
     });
     this.options = options;
@@ -6145,9 +6145,9 @@ function requireSchema() {
   hasRequiredSchema = 1;
   var YAMLException = requireException();
   var Type = requireType();
-  function compileList(schema2, name2) {
+  function compileList(schema2, name) {
     var result = [];
-    schema2[name2].forEach(function(currentType) {
+    schema2[name].forEach(function(currentType) {
       var newIndex = result.length;
       result.forEach(function(previousType, previousIndex) {
         if (previousType.tag === currentType.tag && previousType.kind === currentType.kind && previousType.multi === currentType.multi) {
@@ -6994,7 +6994,7 @@ function requireLoader() {
     }
   }
   var directiveHandlers = {
-    YAML: function handleYamlDirective(state2, name2, args) {
+    YAML: function handleYamlDirective(state2, name, args) {
       var match, major, minor;
       if (state2.version !== null) {
         throwError(state2, "duplication of %YAML directive");
@@ -7017,7 +7017,7 @@ function requireLoader() {
         throwWarning(state2, "unsupported YAML version of the document");
       }
     },
-    TAG: function handleTagDirective(state2, name2, args) {
+    TAG: function handleTagDirective(state2, name, args) {
       var handle, prefix;
       if (args.length !== 2) {
         throwError(state2, "TAG directive accepts exactly two arguments");
@@ -8696,13 +8696,13 @@ function requireJsYaml() {
   jsYaml.safeDump = renamed("safeDump", "dump");
   return jsYaml;
 }
-var main$1 = {};
+var main = {};
 var hasRequiredMain$1;
 function requireMain$1() {
-  if (hasRequiredMain$1) return main$1;
+  if (hasRequiredMain$1) return main;
   hasRequiredMain$1 = 1;
-  Object.defineProperty(main$1, "__esModule", { value: true });
-  main$1.Lazy = void 0;
+  Object.defineProperty(main, "__esModule", { value: true });
+  main.Lazy = void 0;
   class Lazy {
     constructor(creator) {
       this._value = null;
@@ -8724,8 +8724,8 @@ function requireMain$1() {
       this.creator = null;
     }
   }
-  main$1.Lazy = Lazy;
-  return main$1;
+  main.Lazy = Lazy;
+  return main;
 }
 var re = { exports: {} };
 var constants;
@@ -8799,11 +8799,11 @@ function requireRe() {
       }
       return value;
     };
-    const createToken = (name2, value, isGlobal) => {
+    const createToken = (name, value, isGlobal) => {
       const safe2 = makeSafeRegex(value);
       const index = R++;
-      debug(name2, index, value);
-      t[name2] = index;
+      debug(name, index, value);
+      t[name] = index;
       src2[index] = value;
       re2[index] = new RegExp(value, isGlobal ? "g" : void 0);
       safeRe[index] = new RegExp(safe2, isGlobal ? "g" : void 0);
@@ -11286,7 +11286,7 @@ function requireDownloadedUpdateHelper() {
   Object.defineProperty(DownloadedUpdateHelper, "__esModule", { value: true });
   DownloadedUpdateHelper.DownloadedUpdateHelper = void 0;
   DownloadedUpdateHelper.createTempUpdateFile = createTempUpdateFile;
-  const crypto_1 = require$$0$5;
+  const crypto_1 = require$$0$6;
   const fs_1 = fs$1;
   const isEqual = requireLodash_isequal();
   const fs_extra_1 = /* @__PURE__ */ requireLib();
@@ -11422,9 +11422,9 @@ function requireDownloadedUpdateHelper() {
       }).pipe(hash, { end: false });
     });
   }
-  async function createTempUpdateFile(name2, cacheDir, log) {
+  async function createTempUpdateFile(name, cacheDir, log) {
     let nameCounter = 0;
-    let result = path$1.join(cacheDir, name2);
+    let result = path$1.join(cacheDir, name);
     for (let i = 0; i < 3; i++) {
       try {
         await (0, fs_extra_1.unlink)(result);
@@ -11434,7 +11434,7 @@ function requireDownloadedUpdateHelper() {
           return result;
         }
         log.warn(`Error on remove temp update file: ${e}`);
-        result = path$1.join(cacheDir, `${nameCounter++}-${name2}`);
+        result = path$1.join(cacheDir, `${nameCounter++}-${name}`);
       }
     }
     return result;
@@ -11450,7 +11450,7 @@ function requireAppAdapter() {
   Object.defineProperty(AppAdapter, "__esModule", { value: true });
   AppAdapter.getAppCacheDir = getAppCacheDir;
   const path$1 = path;
-  const os_1 = require$$0$2;
+  const os_1 = require$$0$5;
   function getAppCacheDir() {
     const homedir = (0, os_1.homedir)();
     let result;
@@ -11596,7 +11596,6 @@ var hasRequiredLodash_escaperegexp;
 function requireLodash_escaperegexp() {
   if (hasRequiredLodash_escaperegexp) return lodash_escaperegexp;
   hasRequiredLodash_escaperegexp = 1;
-  var INFINITY = 1 / 0;
   var symbolTag = "[object Symbol]";
   var reRegExpChar = /[\\^$.*+?()[\]{}|]/g, reHasRegExpChar = RegExp(reRegExpChar.source);
   var freeGlobal = typeof commonjsGlobal == "object" && commonjsGlobal && commonjsGlobal.Object === Object && commonjsGlobal;
@@ -11614,7 +11613,7 @@ function requireLodash_escaperegexp() {
       return symbolToString ? symbolToString.call(value) : "";
     }
     var result = value + "";
-    return result == "0" && 1 / value == -INFINITY ? "-0" : result;
+    return result == "0" && 1 / value == -Infinity ? "-0" : result;
   }
   function isObjectLike(value) {
     return !!value && typeof value == "object";
@@ -12099,7 +12098,9 @@ function requireKeygenProvider() {
       });
       this.configuration = configuration;
       this.updater = updater;
-      this.baseUrl = (0, util_1.newBaseUrl)(`https://api.keygen.sh/v1/accounts/${this.configuration.account}/artifacts?product=${this.configuration.product}`);
+      this.defaultHostname = "api.keygen.sh";
+      const host = this.configuration.host || this.defaultHostname;
+      this.baseUrl = (0, util_1.newBaseUrl)(`https://${host}/v1/accounts/${this.configuration.account}/artifacts?product=${this.configuration.product}`);
     }
     get channel() {
       return this.updater.channel || this.configuration.channel || "stable";
@@ -12207,10 +12208,10 @@ function requirePrivateGitHubProvider() {
     }
     resolveFiles(updateInfo) {
       return (0, Provider_1.getFileList)(updateInfo).map((it) => {
-        const name2 = path$1.posix.basename(it.url).replace(/ /g, "-");
-        const asset = updateInfo.assets.find((it2) => it2 != null && it2.name === name2);
+        const name = path$1.posix.basename(it.url).replace(/ /g, "-");
+        const asset = updateInfo.assets.find((it2) => it2 != null && it2.name === name);
         if (asset == null) {
-          throw (0, builder_util_runtime_1.newError)(`Cannot find asset "${name2}" in: ${JSON.stringify(updateInfo.assets, null, 2)}`, "ERR_UPDATER_ASSET_NOT_FOUND");
+          throw (0, builder_util_runtime_1.newError)(`Cannot find asset "${name}" in: ${JSON.stringify(updateInfo.assets, null, 2)}`, "ERR_UPDATER_ASSET_NOT_FOUND");
         }
         return {
           url: new url_1.URL(asset.url),
@@ -12311,14 +12312,14 @@ function requireDownloadPlanBuilder() {
     let lastOperation = null;
     const blockMapFile = newBlockMap.files[0];
     const operations = [];
-    const name2 = blockMapFile.name;
-    const oldEntry = nameToOldBlocks.get(name2);
+    const name = blockMapFile.name;
+    const oldEntry = nameToOldBlocks.get(name);
     if (oldEntry == null) {
-      throw new Error(`no file ${name2} in old blockmap`);
+      throw new Error(`no file ${name} in old blockmap`);
     }
-    const newFile = nameToNewBlocks.get(name2);
+    const newFile = nameToNewBlocks.get(name);
     let changedBlockCount = 0;
-    const { checksumToOffset: checksumToOldOffset, checksumToOldSize } = buildChecksumMap(nameToOldBlocks.get(name2), oldEntry.offset, logger2);
+    const { checksumToOffset: checksumToOldOffset, checksumToOldSize } = buildChecksumMap(nameToOldBlocks.get(name), oldEntry.offset, logger2);
     let newOffset = blockMapFile.offset;
     for (let i = 0; i < newFile.checksums.length; newOffset += newFile.sizes[i], i++) {
       const blockSize = newFile.sizes[i];
@@ -12410,7 +12411,7 @@ function requireDataSplitter() {
   DataSplitter.copyData = copyData;
   const builder_util_runtime_1 = requireOut();
   const fs_1 = fs$1;
-  const stream_1 = require$$0$4;
+  const stream_1 = require$$0$2;
   const downloadPlanBuilder_1 = requireDownloadPlanBuilder();
   const DOUBLE_CRLF = Buffer.from("\r\n\r\n");
   var ReadState;
@@ -12718,7 +12719,7 @@ function requireProgressDifferentialDownloadCallbackTransform() {
   hasRequiredProgressDifferentialDownloadCallbackTransform = 1;
   Object.defineProperty(ProgressDifferentialDownloadCallbackTransform, "__esModule", { value: true });
   ProgressDifferentialDownloadCallbackTransform.ProgressDifferentialDownloadCallbackTransform = void 0;
-  const stream_1 = require$$0$4;
+  const stream_1 = require$$0$2;
   var OperationKind;
   (function(OperationKind2) {
     OperationKind2[OperationKind2["COPY"] = 0] = "COPY";
@@ -13064,6 +13065,50 @@ function requireGenericDifferentialDownloader() {
   GenericDifferentialDownloader.GenericDifferentialDownloader = GenericDifferentialDownloader$1;
   return GenericDifferentialDownloader;
 }
+var types = {};
+var hasRequiredTypes;
+function requireTypes() {
+  if (hasRequiredTypes) return types;
+  hasRequiredTypes = 1;
+  (function(exports) {
+    Object.defineProperty(exports, "__esModule", { value: true });
+    exports.UpdaterSignal = exports.UPDATE_DOWNLOADED = exports.DOWNLOAD_PROGRESS = exports.CancellationToken = void 0;
+    exports.addHandler = addHandler;
+    const builder_util_runtime_1 = requireOut();
+    Object.defineProperty(exports, "CancellationToken", { enumerable: true, get: function() {
+      return builder_util_runtime_1.CancellationToken;
+    } });
+    exports.DOWNLOAD_PROGRESS = "download-progress";
+    exports.UPDATE_DOWNLOADED = "update-downloaded";
+    class UpdaterSignal {
+      constructor(emitter) {
+        this.emitter = emitter;
+      }
+      /**
+       * Emitted when an authenticating proxy is [asking for user credentials](https://github.com/electron/electron/blob/master/docs/api/client-request.md#event-login).
+       */
+      login(handler) {
+        addHandler(this.emitter, "login", handler);
+      }
+      progress(handler) {
+        addHandler(this.emitter, exports.DOWNLOAD_PROGRESS, handler);
+      }
+      updateDownloaded(handler) {
+        addHandler(this.emitter, exports.UPDATE_DOWNLOADED, handler);
+      }
+      updateCancelled(handler) {
+        addHandler(this.emitter, "update-cancelled", handler);
+      }
+    }
+    exports.UpdaterSignal = UpdaterSignal;
+    function addHandler(emitter, event, handler) {
+      {
+        emitter.on(event, handler);
+      }
+    }
+  })(types);
+  return types;
+}
 var hasRequiredAppUpdater;
 function requireAppUpdater() {
   if (hasRequiredAppUpdater) return AppUpdater;
@@ -13071,9 +13116,9 @@ function requireAppUpdater() {
   Object.defineProperty(AppUpdater, "__esModule", { value: true });
   AppUpdater.NoOpLogger = AppUpdater.AppUpdater = void 0;
   const builder_util_runtime_1 = requireOut();
-  const crypto_1 = require$$0$5;
-  const os_1 = require$$0$2;
-  const events_1 = require$$0$1;
+  const crypto_1 = require$$0$6;
+  const os_1 = require$$0$5;
+  const events_1 = require$$0$4;
   const fs_extra_1 = /* @__PURE__ */ requireLib();
   const js_yaml_1 = requireJsYaml();
   const lazy_val_1 = requireMain$1();
@@ -13083,11 +13128,11 @@ function requireAppUpdater() {
   const ElectronAppAdapter_1 = requireElectronAppAdapter();
   const electronHttpExecutor_1 = requireElectronHttpExecutor();
   const GenericProvider_1 = requireGenericProvider();
-  const main_1 = requireMain();
   const providerFactory_1 = requireProviderFactory();
-  const zlib_1 = require$$15;
+  const zlib_1 = require$$14;
   const util_1 = requireUtil();
   const GenericDifferentialDownloader_1 = requireGenericDifferentialDownloader();
+  const types_1 = requireTypes();
   let AppUpdater$1 = class AppUpdater2 extends events_1.EventEmitter {
     /**
      * Get the update channel. Doesn't return `channel` from the update configuration, only if was previously set.
@@ -13143,6 +13188,18 @@ function requireAppUpdater() {
       this._appUpdateConfigPath = value;
       this.configOnDisk = new lazy_val_1.Lazy(() => this.loadUpdateConfig());
     }
+    /**
+     * Allows developer to override default logic for determining if an update is supported.
+     * The default logic compares the `UpdateInfo` minimum system version against the `os.release()` with `semver` package
+     */
+    get isUpdateSupported() {
+      return this._isUpdateSupported;
+    }
+    set isUpdateSupported(value) {
+      if (value) {
+        this._isUpdateSupported = value;
+      }
+    }
     constructor(options, app2) {
       super();
       this.autoDownload = true;
@@ -13158,8 +13215,9 @@ function requireAppUpdater() {
       this.downloadedUpdateHelper = null;
       this.requestHeaders = null;
       this._logger = console;
-      this.signals = new main_1.UpdaterSignal(this);
+      this.signals = new types_1.UpdaterSignal(this);
       this._appUpdateConfigPath = null;
+      this._isUpdateSupported = (updateInfo) => this.checkIfUpdateSupported(updateInfo);
       this.clientPromise = null;
       this.stagingUserIdPromise = new lazy_val_1.Lazy(() => this.getOrCreateStagingUserId());
       this.configOnDisk = new lazy_val_1.Lazy(() => this.loadUpdateConfig());
@@ -13214,6 +13272,7 @@ function requireAppUpdater() {
     }
     /**
      * Asks the server whether there is an update.
+     * @returns null if the updater is disabled, otherwise info about the latest version
      */
     checkForUpdates() {
       if (!this.isUpdaterActive()) {
@@ -13307,6 +13366,21 @@ function requireAppUpdater() {
       if ((0, semver_1.eq)(latestVersion, currentVersion)) {
         return false;
       }
+      if (!await Promise.resolve(this.isUpdateSupported(updateInfo))) {
+        return false;
+      }
+      const isStagingMatch = await this.isStagingMatch(updateInfo);
+      if (!isStagingMatch) {
+        return false;
+      }
+      const isLatestVersionNewer = (0, semver_1.gt)(latestVersion, currentVersion);
+      const isLatestVersionOlder = (0, semver_1.lt)(latestVersion, currentVersion);
+      if (isLatestVersionNewer) {
+        return true;
+      }
+      return this.allowDowngrade && isLatestVersionOlder;
+    }
+    checkIfUpdateSupported(updateInfo) {
       const minimumSystemVersion = updateInfo === null || updateInfo === void 0 ? void 0 : updateInfo.minimumSystemVersion;
       const currentOSVersion = (0, os_1.release)();
       if (minimumSystemVersion) {
@@ -13319,16 +13393,7 @@ function requireAppUpdater() {
           this._logger.warn(`Failed to compare current OS version(${currentOSVersion}) with minimum OS version(${minimumSystemVersion}): ${(e.message || e).toString()}`);
         }
       }
-      const isStagingMatch = await this.isStagingMatch(updateInfo);
-      if (!isStagingMatch) {
-        return false;
-      }
-      const isLatestVersionNewer = (0, semver_1.gt)(latestVersion, currentVersion);
-      const isLatestVersionOlder = (0, semver_1.lt)(latestVersion, currentVersion);
-      if (isLatestVersionNewer) {
-        return true;
-      }
-      return this.allowDowngrade && isLatestVersionOlder;
+      return true;
     }
     async getUpdateInfoAndProvider() {
       await this.app.whenReady();
@@ -13358,6 +13423,7 @@ function requireAppUpdater() {
         this._logger.info(`Update for version ${this.currentVersion.format()} is not available (latest version: ${updateInfo.version}, downgrade is ${this.allowDowngrade ? "allowed" : "disallowed"}).`);
         this.emit("update-not-available", updateInfo);
         return {
+          isUpdateAvailable: false,
           versionInfo: updateInfo,
           updateInfo
         };
@@ -13366,6 +13432,7 @@ function requireAppUpdater() {
       this.onUpdateAvailable(updateInfo);
       const cancellationToken = new builder_util_runtime_1.CancellationToken();
       return {
+        isUpdateAvailable: true,
         versionInfo: updateInfo,
         updateInfo,
         cancellationToken,
@@ -13419,7 +13486,7 @@ function requireAppUpdater() {
       this.emit("error", e, (e.stack || e).toString());
     }
     dispatchUpdateDownloaded(event) {
-      this.emit(main_1.UPDATE_DOWNLOADED, event);
+      this.emit(types_1.UPDATE_DOWNLOADED, event);
     }
     async loadUpdateConfig() {
       if (this._appUpdateConfigPath == null) {
@@ -13500,8 +13567,8 @@ function requireAppUpdater() {
         sha2: fileInfo.info.sha2,
         sha512: fileInfo.info.sha512
       };
-      if (this.listenerCount(main_1.DOWNLOAD_PROGRESS) > 0) {
-        downloadOptions.onProgress = (it) => this.emit(main_1.DOWNLOAD_PROGRESS, it);
+      if (this.listenerCount(types_1.DOWNLOAD_PROGRESS) > 0) {
+        downloadOptions.onProgress = (it) => this.emit(types_1.DOWNLOAD_PROGRESS, it);
       }
       const updateInfo = taskOptions.downloadUpdateOptions.updateInfoAndProvider.info;
       const version2 = updateInfo.version;
@@ -13585,8 +13652,8 @@ function requireAppUpdater() {
           requestHeaders: downloadUpdateOptions.requestHeaders,
           cancellationToken: downloadUpdateOptions.cancellationToken
         };
-        if (this.listenerCount(main_1.DOWNLOAD_PROGRESS) > 0) {
-          downloadOptions.onProgress = (it) => this.emit(main_1.DOWNLOAD_PROGRESS, it);
+        if (this.listenerCount(types_1.DOWNLOAD_PROGRESS) > 0) {
+          downloadOptions.onProgress = (it) => this.emit(types_1.DOWNLOAD_PROGRESS, it);
         }
         const blockMapDataList = await Promise.all(blockmapFileUrls.map((u) => downloadBlockMap(u)));
         await new GenericDifferentialDownloader_1.GenericDifferentialDownloader(fileInfo.info, this.httpExecutor, downloadOptions).download(blockMapDataList[0], blockMapDataList[1]);
@@ -13655,6 +13722,9 @@ function requireBaseUpdater() {
         }
       });
     }
+    get installerPath() {
+      return this.downloadedUpdateHelper == null ? null : this.downloadedUpdateHelper.file;
+    }
     // must be sync (because quit even handler is not async)
     install(isSilent = false, isForceRunAfter = false) {
       if (this.quitAndInstallCalled) {
@@ -13662,7 +13732,7 @@ function requireBaseUpdater() {
         return false;
       }
       const downloadedUpdateHelper = this.downloadedUpdateHelper;
-      const installerPath = downloadedUpdateHelper && downloadedUpdateHelper.file ? process.platform === "linux" ? downloadedUpdateHelper.file.replace(/ /g, "\\ ") : downloadedUpdateHelper.file : null;
+      const installerPath = this.installerPath;
       const downloadedFileInfo = downloadedUpdateHelper == null ? null : downloadedUpdateHelper.downloadedFileInfo;
       if (installerPath == null || downloadedFileInfo == null) {
         this.dispatchError(new Error("No valid update available, can't quit and install"));
@@ -13672,7 +13742,6 @@ function requireBaseUpdater() {
       try {
         this._logger.info(`Install: isSilent: ${isSilent}, isForceRunAfter: ${isForceRunAfter}`);
         return this.doInstall({
-          installerPath,
           isSilent,
           isForceRunAfter,
           isAdminRightsRequired: downloadedFileInfo.isAdminRightsRequired
@@ -13705,8 +13774,8 @@ function requireBaseUpdater() {
       });
     }
     wrapSudo() {
-      const { name: name2 } = this.app;
-      const installComment = `"${name2} would like to update"`;
+      const { name } = this.app;
+      const installComment = `"${name} would like to update"`;
       const sudo = this.spawnSyncLog("which gksudo || which kdesudo || which pkexec || which beesu");
       const command = [sudo];
       if (/kdesudo/i.test(sudo)) {
@@ -13726,7 +13795,15 @@ function requireBaseUpdater() {
         encoding: "utf-8",
         shell: true
       });
-      return response.stdout.trim();
+      const { error: error2, status, stdout, stderr } = response;
+      if (error2 != null) {
+        this._logger.error(stderr);
+        throw error2;
+      } else if (status != null && status !== 0) {
+        this._logger.error(stderr);
+        throw new Error(`Command ${cmd} exited with code ${status}`);
+      }
+      return stdout.trim();
     }
     /**
      * This handles both node 8 and node 10 way of emitting error when spawning a process
@@ -13767,7 +13844,7 @@ function requireFileWithEmbeddedBlockMapDifferentialDownloader() {
   FileWithEmbeddedBlockMapDifferentialDownloader.FileWithEmbeddedBlockMapDifferentialDownloader = void 0;
   const fs_extra_1 = /* @__PURE__ */ requireLib();
   const DifferentialDownloader_1 = requireDifferentialDownloader();
-  const zlib_1 = require$$15;
+  const zlib_1 = require$$14;
   let FileWithEmbeddedBlockMapDifferentialDownloader$1 = class FileWithEmbeddedBlockMapDifferentialDownloader extends DifferentialDownloader_1.DifferentialDownloader {
     async download() {
       const packageInfo = this.blockAwareFileInfo;
@@ -13812,8 +13889,8 @@ function requireAppImageUpdater() {
   const path$1 = path;
   const BaseUpdater_1 = requireBaseUpdater();
   const FileWithEmbeddedBlockMapDifferentialDownloader_1 = requireFileWithEmbeddedBlockMapDifferentialDownloader();
-  const main_1 = requireMain();
   const Provider_1 = requireProvider();
+  const types_1 = requireTypes();
   let AppImageUpdater$1 = class AppImageUpdater extends BaseUpdater_1.BaseUpdater {
     constructor(options, app2) {
       super(options, app2);
@@ -13832,7 +13909,7 @@ function requireAppImageUpdater() {
     /*** @private */
     doDownloadUpdate(downloadUpdateOptions) {
       const provider = downloadUpdateOptions.updateInfoAndProvider.provider;
-      const fileInfo = (0, Provider_1.findFile)(provider.resolveFiles(downloadUpdateOptions.updateInfoAndProvider.info), "AppImage", ["rpm", "deb"]);
+      const fileInfo = (0, Provider_1.findFile)(provider.resolveFiles(downloadUpdateOptions.updateInfoAndProvider.info), "AppImage", ["rpm", "deb", "pacman"]);
       return this.executeDownload({
         fileExtension: "AppImage",
         fileInfo,
@@ -13842,31 +13919,33 @@ function requireAppImageUpdater() {
           if (oldFile == null) {
             throw (0, builder_util_runtime_1.newError)("APPIMAGE env is not defined", "ERR_UPDATER_OLD_FILE_NOT_FOUND");
           }
-          let isDownloadFull = false;
-          try {
-            const downloadOptions2 = {
-              newUrl: fileInfo.url,
-              oldFile,
-              logger: this._logger,
-              newFile: updateFile,
-              isUseMultipleRangeRequest: provider.isUseMultipleRangeRequest,
-              requestHeaders: downloadUpdateOptions.requestHeaders,
-              cancellationToken: downloadUpdateOptions.cancellationToken
-            };
-            if (this.listenerCount(main_1.DOWNLOAD_PROGRESS) > 0) {
-              downloadOptions2.onProgress = (it) => this.emit(main_1.DOWNLOAD_PROGRESS, it);
-            }
-            await new FileWithEmbeddedBlockMapDifferentialDownloader_1.FileWithEmbeddedBlockMapDifferentialDownloader(fileInfo.info, this.httpExecutor, downloadOptions2).download();
-          } catch (e) {
-            this._logger.error(`Cannot download differentially, fallback to full download: ${e.stack || e}`);
-            isDownloadFull = process.platform === "linux";
-          }
-          if (isDownloadFull) {
+          if (downloadUpdateOptions.disableDifferentialDownload || await this.downloadDifferential(fileInfo, oldFile, updateFile, provider, downloadUpdateOptions)) {
             await this.httpExecutor.download(fileInfo.url, updateFile, downloadOptions);
           }
           await (0, fs_extra_1.chmod)(updateFile, 493);
         }
       });
+    }
+    async downloadDifferential(fileInfo, oldFile, updateFile, provider, downloadUpdateOptions) {
+      try {
+        const downloadOptions = {
+          newUrl: fileInfo.url,
+          oldFile,
+          logger: this._logger,
+          newFile: updateFile,
+          isUseMultipleRangeRequest: provider.isUseMultipleRangeRequest,
+          requestHeaders: downloadUpdateOptions.requestHeaders,
+          cancellationToken: downloadUpdateOptions.cancellationToken
+        };
+        if (this.listenerCount(types_1.DOWNLOAD_PROGRESS) > 0) {
+          downloadOptions.onProgress = (it) => this.emit(types_1.DOWNLOAD_PROGRESS, it);
+        }
+        await new FileWithEmbeddedBlockMapDifferentialDownloader_1.FileWithEmbeddedBlockMapDifferentialDownloader(fileInfo.info, this.httpExecutor, downloadOptions).download();
+        return false;
+      } catch (e) {
+        this._logger.error(`Cannot download differentially, fallback to full download: ${e.stack || e}`);
+        return process.platform === "linux";
+      }
     }
     doInstall(options) {
       const appImageFile = process.env["APPIMAGE"];
@@ -13876,12 +13955,17 @@ function requireAppImageUpdater() {
       (0, fs_1.unlinkSync)(appImageFile);
       let destination;
       const existingBaseName = path$1.basename(appImageFile);
-      if (path$1.basename(options.installerPath) === existingBaseName || !/\d+\.\d+\.\d+/.test(existingBaseName)) {
+      const installerPath = this.installerPath;
+      if (installerPath == null) {
+        this.dispatchError(new Error("No valid update available, can't quit and install"));
+        return false;
+      }
+      if (path$1.basename(installerPath) === existingBaseName || !/\d+\.\d+\.\d+/.test(existingBaseName)) {
         destination = appImageFile;
       } else {
-        destination = path$1.join(path$1.dirname(appImageFile), path$1.basename(options.installerPath));
+        destination = path$1.join(path$1.dirname(appImageFile), path$1.basename(installerPath));
       }
-      (0, child_process_1.execFileSync)("mv", ["-f", options.installerPath, destination]);
+      (0, child_process_1.execFileSync)("mv", ["-f", installerPath, destination]);
       if (destination !== appImageFile) {
         this.emit("appimage-filename-updated", destination);
       }
@@ -13909,8 +13993,8 @@ function requireDebUpdater() {
   Object.defineProperty(DebUpdater, "__esModule", { value: true });
   DebUpdater.DebUpdater = void 0;
   const BaseUpdater_1 = requireBaseUpdater();
-  const main_1 = requireMain();
   const Provider_1 = requireProvider();
+  const types_1 = requireTypes();
   let DebUpdater$1 = class DebUpdater extends BaseUpdater_1.BaseUpdater {
     constructor(options, app2) {
       super(options, app2);
@@ -13918,23 +14002,32 @@ function requireDebUpdater() {
     /*** @private */
     doDownloadUpdate(downloadUpdateOptions) {
       const provider = downloadUpdateOptions.updateInfoAndProvider.provider;
-      const fileInfo = (0, Provider_1.findFile)(provider.resolveFiles(downloadUpdateOptions.updateInfoAndProvider.info), "deb", ["AppImage", "rpm"]);
+      const fileInfo = (0, Provider_1.findFile)(provider.resolveFiles(downloadUpdateOptions.updateInfoAndProvider.info), "deb", ["AppImage", "rpm", "pacman"]);
       return this.executeDownload({
         fileExtension: "deb",
         fileInfo,
         downloadUpdateOptions,
         task: async (updateFile, downloadOptions) => {
-          if (this.listenerCount(main_1.DOWNLOAD_PROGRESS) > 0) {
-            downloadOptions.onProgress = (it) => this.emit(main_1.DOWNLOAD_PROGRESS, it);
+          if (this.listenerCount(types_1.DOWNLOAD_PROGRESS) > 0) {
+            downloadOptions.onProgress = (it) => this.emit(types_1.DOWNLOAD_PROGRESS, it);
           }
           await this.httpExecutor.download(fileInfo.url, updateFile, downloadOptions);
         }
       });
     }
+    get installerPath() {
+      var _a, _b;
+      return (_b = (_a = super.installerPath) === null || _a === void 0 ? void 0 : _a.replace(/ /g, "\\ ")) !== null && _b !== void 0 ? _b : null;
+    }
     doInstall(options) {
       const sudo = this.wrapSudo();
       const wrapper = /pkexec/i.test(sudo) ? "" : `"`;
-      const cmd = ["dpkg", "-i", options.installerPath, "||", "apt-get", "install", "-f", "-y"];
+      const installerPath = this.installerPath;
+      if (installerPath == null) {
+        this.dispatchError(new Error("No valid update available, can't quit and install"));
+        return false;
+      }
+      const cmd = ["dpkg", "-i", installerPath, "||", "apt-get", "install", "-f", "-y"];
       this.spawnSyncLog(sudo, [`${wrapper}/bin/bash`, "-c", `'${cmd.join(" ")}'${wrapper}`]);
       if (options.isForceRunAfter) {
         this.app.relaunch();
@@ -13945,6 +14038,59 @@ function requireDebUpdater() {
   DebUpdater.DebUpdater = DebUpdater$1;
   return DebUpdater;
 }
+var PacmanUpdater = {};
+var hasRequiredPacmanUpdater;
+function requirePacmanUpdater() {
+  if (hasRequiredPacmanUpdater) return PacmanUpdater;
+  hasRequiredPacmanUpdater = 1;
+  Object.defineProperty(PacmanUpdater, "__esModule", { value: true });
+  PacmanUpdater.PacmanUpdater = void 0;
+  const BaseUpdater_1 = requireBaseUpdater();
+  const types_1 = requireTypes();
+  const Provider_1 = requireProvider();
+  let PacmanUpdater$1 = class PacmanUpdater extends BaseUpdater_1.BaseUpdater {
+    constructor(options, app2) {
+      super(options, app2);
+    }
+    /*** @private */
+    doDownloadUpdate(downloadUpdateOptions) {
+      const provider = downloadUpdateOptions.updateInfoAndProvider.provider;
+      const fileInfo = (0, Provider_1.findFile)(provider.resolveFiles(downloadUpdateOptions.updateInfoAndProvider.info), "pacman", ["AppImage", "deb", "rpm"]);
+      return this.executeDownload({
+        fileExtension: "pacman",
+        fileInfo,
+        downloadUpdateOptions,
+        task: async (updateFile, downloadOptions) => {
+          if (this.listenerCount(types_1.DOWNLOAD_PROGRESS) > 0) {
+            downloadOptions.onProgress = (it) => this.emit(types_1.DOWNLOAD_PROGRESS, it);
+          }
+          await this.httpExecutor.download(fileInfo.url, updateFile, downloadOptions);
+        }
+      });
+    }
+    get installerPath() {
+      var _a, _b;
+      return (_b = (_a = super.installerPath) === null || _a === void 0 ? void 0 : _a.replace(/ /g, "\\ ")) !== null && _b !== void 0 ? _b : null;
+    }
+    doInstall(options) {
+      const sudo = this.wrapSudo();
+      const wrapper = /pkexec/i.test(sudo) ? "" : `"`;
+      const installerPath = this.installerPath;
+      if (installerPath == null) {
+        this.dispatchError(new Error("No valid update available, can't quit and install"));
+        return false;
+      }
+      const cmd = ["pacman", "-U", "--noconfirm", installerPath];
+      this.spawnSyncLog(sudo, [`${wrapper}/bin/bash`, "-c", `'${cmd.join(" ")}'${wrapper}`]);
+      if (options.isForceRunAfter) {
+        this.app.relaunch();
+      }
+      return true;
+    }
+  };
+  PacmanUpdater.PacmanUpdater = PacmanUpdater$1;
+  return PacmanUpdater;
+}
 var RpmUpdater = {};
 var hasRequiredRpmUpdater;
 function requireRpmUpdater() {
@@ -13953,7 +14099,7 @@ function requireRpmUpdater() {
   Object.defineProperty(RpmUpdater, "__esModule", { value: true });
   RpmUpdater.RpmUpdater = void 0;
   const BaseUpdater_1 = requireBaseUpdater();
-  const main_1 = requireMain();
+  const types_1 = requireTypes();
   const Provider_1 = requireProvider();
   let RpmUpdater$1 = class RpmUpdater extends BaseUpdater_1.BaseUpdater {
     constructor(options, app2) {
@@ -13962,30 +14108,38 @@ function requireRpmUpdater() {
     /*** @private */
     doDownloadUpdate(downloadUpdateOptions) {
       const provider = downloadUpdateOptions.updateInfoAndProvider.provider;
-      const fileInfo = (0, Provider_1.findFile)(provider.resolveFiles(downloadUpdateOptions.updateInfoAndProvider.info), "rpm", ["AppImage", "deb"]);
+      const fileInfo = (0, Provider_1.findFile)(provider.resolveFiles(downloadUpdateOptions.updateInfoAndProvider.info), "rpm", ["AppImage", "deb", "pacman"]);
       return this.executeDownload({
         fileExtension: "rpm",
         fileInfo,
         downloadUpdateOptions,
         task: async (updateFile, downloadOptions) => {
-          if (this.listenerCount(main_1.DOWNLOAD_PROGRESS) > 0) {
-            downloadOptions.onProgress = (it) => this.emit(main_1.DOWNLOAD_PROGRESS, it);
+          if (this.listenerCount(types_1.DOWNLOAD_PROGRESS) > 0) {
+            downloadOptions.onProgress = (it) => this.emit(types_1.DOWNLOAD_PROGRESS, it);
           }
           await this.httpExecutor.download(fileInfo.url, updateFile, downloadOptions);
         }
       });
     }
+    get installerPath() {
+      var _a, _b;
+      return (_b = (_a = super.installerPath) === null || _a === void 0 ? void 0 : _a.replace(/ /g, "\\ ")) !== null && _b !== void 0 ? _b : null;
+    }
     doInstall(options) {
-      const upgradePath = options.installerPath;
       const sudo = this.wrapSudo();
       const wrapper = /pkexec/i.test(sudo) ? "" : `"`;
       const packageManager = this.spawnSyncLog("which zypper");
+      const installerPath = this.installerPath;
+      if (installerPath == null) {
+        this.dispatchError(new Error("No valid update available, can't quit and install"));
+        return false;
+      }
       let cmd;
       if (!packageManager) {
         const packageManager2 = this.spawnSyncLog("which dnf || which yum");
-        cmd = [packageManager2, "-y", "install", upgradePath];
+        cmd = [packageManager2, "-y", "install", installerPath];
       } else {
-        cmd = [packageManager, "--no-refresh", "install", "--allow-unsigned-rpm", "-y", "-f", upgradePath];
+        cmd = [packageManager, "--no-refresh", "install", "--allow-unsigned-rpm", "-y", "-f", installerPath];
       }
       this.spawnSyncLog(sudo, [`${wrapper}/bin/bash`, "-c", `'${cmd.join(" ")}'${wrapper}`]);
       if (options.isForceRunAfter) {
@@ -14012,7 +14166,7 @@ function requireMacUpdater() {
   const AppUpdater_1 = requireAppUpdater();
   const Provider_1 = requireProvider();
   const child_process_1 = require$$1$3;
-  const crypto_1 = require$$0$5;
+  const crypto_1 = require$$0$6;
   let MacUpdater$1 = class MacUpdater extends AppUpdater_1.AppUpdater {
     constructor(options, app2) {
       super(options, app2);
@@ -14102,11 +14256,11 @@ function requireMacUpdater() {
             await this.httpExecutor.download(zipFileInfo.url, destinationFile, downloadOptions);
           }
         },
-        done: (event) => {
+        done: async (event) => {
           if (!downloadUpdateOptions.disableDifferentialDownload) {
             try {
               const cachedUpdateFilePath = path$1.join(this.downloadedUpdateHelper.cacheDir, CURRENT_MAC_APP_ZIP_FILE_NAME);
-              (0, fs_1.copyFileSync)(event.downloadedFile, cachedUpdateFilePath);
+              await (0, fs_extra_1.copyFile)(event.downloadedFile, cachedUpdateFilePath);
             } catch (error2) {
               this._logger.warn(`Unable to copy file for caching for future differential downloads: ${error2.message}`);
             }
@@ -14216,15 +14370,19 @@ function requireMacUpdater() {
         });
       });
     }
+    handleUpdateDownloaded() {
+      if (this.autoRunAppAfterInstall) {
+        this.nativeUpdater.quitAndInstall();
+      } else {
+        this.app.quit();
+      }
+      this.closeServerIfExists();
+    }
     quitAndInstall() {
       if (this.squirrelDownloadedUpdate) {
-        this.nativeUpdater.quitAndInstall();
-        this.closeServerIfExists();
+        this.handleUpdateDownloaded();
       } else {
-        this.nativeUpdater.on("update-downloaded", () => {
-          this.nativeUpdater.quitAndInstall();
-          this.closeServerIfExists();
-        });
+        this.nativeUpdater.on("update-downloaded", () => this.handleUpdateDownloaded());
         if (!this.autoInstallOnAppQuit) {
           this.nativeUpdater.checkForUpdates();
         }
@@ -14244,7 +14402,7 @@ function requireWindowsExecutableCodeSignatureVerifier() {
   windowsExecutableCodeSignatureVerifier.verifySignature = verifySignature;
   const builder_util_runtime_1 = requireOut();
   const child_process_1 = require$$1$3;
-  const os = require$$0$2;
+  const os = require$$0$5;
   const path$1 = path;
   function verifySignature(publisherNames, unescapedTempUpdateFile, logger2) {
     return new Promise((resolve, reject) => {
@@ -14277,15 +14435,15 @@ function requireWindowsExecutableCodeSignatureVerifier() {
             }
             const subject = (0, builder_util_runtime_1.parseDn)(data.SignerCertificate.Subject);
             let match = false;
-            for (const name2 of publisherNames) {
-              const dn = (0, builder_util_runtime_1.parseDn)(name2);
+            for (const name of publisherNames) {
+              const dn = (0, builder_util_runtime_1.parseDn)(name);
               if (dn.size) {
                 const allKeys = Array.from(dn.keys());
                 match = allKeys.every((key) => {
                   return dn.get(key) === subject.get(key);
                 });
-              } else if (name2 === subject.get("CN")) {
-                logger2.warn(`Signature validated using only CN ${name2}. Please add your full Distinguished Name (DN) to publisherNames configuration`);
+              } else if (name === subject.get("CN")) {
+                logger2.warn(`Signature validated using only CN ${name}. Please add your full Distinguished Name (DN) to publisherNames configuration`);
                 match = true;
               }
               if (match) {
@@ -14294,7 +14452,7 @@ function requireWindowsExecutableCodeSignatureVerifier() {
               }
             }
           }
-          const result = `publisherNames: ${publisherNames.join(" | ")}, raw info: ` + JSON.stringify(data, (name2, value) => name2 === "RawData" ? void 0 : value, 2);
+          const result = `publisherNames: ${publisherNames.join(" | ")}, raw info: ` + JSON.stringify(data, (name, value) => name === "RawData" ? void 0 : value, 2);
           logger2.warn(`Sign verification failed, installer signed with incorrect certificate: ${result}`);
           resolve(result);
         } catch (e) {
@@ -14354,7 +14512,7 @@ function requireNsisUpdater() {
   const path$1 = path;
   const BaseUpdater_1 = requireBaseUpdater();
   const FileWithEmbeddedBlockMapDifferentialDownloader_1 = requireFileWithEmbeddedBlockMapDifferentialDownloader();
-  const main_1 = requireMain();
+  const types_1 = requireTypes();
   const Provider_1 = requireProvider();
   const fs_extra_1 = /* @__PURE__ */ requireLib();
   const windowsExecutableCodeSignatureVerifier_1 = requireWindowsExecutableCodeSignatureVerifier();
@@ -14440,6 +14598,11 @@ function requireNsisUpdater() {
       return await this._verifyUpdateCodeSignature(Array.isArray(publisherName) ? publisherName : [publisherName], tempUpdateFile);
     }
     doInstall(options) {
+      const installerPath = this.installerPath;
+      if (installerPath == null) {
+        this.dispatchError(new Error("No valid update available, can't quit and install"));
+        return false;
+      }
       const args = ["--updated"];
       if (options.isSilent) {
         args.push("/S");
@@ -14455,20 +14618,20 @@ function requireNsisUpdater() {
         args.push(`--package-file=${packagePath}`);
       }
       const callUsingElevation = () => {
-        this.spawnLog(path$1.join(process.resourcesPath, "elevate.exe"), [options.installerPath].concat(args)).catch((e) => this.dispatchError(e));
+        this.spawnLog(path$1.join(process.resourcesPath, "elevate.exe"), [installerPath].concat(args)).catch((e) => this.dispatchError(e));
       };
       if (options.isAdminRightsRequired) {
         this._logger.info("isAdminRightsRequired is set to true, run installer using elevate.exe");
         callUsingElevation();
         return true;
       }
-      this.spawnLog(options.installerPath, args).catch((e) => {
+      this.spawnLog(installerPath, args).catch((e) => {
         const errorCode = e.code;
         this._logger.info(`Cannot run installer: error code: ${errorCode}, error message: "${e.message}", will be executed again using elevate if EACCES, and will try to use electron.shell.openItem if ENOENT`);
         if (errorCode === "UNKNOWN" || errorCode === "EACCES") {
           callUsingElevation();
         } else if (errorCode === "ENOENT") {
-          require$$1$2.shell.openPath(options.installerPath).catch((err) => this.dispatchError(err));
+          require$$1$2.shell.openPath(installerPath).catch((err) => this.dispatchError(err));
         } else {
           this.dispatchError(e);
         }
@@ -14489,8 +14652,8 @@ function requireNsisUpdater() {
           isUseMultipleRangeRequest: provider.isUseMultipleRangeRequest,
           cancellationToken: downloadUpdateOptions.cancellationToken
         };
-        if (this.listenerCount(main_1.DOWNLOAD_PROGRESS) > 0) {
-          downloadOptions.onProgress = (it) => this.emit(main_1.DOWNLOAD_PROGRESS, it);
+        if (this.listenerCount(types_1.DOWNLOAD_PROGRESS) > 0) {
+          downloadOptions.onProgress = (it) => this.emit(types_1.DOWNLOAD_PROGRESS, it);
         }
         await new FileWithEmbeddedBlockMapDifferentialDownloader_1.FileWithEmbeddedBlockMapDifferentialDownloader(packageInfo, this.httpExecutor, downloadOptions).download();
       } catch (e) {
@@ -14505,15 +14668,27 @@ function requireNsisUpdater() {
 }
 var hasRequiredMain;
 function requireMain() {
-  if (hasRequiredMain) return main$2;
+  if (hasRequiredMain) return main$1;
   hasRequiredMain = 1;
   (function(exports) {
+    var __createBinding = main$1 && main$1.__createBinding || (Object.create ? function(o, m, k, k2) {
+      if (k2 === void 0) k2 = k;
+      var desc = Object.getOwnPropertyDescriptor(m, k);
+      if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
+        desc = { enumerable: true, get: function() {
+          return m[k];
+        } };
+      }
+      Object.defineProperty(o, k2, desc);
+    } : function(o, m, k, k2) {
+      if (k2 === void 0) k2 = k;
+      o[k2] = m[k];
+    });
+    var __exportStar = main$1 && main$1.__exportStar || function(m, exports2) {
+      for (var p in m) if (p !== "default" && !Object.prototype.hasOwnProperty.call(exports2, p)) __createBinding(exports2, m, p);
+    };
     Object.defineProperty(exports, "__esModule", { value: true });
-    exports.UpdaterSignal = exports.UPDATE_DOWNLOADED = exports.DOWNLOAD_PROGRESS = exports.NsisUpdater = exports.MacUpdater = exports.RpmUpdater = exports.DebUpdater = exports.AppImageUpdater = exports.Provider = exports.CancellationToken = exports.NoOpLogger = exports.AppUpdater = exports.BaseUpdater = void 0;
-    const builder_util_runtime_1 = requireOut();
-    Object.defineProperty(exports, "CancellationToken", { enumerable: true, get: function() {
-      return builder_util_runtime_1.CancellationToken;
-    } });
+    exports.NsisUpdater = exports.MacUpdater = exports.RpmUpdater = exports.PacmanUpdater = exports.DebUpdater = exports.AppImageUpdater = exports.Provider = exports.NoOpLogger = exports.AppUpdater = exports.BaseUpdater = void 0;
     const fs_extra_1 = /* @__PURE__ */ requireLib();
     const path$1 = path;
     var BaseUpdater_1 = requireBaseUpdater();
@@ -14539,6 +14714,10 @@ function requireMain() {
     Object.defineProperty(exports, "DebUpdater", { enumerable: true, get: function() {
       return DebUpdater_1.DebUpdater;
     } });
+    var PacmanUpdater_1 = requirePacmanUpdater();
+    Object.defineProperty(exports, "PacmanUpdater", { enumerable: true, get: function() {
+      return PacmanUpdater_1.PacmanUpdater;
+    } });
     var RpmUpdater_1 = requireRpmUpdater();
     Object.defineProperty(exports, "RpmUpdater", { enumerable: true, get: function() {
       return RpmUpdater_1.RpmUpdater;
@@ -14551,6 +14730,7 @@ function requireMain() {
     Object.defineProperty(exports, "NsisUpdater", { enumerable: true, get: function() {
       return NsisUpdater_1.NsisUpdater;
     } });
+    __exportStar(requireTypes(), exports);
     let _autoUpdater;
     function doLoadAutoUpdater() {
       if (process.platform === "win32") {
@@ -14574,6 +14754,9 @@ function requireMain() {
             case "rpm":
               _autoUpdater = new (requireRpmUpdater()).RpmUpdater();
               break;
+            case "pacman":
+              _autoUpdater = new (requirePacmanUpdater()).PacmanUpdater();
+              break;
             default:
               break;
           }
@@ -14589,36 +14772,8 @@ function requireMain() {
         return _autoUpdater || doLoadAutoUpdater();
       }
     });
-    exports.DOWNLOAD_PROGRESS = "download-progress";
-    exports.UPDATE_DOWNLOADED = "update-downloaded";
-    class UpdaterSignal {
-      constructor(emitter) {
-        this.emitter = emitter;
-      }
-      /**
-       * Emitted when an authenticating proxy is [asking for user credentials](https://github.com/electron/electron/blob/master/docs/api/client-request.md#event-login).
-       */
-      login(handler) {
-        addHandler(this.emitter, "login", handler);
-      }
-      progress(handler) {
-        addHandler(this.emitter, exports.DOWNLOAD_PROGRESS, handler);
-      }
-      updateDownloaded(handler) {
-        addHandler(this.emitter, exports.UPDATE_DOWNLOADED, handler);
-      }
-      updateCancelled(handler) {
-        addHandler(this.emitter, "update-cancelled", handler);
-      }
-    }
-    exports.UpdaterSignal = UpdaterSignal;
-    function addHandler(emitter, event, handler) {
-      {
-        emitter.on(event, handler);
-      }
-    }
-  })(main$2);
-  return main$2;
+  })(main$1);
+  return main$1;
 }
 var mainExports = requireMain();
 const electronUpdaterPkg = /* @__PURE__ */ getDefaultExportFromCjs(mainExports);
@@ -14745,7 +14900,7 @@ var hasRequiredSupportsColors;
 function requireSupportsColors() {
   if (hasRequiredSupportsColors) return supportsColors;
   hasRequiredSupportsColors = 1;
-  var os = require$$0$2;
+  var os = require$$0$5;
   var hasFlag2 = requireHasFlag();
   var env = process.env;
   var forceColor = void 0;
@@ -15299,10 +15454,10 @@ function requireColors() {
     };
     function init() {
       var ret = {};
-      Object.keys(styles2).forEach(function(name2) {
-        ret[name2] = {
+      Object.keys(styles2).forEach(function(name) {
+        ret[name] = {
           get: function() {
-            return build([name2]);
+            return build([name]);
           }
         };
       });
@@ -17058,8 +17213,8 @@ function requireLogform() {
   hasRequiredLogform = 1;
   const format2 = logform.format = requireFormat();
   logform.levels = requireLevels();
-  function exposeFormat(name2, requireFormat2) {
-    Object.defineProperty(format2, name2, {
+  function exposeFormat(name, requireFormat2) {
+    Object.defineProperty(format2, name, {
       get() {
         return requireFormat2();
       },
@@ -17158,37 +17313,9 @@ function requireCommon() {
   })(common);
   return common;
 }
-const name = "winston";
-const description = "A logger for just about everything.";
 const version = "3.17.0";
-const author = "Charlie Robbins <charlie.robbins@gmail.com>";
-const maintainers = ["David Hyde <dabh@alumni.stanford.edu>"];
-const repository = { "type": "git", "url": "https://github.com/winstonjs/winston.git" };
-const keywords = ["winston", "logger", "logging", "logs", "sysadmin", "bunyan", "pino", "loglevel", "tools", "json", "stream"];
-const dependencies = { "@dabh/diagnostics": "^2.0.2", "@colors/colors": "^1.6.0", "async": "^3.2.3", "is-stream": "^2.0.0", "logform": "^2.7.0", "one-time": "^1.0.0", "readable-stream": "^3.4.0", "safe-stable-stringify": "^2.3.1", "stack-trace": "0.0.x", "triple-beam": "^1.3.0", "winston-transport": "^4.9.0" };
-const devDependencies = { "@babel/cli": "^7.23.9", "@babel/core": "^7.24.0", "@babel/preset-env": "^7.24.0", "@dabh/eslint-config-populist": "^4.4.0", "@types/node": "^20.11.24", "abstract-winston-transport": "^0.5.1", "assume": "^2.2.0", "cross-spawn-async": "^2.2.5", "eslint": "^8.57.0", "hock": "^1.4.1", "mocha": "^10.3.0", "nyc": "^17.1.0", "rimraf": "5.0.1", "split2": "^4.1.0", "std-mocks": "^2.0.0", "through2": "^4.0.2", "winston-compat": "^0.1.5" };
-const main = "./lib/winston.js";
-const browser = "./dist/winston";
-const types = "./index.d.ts";
-const scripts = { "lint": "eslint lib/*.js lib/winston/*.js lib/winston/**/*.js --resolve-plugins-relative-to ./node_modules/@dabh/eslint-config-populist", "test": "rimraf test/fixtures/logs/* && mocha", "test:coverage": "nyc npm run test:unit", "test:unit": "mocha test/unit", "test:integration": "mocha test/integration", "build": "rimraf dist && babel lib -d dist", "prepublishOnly": "npm run build" };
-const engines = { "node": ">= 12.0.0" };
-const license = "MIT";
 const require$$2 = {
-  name,
-  description,
-  version,
-  author,
-  maintainers,
-  repository,
-  keywords,
-  dependencies,
-  devDependencies,
-  main,
-  browser,
-  types,
-  scripts,
-  engines,
-  license
+  version
 };
 var transports = {};
 var winstonTransport = { exports: {} };
@@ -17206,7 +17333,7 @@ var hasRequiredStream$1;
 function requireStream$1() {
   if (hasRequiredStream$1) return stream$1;
   hasRequiredStream$1 = 1;
-  stream$1 = require$$0$4;
+  stream$1 = require$$0$2;
   return stream$1;
 }
 var destroy_1;
@@ -17358,10 +17485,10 @@ function requireErrors() {
       return str2.indexOf(search, start) !== -1;
     }
   }
-  createErrorType("ERR_INVALID_OPT_VALUE", function(name2, value) {
-    return 'The value "' + value + '" is invalid for option "' + name2 + '"';
+  createErrorType("ERR_INVALID_OPT_VALUE", function(name, value) {
+    return 'The value "' + value + '" is invalid for option "' + name + '"';
   }, TypeError);
-  createErrorType("ERR_INVALID_ARG_TYPE", function(name2, expected, actual) {
+  createErrorType("ERR_INVALID_ARG_TYPE", function(name, expected, actual) {
     let determiner;
     if (typeof expected === "string" && startsWith(expected, "not ")) {
       determiner = "must not be";
@@ -17370,22 +17497,22 @@ function requireErrors() {
       determiner = "must be";
     }
     let msg;
-    if (endsWith(name2, " argument")) {
-      msg = `The ${name2} ${determiner} ${oneOf(expected, "type")}`;
+    if (endsWith(name, " argument")) {
+      msg = `The ${name} ${determiner} ${oneOf(expected, "type")}`;
     } else {
-      const type2 = includes(name2, ".") ? "property" : "argument";
-      msg = `The "${name2}" ${type2} ${determiner} ${oneOf(expected, "type")}`;
+      const type2 = includes(name, ".") ? "property" : "argument";
+      msg = `The "${name}" ${type2} ${determiner} ${oneOf(expected, "type")}`;
     }
     msg += `. Received type ${typeof actual}`;
     return msg;
   }, TypeError);
   createErrorType("ERR_STREAM_PUSH_AFTER_EOF", "stream.push() after EOF");
-  createErrorType("ERR_METHOD_NOT_IMPLEMENTED", function(name2) {
-    return "The " + name2 + " method is not implemented";
+  createErrorType("ERR_METHOD_NOT_IMPLEMENTED", function(name) {
+    return "The " + name + " method is not implemented";
   });
   createErrorType("ERR_STREAM_PREMATURE_CLOSE", "Premature close");
-  createErrorType("ERR_STREAM_DESTROYED", function(name2) {
-    return "Cannot call " + name2 + " after a stream was destroyed";
+  createErrorType("ERR_STREAM_DESTROYED", function(name) {
+    return "Cannot call " + name + " after a stream was destroyed";
   });
   createErrorType("ERR_MULTIPLE_CALLBACK", "Callback called multiple times");
   createErrorType("ERR_STREAM_CANNOT_PIPE", "Cannot pipe, not readable");
@@ -17411,8 +17538,8 @@ function requireState() {
     var hwm = highWaterMarkFrom(options, isDuplex, duplexKey);
     if (hwm != null) {
       if (!(isFinite(hwm) && Math.floor(hwm) === hwm) || hwm < 0) {
-        var name2 = isDuplex ? duplexKey : "highWaterMark";
-        throw new ERR_INVALID_OPT_VALUE(name2, hwm);
+        var name = isDuplex ? duplexKey : "highWaterMark";
+        throw new ERR_INVALID_OPT_VALUE(name, hwm);
       }
       return Math.floor(hwm);
     }
@@ -17532,11 +17659,11 @@ function requireBuffer_list() {
     if (typeof input !== "object" || input === null) return input;
     var prim = input[Symbol.toPrimitive];
     if (prim !== void 0) {
-      var res = prim.call(input, hint || "default");
+      var res = prim.call(input, hint);
       if (typeof res !== "object") return res;
       throw new TypeError("@@toPrimitive must return a primitive value.");
     }
-    return (hint === "string" ? String : Number)(input);
+    return String(input);
   }
   var _require = require$$0$7, Buffer2 = _require.Buffer;
   var _require2 = require$$0$3, inspect = _require2.inspect;
@@ -18121,7 +18248,7 @@ function requireAsync_iterator() {
     if (typeof input !== "object" || input === null) return input;
     var prim = input[Symbol.toPrimitive];
     if (prim !== void 0) {
-      var res = prim.call(input, hint || "default");
+      var res = prim.call(input, hint);
       if (typeof res !== "object") return res;
       throw new TypeError("@@toPrimitive must return a primitive value.");
     }
@@ -18353,7 +18480,7 @@ function requireFrom() {
     if (typeof input !== "object" || input === null) return input;
     var prim = input[Symbol.toPrimitive];
     if (prim !== void 0) {
-      var res = prim.call(input, hint || "default");
+      var res = prim.call(input, hint);
       if (typeof res !== "object") return res;
       throw new TypeError("@@toPrimitive must return a primitive value.");
     }
@@ -18410,7 +18537,7 @@ function require_stream_readable() {
   _stream_readable = Readable;
   var Duplex;
   Readable.ReadableState = ReadableState;
-  require$$0$1.EventEmitter;
+  require$$0$4.EventEmitter;
   var EElistenerCount = function EElistenerCount2(emitter, type2) {
     return emitter.listeners(type2).length;
   };
@@ -19872,7 +19999,7 @@ var hasRequiredConsole$1;
 function requireConsole$1() {
   if (hasRequiredConsole$1) return console_1$1;
   hasRequiredConsole$1 = 1;
-  const os = require$$0$2;
+  const os = require$$0$5;
   const { LEVEL, MESSAGE } = requireTripleBeam();
   const TransportStream = requireWinstonTransport();
   console_1$1 = class Console extends TransportStream {
@@ -20741,7 +20868,7 @@ function requireReadable() {
   if (hasRequiredReadable) return readable.exports;
   hasRequiredReadable = 1;
   (function(module, exports) {
-    var Stream = require$$0$4;
+    var Stream = require$$0$2;
     if (process.env.READABLE_STREAM === "disable" && Stream) {
       module.exports = Stream.Readable;
       Object.assign(module.exports, Stream);
@@ -21079,9 +21206,9 @@ function requireColorString() {
   var swizzle = requireSimpleSwizzle();
   var hasOwnProperty = Object.hasOwnProperty;
   var reverseNames = /* @__PURE__ */ Object.create(null);
-  for (var name2 in colorNames) {
-    if (hasOwnProperty.call(colorNames, name2)) {
-      reverseNames[colorNames[name2]] = name2;
+  for (var name in colorNames) {
+    if (hasOwnProperty.call(colorNames, name)) {
+      reverseNames[colorNames[name]] = name;
     }
   }
   var cs = colorString.exports = {
@@ -22731,18 +22858,18 @@ var hasRequiredEnabled;
 function requireEnabled() {
   if (hasRequiredEnabled) return enabled;
   hasRequiredEnabled = 1;
-  enabled = function enabled2(name2, variable) {
+  enabled = function enabled2(name, variable) {
     if (!variable) return false;
     var variables = variable.split(/[\s,]+/), i = 0;
     for (; i < variables.length; i++) {
       variable = variables[i].replace("*", ".*?");
       if ("-" === variable.charAt(0)) {
-        if (new RegExp("^" + variable.substr(1) + "$").test(name2)) {
+        if (new RegExp("^" + variable.substr(1) + "$").test(name)) {
           return false;
         }
         continue;
       }
-      if (new RegExp("^" + variable + "$").test(name2)) {
+      if (new RegExp("^" + variable + "$").test(name)) {
         return true;
       }
     }
@@ -22929,12 +23056,12 @@ function requireFile() {
   const fs2 = fs$1;
   const path$1 = path;
   const asyncSeries = requireSeries();
-  const zlib = require$$15;
+  const zlib = require$$14;
   const { MESSAGE } = requireTripleBeam();
   const { Stream, PassThrough } = requireReadable();
   const TransportStream = requireWinstonTransport();
   const debug = requireNode()("winston:file");
-  const os = require$$0$2;
+  const os = require$$0$5;
   const tailFile2 = requireTailFile();
   file = class File extends TransportStream {
     /**
@@ -22946,9 +23073,9 @@ function requireFile() {
       super(options);
       this.name = options.name || "file";
       function throwIf(target, ...args) {
-        args.slice(1).forEach((name2) => {
-          if (options[name2]) {
-            throw new Error(`Cannot set ${name2} and ${target} together`);
+        args.slice(1).forEach((name) => {
+          if (options[name]) {
+            throw new Error(`Cannot set ${name} and ${target} together`);
           }
         });
       }
@@ -23753,7 +23880,7 @@ function requireStream() {
   hasRequiredStream = 1;
   const isStream = requireIsStream();
   const { MESSAGE } = requireTripleBeam();
-  const os = require$$0$2;
+  const os = require$$0$5;
   const TransportStream = requireWinstonTransport();
   stream = class Stream extends TransportStream {
     /**
@@ -23954,7 +24081,7 @@ function requireFn_name() {
   if (hasRequiredFn_name) return fn_name;
   hasRequiredFn_name = 1;
   var toString = Object.prototype.toString;
-  fn_name = function name2(fn) {
+  fn_name = function name(fn) {
     if ("string" === typeof fn.displayName && fn.constructor.name) {
       return fn.displayName;
     } else if ("string" === typeof fn.name && fn.name) {
@@ -23976,7 +24103,7 @@ var hasRequiredOneTime;
 function requireOneTime() {
   if (hasRequiredOneTime) return oneTime;
   hasRequiredOneTime = 1;
-  var name2 = requireFn_name();
+  var name = requireFn_name();
   oneTime = function one(fn) {
     var called = 0, value;
     function onetime() {
@@ -23986,7 +24113,7 @@ function requireOneTime() {
       fn = null;
       return value;
     }
-    onetime.displayName = name2(fn);
+    onetime.displayName = name(fn);
     return onetime;
   };
   return oneTime;
@@ -24162,7 +24289,7 @@ var hasRequiredExceptionHandler;
 function requireExceptionHandler() {
   if (hasRequiredExceptionHandler) return exceptionHandler;
   hasRequiredExceptionHandler = 1;
-  const os = require$$0$2;
+  const os = require$$0$5;
   const asyncForEach = requireForEach();
   const debug = requireNode()("winston:exception");
   const once2 = requireOneTime();
@@ -24400,7 +24527,7 @@ var hasRequiredRejectionHandler;
 function requireRejectionHandler() {
   if (hasRequiredRejectionHandler) return rejectionHandler;
   hasRequiredRejectionHandler = 1;
-  const os = require$$0$2;
+  const os = require$$0$5;
   const asyncForEach = requireForEach();
   const debug = requireNode()("winston:rejection");
   const once2 = requireOneTime();
@@ -25881,14 +26008,14 @@ ipcMain.handle("open-tortoisesvn-diff", async (event, data) => {
 });
 ipcMain.handle("fetch-custom-scripts", async () => {
   const { configFolderPath } = packageJson;
-  const scripts2 = [];
+  const scripts = [];
   try {
     const files = fs$1.readdirSync(configFolderPath);
     files.forEach((file2) => {
       const ext = path.extname(file2);
       if ([".bat", ".ps1"].includes(ext.toLowerCase())) {
         const fullPath = path.join(configFolderPath, file2);
-        scripts2.push({
+        scripts.push({
           fileName: path.parse(file2).name,
           path: fullPath,
           type: ext.toLowerCase() === ".bat" ? "batch" : "powershell"
@@ -25899,7 +26026,7 @@ ipcMain.handle("fetch-custom-scripts", async () => {
     logger.error(`Error reading the config folder: ${error2.message}`);
     return { success: false, error: error2.message };
   }
-  return { success: true, scripts: scripts2 };
+  return { success: true, scripts };
 });
 ipcMain.handle("open-svn-resolve", async (event, data) => {
   const { fullPath } = data;
@@ -25940,7 +26067,7 @@ ipcMain.handle("open-svn-diff", async (event, data) => {
 });
 ipcMain.handle("select-folder", async (event, data) => {
   const result = await dialog.showOpenDialog(mainWindow, {
-    defaultPath: (data == null ? void 0 : data.defaultPath) || require$$0$2.homedir(),
+    defaultPath: (data == null ? void 0 : data.defaultPath) || require$$0$5.homedir(),
     properties: ["openDirectory"]
   });
   return result.canceled ? null : result.filePaths[0];

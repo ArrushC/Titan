@@ -1,7 +1,16 @@
 {
 	"folders": [
 		{
+			"name": "Titan",
 			"path": "."
+		},
+		{
+			"name": "Config",
+			"path": "C:/Titan"
+		},
+		{
+			"name": "test_branch",
+			"path": "C:/SVN/test_branch"
 		}
 	],
 	"settings": {}

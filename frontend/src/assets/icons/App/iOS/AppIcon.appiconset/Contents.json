@@ -1,0 +1,68 @@
+{
+  "images": [
+    {
+      "size": "180x180",
+      "idiom": "iphone",
+      "filename": "Icon-60@3x.png",
+      "scale": "1x"
+    },
+    {
+      "size": "120x120",
+      "idiom": "iphone",
+      "filename": "Icon-60@2x.png",
+      "scale": "1x"
+    },
+    {
+      "size": "87x87",
+      "idiom": "iphone",
+      "filename": "Icon-Small@3x.png",
+      "scale": "1x"
+    },
+    {
+      "size": "80x80",
+      "idiom": "iphone",
+      "filename": "Icon-Small-40@2x.png",
+      "scale": "1x"
+    },
+    {
+      "size": "60x60",
+      "idiom": "iphone",
+      "filename": "Icon-60.png",
+      "scale": "1x"
+    },
+    {
+      "size": "58x58",
+      "idiom": "iphone",
+      "filename": "Icon-Small@2x.png",
+      "scale": "1x"
+    },
+    {
+      "size": "40x40",
+      "idiom": "iphone",
+      "filename": "Icon-Small-40.png",
+      "scale": "1x"
+    },
+    {
+      "size": "29x29",
+      "idiom": "iphone",
+      "filename": "Icon-Small.png",
+      "scale": "1x"
+    },
+    {
+      "size": "20x20",
+      "idiom": "iphone",
+      "filename": "Icon-Notification.png",
+      "scale": "1x"
+    },
+    {
+      "size": "1024x1024",
+      "idiom": "iphone",
+      "filename": "iTunesArtwork@2x.png",
+      "scale": "1x"
+    }
+  ],
+  "info": {
+    "version": 1,
+    "author": "AppIconly"
+  }
+}

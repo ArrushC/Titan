@@ -1,0 +1,54 @@
+<svg viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg">
+  <!-- Background circle -->
+  <circle cx="256" cy="256" r="240" fill="#1a1a2e" stroke="#16213e" stroke-width="8"/>
+  
+  <!-- Titan's surface with atmospheric haze -->
+  <circle cx="256" cy="256" r="220" fill="url(#titanGradient)"/>
+  
+  <!-- Surface features and terrain -->
+  <ellipse cx="180" cy="200" rx="40" ry="25" fill="#8b6914" opacity="0.6"/>
+  <ellipse cx="320" cy="180" rx="35" ry="20" fill="#7a5c13" opacity="0.5"/>
+  <ellipse cx="240" cy="300" rx="50" ry="30" fill="#6b4f12" opacity="0.4"/>
+  <ellipse cx="350" cy="280" rx="30" ry="18" fill="#8b6914" opacity="0.3"/>
+  
+  <!-- Methane lakes -->
+  <ellipse cx="160" cy="320" rx="25" ry="15" fill="#2c3e50" opacity="0.8"/>
+  <ellipse cx="300" cy="350" rx="20" ry="12" fill="#2c3e50" opacity="0.7"/>
+  <ellipse cx="380" cy="220" rx="18" ry="10" fill="#2c3e50" opacity="0.6"/>
+  
+  <!-- Atmospheric glow -->
+  <circle cx="256" cy="256" r="220" fill="none" stroke="url(#atmosphereGradient)" stroke-width="12" opacity="0.6"/>
+  
+  <!-- Highlight reflection -->
+  <ellipse cx="200" cy="180" rx="60" ry="40" fill="url(#highlightGradient)" opacity="0.3"/>
+  
+  <!-- Subtle grid pattern for tech feel -->
+  <defs>
+    <pattern id="grid" width="20" height="20" patternUnits="userSpaceOnUse">
+      <path d="M 20 0 L 0 0 0 20" fill="none" stroke="#ffffff" stroke-width="0.5" opacity="0.1"/>
+    </pattern>
+  </defs>
+  <circle cx="256" cy="256" r="220" fill="url(#grid)" opacity="0.2"/>
+  
+  <!-- Gradients -->
+  <defs>
+    <radialGradient id="titanGradient" cx="0.3" cy="0.3">
+      <stop offset="0%" stop-color="#d4af37"/>
+      <stop offset="40%" stop-color="#b8860b"/>
+      <stop offset="70%" stop-color="#8b6914"/>
+      <stop offset="100%" stop-color="#654321"/>
+    </radialGradient>
+    
+    <radialGradient id="atmosphereGradient" cx="0.5" cy="0.5">
+      <stop offset="0%" stop-color="#ffa500" stop-opacity="0"/>
+      <stop offset="70%" stop-color="#ff8c00" stop-opacity="0.3"/>
+      <stop offset="100%" stop-color="#ff6347" stop-opacity="0.6"/>
+    </radialGradient>
+    
+    <radialGradient id="highlightGradient" cx="0.3" cy="0.3">
+      <stop offset="0%" stop-color="#ffffff" stop-opacity="0.8"/>
+      <stop offset="50%" stop-color="#ffffff" stop-opacity="0.3"/>
+      <stop offset="100%" stop-color="#ffffff" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+</svg>

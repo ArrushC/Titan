@@ -1,0 +1,220 @@
+@import "tailwindcss";
+
+/* Configure dark mode to use class-based approach */
+@custom-variant dark (&:where(.dark, .dark *));
+
+/* Configure custom breakpoints with increased max-widths */
+@theme {
+	--breakpoint-sm: 42.5rem; /* 680px (default: 640px) */
+	--breakpoint-md: 51.25rem; /* 820px (default: 768px) */
+	--breakpoint-lg: 75rem; /* 1200px (default: 1024px) */
+	--breakpoint-xl: 87.5rem; /* 1400px (default: 1280px) */
+	--breakpoint-2xl: 100rem; /* 1600px (default: 1536px) */
+}
+
+html,
+body {
+	scroll-behavior: smooth !important;
+	overscroll-behavior: none !important;
+}
+
+* {
+	scroll-snap-type: none !important;
+	/* Ensure smooth scrolling on all scrollable elements */
+	scroll-behavior: smooth !important;
+}
+
+/* Enhanced smooth scrolling for scrollable containers */
+.overflow-y-auto,
+.overflow-y-scroll,
+.overflow-auto,
+.overflow-scroll,
+[class*="overflow-y-auto"],
+[class*="overflow-y-scroll"],
+[class*="overflow-auto"],
+[class*="overflow-scroll"] {
+	scroll-behavior: smooth !important;
+	/* Hardware acceleration for smoother performance */
+	will-change: scroll-position;
+}
+
+/* Smooth scrolling with reduced motion preference */
+@media (prefers-reduced-motion: reduce) {
+	html,
+	body,
+	* {
+		scroll-behavior: auto !important;
+	}
+
+	.overflow-y-auto,
+	.overflow-y-scroll,
+	.overflow-auto,
+	.overflow-scroll,
+	[class*="overflow-y-auto"],
+	[class*="overflow-y-scroll"],
+	[class*="overflow-auto"],
+	[class*="overflow-scroll"] {
+		scroll-behavior: auto !important;
+		will-change: auto;
+	}
+}
+
+/* Floating header responsive width system */
+:root {
+	/* Base container padding (from p-4 = 1rem = 16px each side) */
+	--container-padding: 1rem;
+
+	/* Responsive container max-widths matching Tailwind's container class */
+	--container-sm: 42.5rem; /* 680px */
+	--container-md: 51.25rem; /* 820px */
+	--container-lg: 75rem; /* 1200px */
+	--container-xl: 87.5rem; /* 1400px */
+	--container-2xl: 100rem; /* 1600px */
+
+	/* Floating header margin scale factors for different breakpoints */
+	--floating-margin-base: 1.5rem; /* 24px base margin */
+	--floating-margin-sm: 2rem; /* 32px for small screens */
+	--floating-margin-md: 2.5rem; /* 40px for medium screens */
+	--floating-margin-lg: 3rem; /* 48px for large screens */
+	--floating-margin-xl: 3.5rem; /* 56px for xl screens */
+	--floating-margin-2xl: 4rem; /* 64px for 2xl screens */
+
+	/* Current active container width (will be updated via JS) */
+	--active-container-width: 100vw;
+	--active-floating-margin: var(--floating-margin-base);
+}
+
+/* Enhanced floating header animations - Consistent transform sequences */
+@keyframes floatDown {
+	0% {
+		transform: translateX(-50%) translateY(-20px);
+		opacity: 0.7;
+	}
+	50% {
+		transform: translateX(-50%) translateY(-8px);
+		opacity: 0.85;
+	}
+	100% {
+		transform: translateX(-50%) translateY(0);
+		opacity: 1;
+	}
+}
+
+@keyframes floatUp {
+	0% {
+		transform: translateY(0);
+		opacity: 1;
+	}
+	50% {
+		transform: translateY(-8px);
+		opacity: 0.85;
+	}
+	100% {
+		transform: translateY(0);
+		opacity: 1;
+	}
+}
+
+/* Floating header animation classes */
+.floating-header-entering {
+	animation: floatDown 300ms cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
+}
+
+.floating-header-exiting {
+	animation: floatUp 300ms cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
+}
+
+/* Enhanced transitions for floating headers with flicker prevention */
+.floating-header-static,
+.floating-header-floating,
+.floating-header-fallback {
+	transition: transform 300ms cubic-bezier(0.25, 0.46, 0.45, 0.94), opacity 300ms cubic-bezier(0.25, 0.46, 0.45, 0.94), box-shadow 300ms cubic-bezier(0.25, 0.46, 0.45, 0.94), background-color 300ms cubic-bezier(0.25, 0.46, 0.45, 0.94), border-color 300ms cubic-bezier(0.25, 0.46, 0.45, 0.94);
+	will-change: transform, opacity, box-shadow;
+	/* Prevent flickering during rapid state changes */
+	backface-visibility: hidden;
+	transform-style: preserve-3d;
+}
+
+/* Prevent transition interruption and ensure stable animations */
+.floating-header-entering,
+.floating-header-exiting {
+	will-change: transform, opacity, box-shadow;
+	backface-visibility: hidden;
+	transform-style: preserve-3d;
+	/* Lock animations to prevent interruption */
+	animation-fill-mode: forwards;
+	pointer-events: none; /* Prevent interactions during transition */
+}
+
+/* Reset pointer events after animation */
+.floating-header-static,
+.floating-header-floating {
+	pointer-events: auto;
+}
+
+/* Smooth backdrop blur transitions */
+.floating-header-floating .backdrop-blur-lg {
+	transition: backdrop-filter 200ms ease-out;
+}
+
+/* Enhanced shadow transitions for floating state */
+.floating-header-floating {
+	box-shadow: 0 10px 25px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+}
+
+.dark .floating-header-floating {
+	box-shadow: 0 10px 25px -3px rgba(0, 0, 0, 0.25), 0 4px 6px -2px rgba(0, 0, 0, 0.1);
+}
+
+/* Global scrollbar styling - applies to all scrollbars */
+/* WebKit browsers (Chrome, Safari, Edge) */
+::-webkit-scrollbar {
+	width: 12px;
+	height: 12px;
+}
+
+::-webkit-scrollbar-track {
+	background-color: #f3f4f6; /* gray-100 */
+}
+
+.dark ::-webkit-scrollbar-track {
+	background-color: #111827; /* gray-900 */
+}
+
+::-webkit-scrollbar-thumb {
+	background-color: #9ca3af; /* gray-400 */
+	border-radius: 0.375rem; /* rounded-md */
+	border: 3px solid transparent;
+	background-clip: content-box;
+}
+
+.dark ::-webkit-scrollbar-thumb {
+	background-color: #4b5563; /* gray-600 */
+}
+
+::-webkit-scrollbar-thumb:hover {
+	background-color: #6b7280; /* gray-500 */
+}
+
+.dark ::-webkit-scrollbar-thumb:hover {
+	background-color: #6b7280; /* gray-500 */
+}
+
+/* Corner styling for when both scrollbars are visible */
+::-webkit-scrollbar-corner {
+	background-color: #f3f4f6; /* gray-100 */
+}
+
+.dark ::-webkit-scrollbar-corner {
+	background-color: #111827; /* gray-900 */
+}
+
+/* Firefox scrollbar styling */
+* {
+	scrollbar-width: thin;
+	scrollbar-color: #9ca3af #f3f4f6; /* gray-400 gray-100 */
+}
+
+.dark * {
+	scrollbar-color: #4b5563 #111827; /* gray-600 gray-900 */
+}

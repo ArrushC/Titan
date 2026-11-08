@@ -49,7 +49,6 @@
 		expandable = false,
 		expandedRowComponent = null,
 		getExpandedProps = null,
-		defaultExpanded = false,
 		getRowId = null
 	}: Props = $props();
 
@@ -171,7 +170,7 @@
 
 	function handleRowClick(item: any, index: number) {
 		if (onRowClick) {
-			onRowClick(item, visibleStartIndex + index);
+			onRowClick(item, visibleStartIndex() + index);
 		}
 	}
 
@@ -242,7 +241,6 @@
 			{#each visibleData as item, visibleIndex}
 				{@const actualIndex = visibleStartIndex() + visibleIndex}
 				{@const isExpanded = isRowExpanded(item, actualIndex)}
-				{@const itemRowHeight = getRowHeight(item, actualIndex)}
 				<div
 					class="border-t border-gray-200 dark:border-gray-600 transition-colors"
 					style="min-height: {effectiveRowHeight}px;"

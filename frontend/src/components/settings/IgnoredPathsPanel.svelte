@@ -1,6 +1,6 @@
 <script lang="ts">
 	import Button from "../Button.svelte";
-	import Icon from "../Icon.svelte";
+	import Icon, { type IconName } from "../Icon.svelte";
 
 	interface Props {
 		title: string;
@@ -8,7 +8,7 @@
 		paths: string[];
 		isEditMode: boolean;
 		category: "unknown" | "modified";
-		icon: string;
+		icon: IconName;
 		iconColor: string;
 		placeholder: string;
 		editingCategory: "unknown" | "modified" | null;
@@ -41,7 +41,6 @@
 		newValue,
 		onTest,
 		onAdd,
-		onEdit,
 		onDelete,
 		onStartEdit,
 		onCancelEdit,

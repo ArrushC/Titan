@@ -136,7 +136,7 @@
 		(e.target as HTMLElement).setPointerCapture(e.pointerId);
 		svPointer(e);
 		const move = (ev: PointerEvent) => svPointer(ev);
-		const up = (ev: PointerEvent) => {
+		const up = () => {
 			window.removeEventListener("pointermove", move);
 			window.removeEventListener("pointerup", up);
 			syncFromHSV("change");
@@ -159,7 +159,7 @@
 		(e.target as HTMLElement).setPointerCapture(e.pointerId);
 		huePointer(e);
 		const move = (ev: PointerEvent) => huePointer(ev);
-		const up = (ev: PointerEvent) => {
+		const up = () => {
 			window.removeEventListener("pointermove", move);
 			window.removeEventListener("pointerup", up);
 			syncFromHSV("change");
@@ -184,9 +184,9 @@
 		}
 	}
 
-	function onHexInput(v: string) {
-		hexInput = v;
-		const n = normalizeHex(v);
+	function onHexInput(input: string) {
+		hexInput = input;
+		const n = normalizeHex(input);
 		hexValid = !!n;
 		if (!n) return;
 		hex = n;

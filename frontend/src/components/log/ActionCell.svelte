@@ -10,7 +10,7 @@
 		textSize?: string;
 	}
 
-	const { onViewDiff, revision, item, column, variant = "normal", textSize = "text-sm" }: Props = $props();
+	const { onViewDiff, revision, item,  }: Props = $props();
 
 	// Get revision from props or item
 	const displayRevision = $derived(revision || item?.Revision || "");

@@ -40,7 +40,7 @@
 
 	// Real-time clock for updating relative times
 	let currentTime = $state(new Date());
-	let timeUpdateInterval: NodeJS.Timeout | null = null;
+	let timeUpdateInterval: ReturnType<typeof setInterval> | null = null;
 
 	// WebSocket event handler
 	let wsMessageHandler: ((event: MessageEvent) => void) | null = null;
@@ -83,7 +83,7 @@
 		}
 
 		// Update previous state
-		previousExecutionState = currentExecution;
+		previousExecutionState = Boolean(currentExecution);
 	});
 
 	// Component lifecycle

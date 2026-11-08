@@ -9,7 +9,7 @@
 		textSize?: string;
 	}
 
-	const { date, item, column, variant = "normal", textSize = "text-sm" }: Props = $props();
+	const { date, item, column, textSize = "text-sm" }: Props = $props();
 
 	// Get date from props or item/column
 	const dateString = $derived(date || item?.[column?.key] || "");

@@ -1,0 +1,57 @@
+name: Validate Wails application
+
+on:
+  pull_request:
+  push:
+    branches: [main, migration-go]
+  workflow_call:
+
+permissions:
+  contents: read
+
+jobs:
+  windows:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+          cache: npm
+          cache-dependency-path: frontend/package-lock.json
+      - uses: actions/setup-go@v5
+        with:
+          go-version-file: go.mod
+          cache: true
+      - name: Install frontend dependencies
+        run: npm ci --prefix frontend
+      - name: Check Svelte and TypeScript
+        run: npm run check --prefix frontend
+      - name: Frontend regression tests
+        run: npm test --prefix frontend
+      - name: Build frontend assets for Go embedding
+        run: npm run build --prefix frontend
+      - name: Backend tests
+        run: go test ./...
+      - name: Go vet
+        run: go vet ./...
+      - name: Install matching Wails CLI
+        shell: pwsh
+        run: |
+          $version = go list -m -f '{{.Version}}' github.com/wailsapp/wails/v2
+          go install "github.com/wailsapp/wails/v2/cmd/wails@$version"
+      - name: Install NSIS
+        shell: pwsh
+        run: |
+          if (!(Test-Path 'C:\Program Files (x86)\NSIS\makensis.exe')) {
+            choco install nsis --no-progress -y
+            if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          }
+          'C:\Program Files (x86)\NSIS' >> $env:GITHUB_PATH
+      - name: Build Windows application and installer
+        run: wails build -clean -platform windows/amd64 -nsis -ldflags="-w -s -H windowsgui"
+      - uses: actions/upload-artifact@v4
+        with:
+          name: titan-windows-amd64
+          path: build/bin/*.exe
+          if-no-files-found: error

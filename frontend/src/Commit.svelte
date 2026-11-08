@@ -153,7 +153,6 @@
 	let commitCompleteTemplateNickname = $state("");
 
 	// Commit Again dropdown state
-	let isCommitAgainDropdownOpen = $state(false);
 	const commitAgainOptions = [
 		{ id: "clear", label: "Clear Values", icon: "reload" as const },
 		{ id: "keep", label: "Keep Values", icon: "copy" as const }
@@ -200,6 +199,7 @@
 		for (const [key, isSelected] of Object.entries(selectedBranches)) {
 			if (isSelected) {
 				const [folderName, branchId] = key.split("-");
+				if (!folderName || !branchId) continue;
 				const branch = branchConfig.getBranch(branchId);
 				const folder = branchConfig.getFolder(folderName);
 				if (branch && folder) {
@@ -257,6 +257,7 @@
 
 		// Use the first selected branch for preview purposes
 		const firstBranch = selectedBranchDetails[0];
+		if (!firstBranch) return sanitizeCommitMessage(commitMessage);
 		const processedMessage = processSpecialVariablesForBranch(commitMessage, firstBranch.folderName, firstBranch.branchVersion);
 		return sanitizeCommitMessage(processedMessage);
 	});
@@ -412,6 +413,7 @@
 			ws.addEventListener("message", handleMessage);
 			return () => ws.removeEventListener("message", handleMessage);
 		}
+		return undefined;
 	});
 
 	function handleWebSocketMessage(message: any) {
@@ -497,7 +499,7 @@
 		const templates = loadTemplatesFromStorage();
 		const templateIndex = templates.findIndex(t => t.template === template);
 		if (templateIndex >= 0) {
-			templates[templateIndex].usedCount += 1;
+			templates[templateIndex]!.usedCount += 1;
 			saveTemplatesToStorage(templates);
 		}
 	}
@@ -579,7 +581,7 @@
 			case "Enter":
 				event.preventDefault();
 				if (selectedTemplateIndex >= 0 && selectedTemplateIndex < filteredTemplates.length) {
-					selectTemplate(filteredTemplates[selectedTemplateIndex].template);
+					selectTemplate(filteredTemplates[selectedTemplateIndex]!.template);
 				}
 				break;
 			case "Escape":
@@ -641,7 +643,7 @@
 		const templates = loadCommitCompleteTemplatesFromStorage();
 		const templateIndex = templates.findIndex(t => t.template === template);
 		if (templateIndex >= 0) {
-			templates[templateIndex].usedCount += 1;
+			templates[templateIndex]!.usedCount += 1;
 			saveCommitCompleteTemplatesToStorage(templates);
 		}
 	}
@@ -723,7 +725,7 @@
 			case "Enter":
 				event.preventDefault();
 				if (selectedCommitCompleteTemplateIndex >= 0 && selectedCommitCompleteTemplateIndex < filteredTemplates.length) {
-					selectCommitCompleteTemplate(filteredTemplates[selectedCommitCompleteTemplateIndex].template);
+					selectCommitCompleteTemplate(filteredTemplates[selectedCommitCompleteTemplateIndex]!.template);
 				}
 				break;
 			case "Escape":
@@ -780,6 +782,7 @@
 
 
 	async function startCommitProcess() {
+		let files: FileEntry[] = [];
 		if (commitProcessStarted && currentPhase !== "loading") {
 			return;
 		}
@@ -790,10 +793,10 @@
 
 		try {
 			const totalBranches = selectedBranchDetails.length;
-			let files: FileEntry[] = [];
 
 			for (let i = 0; i < selectedBranchDetails.length; i++) {
 				const branch = selectedBranchDetails[i];
+				if (!branch) continue;
 				loadingMessage = `Checking ${branch.branchVersion} (${i + 1}/${totalBranches})...`;
 				loadingProgress = (i / totalBranches) * 100;
 
@@ -804,7 +807,7 @@
 					try {
 						statusData = JSON.parse(statusJson);
 					} catch (parseError) {
-						throw new Error(`Failed to parse SVN status JSON: ${parseError.message}`);
+						throw new Error(`Failed to parse SVN status JSON: ${(parseError instanceof Error ? parseError.message : String(parseError))}`);
 					}
 
 					// Process status data and extract files
@@ -884,7 +887,7 @@
 						files = Array.from(uniqueFiles.values());
 					}
 				} catch (error) {
-					showError(`Failed to get status for ${branch.branchVersion}: ${error.message || error}`);
+					showError(`Failed to get status for ${branch.branchVersion}: ${(error instanceof Error ? error.message : String(error))}`);
 
 					// Continue with other branches even if one fails
 					continue;
@@ -900,7 +903,7 @@
 				currentPhase = "selection";
 			}, 500);
 		} catch (error) {
-			showError(`Failed to start commit process: ${error.message || error}`);
+			showError(`Failed to start commit process: ${(error instanceof Error ? error.message : String(error))}`);
 
 			// Provide recovery options
 			currentPhase = "selection";
@@ -917,6 +920,7 @@
 
 	// Refresh SVN status without clearing commit variables or messages
 	async function refreshSVNStatus() {
+		let files: FileEntry[] = [];
 		if (refreshing || commitInProgress) {
 			return;
 		}
@@ -926,10 +930,10 @@
 
 		try {
 			const totalBranches = selectedBranchDetails.length;
-			let files: FileEntry[] = [];
 
 			for (let i = 0; i < selectedBranchDetails.length; i++) {
 				const branch = selectedBranchDetails[i];
+				if (!branch) continue;
 				refreshMessage = `Checking ${branch.branchVersion} (${i + 1}/${totalBranches})...`;
 
 				try {
@@ -939,7 +943,7 @@
 					try {
 						statusData = JSON.parse(statusJson);
 					} catch (parseError) {
-						throw new Error(`Failed to parse SVN status JSON: ${parseError.message}`);
+						throw new Error(`Failed to parse SVN status JSON: ${(parseError instanceof Error ? parseError.message : String(parseError))}`);
 					}
 
 					// Process status data and extract files (reusing logic from startCommitProcess)
@@ -1009,7 +1013,7 @@
 						files = Array.from(uniqueFiles.values());
 					}
 				} catch (error) {
-					showError(`Failed to refresh status for ${branch.branchVersion}: ${error.message || error}`);
+					showError(`Failed to refresh status for ${branch.branchVersion}: ${(error instanceof Error ? error.message : String(error))}`);
 					continue;
 				}
 			}
@@ -1030,7 +1034,7 @@
 			refreshMessage = `Refresh complete - found ${files.length} files`;
 			showSuccess(`Successfully refreshed SVN status - found ${files.length} files`);
 		} catch (error) {
-			showError(`Failed to refresh SVN status: ${error.message || error}`);
+			showError(`Failed to refresh SVN status: ${(error instanceof Error ? error.message : String(error))}`);
 			refreshMessage = "Refresh failed";
 		} finally {
 			refreshing = false;
@@ -1427,7 +1431,7 @@
 						updatedFiles.push({
 							...file,
 							status: freshFile.status,
-							propsStatus: freshFile.propsStatus,
+							propsStatus: freshFile.propsStatus ?? "normal",
 							isConflicted: freshFile.isConflicted,
 							lastModified: "Just reverted",
 						});
@@ -1573,7 +1577,7 @@
 							if (existingStagedIndex !== -1) {
 								// Update existing staged file status
 								const updatedFile = {
-									...stagedFiles[existingStagedIndex],
+									...stagedFiles[existingStagedIndex]!,
 									status: fileStatus,
 									propsStatus: wcStatus?.Props || wcStatus?.props || "normal",
 									isConflicted: fileStatus === "conflicted",
@@ -1583,7 +1587,7 @@
 							} else if (existingSelectionIndex !== -1 && (fileStatus === "added" || fileStatus === "deleted" || fileStatus === "modified")) {
 								// File was in allFiles but not staged - move it to staged
 								const fileToMove = {
-									...allFiles[existingSelectionIndex],
+									...allFiles[existingSelectionIndex]!,
 									status: fileStatus,
 									propsStatus: wcStatus?.Props || wcStatus?.props || "normal",
 									isConflicted: fileStatus === "conflicted",
@@ -1743,7 +1747,7 @@
 			console.error("Failed to process special files:", error);
 
 			// Check for specific line ending errors and provide helpful messages
-			const errorMessage = error.message || error.toString();
+			const errorMessage = (error instanceof Error ? error.message : String(error));
 			if (errorMessage.includes("inconsistent newlines") || errorMessage.includes("Inconsistent line ending")) {
 				showError(`Line ending error: Some files have mixed line endings that couldn't be automatically fixed. Please check the file manually and ensure consistent line endings (Windows: CRLF, Unix/Mac: LF).`);
 			} else if (errorMessage.includes("line ending error")) {
@@ -1797,7 +1801,7 @@
 				const revertedFiles = await updateFileStatusAfterSVNOperation([file], "revert");
 
 				if (revertedFiles.length > 0) {
-					const revertedFile = revertedFiles[0];
+					const revertedFile = revertedFiles[0]!;
 
 					// Update the file in allFiles array
 					allFiles = allFiles.map((f) => (f.path === file.path ? revertedFile : f));
@@ -1805,7 +1809,7 @@
 					// For better accuracy, get fresh SVN status
 					const freshStatus = await getActualSVNStatus([file.path]);
 					if (freshStatus.length > 0) {
-						const freshFile = freshStatus[0];
+						const freshFile = freshStatus[0]!;
 						allFiles = allFiles.map((f) => (f.path === file.path ? freshFile : f));
 					}
 
@@ -1813,7 +1817,7 @@
 				}
 			} catch (error) {
 				console.error("Failed to revert file:", error);
-				showError(`Failed to revert ${file.relativePath}: ${error.message || error}`);
+				showError(`Failed to revert ${file.relativePath}: ${(error instanceof Error ? error.message : String(error))}`);
 
 				// If revert failed, add the file back to staged files
 				stagedFiles = [...stagedFiles, file];
@@ -1902,7 +1906,7 @@
 				showSuccess(`Reverted ${filesToRevert.length} files back to selection`);
 			} catch (error) {
 				console.error("Failed to revert files:", error);
-				showError(`Failed to revert some files: ${error.message || error}`);
+				showError(`Failed to revert some files: ${(error instanceof Error ? error.message : String(error))}`);
 
 				// If revert failed, add the files back to staged
 				filesToRevert.forEach((file) => {
@@ -2077,11 +2081,11 @@
 		});
 
 		// Replace custom variable placeholders in the format $t{variableName}
-		processedMessage = processedMessage.replace(/\$t\{([^}]+)\}/g, (match, variableName) => {
+		processedMessage = processedMessage.replace(/\$t\{([^}]+)\}/g, (_match, variableName) => {
 			// Check if the variable exists in branchVariables
 			// Return its value even if it's empty string (for optional variables)
 			// Only return empty string for non-existent variables (typos, removed variables)
-			return variableName in branchVariables ? branchVariables[variableName] : "";
+			return branchVariables[variableName] ?? "";
 		});
 
 		// Then, replace built-in special variables with branch-specific values (double braces syntax: $t{{specialVariable}})
@@ -2246,7 +2250,7 @@
 		if (!svnValidation.isValid) {
 			return {
 				isValid: false,
-				error: svnValidation.errors[0], // Show the first error
+				error: svnValidation.errors[0] ?? "Invalid SVN commit message", // Show the first error
 			};
 		}
 
@@ -2342,7 +2346,7 @@
 
 			// Add processedMessage to each result
 			// No sorting needed - backend processes groups sequentially in the order received
-			commitResults = (result.results || []).map((r) => ({
+			commitResults = (result.results || []).map((r: { branchPath: string; [key: string]: unknown }) => ({
 				...r,
 				processedMessage: sanitizeCommitMessage(processedMessages.get(r.branchPath) || ""),
 			}));
@@ -2452,9 +2456,9 @@
 			diffNewContent = "";
 
 			// Get the file contents for both old (BASE) and new (WORKING) versions
-			const contentResult = await SVNGetFileContent(file.path);
-			diffOldContent = contentResult.oldContent || "";
-			diffNewContent = contentResult.newContent || "";
+			const contentResult = await SVNGetFileContent(file.path, "", file.branchPath);
+			diffOldContent = contentResult["oldContent"] || "";
+			diffNewContent = contentResult["newContent"] || "";
 
 			// Handle case where both contents are empty
 			if (!diffOldContent && !diffNewContent) {
@@ -2548,7 +2552,7 @@
 			const revertedFiles = await updateFileStatusAfterSVNOperation([file], "revert");
 
 			if (revertedFiles.length > 0) {
-				const revertedFile = revertedFiles[0];
+				const revertedFile = revertedFiles[0]!;
 
 				// Update the file in allFiles array
 				allFiles = allFiles.map((f) => (f.path === file.path ? revertedFile : f));
@@ -2556,7 +2560,7 @@
 				// For better accuracy, get fresh SVN status
 				const freshStatus = await getActualSVNStatus([file.path]);
 				if (freshStatus.length > 0) {
-					const freshFile = freshStatus[0];
+					const freshFile = freshStatus[0]!;
 					allFiles = allFiles.map((f) => (f.path === file.path ? freshFile : f));
 				}
 
@@ -2669,7 +2673,7 @@
 			}
 
 			// Fetch commit log using the enhanced backend that handles multiple paths
-			const logJson = await SVNLog(-1, false, branchPaths);
+			const logJson = await SVNLog(-1, false, branchPaths, false);
 			const logData = JSON.parse(logJson);
 
 			if (logData && logData.LogEntry) {
@@ -2701,7 +2705,7 @@
 			let errorMessage = `Failed to load commit history: ${error}`;
 
 			if (error instanceof Error) {
-				const errorStr = error.message || error.toString();
+				const errorStr = (error instanceof Error ? error.message : String(error));
 
 				if (errorStr.includes("E200007")) {
 					// This error should now be fixed by the backend, but provide fallback message
@@ -2961,7 +2965,6 @@
 					// Set the branch status to "Latest" (0 revisions behind)
 					branchStatusStore.updateStatus(branchId, {
 						revisionsBehind: 0,
-						error: undefined,
 						lastChecked: Date.now(),
 					});
 					updatedBranchIds.push(branchId);
@@ -3051,7 +3054,7 @@
 			case "Enter":
 				event.preventDefault();
 				if (selectedHistoryIndex >= 0 && selectedHistoryIndex < filteredCommitHistory.length) {
-					selectCommitMessage(filteredCommitHistory[selectedHistoryIndex].message);
+					selectCommitMessage(filteredCommitHistory[selectedHistoryIndex]!.message);
 				}
 				break;
 
@@ -3200,11 +3203,13 @@
 	function toggleCurrentSelection() {
 		if (activeTable === "files" && selectedFileIndex >= 0 && selectedFileIndex < filteredFiles.length) {
 			const file = filteredFiles[selectedFileIndex];
+			if (!file) return;
 			if (isFileSelectable(file)) {
 				moveFileToStaged(file);
 			}
 		} else if (activeTable === "staged" && selectedStagedFileIndex >= 0 && selectedStagedFileIndex < filteredStagedFiles.length) {
 			const file = filteredStagedFiles[selectedStagedFileIndex];
+			if (!file) return;
 			if (isFileSelectable(file)) {
 				moveFileToSelection(file);
 			}
@@ -4765,7 +4770,6 @@
 						variant="secondary"
 						options={commitAgainOptions}
 						onaction={handleCommitAgainAction}
-						ondropdownchange={(open) => isCommitAgainDropdownOpen = open}
 						disabled={isAutoUpdatingBranches || !autoUpdateCompleted}
 						tooltip={isAutoUpdatingBranches || !autoUpdateCompleted ? "Please wait for auto-update to complete" : "Choose how to start a new commit"}
 						class="px-6 py-2"
@@ -4909,7 +4913,7 @@
 				<Button variant="secondary" class="px-4 py-2 text-sm" onclick={closeUnstageWarningDialog}>Cancel</Button>
 				<Button variant="danger" class="px-4 py-2 text-sm text-orange-600 bg-white border-orange-600 hover:bg-orange-600 hover:text-white" onclick={confirmUnstaging}>Force Unstage Directory</Button>
 				{#if unstageConflictInfo.affectedChildren.length > 0}
-					<Button variant="primary" class="px-4 py-2 text-sm" onclick={() => performUnstageWithChildren(fileBeingUnstaged)}>Unstage Directory + Children</Button>
+					<Button variant="primary" class="px-4 py-2 text-sm" onclick={() => fileBeingUnstaged && performUnstageWithChildren(fileBeingUnstaged)}>Unstage Directory + Children</Button>
 				{/if}
 			</div>
 		</div>

@@ -10,7 +10,7 @@
 		textSize?: string;
 	}
 
-	const { message = "", maxLines = 1, item, column, variant = "normal", textSize = "text-sm" }: Props = $props();
+	const { message = "", maxLines = 1, item, column, textSize = "text-sm" }: Props = $props();
 
 	// Get message from props or item/column
 	const displayMessage = $derived(message || item?.[column?.key] || "");

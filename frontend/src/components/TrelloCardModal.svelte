@@ -20,50 +20,6 @@
 	let loadError = $state<string>("");
 	let closeButtonRef = $state<any>();
 
-	// Avatar caching - 3 month lifespan
-	const AVATAR_CACHE_KEY = 'trello:avatars';
-	const AVATAR_CACHE_TTL = 3 * 30 * 24 * 60 * 60 * 1000; // 3 months in milliseconds
-
-	interface AvatarCacheEntry {
-		url: string;
-		timestamp: number;
-		avatar: string; // base64 or blob URL
-	}
-
-	function getCachedAvatar(url: string): string | null {
-		try {
-			const cache = JSON.parse(localStorage.getItem(AVATAR_CACHE_KEY) || '{}');
-			const entry: AvatarCacheEntry = cache[url];
-			if (entry && (Date.now() - entry.timestamp < AVATAR_CACHE_TTL)) {
-				return entry.avatar;
-			}
-		} catch (e) {
-			console.warn('Failed to read avatar cache:', e);
-		}
-		return null;
-	}
-
-	function setCachedAvatar(url: string, avatar: string) {
-		try {
-			const cache = JSON.parse(localStorage.getItem(AVATAR_CACHE_KEY) || '{}');
-			cache[url] = {
-				url,
-				timestamp: Date.now(),
-				avatar
-			};
-			// Clean old entries to prevent unbounded growth
-			const keys = Object.keys(cache);
-			if (keys.length > 100) { // Keep max 100 avatars
-				const sortedEntries = keys.map(k => cache[k]).sort((a, b) => a.timestamp - b.timestamp);
-				const toRemove = sortedEntries.slice(0, keys.length - 50); // Remove oldest 50
-				toRemove.forEach(entry => delete cache[entry.url]);
-			}
-			localStorage.setItem(AVATAR_CACHE_KEY, JSON.stringify(cache));
-		} catch (e) {
-			console.warn('Failed to cache avatar:', e);
-		}
-	}
-
 	// Get member avatar URL
 	function getMemberAvatar(member: any): string {
 		if (!member) return '';
@@ -401,10 +357,11 @@
 														loading="lazy"
 														onerror={(e) => {
 															// Fallback to initials on error
-															const img = e.target;
+															const img = e.currentTarget;
+								if (!(img instanceof HTMLImageElement)) return;
 															img.style.display = 'none';
 															if (img.nextElementSibling) {
-																img.nextElementSibling.style.display = 'flex';
+																if (img.nextElementSibling instanceof HTMLElement) img.nextElementSibling.style.display = 'flex';
 															}
 														}}
 													/>
@@ -542,9 +499,10 @@
 														loading="lazy"
 														onerror={(e) => {
 															// Fallback to initials on error
-															const img = e.target;
+															const img = e.currentTarget;
+								if (!(img instanceof HTMLImageElement)) return;
 															img.style.display = 'none';
-															img.nextElementSibling.style.display = 'flex';
+															if (img.nextElementSibling instanceof HTMLElement) img.nextElementSibling.style.display = 'flex';
 														}}
 													/>
 													<div
@@ -624,9 +582,10 @@
 															loading="lazy"
 															onerror={(e) => {
 																// Fallback to initials on error
-																const img = e.target;
+																const img = e.currentTarget;
+								if (!(img instanceof HTMLImageElement)) return;
 																img.style.display = 'none';
-																img.nextElementSibling.style.display = 'flex';
+																if (img.nextElementSibling instanceof HTMLElement) img.nextElementSibling.style.display = 'flex';
 															}}
 														/>
 														<div

@@ -5,7 +5,7 @@
 		name: string;
 		description: string;
 		defaultValue: string;
-		required: boolean;
+		required?: boolean;
 	}
 
 	interface Props {
@@ -64,14 +64,16 @@
 			<div class="flex gap-2">
 				<input
 					type="text"
-					bind:value={editingVariableName}
+					value={editingVariableName}
+					oninput={(e) => onUpdateEditingName(e.currentTarget.value)}
 					placeholder="Variable name"
 					class="flex-1 px-3 py-1 border border-gray-300 dark:border-gray-600 rounded text-sm bg-white dark:bg-gray-600 text-gray-900 dark:text-gray-100"
 					disabled={!isEditMode}
 				/>
 				<input
 					type="text"
-					bind:value={editingVariableDefaultValue}
+					value={editingVariableDefaultValue}
+					oninput={(e) => onUpdateEditingDefaultValue(e.currentTarget.value)}
 					placeholder="Default value"
 					class="flex-1 px-3 py-1 border border-gray-300 dark:border-gray-600 rounded text-sm bg-white dark:bg-gray-600 text-gray-900 dark:text-gray-100"
 					disabled={!isEditMode}
@@ -79,7 +81,8 @@
 			</div>
 			<input
 				type="text"
-				bind:value={editingVariableDescription}
+				value={editingVariableDescription}
+					oninput={(e) => onUpdateEditingDescription(e.currentTarget.value)}
 				placeholder="Description"
 				class="w-full px-3 py-1 border border-gray-300 dark:border-gray-600 rounded text-sm bg-white dark:bg-gray-600 text-gray-900 dark:text-gray-100"
 				disabled={!isEditMode}
@@ -87,7 +90,8 @@
 			<div class="flex items-center gap-2 mb-2">
 				<input
 					type="checkbox"
-					bind:checked={editingVariableRequired}
+					checked={editingVariableRequired}
+					onchange={(e) => onUpdateEditingRequired(e.currentTarget.checked)}
 					id="edit-variable-required-{safeId(variable.name)}"
 					class="rounded"
 					disabled={!isEditMode}

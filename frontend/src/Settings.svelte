@@ -1,5 +1,4 @@
 <script lang="ts">
-	import { onMount } from "svelte";
 	import { getAppConfig, setAppConfig, getBranchConfig, setBranchConfig } from "./stores/app.svelte.ts";
 	import Icon from "./components/Icon.svelte";
 	import Button from "./components/Button.svelte";
@@ -37,7 +36,6 @@
 	let editingPathCategory = $state<"unknown" | "modified" | null>(null);
 	let editingPathIndex = $state<number | null>(null);
 	let editingPathValue = $state<string>("");
-	let newPathCategory = $state<"unknown" | "modified">("unknown");
 	let newUnknownPath = $state("");
 	let newModifiedPath = $state("");
 
@@ -69,7 +67,7 @@
 
 		if (!template || !config) return "";
 
-		return template.replace(/\$t\{([^}]+)\}/g, (match, varName) => {
+		return template.replace(/\$t\{([^}]+)\}/g, (_match, varName) => {
 			const variable = config.getCommitVariables().find((v) => v.name === varName);
 			return variable?.defaultValue || `[${varName}]`;
 		});
@@ -176,7 +174,6 @@
 		editingPathCategory = null;
 		editingPathIndex = null;
 		editingPathValue = "";
-		newPathCategory = "unknown";
 		newUnknownPath = "";
 		newModifiedPath = "";
 
@@ -394,7 +391,8 @@
 
 			// Check for duplicate names (excluding current variable) - case insensitive
 			const existingVariables = tempAppConfig.getCommitVariables();
-			const isDuplicate = existingVariables.some((v) => v.name.toLowerCase() === trimmedName.toLowerCase() && v.name.toLowerCase() !== editingVariableId.toLowerCase());
+			const originalVariableId = editingVariableId;
+			const isDuplicate = existingVariables.some((v) => v.name.toLowerCase() === trimmedName.toLowerCase() && v.name.toLowerCase() !== originalVariableId.toLowerCase());
 			if (isDuplicate) {
 				showError(`Variable name "${trimmedName}" already exists`);
 				return;
@@ -424,25 +422,11 @@
 		}
 	}
 
-	async function deleteVariable(variableName: string) {
-		if (!tempAppConfig) return;
-
-		try {
-			const cloned = tempAppConfig.clone();
-			await cloned.removeCommitVariable(variableName);
-			tempAppConfig = cloned; // trigger reactivity
-			showSuccess("Variable deleted successfully");
-		} catch (error) {
-			console.error("Failed to delete variable:", error);
-			showError("Failed to delete variable");
-		}
-	}
-
 	async function addNewVariable() {
 		if (!tempAppConfig) return;
+		const trimmedName = newVariableName.trim();
 
 		try {
-			const trimmedName = newVariableName.trim();
 			const trimmedDescription = newVariableDescription.trim();
 			const trimmedDefaultValue = newVariableDefaultValue.trim();
 
@@ -504,7 +488,7 @@
 
 		// If any errors occurred, fail-fast and report all failures
 		if (errors.length > 0) {
-			const errorMessage = errors.length === 1 ? `Failed to delete variable "${errors[0].variable}": ${errors[0].error}` : `Failed to delete ${errors.length} variables:\n${errors.map((e) => `• ${e.variable}: ${e.error}`).join("\n")}`;
+			const errorMessage = errors.length === 1 ? `Failed to delete variable "${errors[0]!.variable}": ${errors[0]!.error}` : `Failed to delete ${errors.length} variables:\n${errors.map((e) => `• ${e.variable}: ${e.error}`).join("\n")}`;
 			throw new Error(errorMessage);
 		}
 
@@ -543,7 +527,6 @@
 	}
 
 	// Wrapper functions to match UI function calls
-	const deleteCommitVariable = deleteVariable;
 	const addNewCommitVariable = addNewVariable;
 	const updateCommitTemplate = updateCommitMessageTemplate;
 </script>
@@ -772,7 +755,7 @@
 									value={trello?.key ?? ""}
 									placeholder="Enter Trello API key"
 									disabled={!isEditMode}
-									class={!isEditMode ? "bg-gray-100 dark:bg-gray-800" : ""}
+									inputClass={!isEditMode ? "bg-gray-100 dark:bg-gray-800" : ""}
 									oninput={async (e) => {
 										if (tempAppConfig) {
 											await tempAppConfig.updateTrelloKey(e.currentTarget.value);
@@ -786,7 +769,7 @@
 									value={trello?.token ?? ""}
 									placeholder="Enter Trello token"
 									disabled={!isEditMode}
-									class={!isEditMode ? "bg-gray-100 dark:bg-gray-800" : ""}
+									inputClass={!isEditMode ? "bg-gray-100 dark:bg-gray-800" : ""}
 									oninput={async (e) => {
 										if (tempAppConfig) {
 											await tempAppConfig.updateTrelloToken(e.currentTarget.value);

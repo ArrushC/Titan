@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { confirmationDialog } from '../stores/confirmationDialog.svelte.ts';
-	import Icon from './Icon.svelte';
+	import Icon, { icons, type IconName } from './Icon.svelte';
 	import Button from './Button.svelte';
 	import { cubicOut } from 'svelte/easing';
 
@@ -8,7 +8,7 @@
 	let dialog = $derived(confirmationDialog.current);
 
 	// Animation functions
-	function dialogEnter(node: Element, { duration = 200 }) {
+	function dialogEnter(_node: Element, { duration = 200 } = {}) {
 		return {
 			duration,
 			css: (t: number) => {
@@ -25,7 +25,7 @@
 		};
 	}
 
-	function dialogExit(node: Element, { duration = 150 }) {
+	function dialogExit(_node: Element, { duration = 150 } = {}) {
 		return {
 			duration,
 			css: (t: number) => {
@@ -41,7 +41,7 @@
 		};
 	}
 
-	function backdropEnter(node: Element, { duration = 200 }) {
+	function backdropEnter(_node: Element, { duration = 200 } = {}) {
 		return {
 			duration,
 			css: (t: number) => {
@@ -51,7 +51,7 @@
 		};
 	}
 
-	function backdropExit(node: Element, { duration = 150 }) {
+	function backdropExit(_node: Element, { duration = 150 } = {}) {
 		return {
 			duration,
 			css: (t: number) => {
@@ -124,6 +124,7 @@
 				document.removeEventListener('keydown', handleKeydown);
 			};
 		}
+		return undefined;
 	});
 </script>
 
@@ -156,7 +157,7 @@
 				<div class="flex items-start gap-4">
 					{#if dialog.icon}
 						<div class="flex-shrink-0">
-							<Icon name={dialog.icon} size={24} class={typeStyles.iconColor} />
+							<Icon name={dialog.icon in icons ? dialog.icon as IconName : "info"} size={24} class={typeStyles.iconColor} />
 						</div>
 					{/if}
 

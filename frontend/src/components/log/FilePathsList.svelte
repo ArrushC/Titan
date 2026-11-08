@@ -17,14 +17,7 @@
 		index?: number;
 	}
 
-	const { 
-		paths = [], 
-		onViewDiff, 
-		branchPath = "", 
-		variant = "compact",
-		item,
-		index
-	}: Props = $props();
+	const { paths = [], onViewDiff }: Props = $props();
 
 	// Action type styling
 	function getActionStyle(action: string): string {

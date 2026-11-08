@@ -9,7 +9,7 @@
 	import { BranchConfig, type Branch } from "./utils/BranchConfig.ts";
 	import { showError, showSuccess } from "./stores/toast.svelte.ts";
 	import { showDanger } from "./stores/confirmationDialog.svelte.ts";
-	import { SelectDirectory, GetBranchConfig, ReloadBranchConfig, GetBranchSVNStatuses, SVNUpdateBranches, SaveBranchConfig } from "../wailsjs/go/main/App.js";
+	import { SelectDirectory, GetBranchConfig, ReloadBranchConfig, GetBranchSVNStatuses, GetBranchSVNStatusesWithFreshCheck, SVNUpdateBranches, SaveBranchConfig } from "../wailsjs/go/main/App.js";
 	import { tooltip } from "./utils/tooltip";
 	import { generateRandomColor } from "./utils/colorUtils";
 	import { branchStatusStore } from "./stores/branchStatus.svelte.ts";
@@ -57,7 +57,6 @@
 	let isJsonEditorVisible = $state(false);
 	let jsonEditorContent = $state("");
 	let isLoadingJsonConfig = $state(false);
-	let hasJsonEditorChanges = $state(false);
 
 	// Optimized derived state with memoization
 	let activeConfig = $derived(isEditMode && tempBranchConfig ? tempBranchConfig : branchConfig);
@@ -204,7 +203,7 @@
 			branchStatusStore.setLoading(true);
 
 			// Call the backend function to get real SVN statuses
-			const backendResults = await GetBranchSVNStatuses(allBranchIds);
+			const backendResults = await (bypassCache ? GetBranchSVNStatusesWithFreshCheck(allBranchIds) : GetBranchSVNStatuses(allBranchIds));
 
 			// Transform backend results to store format and handle error toasts
 			const statuses: Record<string, any> = {};
@@ -1327,7 +1326,6 @@
 			// Reset state and show loading
 			isLoadingJsonConfig = true;
 			jsonEditorContent = "";
-			hasJsonEditorChanges = false;
 			isJsonEditorVisible = true;
 
 			// Get the current configuration from backend
@@ -1346,7 +1344,6 @@
 		isJsonEditorVisible = false;
 		jsonEditorContent = "";
 		// Reset the changes flag when closing without saving
-		hasJsonEditorChanges = false;
 	}
 
 	async function saveJsonConfig(content: string) {
@@ -1373,7 +1370,6 @@
 			await SaveBranchConfig(sanitizedContent);
 
 			// Mark that changes were saved
-			hasJsonEditorChanges = true;
 
 			// Exit edit mode first
 			if (isEditMode) {

@@ -93,6 +93,7 @@
 		for (const [key, isSelected] of Object.entries(selectedBranches)) {
 			if (isSelected) {
 				const [folderName, branchId] = key.split('-');
+				if (!folderName || !branchId) continue;
 				const branch = branchConfig.getBranch(branchId);
 				if (branch) {
 					branchInfo.push({
@@ -265,6 +266,7 @@
 		// Create promises for parallel loading of individual branches
 		const logPromises = branchesInfo.map(async (info, index) => {
 			const group = branchLogGroups[index];
+			if (!group) return { success: false, cancelled: true };
 
 			try {
 				// Always use cached version for incremental loading
@@ -273,7 +275,7 @@
 				// Check if this is still the latest request
 				if (id !== reqId) return { success: false, cancelled: true };
 
-				const branchLogData = cachedResult.data;
+				const branchLogData = cachedResult["data"];
 
 				const branchLogResult = JSON.parse(branchLogData);
 				const logEntries = branchLogResult.LogEntry || [];
@@ -281,7 +283,7 @@
 				// Update group with results
 				group.entries = logEntries;
 				group.loading = false;
-				group.error = undefined;
+				delete group.error;
 
 				// Calculate date range and revision info
 				if (logEntries.length > 0) {
@@ -401,9 +403,9 @@
 			// Pass branchPath as working directory context for repository paths
 			const result = await SVNGetFileContent(filePath, entry.Revision, branchPath);
 
-			if (result && result.success) {
-				diffOldContent = result.oldContent || "";
-				diffNewContent = result.newContent || "";
+			if (result && result["success"]) {
+				diffOldContent = result["oldContent"] || "";
+				diffNewContent = result["newContent"] || "";
 			} else {
 				throw new Error("Failed to retrieve file content");
 			}

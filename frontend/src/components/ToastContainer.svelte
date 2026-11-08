@@ -7,7 +7,7 @@
 	const toasts = $derived(toastStore.all);
 	
 	// Custom queue entry animation
-	function queueEnter(node: Element, { duration = 300 }) {
+	function queueEnter(_node: Element, { duration = 300 }) {
 		return {
 			duration,
 			css: (t: number) => {
@@ -25,11 +25,10 @@
 	}
 	
 	// Custom queue exit animation
-	function queueExit(node: Element, { duration = 250 }) {
+	function queueExit(_node: Element, { duration = 250 }) {
 		return {
 			duration,
 			css: (t: number) => {
-				const eased = cubicOut(1 - t);
 				const translateY = (1 - t) * -10;
 				const opacity = t;
 				const scale = 0.98 + (t * 0.02);
